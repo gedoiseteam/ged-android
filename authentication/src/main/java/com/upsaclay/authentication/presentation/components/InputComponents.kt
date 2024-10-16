@@ -43,7 +43,7 @@ internal fun OutlinedEmailInput(
     readOnly: Boolean = false
 ) {
     OutlinedTextField(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier,
         value = text,
         label = { Text(text = label) },
         onValueChange = onValueChange,
@@ -81,7 +81,7 @@ fun OutlinedPasswordInput(
         )
     }
     OutlinedTextField(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier,
         value = text,
         label = { Text(text = label) },
         onValueChange = onValueChange,
@@ -114,7 +114,7 @@ fun OutlinedPasswordInput(
 
 @Preview(showBackground = true)
 @Composable
-fun OutlinedInputsPreview() {
+private fun OutlinedInputsPreview() {
     var mail by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 

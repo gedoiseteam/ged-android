@@ -1,13 +1,11 @@
 package com.upsaclay.authentication.domain.usecase
 
-import com.upsaclay.authentication.domain.repository.AuthenticationRepository
+import com.upsaclay.authentication.domain.repository.FirebaseAuthenticationRepository
 
 class LoginUseCase(
-    private val authenticationRepository: AuthenticationRepository,
-    private val generateHashUseCase: GenerateHashUseCase
+    private val firebaseAuthenticationRepository: FirebaseAuthenticationRepository
 ) {
     suspend operator fun invoke(email: String, password: String): Result<Unit> {
-        val hash = generateHashUseCase()
-        return authenticationRepository.login(email, password, hash)
+        return firebaseAuthenticationRepository.loginWithEmailAndPassword(email, password)
     }
 }

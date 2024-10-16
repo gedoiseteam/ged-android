@@ -55,7 +55,7 @@ class AuthenticationUiTest {
 
         buttonLogin = hasText(rule.activity.getString(R.string.login)) and hasClickAction()
         errorConnectionText = hasText(rule.activity.getString(R.string.error_connection))
-        errorInputText = hasText(rule.activity.getString(CoreResource.string.error_empty_fields))
+        errorInputText = hasText(rule.activity.getString(CoreResource.string.empty_fields_error))
         circularProgressBar = hasProgressBarRangeInfo(ProgressBarRangeInfo.Indeterminate)
     }
 
@@ -74,7 +74,7 @@ class AuthenticationUiTest {
         }
 
         rule.onNode(buttonLogin).performClick()
-        authenticationState.value = AuthenticationState.INPUT_ERROR
+        authenticationState.value = AuthenticationState.INPUTS_EMPTY_ERROR
         rule.onNode(errorInputText).assertExists("Error empty text don't exist")
     }
 

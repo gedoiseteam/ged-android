@@ -7,7 +7,7 @@ object GedoiseColor {
     val Secondary = Color(0xFF0B86FF)
     val Tertiary = Color(0xFF009688)
     val White = Color(0xFFFFFFFF)
-    val LittleTransparentWhite = Color(0xBFFFFFFF)
+    val LittleTransparentWhite = Color(0x66FFFFFF)
     val Black = Color(0xFF000000)
     val PrimaryVariant = Color(0xFFDBE0E9)
     val Background = White

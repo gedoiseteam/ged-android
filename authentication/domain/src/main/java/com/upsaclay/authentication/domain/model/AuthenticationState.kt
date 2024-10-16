@@ -1,9 +1,14 @@
 package com.upsaclay.authentication.domain.model
 
 enum class AuthenticationState {
-    AUTHENTICATED,
     UNAUTHENTICATED,
+    AUTHENTICATED,
+    LOADING,
+    EMAIL_NOT_VERIFIED,
     AUTHENTICATION_ERROR,
-    INPUT_ERROR,
-    LOADING
+    INPUTS_EMPTY_ERROR,
+    UNKNOWN_ERROR,
+    NETWORK_ERROR,
+    TOO_MANY_REQUESTS_ERROR,
+    AUTHENTICATED_USER_NOT_FOUND
 }

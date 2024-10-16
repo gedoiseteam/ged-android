@@ -23,7 +23,7 @@ import com.upsaclay.common.presentation.components.SmallTopBarEdit
 import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.gedoise.R
-import com.upsaclay.gedoise.data.profile.AccountInfo
+import com.upsaclay.gedoise.data.account.AccountInfo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

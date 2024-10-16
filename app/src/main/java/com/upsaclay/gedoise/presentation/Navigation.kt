@@ -1,11 +1,19 @@
 package com.upsaclay.gedoise.presentation
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -17,16 +25,21 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.upsaclay.authentication.presentation.AuthenticationScreen
+import com.upsaclay.authentication.presentation.registration.EmailVerificationScreen
 import com.upsaclay.authentication.presentation.registration.FirstRegistrationScreen
-import com.upsaclay.authentication.presentation.registration.RegistrationViewModel
 import com.upsaclay.authentication.presentation.registration.SecondRegistrationScreen
+import com.upsaclay.authentication.presentation.registration.RegistrationViewModel
 import com.upsaclay.authentication.presentation.registration.ThirdRegistrationScreen
+import com.upsaclay.authentication.presentation.registration.FourthRegistrationScreen
 import com.upsaclay.common.domain.model.Screen
 import com.upsaclay.common.domain.model.User
 import com.upsaclay.common.presentation.components.SmallTopBarBack
 import com.upsaclay.common.utils.showToast
 import com.upsaclay.gedoise.R
 import com.upsaclay.gedoise.data.BottomNavigationItem
+import com.upsaclay.gedoise.presentation.components.MainBottomBar
+import com.upsaclay.gedoise.presentation.components.MainTopBar
+import com.upsaclay.gedoise.presentation.components.SplashScreen
 import com.upsaclay.gedoise.presentation.profile.ProfileScreen
 import com.upsaclay.gedoise.presentation.account.AccountScreen
 import com.upsaclay.message.presentation.screen.ChatScreen
@@ -41,6 +54,7 @@ import com.upsaclay.news.presentation.screen.NewsScreen
 import com.upsaclay.news.presentation.screen.ReadAnnouncementScreen
 import com.upsaclay.news.presentation.viewmodel.EditAnnouncementViewModel
 import com.upsaclay.news.presentation.viewmodel.NewsViewModel
+import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 import org.koin.java.KoinJavaComponent.inject
@@ -49,7 +63,7 @@ import org.koin.java.KoinJavaComponent.inject
 fun Navigation(mainViewModel: MainViewModel = koinViewModel()) {
     val navController = rememberNavController()
     val user = mainViewModel.user.collectAsState(null).value
-    val isAuthenticated = mainViewModel.isAuthenticated.collectAsState(false).value
+    val isAuthenticated = mainViewModel.isAuthenticated.collectAsState(null).value
 
     val sharedRegistrationViewModel: RegistrationViewModel = koinViewModel()
     val sharedNewsViewModel: NewsViewModel = koinViewModel()
@@ -58,16 +72,28 @@ fun Navigation(mainViewModel: MainViewModel = koinViewModel()) {
     val convertAnnouncementToJsonUseCase: ConvertAnnouncementToJsonUseCase by inject(
         ConvertAnnouncementToJsonUseCase::class.java
     )
-    val startDestination = if (isAuthenticated) {
-        Screen.NEWS.route
-    } else {
-        Screen.AUTHENTICATION.route
+
+    var startDestination by remember { mutableStateOf(Screen.SPLASH.route) }
+
+    LaunchedEffect(key1 = isAuthenticated) {
+        if(startDestination == Screen.SPLASH.route) {
+            delay(1000)
+            startDestination = if (isAuthenticated == true) {
+                Screen.NEWS.route
+            } else {
+                Screen.AUTHENTICATION.route
+            }
+        }
     }
 
     NavHost(
         navController = navController,
         startDestination = startDestination
     ) {
+        composable(Screen.SPLASH.route) {
+            SplashScreen()
+        }
+
         composable(Screen.AUTHENTICATION.route) {
             AuthenticationScreen(navController = navController)
         }
@@ -88,6 +114,20 @@ fun Navigation(mainViewModel: MainViewModel = koinViewModel()) {
 
         composable(Screen.THIRD_REGISTRATION_SCREEN.route) {
             ThirdRegistrationScreen(
+                navController = navController,
+                registrationViewModel = sharedRegistrationViewModel
+            )
+        }
+
+        composable(Screen.CHECK_EMAIL_VERIFIED_SCREEN.route) {
+            EmailVerificationScreen(
+                navController = navController,
+                registrationViewModel = sharedRegistrationViewModel
+            )
+        }
+
+        composable(Screen.FOURTH_REGISTRATION_SCREEN.route) {
+            FourthRegistrationScreen(
                 navController = navController,
                 registrationViewModel = sharedRegistrationViewModel
             )
@@ -218,7 +258,11 @@ fun Navigation(mainViewModel: MainViewModel = koinViewModel()) {
                     bottomNavigationItems = mainViewModel.bottomNavigationItem.values.toList(),
                     user = user
                 ) {
-                    Text(text = "Calendar")
+                    Text(
+                        modifier = Modifier.align(Alignment.Center),
+                        text = "Calendar",
+                        style = MaterialTheme.typography.titleLarge
+                    )
                 }
             }
         }
@@ -230,7 +274,11 @@ fun Navigation(mainViewModel: MainViewModel = koinViewModel()) {
                     bottomNavigationItems = mainViewModel.bottomNavigationItem.values.toList(),
                     user = user
                 ) {
-                    Text(text = "Forum")
+                    Text(
+                        modifier = Modifier.align(Alignment.Center),
+                        text = "Forum",
+                        style = MaterialTheme.typography.titleLarge
+                    )
                 }
             }
         }
@@ -250,7 +298,7 @@ private fun MainNavigationBars(
     navController: NavController,
     bottomNavigationItems: List<BottomNavigationItem>,
     user: User,
-    content: @Composable () -> Unit
+    content: @Composable BoxScope.() -> Unit
 ) {
     Scaffold(
         topBar = { MainTopBar(navController = navController, user = user) },

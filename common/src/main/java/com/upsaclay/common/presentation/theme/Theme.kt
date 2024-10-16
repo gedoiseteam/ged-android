@@ -34,17 +34,10 @@ private val LightColorScheme = lightColorScheme(
     outlineVariant = Color.LightGray
 )
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Primary,
-    secondary = Secondary,
-    tertiary = Tertiary,
-    onBackground = Color.White
-)
-
 @Composable
 fun GedoiseTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
     val colors = when {
-        darkTheme -> DarkColorScheme
+        darkTheme -> LightColorScheme
         else -> LightColorScheme
     }
     val view = LocalView.current
@@ -52,7 +45,7 @@ fun GedoiseTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composabl
         SideEffect {
             val window = (view.context as Activity).window
             window.statusBarColor = colors.background.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = true
         }
     }
 

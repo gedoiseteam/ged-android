@@ -26,6 +26,7 @@ fun SimpleDropDownMenu(
     selectedItem: String,
     onItemClicked: (String) -> Unit,
     expanded: Boolean,
+    isEnable: Boolean = true,
     onExpandedChange: (Boolean) -> Unit,
     onDismissRequest: () -> Unit
 ) {
@@ -38,6 +39,7 @@ fun SimpleDropDownMenu(
             value = selectedItem,
             onValueChange = {},
             readOnly = true,
+            enabled = isEnable,
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             modifier = modifier
                 .menuAnchor()

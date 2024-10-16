@@ -109,7 +109,7 @@ fun ReadAnnouncementScreen(modifier: Modifier = Modifier, navController: NavCont
     }
 
     if (showLoadingDialog) {
-        LoadingDialog(text = stringResource(id = com.upsaclay.common.R.string.deletion))
+        LoadingDialog(message = stringResource(id = com.upsaclay.common.R.string.deletion))
     }
 
     val bottomSheetItemData: List<ClickableMenuItemData> = listOf(
@@ -253,7 +253,7 @@ private fun EditAnnouncementModelBottomSheet(
 @Composable
 private fun DeleteAnnouncementDialog(onConfirm: () -> Unit, onCancel: () -> Unit) {
     SensibleActionDialog(
-        text = stringResource(id = R.string.delete_announcement_dialog_text),
+        message = stringResource(id = R.string.delete_announcement_dialog_text),
         onDismiss = onCancel,
         confirmText = stringResource(id = com.upsaclay.common.R.string.delete),
         onConfirm = onConfirm,

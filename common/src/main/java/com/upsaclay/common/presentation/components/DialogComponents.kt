@@ -27,8 +27,8 @@ import com.upsaclay.common.presentation.theme.spacing
 
 @Composable
 fun SimpleDialog(
-    title: String,
-    text: String,
+    title: String? = null,
+    message: String,
     confirmText: String = stringResource(id = R.string.accept),
     cancelText: String = stringResource(id = R.string.cancel),
     onConfirm: () -> Unit,
@@ -36,8 +36,8 @@ fun SimpleDialog(
     onDismiss: () -> Unit
 ) {
     AlertDialog(
-        title = { Text(text = title) },
-        text = { Text(text = text) },
+        title = { title?.let { Text(text = title)} },
+        text = { Text(text = message) },
         onDismissRequest = onDismiss,
         confirmButton = {
             TextButton(onClick = onConfirm) {
@@ -54,7 +54,8 @@ fun SimpleDialog(
 
 @Composable
 fun SensibleActionDialog(
-    text: String,
+    title: String? = null,
+    message: String,
     confirmText: String,
     cancelText: String = stringResource(id = R.string.cancel),
     onDismiss: () -> Unit,
@@ -62,8 +63,9 @@ fun SensibleActionDialog(
     onCancel: () -> Unit
 ) {
     AlertDialog(
+        title = { title?.let { Text(text = title) } },
         text = {
-            Text(text = text, style = MaterialTheme.typography.bodyLarge)
+            Text(text = message, style = MaterialTheme.typography.bodyLarge)
         },
         onDismissRequest = onDismiss,
         confirmButton = {
@@ -84,7 +86,7 @@ fun SensibleActionDialog(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoadingDialog(text: String = stringResource(id = R.string.loading)) {
+fun LoadingDialog(message: String = stringResource(id = R.string.loading)) {
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
 
     BasicAlertDialog(
@@ -106,7 +108,7 @@ fun LoadingDialog(text: String = stringResource(id = R.string.loading)) {
             Spacer(modifier = Modifier.width(MaterialTheme.spacing.medium))
 
             Text(
-                text = text,
+                text = message,
                 style = MaterialTheme.typography.bodySmall,
                 textAlign = TextAlign.Center
             )
@@ -126,7 +128,7 @@ private fun SimpleDialogPreview() {
     GedoiseTheme {
         SimpleDialog(
             title = "Simple dialog",
-            text = "There is the text area",
+            message = "There is the text area",
             confirmText = "Confirm",
             cancelText = "Cancel",
             onConfirm = { },
@@ -141,7 +143,7 @@ private fun SimpleDialogPreview() {
 private fun SensibleActionDialogPreview() {
     GedoiseTheme {
         SensibleActionDialog(
-            text = "Do you want delete this item ?",
+            message = "Do you want delete this item ?",
             confirmText = "Delete",
             cancelText = "Cancel",
             onConfirm = { },
@@ -156,7 +158,7 @@ private fun SensibleActionDialogPreview() {
 private fun InformationDialogPreview() {
     GedoiseTheme {
         LoadingDialog(
-            text = "Waiting..."
+            message = "Waiting..."
         )
     }
 }

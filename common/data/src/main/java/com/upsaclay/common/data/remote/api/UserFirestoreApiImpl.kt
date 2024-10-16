@@ -2,6 +2,8 @@ package com.upsaclay.common.data.remote.api
 
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
+import com.upsaclay.common.data.remote.UserFieldsRemote
+import com.upsaclay.common.data.remote.UserFirestoreModel
 import com.upsaclay.common.domain.e
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -10,7 +12,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
-internal class UserFirebaseApiImpl : UserFirebaseApi {
+internal class UserFirestoreApiImpl : UserFirestoreApi {
     private val users = Firebase.firestore.collection("users")
 
     override suspend fun getUser(userId: String): RemoteUserFirebase? =
@@ -34,7 +36,7 @@ internal class UserFirebaseApiImpl : UserFirebaseApi {
 
                 val allUsers = value?.documents?.mapNotNull {
                     it.toObject(
-                        RemoteUserFirebase::class.java
+                        UserFirestoreModel::class.java
                     )
                 } ?: emptyList()
 
@@ -44,16 +46,15 @@ internal class UserFirebaseApiImpl : UserFirebaseApi {
             awaitClose { listener.remove() }
         }
 
-    override suspend fun createUser(remoteUserFirebase: RemoteUserFirebase): Result<Unit> =
-        suspendCoroutine { continuation ->
-            users.document(remoteUserFirebase.userId.toString()).set(remoteUserFirebase)
-                .addOnSuccessListener {
-                    continuation.resume(Result.success(Unit))
-                }
-                .addOnFailureListener { e ->
-                    continuation.resumeWithException(e)
-                }
-        }
+    override suspend fun createUser(userFirestoreModel: UserFirestoreModel): Result<Unit> = suspendCoroutine { continuation ->
+        users.document(userFirestoreModel.userId.toString()).set(userFirestoreModel)
+            .addOnSuccessListener {
+                continuation.resume(Result.success(Unit))
+            }
+            .addOnFailureListener { e ->
+                continuation.resumeWithException(e)
+            }
+    }
 
     override suspend fun updateProfilePictureUrl(
         userId: String,
@@ -68,4 +69,15 @@ internal class UserFirebaseApiImpl : UserFirebaseApi {
                     continuation.resumeWithException(e)
                 }
         }
+
+    override suspend fun isUserExist(email: String): Boolean = suspendCoroutine { continuation ->
+        users.whereEqualTo(UserFieldsRemote.EMAIL, email)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                continuation.resume(!querySnapshot.isEmpty)
+            }
+            .addOnFailureListener { e ->
+                continuation.resumeWithException(e)
+            }
+    }
 }

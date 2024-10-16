@@ -25,7 +25,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.upsaclay.common.domain.model.ElapsedTime
 import com.upsaclay.common.domain.usecase.GetElapsedTimeUseCase
 import com.upsaclay.common.domain.usecase.LocalDateTimeFormatterUseCase
 import com.upsaclay.common.presentation.components.ProfilePicture
@@ -98,7 +97,7 @@ fun ConversationItem(
     ) {
         ProfilePicture(
             imageUrl = conversation.interlocutor.profilePictureUrl,
-            scaleImage = 0.5f
+            scale = 0.5f
         )
 
         Spacer(modifier = Modifier.width(MaterialTheme.spacing.smallMedium))

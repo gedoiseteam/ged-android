@@ -19,6 +19,7 @@
     <string name="support">Support</string>
     <string name="settings">Paramètres</string>
     <string name="logout">Se déconnecter</string>
+    <string name="disconnection">Déconnexion...</string>
 
     <string name="account_icon_description">Icône pour accéder à la page de compte</string>
     <string name="support_icon_description">Icône pour accéder à la page de support</string>

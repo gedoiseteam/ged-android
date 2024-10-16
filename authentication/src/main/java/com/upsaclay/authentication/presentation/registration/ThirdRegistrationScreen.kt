@@ -1,42 +1,44 @@
 package com.upsaclay.authentication.presentation.registration
 
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.upsaclay.authentication.R
 import com.upsaclay.authentication.domain.model.RegistrationState
-import com.upsaclay.authentication.presentation.components.LargeButton
+import com.upsaclay.authentication.presentation.components.OutlinedEmailInput
+import com.upsaclay.authentication.presentation.components.OutlinedPasswordInput
 import com.upsaclay.authentication.presentation.components.RegistrationTopBar
 import com.upsaclay.common.domain.model.Screen
-import com.upsaclay.common.presentation.components.ErrorText
-import com.upsaclay.common.presentation.components.OverlayLoadingScreen
-import com.upsaclay.common.presentation.components.ProfilePicture
+import com.upsaclay.common.presentation.components.ErrorTextWithIcon
+import com.upsaclay.common.presentation.components.PrimaryButton
+import com.upsaclay.common.presentation.components.TopLinearLoadingScreen
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
+import com.upsaclay.common.utils.showToast
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -44,89 +46,118 @@ fun ThirdRegistrationScreen(
     navController: NavController,
     registrationViewModel: RegistrationViewModel = koinViewModel()
 ) {
-    val singlePhotoPickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickVisualMedia(),
-        onResult = { uri ->
-            registrationViewModel.updateProfilePictureUri(uri)
-        }
-    )
-    val registrationState by registrationViewModel.registrationState.collectAsState(RegistrationState.NOT_REGISTERED)
+    LaunchedEffect(Unit) {
+        registrationViewModel.resetRegistrationState()
+        registrationViewModel.resetSchoolLevel()
+    }
 
-    if (registrationState == RegistrationState.REGISTERED) {
-        navController.navigate(Screen.NEWS.route) {
-            popUpTo(Screen.NEWS.route) { inclusive = true }
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val registrationState by registrationViewModel.registrationState.collectAsState()
+    val focusRequester = remember { FocusRequester() }
+    val focusManager = LocalFocusManager.current
+    val context = LocalContext.current
+    val isLoading = registrationState == RegistrationState.LOADING
+
+    val inputsError = when(registrationState) {
+        RegistrationState.UNRECOGNIZED_ACCOUNT, RegistrationState.INPUTS_EMPTY_ERROR -> true
+        else -> false
+    }
+
+    val errorMessage = when (registrationState) {
+        RegistrationState.UNRECOGNIZED_ACCOUNT -> stringResource(id = R.string.unrecognized_account)
+        RegistrationState.INPUTS_EMPTY_ERROR -> stringResource(id = com.upsaclay.common.R.string.empty_fields_error)
+        RegistrationState.EMAIL_FORMAT_ERROR -> stringResource(id = R.string.error_incorrect_email_format)
+        RegistrationState.PASSWORD_LENGTH_ERROR -> stringResource(id = R.string.error_password_length)
+        RegistrationState.USER_ALREADY_EXIST -> stringResource(id = R.string.email_already_associated)
+        else -> null
+    }
+
+    LaunchedEffect(registrationState) {
+        when (registrationState) {
+            RegistrationState.USER_NOT_EXIST -> {
+                registrationViewModel.register()
+            }
+            RegistrationState.REGISTERED -> {
+                registrationViewModel.resetRegistrationState()
+                navController.navigate(Screen.CHECK_EMAIL_VERIFIED_SCREEN.route) {
+                    popUpTo(navController.graph.id) { inclusive = true }
+                }
+            }
+            RegistrationState.ERROR -> showToast(context, com.upsaclay.common.R.string.unknown_error)
+            else -> {}
         }
     }
 
+    if(isLoading) {
+        TopLinearLoadingScreen()
+    }
+
     RegistrationTopBar(
-        navController = navController,
-        currentStep = 3,
-        maxStep = MAX_REGISTRATION_STEP
+        navController = navController
     ) {
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.Center),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxSize()
+                .pointerInput(Unit) {
+                    detectTapGestures(onPress = {
+                        focusManager.clearFocus()
+                        keyboardController?.hide()
+                    })
+                }
         ) {
+            Spacer(Modifier.height(MaterialTheme.spacing.large))
+
             Text(
-                text = stringResource(id = R.string.add_profile_picture),
+                text = stringResource(id = R.string.enter_email_password),
                 style = MaterialTheme.typography.titleMedium
             )
 
             Spacer(Modifier.height(MaterialTheme.spacing.medium))
 
-            ProfilePicture(
-                imageUri = registrationViewModel.profilePictureUri,
-                scaleImage = 2f,
-                onClick = {
-                    singlePhotoPickerLauncher.launch(
-                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                    )
-                }
-            )
-
-            registrationViewModel.profilePictureUri?.let {
-                TextButton(
-                    onClick = { registrationViewModel.resetProfilePictureUri() }
-                ) {
-                    Text(
-                        text = stringResource(id = com.upsaclay.common.R.string.remove),
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                }
-            }
-
-            Text(
-                text = registrationViewModel.fullName,
-                style = MaterialTheme.typography.headlineMedium
-            )
-
-            Text(
+            OutlinedEmailInput(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusRequester(focusRequester),
                 text = registrationViewModel.email,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                isError = inputsError,
+                isEnable = !isLoading,
+                onValueChange = { registrationViewModel.updateEmail(it) }
             )
 
-            Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))
+            Spacer(Modifier.height(MaterialTheme.spacing.medium))
 
-            if (registrationState == RegistrationState.REGISTRATION_ERROR) {
-                ErrorText(text = stringResource(id = R.string.error_registration))
+            OutlinedPasswordInput(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusRequester(focusRequester),
+                text = registrationViewModel.password,
+                isError = inputsError,
+                isEnable = !isLoading,
+                onValueChange = { registrationViewModel.updatePassword(it) }
+            )
+
+            errorMessage?.let {
+                Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
+
+                ErrorTextWithIcon(
+                    modifier = Modifier.align(Alignment.Start),
+                    text = errorMessage
+                )
             }
         }
 
-        LargeButton(
-            text = stringResource(id = com.upsaclay.common.R.string.finish),
-            onClick = { registrationViewModel.register() },
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth()
+        PrimaryButton(
+            modifier = Modifier.align(Alignment.BottomEnd),
+            shape = MaterialTheme.shapes.small,
+            isEnable = !isLoading,
+            text = stringResource(id = com.upsaclay.common.R.string.next),
+            onClick = {
+                keyboardController?.hide()
+                if(registrationViewModel.verifyEmailFormat() && registrationViewModel.verifyPasswordFormat()) {
+                    registrationViewModel.verifyIsUserAlreadyExist()
+                }
+            }
         )
-
-        if (registrationState == RegistrationState.LOADING) {
-            OverlayLoadingScreen()
-        }
     }
 }
 
@@ -138,90 +169,70 @@ fun ThirdRegistrationScreen(
 
 @Preview
 @Composable
-fun ThirdRegistrationScreenPreview() {
-    val errorRegistration = false
-    val pictureChanged = false
-    val isLoading = false
+private fun ThirdRegistrationScreenPreview() {
+    val mail = "pierre.dupont@universite-paris-saclay.fr"
+    val password = "password"
+    var isLoading by remember { mutableStateOf(false) }
+    val isError = false
+    val focusRequester = remember { FocusRequester() }
+    val focusManager = LocalFocusManager.current
 
     GedoiseTheme {
+        if(isLoading) {
+            TopLinearLoadingScreen()
+        }
+
         RegistrationTopBar(
-            navController = rememberNavController(),
-            currentStep = 3,
-            maxStep = MAX_REGISTRATION_STEP
+            navController = rememberNavController()
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.Center),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .fillMaxSize()
+                    .pointerInput(Unit) {
+                        detectTapGestures(onPress = {
+                            focusManager.clearFocus()
+                        })
+                    }
             ) {
+                Spacer(Modifier.height(MaterialTheme.spacing.large))
+
                 Text(
-                    text = stringResource(id = R.string.add_profile_picture),
+                    text = stringResource(id = R.string.enter_email_password),
                     style = MaterialTheme.typography.titleMedium
                 )
+
                 Spacer(Modifier.height(MaterialTheme.spacing.medium))
 
-                Box(
-                    modifier = Modifier.size(220.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Image(
-                        painter = painterResource(id = com.upsaclay.common.R.drawable.default_profile_picture),
-                        contentDescription = "",
-                        modifier = Modifier
-                            .size(100.dp)
-                            .scale(2f)
-                    )
-                    ProfilePicture(
-                        imageUrl = null,
-                        scaleImage = 2f,
-                        onClick = {}
-                    )
-                }
-
-                if (pictureChanged) {
-                    TextButton(
-                        onClick = { }
-                    ) {
-                        Text(
-                            text = stringResource(id = com.upsaclay.common.R.string.remove),
-                            color = MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-                    }
-                }
-
-                Text(
-                    text = "Pierre Dupont",
-                    style = MaterialTheme.typography.headlineMedium
+                OutlinedEmailInput(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .focusRequester(focusRequester),
+                    text = mail,
+                    isEnable = !isLoading,
+                    isError = isError,
+                    onValueChange = {}
                 )
-                Text(
-                    text = "pierre.dupont@universite-paris-saclay.fr",
-                    maxLines = 1,
-                    color = Color.DarkGray,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))
 
-                if (errorRegistration) {
-                    Text(
-                        text = stringResource(id = R.string.error_registration),
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
+                Spacer(Modifier.height(MaterialTheme.spacing.medium))
+
+                OutlinedPasswordInput(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .focusRequester(focusRequester),
+                    text = password,
+                    isEnable = !isLoading,
+                    isError = isError,
+                    onValueChange = {}
+                )
             }
 
-            LargeButton(
-                text = stringResource(id = com.upsaclay.common.R.string.finish),
-                onClick = { },
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
+            PrimaryButton(
+                modifier = Modifier.align(Alignment.BottomEnd),
+                text = stringResource(id = com.upsaclay.common.R.string.next),
+                isEnable = !isLoading,
+                shape = MaterialTheme.shapes.small,
+                onClick = { isLoading = true }
             )
-        }
-        if (isLoading) {
-            OverlayLoadingScreen()
         }
     }
 }

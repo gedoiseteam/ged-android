@@ -1,4 +1,4 @@
-package com.upsaclay.gedoise.data.profile
+package com.upsaclay.gedoise.data.account
 
 enum class AccountScreenState {
     READ,

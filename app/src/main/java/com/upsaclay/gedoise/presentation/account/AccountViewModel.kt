@@ -6,11 +6,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.upsaclay.common.domain.model.User
 import com.upsaclay.common.domain.usecase.DeleteUserProfilePictureUseCase
 import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
 import com.upsaclay.common.domain.usecase.UpdateUserProfilePictureUseCase
-import com.upsaclay.gedoise.data.profile.AccountScreenState
+import com.upsaclay.gedoise.data.account.AccountScreenState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -45,8 +44,7 @@ class AccountViewModel(
 
         profilePictureUri?.let { uri ->
             viewModelScope.launch {
-                val (id, profilePictureUrl) = user.first()?.id to user.first()?.profilePictureUrl
-                updateUserProfilePictureUseCase(id!!, uri, profilePictureUrl)
+                updateUserProfilePictureUseCase(uri)
                     .onSuccess {
                         _accountScreenState.value =
                             AccountScreenState.PROFILE_PICTURE_UPDATED

@@ -23,7 +23,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -38,13 +43,16 @@ import androidx.navigation.compose.rememberNavController
 import com.upsaclay.common.domain.model.Screen
 import com.upsaclay.common.presentation.ClickableMenuItemData
 import com.upsaclay.common.presentation.components.CircularProgressBar
+import com.upsaclay.common.presentation.components.LoadingDialog
 import com.upsaclay.common.presentation.components.ProfilePicture
+import com.upsaclay.common.presentation.components.SensibleActionDialog
 import com.upsaclay.common.presentation.components.SimpleClickableItem
 import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.common.utils.userFixture
 import com.upsaclay.gedoise.R
+import com.upsaclay.gedoise.data.profile.ProfileState
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import org.koin.androidx.compose.koinViewModel
@@ -52,8 +60,49 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun ProfileScreen(navController: NavController, profileViewModel: ProfileViewModel = koinViewModel()) {
     val user = profileViewModel.user.collectAsState(initial = null).value
+    var showLogoutDialog by remember { mutableStateOf(false) }
+    var showLoadingDialog by remember { mutableStateOf(false) }
+    val profileState = profileViewModel.profileState.collectAsState().value
+
     val clickableMenuItemsData: ImmutableList<ClickableMenuItemData> =
-        buildProfileMenuItemData(navController, profileViewModel)
+        buildProfileMenuItemData(
+            onAccountClick = { navController.navigate(Screen.ACCOUNT.route) },
+            onLogoutClick = { showLogoutDialog = true }
+        )
+
+    LaunchedEffect(profileState) {
+        when(profileState) {
+            ProfileState.LOADING -> showLoadingDialog = true
+            ProfileState.LOGGED_OUT -> {
+                showLoadingDialog = false
+                navController.navigate(Screen.AUTHENTICATION.route) {
+                    popUpTo(navController.graph.id) {
+                        inclusive = true
+                    }
+                }
+            }
+            else -> {}
+        }
+    }
+
+    if (showLogoutDialog) {
+        SensibleActionDialog(
+            title = stringResource(id = R.string.logout),
+            message = stringResource(id = com.upsaclay.authentication.R.string.logout_dialog_message),
+            cancelText = stringResource(id = com.upsaclay.common.R.string.cancel),
+            confirmText = stringResource(id = R.string.logout),
+            onConfirm = {
+                profileViewModel.logout()
+                showLogoutDialog = false
+            },
+            onDismiss = { showLogoutDialog = false },
+            onCancel = { showLogoutDialog = false }
+        )
+    }
+
+    if(showLoadingDialog) {
+        LoadingDialog(message = stringResource(R.string.disconnection))
+    }
 
     Scaffold(
         topBar = { ProfileTopBar(navController = navController) }
@@ -67,8 +116,7 @@ fun ProfileScreen(navController: NavController, profileViewModel: ProfileViewMod
                 Column {
                     TopSection(
                         profilePictureUrl = user.profilePictureUrl,
-                        userFullName = user.fullName,
-                        userEmail = user.email
+                        userFullName = user.fullName
                     )
 
                     HorizontalDivider()
@@ -91,7 +139,7 @@ fun ProfileScreen(navController: NavController, profileViewModel: ProfileViewMod
 }
 
 @Composable
-private fun TopSection(profilePictureUrl: String?, userFullName: String, userEmail: String) {
+private fun TopSection(profilePictureUrl: String?, userFullName: String) {
     Column {
         Row(
             modifier = Modifier
@@ -105,7 +153,7 @@ private fun TopSection(profilePictureUrl: String?, userFullName: String, userEma
         ) {
             ProfilePicture(
                 imageUrl = profilePictureUrl,
-                scaleImage = 0.7f
+                scale = 0.7f
             )
 
             Spacer(modifier = Modifier.width(MaterialTheme.spacing.medium))
@@ -140,8 +188,8 @@ fun ProfileTopBar(navController: NavController) {
 }
 
 private fun buildProfileMenuItemData(
-    navController: NavController,
-    profileViewModel: ProfileViewModel
+    onAccountClick: () -> Unit,
+    onLogoutClick: () -> Unit
 ): ImmutableList<ClickableMenuItemData> = persistentListOf(
     ClickableMenuItemData(
         text = { Text(text = stringResource(id = R.string.account_informations)) },
@@ -152,14 +200,11 @@ private fun buildProfileMenuItemData(
                 contentDescription = stringResource(id = R.string.account_icon_description)
             )
         },
-        onClick = { navController.navigate(Screen.ACCOUNT.route) }
+        onClick = onAccountClick
     ),
     ClickableMenuItemData(
         text = {
-            Text(
-                text = stringResource(id = R.string.logout),
-                color = GedoiseColor.Red
-            )
+            Text(text = stringResource(id = R.string.logout), color = GedoiseColor.Red)
         },
         icon = {
             Icon(
@@ -168,7 +213,7 @@ private fun buildProfileMenuItemData(
                 tint = GedoiseColor.Red
             )
         },
-        onClick = { profileViewModel.logout() }
+        onClick = onLogoutClick
     )
 )
 
@@ -255,29 +300,6 @@ private val profileMenuItemsDataFixture: ImmutableList<ClickableMenuItemData> = 
         },
         onClick = {}
     ),
-//    ClickableMenuItemData(
-//        text = {
-//            Text(text = stringResource(id = R.string.settings))
-//        },
-//        icon = {
-//            Icon(
-//                modifier = Modifier.size(28.dp),
-//                painter = painterResource(id = com.upsaclay.common.R.drawable.ic_settings),
-//                contentDescription = stringResource(id = R.string.settings_icon_description)
-//            )
-//        }
-//    ),
-//    ClickableMenuItemData(
-//        text = {
-//            Text(text = stringResource(id = R.string.support))
-//        },
-//        icon = {
-//            Icon(
-//                painter = painterResource(id = com.upsaclay.common.R.drawable.ic_support),
-//                contentDescription = stringResource(id = R.string.support_icon_description)
-//            )
-//        }
-//    ),
     ClickableMenuItemData(
         text = {
             Text(
