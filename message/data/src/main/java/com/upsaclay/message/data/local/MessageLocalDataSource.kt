@@ -8,7 +8,7 @@ internal class MessageLocalDataSource(private val messageDao: MessageDao) {
     fun getLastMessages(conversationId: String): Flow<List<LocalMessage>> =
         messageDao.getLastMessages(conversationId)
 
-    suspend fun getMessages(conversationId: String, offset: Int): List<LocalMessage> =
+    suspend fun getMessages(conversationId: String, offset: Int = 0): List<LocalMessage> =
         messageDao.getMessages(conversationId, offset)
 
     suspend fun insertMessage(localMessage: LocalMessage) {

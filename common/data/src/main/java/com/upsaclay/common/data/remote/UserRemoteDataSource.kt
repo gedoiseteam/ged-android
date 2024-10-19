@@ -15,41 +15,9 @@ internal class UserRemoteDataSource(
     private val userRetrofitApi: UserRetrofitApi,
     private val userFirestoreApi: UserFirestoreApi
 ) {
-    suspend fun getCurrentUser(userId: Int): UserDTO? = withContext(Dispatchers.IO) {
-        try {
-            val response = userRetrofitApi.getUser(userId)
-            if (response.isSuccessful) {
-                response.body()
-            } else {
-                val errorMessage = formatHttpError("Error getting current user", response)
-                e(errorMessage)
-                null
-            }
-        } catch (e: IOException) {
-            e("Error getting current user: ${e.message}")
-            null
-        }
-    }
-
-    suspend fun getUserWithOracle(email: String): UserDTO? = withContext(Dispatchers.IO) {
-        try {
-            val response = userRetrofitApi.getUser(email)
-            if(response.isSuccessful) {
-                response.body()
-            } else {
-                val errorMessage = formatHttpError("Error getting current user with email", response)
-                e(errorMessage)
-                null
-            }
-        } catch (e: IOException) {
-            e("Error getting user with email: ${e.message}")
-            null
-        }
-    }
-
     suspend fun getUserWithFirestore(userId: Int): UserFirestoreModel? = withContext(Dispatchers.IO) {
         try {
-            userFirestoreApi.getUser(userId.toString())
+            userFirestoreApi.getUser(userId)
         } catch (e: IOException) {
             e("Error getting user: ${e.message}")
             null
@@ -71,21 +39,8 @@ internal class UserRemoteDataSource(
         }
     }
 
-    suspend fun getAllUsersWithFirestore(): List<UserFirestoreModel> = try {
+    suspend fun getAllUsers(): Flow<List<UserFirestoreModel>> = withContext(Dispatchers.IO) {
         userFirestoreApi.getAllUsers()
-    } catch (e: Exception) {
-        e("Error getting all users: ${e.message}", e)
-        emptyList()
-    }
-
-    suspend fun getOnlineUsers(): List<UserFirestoreModel> = try {
-        userFirestoreApi.getOnlineUsers()
-    } catch (e: IOException) {
-        e("Error getting all online users: ${e.message}", e)
-        emptyList()
-    } catch (e: FirebaseFirestoreException) {
-        e("Error getting all online users: ${e.message}", e)
-        emptyList()
     }
 
     suspend fun createUserWithOracle(userDTO: UserDTO): Int? = withContext(Dispatchers.IO) {

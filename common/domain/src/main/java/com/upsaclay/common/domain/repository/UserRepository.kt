@@ -2,21 +2,17 @@ package com.upsaclay.common.domain.repository
 
 import com.upsaclay.common.domain.model.User
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.StateFlow
 
 interface UserRepository {
-    val currentUser: Flow<User?>
+    val currentUserFlow: Flow<User>
+    val currentUser: User?
     val users: Flow<List<User>>
 
-    suspend fun getUserWithFirestore(userId: Int): User?
+    suspend fun getUser(userId: Int): User?
 
-    suspend fun getUserWithFirestore(userEmail: String): User?
+    suspend fun getUser(userEmail: String): User?
 
-    suspend fun getUserWithOracle(email: String): User?
-
-    suspend fun createUserWithOracle(user: User): Int?
-
-    suspend fun createUserWithFirestore(user: User): Result<Unit>
+    suspend fun createUser(user: User): Result<Int>
 
     suspend fun setCurrentUser(user: User)
 

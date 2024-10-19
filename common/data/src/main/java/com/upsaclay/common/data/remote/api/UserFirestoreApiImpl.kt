@@ -15,11 +15,11 @@ import kotlin.coroutines.suspendCoroutine
 internal class UserFirestoreApiImpl : UserFirestoreApi {
     private val users = Firebase.firestore.collection("users")
 
-    override suspend fun getUser(userId: String): RemoteUserFirebase? =
+    override suspend fun getUser(userId: Int): UserFirestoreModel? =
         suspendCoroutine { continuation ->
-            users.document(userId).get()
+            users.document(userId.toString()).get()
                 .addOnSuccessListener { document ->
-                    val user = document.toObject(RemoteUserFirebase::class.java)
+                    val user = document.toObject(UserFirestoreModel::class.java)
                     continuation.resume(user)
                 }
                 .addOnFailureListener { e ->
@@ -27,7 +27,18 @@ internal class UserFirestoreApiImpl : UserFirestoreApi {
                 }
         }
 
-    override suspend fun getAllUsers(): Flow<List<RemoteUserFirebase>> = callbackFlow {
+    override suspend fun getUser(userEmail: String): UserFirestoreModel? = suspendCoroutine { continuation ->
+        users.whereEqualTo(UserFieldsRemote.EMAIL, userEmail).get()
+            .addOnSuccessListener { querySnapshot ->
+                val user = querySnapshot.documents.firstOrNull()?.toObject(UserFirestoreModel::class.java)
+                continuation.resume(user)
+            }
+            .addOnFailureListener { e ->
+                continuation.resumeWithException(e)
+            }
+    }
+
+    override suspend fun getAllUsers(): Flow<List<UserFirestoreModel>> = callbackFlow {
             val listener = users.addSnapshotListener { value, error ->
                 error?.let {
                     e("Error getting all users", it)
@@ -35,9 +46,7 @@ internal class UserFirestoreApiImpl : UserFirestoreApi {
                 }
 
                 val allUsers = value?.documents?.mapNotNull {
-                    it.toObject(
-                        UserFirestoreModel::class.java
-                    )
+                    it.toObject(UserFirestoreModel::class.java)
                 } ?: emptyList()
 
                 trySend(allUsers)
@@ -71,8 +80,7 @@ internal class UserFirestoreApiImpl : UserFirestoreApi {
         }
 
     override suspend fun isUserExist(email: String): Boolean = suspendCoroutine { continuation ->
-        users.whereEqualTo(UserFieldsRemote.EMAIL, email)
-            .get()
+        users.whereEqualTo(UserFieldsRemote.EMAIL, email).get()
             .addOnSuccessListener { querySnapshot ->
                 continuation.resume(!querySnapshot.isEmpty)
             }

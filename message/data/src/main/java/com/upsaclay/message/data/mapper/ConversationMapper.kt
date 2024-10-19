@@ -12,7 +12,7 @@ import com.upsaclay.message.domain.model.Message
 internal object ConversationMapper {
     private val gson = Gson()
 
-    fun fromLocal(localConversation: LocalConversation): ConversationDTO {
+    fun toDTO(localConversation: LocalConversation): ConversationDTO {
         val type = object : TypeToken<List<Int>>() {}.type
         return ConversationDTO(
             conversationId = localConversation.conversationId,

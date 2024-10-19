@@ -2,11 +2,11 @@ package com.upsaclay.common.domain.usecase
 
 import com.upsaclay.common.domain.model.User
 import com.upsaclay.common.domain.repository.UserRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filterNotNull
 
-class GetUserUseCase(
+class GetCurrentUserFlowUseCase(
     private val userRepository: UserRepository
 ) {
-    suspend fun withId(userId: Int): User? = userRepository.getUser(userId)
-
-    suspend fun withEmail(email: String): User? = userRepository.getUser(email)
+    operator fun invoke(): Flow<User> = userRepository.currentUserFlow.filterNotNull()
 }

@@ -1,15 +1,14 @@
 package com.upsaclay.common.data.remote.api
 
 import com.upsaclay.common.data.remote.UserFirestoreModel
+import kotlinx.coroutines.flow.Flow
 
 internal interface UserFirestoreApi {
     suspend fun getUser(userId: Int): UserFirestoreModel?
 
     suspend fun getUser(userEmail: String): UserFirestoreModel?
 
-    suspend fun getAllUsers(): List<UserFirestoreModel>
-
-    suspend fun getOnlineUsers(): List<UserFirestoreModel>
+    suspend fun getAllUsers(): Flow<List<UserFirestoreModel>>
 
     suspend fun createUser(userFirestoreModel: UserFirestoreModel): Result<Unit>
 

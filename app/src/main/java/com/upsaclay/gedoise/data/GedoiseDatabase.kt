@@ -11,14 +11,14 @@ import com.upsaclay.news.data.local.LocalAnnouncement
 
 @Database(
     entities = [
-        com.upsaclay.news.data.local.LocalAnnouncement::class,
+        LocalAnnouncement::class,
         LocalConversation::class,
         LocalMessage::class
     ],
-    version = 1
+    version = 2
 )
 internal abstract class GedoiseDatabase : RoomDatabase() {
-    abstract fun announcementDao(): com.upsaclay.news.data.local.AnnouncementDao
+    abstract fun announcementDao(): AnnouncementDao
     abstract fun conversationDao(): ConversationDao
     abstract fun messageDao(): MessageDao
 }

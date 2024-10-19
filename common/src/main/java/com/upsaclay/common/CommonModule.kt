@@ -2,6 +2,7 @@ package com.upsaclay.common
 
 import com.upsaclay.common.domain.usecase.DeleteUserProfilePictureUseCase
 import com.upsaclay.common.domain.usecase.GetAllUserUseCase
+import com.upsaclay.common.domain.usecase.GetCurrentUserFlowUseCase
 import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
 import com.upsaclay.common.domain.usecase.GetDrawableUriUseCase
 import com.upsaclay.common.domain.usecase.GetUserUseCase
@@ -15,6 +16,7 @@ val commonModule = module {
 
     singleOf(::DeleteUserProfilePictureUseCase)
     singleOf(::GetAllUserUseCase)
+    singleOf(::GetCurrentUserFlowUseCase)
     singleOf(::GetCurrentUserUseCase)
     singleOf(::GetDrawableUriUseCase)
     singleOf(::GetUserUseCase)

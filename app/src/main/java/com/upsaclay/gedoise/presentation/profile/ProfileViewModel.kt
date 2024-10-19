@@ -19,7 +19,7 @@ class ProfileViewModel(
 ) : ViewModel() {
     private val _profileState = MutableStateFlow(ProfileState.DEFAULT)
     val profileState: StateFlow<ProfileState> = _profileState
-    val user: Flow<User?> = getCurrentUserFlowUseCase()
+    val user: Flow<User> = getCurrentUserFlowUseCase()
 
     fun logout() {
         _profileState.value = ProfileState.LOADING

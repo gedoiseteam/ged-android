@@ -6,7 +6,6 @@ import com.upsaclay.message.data.model.ConversationDTO
 import com.upsaclay.message.data.remote.ConversationRemoteDataSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -21,7 +20,7 @@ internal class InternalConversationRepositoryImpl(
     init {
         CoroutineScope(Dispatchers.IO).launch {
             conversationLocalDataSource.getAllConversations().collect { localConversations ->
-                _conversationsDTO.value = localConversations.map { ConversationMapper.fromLocal(it) }
+                _conversationsDTO.value = localConversations.map { ConversationMapper.toDTO(it) }
             }
         }
     }

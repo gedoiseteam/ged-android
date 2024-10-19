@@ -17,7 +17,6 @@ internal class InternalMessageRepositoryImpl(
             remoteMessages.map(MessageMapper::toDTO)
         }
 
-    override suspend fun getMessages(conversationId: String, limit: Long): List<MessageDTO> = messageRemoteDataSource
-        .getMessages(conversationId, limit)
-        .map(MessageMapper::toDTO)
+    override suspend fun getMessages(conversationId: String): List<MessageDTO> =
+        messageLocalDataSource.getMessages(conversationId).map(MessageMapper::toDTO)
 }

@@ -3,7 +3,7 @@ package com.upsaclay.authentication
 import com.upsaclay.authentication.domain.usecase.GenerateHashUseCase
 import com.upsaclay.authentication.domain.usecase.IsUserAuthenticatedUseCase
 import com.upsaclay.authentication.domain.usecase.IsUserEmailVerifiedUseCase
-import com.upsaclay.common.domain.usecase.CreateNewUserUseCase
+import com.upsaclay.common.domain.usecase.CreateUserUseCase
 import com.upsaclay.authentication.domain.usecase.LoginUseCase
 import com.upsaclay.authentication.domain.usecase.LogoutUseCase
 import com.upsaclay.authentication.domain.usecase.RegisterUseCase
@@ -20,7 +20,7 @@ val authenticationModule = module {
     viewModelOf(::AuthenticationViewModel)
     viewModelOf(::RegistrationViewModel)
 
-    singleOf(::CreateNewUserUseCase)
+    singleOf(::CreateUserUseCase)
     singleOf(::GenerateHashUseCase)
     singleOf(::IsUserAuthenticatedUseCase)
     singleOf(::IsUserEmailVerifiedUseCase)

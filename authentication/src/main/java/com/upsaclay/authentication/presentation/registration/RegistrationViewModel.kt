@@ -11,13 +11,14 @@ import com.upsaclay.authentication.domain.model.exception.AuthenticationExceptio
 import com.upsaclay.authentication.domain.model.exception.FirebaseAuthErrorCode
 import com.upsaclay.authentication.domain.model.exception.TooManyRequestException
 import com.upsaclay.authentication.domain.usecase.IsUserEmailVerifiedUseCase
-import com.upsaclay.common.domain.usecase.CreateNewUserUseCase
+import com.upsaclay.common.domain.usecase.CreateUserUseCase
 import com.upsaclay.authentication.domain.usecase.RegisterUseCase
 import com.upsaclay.authentication.domain.usecase.SendVerificationEmailUseCase
 import com.upsaclay.authentication.domain.usecase.SetUserAuthenticatedUseCase
 import com.upsaclay.authentication.domain.usecase.VerifyEmailFormatUseCase
 import com.upsaclay.common.domain.uppercaseFirstLetter
 import com.upsaclay.common.domain.model.User
+import com.upsaclay.common.domain.usecase.GetCurrentUserFlowUseCase
 import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
 import com.upsaclay.common.domain.usecase.IsUserExistUseCase
 import com.upsaclay.common.domain.usecase.UpdateUserProfilePictureUseCase
@@ -28,7 +29,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class RegistrationViewModel(
-    private val createNewUserUseCase: CreateNewUserUseCase,
+    private val createUserUseCase: CreateUserUseCase,
     private val registerUseCase: RegisterUseCase,
     private val verifyEmailFormatUseCase: VerifyEmailFormatUseCase,
     private val isUserExistUseCase: IsUserExistUseCase,
@@ -163,9 +164,7 @@ class RegistrationViewModel(
         }
     }
 
-    private fun checkEmptyEmailAndPassword(): Boolean {
-        return email.isNotBlank() && password.isNotBlank()
-    }
+    private fun checkEmptyEmailAndPassword(): Boolean = email.isNotBlank() && password.isNotBlank()
 
     fun verifyIsUserAlreadyExist() {
         _registrationState.value = RegistrationState.LOADING
@@ -196,7 +195,7 @@ class RegistrationViewModel(
 
             registerUseCase(email.trim(), password)
                 .onSuccess {
-                    createNewUserUseCase(user)
+                    createUserUseCase(user)
                         .onSuccess {
                             setUserAuthenticatedUseCase(true)
                             _registrationState.value = RegistrationState.REGISTERED

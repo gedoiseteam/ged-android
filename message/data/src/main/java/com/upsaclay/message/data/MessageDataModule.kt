@@ -12,8 +12,10 @@ import com.upsaclay.message.data.repository.InternalConversationRepository
 import com.upsaclay.message.data.repository.InternalConversationRepositoryImpl
 import com.upsaclay.message.data.repository.InternalMessageRepository
 import com.upsaclay.message.data.repository.InternalMessageRepositoryImpl
+import com.upsaclay.message.data.repository.MessageRepositoryImpl
 import com.upsaclay.message.data.repository.UserConversationRepositoryImpl
 import com.upsaclay.message.domain.repository.ConversationRepository
+import com.upsaclay.message.domain.repository.MessageRepository
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
@@ -24,6 +26,7 @@ val messageDataModule = module {
     singleOf(::ConversationRemoteDataSource)
     singleOf(::ConversationLocalDataSource)
 
+    singleOf(::MessageRepositoryImpl) { bind<MessageRepository>() }
     singleOf(::MessageApiImpl) { bind<MessageApi>() }
     singleOf(::MessageRemoteDataSource)
     singleOf(::MessageLocalDataSource)

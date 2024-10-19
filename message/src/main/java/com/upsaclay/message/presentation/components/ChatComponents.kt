@@ -57,7 +57,7 @@ fun ReceiveMessageItem(
         verticalAlignment = Alignment.Bottom
     ) {
         if(displayProfilePicture) {
-            ProfilePicture(imageUrl = profilePictureUrl, scaleImage = 0.3f)
+            ProfilePicture(imageUrl = profilePictureUrl, scale = 0.3f)
         }
 
         Spacer(modifier = Modifier.width(MaterialTheme.spacing.small))

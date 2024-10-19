@@ -52,7 +52,10 @@ import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AccountScreen(navController: NavController, accountViewModel: AccountViewModel = koinViewModel()) {
+fun AccountScreen(
+    navController: NavController,
+    accountViewModel: AccountViewModel = koinViewModel()
+) {
     val user = accountViewModel.user.collectAsState(initial = null).value
     val accountScreenState = accountViewModel.accountScreenState.collectAsState().value
     val sheetState = rememberModalBottomSheetState()
@@ -219,7 +222,12 @@ fun AccountScreen(navController: NavController, accountViewModel: AccountViewMod
 }
 
 @Composable
-private fun ProfilePictureSection(isEdited: Boolean, profilePictureUri: Uri?, profilePictureUrl: String?, onClick: () -> Unit) {
+private fun ProfilePictureSection(
+    isEdited: Boolean,
+    profilePictureUri: Uri?,
+    profilePictureUrl: String?,
+    onClick: () -> Unit
+) {
     val scaleImage = 1.8f
 
     profilePictureUri?.let { uri ->

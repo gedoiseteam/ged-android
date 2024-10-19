@@ -2,7 +2,6 @@ package com.upsaclay.common.domain.usecase
 
 import android.net.Uri
 import com.upsaclay.common.domain.formatProfilePictureUrl
-import com.upsaclay.common.domain.i
 import com.upsaclay.common.domain.repository.FileRepository
 import com.upsaclay.common.domain.repository.ImageRepository
 import com.upsaclay.common.domain.repository.UserRepository
