@@ -3,9 +3,11 @@ package com.upsaclay.gedoise.presentation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -17,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavController
 import androidx.navigation.NavType.Companion.IntType
 import androidx.navigation.NavType.Companion.StringType
@@ -38,7 +41,7 @@ import com.upsaclay.common.utils.showToast
 import com.upsaclay.gedoise.R
 import com.upsaclay.gedoise.data.BottomNavigationItem
 import com.upsaclay.gedoise.presentation.components.MainBottomBar
-import com.upsaclay.gedoise.presentation.components.MainTopBar
+import com.upsaclay.gedoise.presentation.components.HomeTopBar
 import com.upsaclay.gedoise.presentation.components.SplashScreen
 import com.upsaclay.gedoise.presentation.profile.ProfileScreen
 import com.upsaclay.gedoise.presentation.account.AccountScreen
@@ -59,6 +62,7 @@ import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 import org.koin.java.KoinJavaComponent.inject
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Navigation(mainViewModel: MainViewModel = koinViewModel()) {
     val navController = rememberNavController()
@@ -137,8 +141,8 @@ fun Navigation(mainViewModel: MainViewModel = koinViewModel()) {
             user?.let {
                 MainNavigationBars(
                     navController = navController,
+                    topBar = { HomeTopBar(navController = navController, user = user) },
                     bottomNavigationItems = mainViewModel.bottomNavigationItem.values.toList(),
-                    user = user
                 ) {
                     NewsScreen(
                         navController = navController,
@@ -190,17 +194,25 @@ fun Navigation(mainViewModel: MainViewModel = koinViewModel()) {
         }
 
         composable(Screen.CONVERSATIONS.route) {
-            user?.let {
-                MainNavigationBars(
-                    navController = navController,
-                    bottomNavigationItems = mainViewModel.bottomNavigationItem.values.toList(),
-                    user = user
-                ) {
-                    ConversationScreen(
-                        navController = navController,
-                        conversationViewModel = sharedConversationViewModel
+            MainNavigationBars(
+                navController = navController,
+                topBar = {
+                    TopAppBar(
+                        title = {
+                            Text(
+                                text = stringResource(R.string.messages),
+                                fontWeight = FontWeight.Bold,
+                                style = MaterialTheme.typography.titleLarge
+                            )
+                        }
                     )
-                }
+                },
+                bottomNavigationItems = mainViewModel.bottomNavigationItem.values.toList(),
+            ) {
+                ConversationScreen(
+                    navController = navController,
+                    conversationViewModel = sharedConversationViewModel
+                )
             }
         }
 
@@ -251,37 +263,41 @@ fun Navigation(mainViewModel: MainViewModel = koinViewModel()) {
             }
         }
 
-        composable(Screen.CALENDAR.route) {
-            user?.let {
-                MainNavigationBars(
-                    navController = navController,
-                    bottomNavigationItems = mainViewModel.bottomNavigationItem.values.toList(),
-                    user = user
-                ) {
-                    Text(
-                        modifier = Modifier.align(Alignment.Center),
-                        text = "Calendar",
-                        style = MaterialTheme.typography.titleLarge
-                    )
-                }
-            }
-        }
+//        composable(Screen.CALENDAR.route) {
+//            MainNavigationBars(
+//                navController = navController,
+//                topBar = {
+//                    TopAppBar(
+//                        title = {
+//                            Text(
+//                                text = stringResource(R.string.calendar),
+//                                fontWeight = FontWeight.Bold,
+//                                style = MaterialTheme.typography.titleLarge
+//                            )
+//                        }
+//                    )
+//                },
+//                bottomNavigationItems = mainViewModel.bottomNavigationItem.values.toList(),
+//            ) { }
+//        }
 
-        composable(Screen.FORUM.route) {
-            user?.let {
-                MainNavigationBars(
-                    navController = navController,
-                    bottomNavigationItems = mainViewModel.bottomNavigationItem.values.toList(),
-                    user = user
-                ) {
-                    Text(
-                        modifier = Modifier.align(Alignment.Center),
-                        text = "Forum",
-                        style = MaterialTheme.typography.titleLarge
-                    )
-                }
-            }
-        }
+//        composable(Screen.FORUM.route) {
+//            MainNavigationBars(
+//                navController = navController,
+//                topBar = {
+//                    TopAppBar(
+//                        title = {
+//                            Text(
+//                                text = stringResource(R.string.forum),
+//                                fontWeight = FontWeight.Bold,
+//                                style = MaterialTheme.typography.titleLarge
+//                            )
+//                        }
+//                    )
+//                },
+//                bottomNavigationItems = mainViewModel.bottomNavigationItem.values.toList(),
+//            ) { }
+//        }
 
         composable(Screen.PROFILE.route) {
             ProfileScreen(navController = navController)
@@ -296,12 +312,12 @@ fun Navigation(mainViewModel: MainViewModel = koinViewModel()) {
 @Composable
 private fun MainNavigationBars(
     navController: NavController,
+    topBar: @Composable () -> Unit,
     bottomNavigationItems: List<BottomNavigationItem>,
-    user: User,
     content: @Composable BoxScope.() -> Unit
 ) {
     Scaffold(
-        topBar = { MainTopBar(navController = navController, user = user) },
+        topBar = topBar,
         bottomBar = {
             MainBottomBar(
                 navController = navController,

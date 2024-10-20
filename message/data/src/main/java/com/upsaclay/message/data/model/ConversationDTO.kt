@@ -1,6 +1,11 @@
 package com.upsaclay.message.data.model
 
-internal data class ConversationDTO(
+import com.upsaclay.common.domain.model.User
+
+data class ConversationDTO(
     val conversationId: String,
-    val participants: List<Int>
+    val interlocutor: User,
+    val isSynchronized: Boolean,
+    val participantsId: List<Int>,
+    val isActive: Boolean
 )

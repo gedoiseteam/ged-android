@@ -11,6 +11,10 @@ data class LocalConversation(
     @PrimaryKey
     @ColumnInfo(name = ConversationField.CONVERSATION_ID)
     val conversationId: String,
-    @ColumnInfo(name = ConversationField.PARTICIPANTS)
-    val usersIdsJson: String
+    @ColumnInfo(name = ConversationField.Local.INTERLOCUTOR)
+    val interlocutorJson: String,
+    @ColumnInfo(name = ConversationField.Local.IS_SYNCHRONIZED)
+    val isSynchronized: Boolean = false,
+    @ColumnInfo(name = ConversationField.IS_ACTIVE)
+    val isActive: Boolean = false
 )

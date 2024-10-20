@@ -44,4 +44,6 @@
     <string name="hour_ago_medium">%d heures</string>
     <string name="day_ago_medium">%d jours</string>
     <string name="week_ago_medium">%d semaines</string>
+
+    <string name="no_user_found">Aucun utilisateur trouvé</string>
 </resources>

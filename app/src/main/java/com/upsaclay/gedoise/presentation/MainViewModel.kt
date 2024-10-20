@@ -16,8 +16,8 @@ class MainViewModel(
     val bottomNavigationItem: Map<BottomNavigationItemType, BottomNavigationItem> = mapOf(
         BottomNavigationItemType.HOME to BottomNavigationItem.Home(),
         BottomNavigationItemType.MESSAGE to BottomNavigationItem.Message(),
-        BottomNavigationItemType.CALENDAR to BottomNavigationItem.Calendar(),
-        BottomNavigationItemType.FORUM to BottomNavigationItem.Forum()
+//        BottomNavigationItemType.CALENDAR to BottomNavigationItem.Calendar(),
+//        BottomNavigationItemType.FORUM to BottomNavigationItem.Forum()
     )
     val isAuthenticated: Flow<Boolean> = isUserAuthenticatedUseCase()
     val user: Flow<User> = getCurrentUserFlowUseCase()

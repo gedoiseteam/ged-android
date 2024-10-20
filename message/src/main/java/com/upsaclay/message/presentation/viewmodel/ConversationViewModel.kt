@@ -9,6 +9,7 @@ import com.upsaclay.message.domain.model.Conversation
 import com.upsaclay.message.domain.model.ConversationState
 import com.upsaclay.message.domain.usecase.GetAllConversationsUseCase
 import com.upsaclay.message.domain.usecase.CreateConversationUseCase
+import com.upsaclay.message.domain.usecase.DeleteConversationUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,32 +20,30 @@ class ConversationViewModel(
     getAllConversationsUseCase: GetAllConversationsUseCase,
     private val createConversationUseCase: CreateConversationUseCase,
     private val getAllUserUseCase: GetAllUserUseCase,
-    getCurrentUserUseCase: GetCurrentUserUseCase
+    private val getCurrentUserUseCase: GetCurrentUserUseCase
 ) : ViewModel() {
     private val _users = MutableStateFlow<List<User>>(emptyList())
     val users: Flow<List<User>> = _users
-    private val currentUser = getCurrentUserUseCase()
+    private val currentUser: User? get() = getCurrentUserUseCase()
     private val _conversationState = MutableStateFlow(ConversationState.DEFAULT)
     val conversationState: Flow<ConversationState> = _conversationState
     val conversations: Flow<List<Conversation>> = getAllConversationsUseCase()
-
-    init {
-        viewModelScope.launch {
-            _conversationState.value = ConversationState.LOADING
-            getAllUserUseCase().collectLatest { usersList ->
-                currentUser?.let {
-                    _users.value = usersList.filterNot { it.id == currentUser.id }
-                    _conversationState.value = ConversationState.DEFAULT
-                }
-            }
-        }
-    }
 
     fun createNewConversation(interlocutor: User) {
         _conversationState.value = ConversationState.LOADING
         viewModelScope.launch {
             createConversationUseCase(interlocutor)
             _conversationState.value = ConversationState.CREATED
+        }
+    }
+
+    fun getAllUsers() {
+        viewModelScope.launch {
+            getAllUserUseCase().collectLatest {
+                currentUser?.let { currentUser ->
+                    _users.value = it.filter { user -> user.id != currentUser.id }
+                }
+            }
         }
     }
 }

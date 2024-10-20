@@ -81,7 +81,7 @@ fun ConversationItem(
     }
 
     val unreadMessage = lastMessage?.let {
-        it.senderId == conversation.interlocutor.id && !it.isRead
+        !(it.sentByUser && it.isRead)
     } ?: false
 
     Row(
@@ -132,7 +132,7 @@ fun ConversationItem(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             modifier = Modifier.weight(1f),
-                            text = lastMessage!!.text,
+                            text = lastMessage!!.content,
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.SemiBold,
                             maxLines = 1,
@@ -171,7 +171,7 @@ fun ConversationItem(
 
                     lastMessage?.let {
                         Text(
-                            text = lastMessage.text,
+                            text = lastMessage.content,
                             style = MaterialTheme.typography.bodyMedium,
                             color = GedoiseColor.PreviewText,
                             maxLines = 1,

@@ -63,7 +63,7 @@ fun ReceiveMessageItem(
         Spacer(modifier = Modifier.width(MaterialTheme.spacing.small))
 
         MessageText(
-            text = message.text,
+            text = message.content,
             backgroundColor = backgroundColor
         )
     }
@@ -120,7 +120,7 @@ private fun SentMessageItemPreview() {
 private fun ReceiveMessageItemPreview() {
     GedoiseTheme {
         ReceiveMessageItem(
-            message = messageFixture.copy(text = mediumText),
+            message = messageFixture.copy(content = mediumText),
             displayProfilePicture = true,
             profilePictureUrl = ""
         )

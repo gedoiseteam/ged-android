@@ -37,7 +37,7 @@ import com.upsaclay.gedoise.data.BottomNavigationItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainTopBar(navController: NavController, user: User) {
+fun HomeTopBar(navController: NavController, user: User) {
     TopAppBar(
         title = {
             Text(

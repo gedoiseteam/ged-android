@@ -70,7 +70,8 @@ internal class UserFirestoreApiImpl : UserFirestoreApi {
         profilePictureUrl: String?
     ): Result<Unit> =
         suspendCoroutine { continuation ->
-            users.document(userId).update("profile_picture_url", profilePictureUrl)
+            users.document(userId)
+                .update(UserFieldsRemote.PROFILE_PICTURE_URL, profilePictureUrl)
                 .addOnSuccessListener {
                     continuation.resume(Result.success(Unit))
                 }

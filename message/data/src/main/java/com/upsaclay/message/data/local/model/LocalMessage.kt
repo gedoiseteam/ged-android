@@ -15,8 +15,8 @@ data class LocalMessage(
     val senderId: Int,
     @ColumnInfo(name = MessageField.CONVERSATION_ID)
     val conversationId: String,
-    @ColumnInfo(name = MessageField.TEXT)
-    val text: String,
+    @ColumnInfo(name = MessageField.CONTENT)
+    val content: String,
     @ColumnInfo(name = MessageField.TIMESTAMP)
     val timestamp: Long,
     @ColumnInfo(name = MessageField.IS_READ)

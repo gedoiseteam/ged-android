@@ -7,4 +7,8 @@ interface ConversationRepository {
     val conversations: Flow<Set<Conversation>>
 
     suspend fun createConversation(conversation: Conversation)
+
+    suspend fun setConversationActive(conversation: Conversation)
+
+    suspend fun deleteConversation(conversation: Conversation)
 }

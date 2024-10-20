@@ -24,7 +24,7 @@ sealed class BottomNavigationItem(
 
     data class Message(
         override val screen: Screen = Screen.CONVERSATIONS,
-        override val label: Int = R.string.message,
+        override val label: Int = R.string.messages,
         override var badges: Int = 0,
         override var hasNews: Boolean = false,
         override val icon: Int = com.upsaclay.common.R.drawable.ic_mail,

@@ -30,7 +30,6 @@ import com.upsaclay.common.domain.model.User
 import com.upsaclay.common.presentation.components.OverlayCircularLoadingScreen
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
-import com.upsaclay.common.utils.userFixture
 import com.upsaclay.message.R
 import com.upsaclay.message.domain.model.Message
 import com.upsaclay.message.presentation.components.ChatTopBar
@@ -49,13 +48,12 @@ fun ChatScreen(
     chatViewModel: ChatViewModel = koinViewModel()
 ) {
     val conversation = chatViewModel.conversation.collectAsState(null).value
-    val currentUser = chatViewModel.currentUser.collectAsState(null).value
 
     LaunchedEffect(Unit) {
         chatViewModel.getConversation(interlocutorId)
     }
 
-    if (conversation != null && currentUser != null) {
+    if (conversation != null) {
         Scaffold(
             topBar = {
                 ChatTopBar(
@@ -75,7 +73,6 @@ fun ChatScreen(
                 DisplayMessageSection(
                     modifier = Modifier.weight(1f),
                     messages = conversation.messages,
-                    currentUser = currentUser,
                     interlocutor = conversation.interlocutor
                 )
 
@@ -110,7 +107,6 @@ fun ChatScreen(
 private fun DisplayMessageSection(
     modifier: Modifier = Modifier,
     messages: List<Message>,
-    currentUser: User,
     interlocutor: User
 ) {
     LazyColumn(
@@ -119,7 +115,9 @@ private fun DisplayMessageSection(
     ) {
         if(messages.isNotEmpty()) {
             itemsIndexed(messages) { index, message ->
-                val sameSender = index > 0 && message.senderId == messages[index - 1].senderId
+                val sameSender = index > 0 &&
+                        ((message.sentByUser && messages[index - 1].sentByUser) ||
+                                (!message.sentByUser && !messages[index - 1].sentByUser))
 
                 val spacerHeight: Dp = if (sameSender) {
                     MaterialTheme.spacing.extraSmall
@@ -127,12 +125,10 @@ private fun DisplayMessageSection(
                     MaterialTheme.spacing.smallMedium
                 }
 
-                val isCurrentUserSender = message.senderId == currentUser.id
-
                 Spacer(modifier = Modifier.height(spacerHeight))
 
-                if (isCurrentUserSender) {
-                    SentMessageItem(text = message.text)
+                if (message.sentByUser) {
+                    SentMessageItem(text = message.content)
                 } else {
                     val displayProfilePicture: Boolean = index == 0 || !sameSender
 
@@ -186,7 +182,6 @@ private fun ChatScreenPreview() {
                     DisplayMessageSection(
                         modifier = Modifier.weight(1f),
                         messages = messagesFixture,
-                        currentUser = userFixture,
                         interlocutor = conversationFixture.interlocutor
                     )
 
