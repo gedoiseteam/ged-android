@@ -33,10 +33,10 @@ fun ProfilePictureWithIcon(
     modifier: Modifier = Modifier,
     scale: Float = 1f,
     imageUri: Uri?,
-    iconVector: ImageVector,
+    iconVector: ImageVector = Icons.Default.Edit,
     iconBackgroundColor: Color = MaterialTheme.colorScheme.primary,
     iconColor: Color = Color.White,
-    contentDescription: String,
+    contentDescription: String = "",
     onClick: (() -> Unit)?
 ) {
     ImageWithIcon(
@@ -56,10 +56,10 @@ fun ProfilePictureWithIcon(
     modifier: Modifier = Modifier,
     scale: Float = 1f,
     imageUrl: String?,
-    iconVector: ImageVector,
+    iconVector: ImageVector = Icons.Default.Edit,
     iconBackgroundColor: Color = MaterialTheme.colorScheme.primary,
     iconColor: Color = Color.White,
-    contentDescription: String,
+    contentDescription: String = "",
     onClick: (() -> Unit)? = null
 ) {
     ImageWithIcon(
@@ -77,7 +77,7 @@ fun ProfilePictureWithIcon(
 @Composable
 fun ProfilePicture(
     modifier: Modifier = Modifier,
-    scaleImage: Float = 1f,
+    scale: Float = 1f,
     imageUrl: String?,
     onClick: (() -> Unit)? = null
 ) {
@@ -87,12 +87,12 @@ fun ProfilePicture(
         contentScale = ContentScale.Crop,
         modifier = onClick?.let {
             modifier
-                .size(100.dp * scaleImage)
+                .size(100.dp * scale)
                 .clip(CircleShape)
                 .clickable(onClick = it)
         } ?: run {
             modifier
-                .size(100.dp * scaleImage)
+                .size(100.dp * scale)
                 .clip(CircleShape)
         }
     )
@@ -101,7 +101,7 @@ fun ProfilePicture(
 @Composable
 fun ProfilePicture(
     modifier: Modifier = Modifier,
-    scaleImage: Float = 1f,
+    scale: Float = 1f,
     imageUri: Uri?,
     onClick: (() -> Unit)? = null
 ) {
@@ -111,12 +111,12 @@ fun ProfilePicture(
         contentScale = ContentScale.Crop,
         modifier = onClick?.let {
             modifier
-                .size(100.dp * scaleImage)
+                .size(100.dp * scale)
                 .clip(CircleShape)
                 .clickable(onClick = it)
         } ?: run {
             modifier
-                .size(100.dp * scaleImage)
+                .size(100.dp * scale)
                 .clip(CircleShape)
         }
     )

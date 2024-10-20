@@ -3,10 +3,10 @@ package com.upsaclay.authentication.presentation
 import android.os.Build
 import android.view.ViewTreeObserver
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,11 +16,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -31,12 +31,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -46,50 +51,82 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.NavController
 import com.upsaclay.authentication.R
 import com.upsaclay.authentication.domain.model.AuthenticationState
-import com.upsaclay.authentication.presentation.components.LargeButton
-import com.upsaclay.authentication.presentation.components.LoadingLargeButton
+import com.upsaclay.authentication.presentation.components.LoginButton
 import com.upsaclay.authentication.presentation.components.OutlinedEmailInput
 import com.upsaclay.authentication.presentation.components.OutlinedPasswordInput
 import com.upsaclay.common.domain.model.Screen
-import com.upsaclay.common.presentation.components.ErrorText
-import com.upsaclay.common.presentation.components.OverlayLoadingScreen
+import com.upsaclay.common.presentation.components.ErrorTextWithIcon
+import com.upsaclay.common.presentation.components.SimpleDialog
 import com.upsaclay.common.presentation.theme.GedoiseColor.Primary
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
+import com.upsaclay.common.utils.showToast
 import org.koin.androidx.compose.koinViewModel
-import com.upsaclay.common.R as CoreResource
 
 @Composable
 fun AuthenticationScreen(
     navController: NavController,
     authenticationViewModel: AuthenticationViewModel = koinViewModel()
 ) {
-    val authenticationState by authenticationViewModel.authenticationState.collectAsState()
-    var isError by remember { mutableStateOf(false) }
+    val authenticationState = authenticationViewModel.authenticationState.collectAsState().value
+    var inputsError by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
+    var showVerifyEmailDialog by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
     val keyboardController = LocalSoftwareKeyboardController.current
     var isKeyboardVisible by remember { mutableStateOf(false) }
     val view = LocalView.current
     val context = LocalContext.current
-    val email = authenticationViewModel.email
-    val password = authenticationViewModel.password
+    val focusRequester = remember { FocusRequester() }
+    val focusManager = LocalFocusManager.current
 
-    if (authenticationState == AuthenticationState.AUTHENTICATED) {
-        navController.navigate(Screen.NEWS.route)
-    }
-
-    isError = authenticationState == AuthenticationState.AUTHENTICATION_ERROR ||
-            authenticationState == AuthenticationState.INPUT_ERROR
+    inputsError = authenticationState == AuthenticationState.AUTHENTICATION_ERROR ||
+            authenticationState == AuthenticationState.INPUTS_EMPTY_ERROR
 
     errorMessage = when (authenticationState) {
         AuthenticationState.AUTHENTICATION_ERROR ->
             stringResource(id = R.string.error_connection)
 
-        AuthenticationState.INPUT_ERROR ->
-            stringResource(id = CoreResource.string.error_empty_fields)
+        AuthenticationState.INPUTS_EMPTY_ERROR ->
+            stringResource(id = com.upsaclay.common.R.string.empty_fields_error)
+
+        AuthenticationState.AUTHENTICATED_USER_NOT_FOUND ->
+            stringResource(id = R.string.authenticated_user_not_found)
+
+        AuthenticationState.TOO_MANY_REQUESTS_ERROR ->
+            stringResource(id = R.string.too_many_request_error)
 
         else -> ""
+    }
+
+    LaunchedEffect(Unit) {
+        authenticationViewModel.resetAuthenticationState()
+    }
+
+    LaunchedEffect(authenticationState) {
+        when(authenticationState) {
+            AuthenticationState.AUTHENTICATED -> {
+                navController.navigate(Screen.NEWS.route) {
+                    popUpTo(navController.graph.id) {
+                        inclusive = true
+                    }
+                }
+            }
+
+            AuthenticationState.NETWORK_ERROR -> {
+                showToast(context = context, stringRes = com.upsaclay.common.R.string.network_error)
+            }
+
+            AuthenticationState.EMAIL_NOT_VERIFIED -> {
+                showVerifyEmailDialog = true
+            }
+
+            AuthenticationState.UNKNOWN_ERROR -> {
+                showToast(context = context, stringRes = com.upsaclay.common.R.string.unknown_error)
+            }
+
+            else -> {}
+        }
     }
 
     DisposableEffect(context) {
@@ -115,40 +152,78 @@ fun AuthenticationScreen(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.aligned { size, space ->
-                size + (30 * space / 100)
+    if(showVerifyEmailDialog) {
+        SimpleDialog(
+            message = stringResource(id = R.string.email_not_verified_dialog_message),
+            confirmText = stringResource(id = com.upsaclay.common.R.string.keep_going),
+            onDismiss = {
+                showVerifyEmailDialog = false
+                authenticationViewModel.resetAuthenticationState()
             },
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(scrollState)
-                .padding(MaterialTheme.spacing.medium)
-        ) {
-            TitleSection()
+            onConfirm = {
+                navController.navigate(Screen.CHECK_EMAIL_VERIFIED_SCREEN.route) {
+                    popUpTo(navController.graph.id) { inclusive = true }
+                }
+            },
+            onCancel = {
+                showVerifyEmailDialog = false
+                authenticationViewModel.resetAuthenticationState()
+            }
+        )
+    }
 
-            Spacer(modifier = Modifier.height(MaterialTheme.spacing.extraLarge))
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.aligned { size, space ->
+            size + (30 * space / 100)
+        },
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            .verticalScroll(scrollState)
+            .padding(MaterialTheme.spacing.medium)
+            .pointerInput(Unit) {
+                detectTapGestures(onPress = {
+                    focusManager.clearFocus()
+                    keyboardController?.hide()
+                })
+            }
+    ) {
+        TitleSection()
 
-            BottomSection(
-                email = email,
+        Spacer(modifier = Modifier.height(MaterialTheme.spacing.extraLarge))
+
+        Column {
+            InputsSection(
+                email = authenticationViewModel.email,
                 onEmailChange = { authenticationViewModel.updateEmail(it) },
-                password = password,
+                password = authenticationViewModel.password,
                 onPasswordChange = { authenticationViewModel.updatePassword(it) },
-                errorMessage = errorMessage,
                 keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
-                onConnectionClick = {
+                errorMessage = errorMessage,
+                isError = inputsError,
+                focusRequester = focusRequester
+            )
+
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))
+
+            LoginButton(
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(id = R.string.login),
+                isLoading = authenticationState == AuthenticationState.LOADING ||
+                        authenticationState == AuthenticationState.AUTHENTICATED,
+                onClick = {
                     keyboardController?.hide()
                     authenticationViewModel.login()
-                },
-                onRegistrationClick = { navController.navigate(Screen.FIRST_REGISTRATION_SCREEN.route) },
-                isError = isError,
-                isEnable = authenticationState != AuthenticationState.LOADING
+                }
             )
-        }
 
-        if (authenticationState == AuthenticationState.LOADING) {
-            OverlayLoadingScreen()
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.smallMedium))
+
+            RegistrationSection(
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                onRegistrationClick = { navController.navigate(Screen.FIRST_REGISTRATION_SCREEN.route) }
+            )
         }
     }
 }
@@ -157,16 +232,16 @@ fun AuthenticationScreen(
 private fun TitleSection() {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Image(
-            painter = painterResource(id = CoreResource.drawable.ged_logo),
-            contentDescription = stringResource(id = CoreResource.string.ged_logo_description),
+            painter = painterResource(id = com.upsaclay.common.R.drawable.ged_logo),
+            contentDescription = stringResource(id = com.upsaclay.common.R.string.ged_logo_description),
             contentScale = ContentScale.Fit,
             alignment = Alignment.Center,
-            modifier = Modifier.size(140.dp)
+            modifier = Modifier.size(100.dp)
         )
         Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))
 
         Text(
-            text = stringResource(id = R.string.welcome_text),
+            text = stringResource(id = R.string.authentication_screen_title),
             style = MaterialTheme.typography.titleMedium,
             textAlign = TextAlign.Center
         )
@@ -183,63 +258,24 @@ private fun TitleSection() {
 }
 
 @Composable
-private fun BottomSection(
-    email: String,
-    onEmailChange: (String) -> Unit,
-    password: String,
-    onPasswordChange: (String) -> Unit,
-    keyboardActions: KeyboardActions,
-    isError: Boolean,
-    isEnable: Boolean = true,
-    errorMessage: String,
-    onConnectionClick: () -> Unit,
-    onRegistrationClick: () -> Unit,
-    isLoading: Boolean = false
+private fun RegistrationSection(
+    modifier: Modifier = Modifier,
+    onRegistrationClick: () -> Unit
 ) {
-    Column {
-        InputsSection(
-            email = email,
-            onEmailChange = onEmailChange,
-            password = password,
-            onPasswordChange = onPasswordChange,
-            keyboardActions = keyboardActions,
-            errorMessage = errorMessage,
-            isError = isError,
-            isEnable = isEnable
+    Row(modifier = modifier) {
+        Text(text = stringResource(id = R.string.first_arrival))
+
+        Spacer(modifier = Modifier.width(MaterialTheme.spacing.extraSmall))
+
+        ClickableText(
+            text = AnnotatedString(stringResource(id = R.string.sign_up)),
+            style = MaterialTheme.typography.bodyLarge.copy(
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.primary,
+                textDecoration = TextDecoration.Underline
+            ),
+            onClick = { onRegistrationClick() }
         )
-
-        Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))
-
-        if (isLoading) {
-            LoadingLargeButton(modifier = Modifier.fillMaxWidth())
-        } else {
-            LargeButton(
-                text = stringResource(id = R.string.login),
-                onClick = onConnectionClick,
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
-
-        Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
-
-        Row(modifier = Modifier.align(Alignment.CenterHorizontally)) {
-            Text(text = stringResource(id = R.string.first_arrival))
-
-            Spacer(modifier = Modifier.width(MaterialTheme.spacing.extraSmall))
-
-            TextButton(
-                contentPadding = PaddingValues(MaterialTheme.spacing.default),
-                modifier = Modifier.height(MaterialTheme.spacing.large),
-                onClick = onRegistrationClick
-            ) {
-                Text(
-                    text = stringResource(id = R.string.sign_up),
-                    textDecoration = TextDecoration.Underline,
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
-        }
     }
 }
 
@@ -252,30 +288,35 @@ private fun InputsSection(
     keyboardActions: KeyboardActions,
     errorMessage: String,
     isError: Boolean,
-    isEnable: Boolean = true
+    focusRequester: FocusRequester
 ) {
     Column {
         OutlinedEmailInput(
+            modifier = Modifier
+                .fillMaxWidth()
+                .focusRequester(focusRequester),
             text = email,
             onValueChange = onEmailChange,
             keyboardActions = keyboardActions,
-            isError = isError,
-            isEnable = isEnable
+            isError = isError
         )
 
         Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
 
         OutlinedPasswordInput(
+            modifier = Modifier
+                .fillMaxWidth()
+                .focusRequester(focusRequester),
             text = password,
             onValueChange = onPasswordChange,
             keyboardActions = keyboardActions,
-            isError = isError,
-            isEnable = isEnable
+            isError = isError
         )
-        if (isError) {
+
+        if(errorMessage.isNotEmpty()) {
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
 
-            ErrorText(text = errorMessage)
+            ErrorTextWithIcon(text = errorMessage)
         }
     }
 }
@@ -292,6 +333,8 @@ private fun AuthenticationScreenPreview() {
     var isLoading by remember { mutableStateOf(false) }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    val focusRequester = remember { FocusRequester() }
+    val focusManager = LocalFocusManager.current
 
     GedoiseTheme {
         Column(
@@ -302,24 +345,44 @@ private fun AuthenticationScreenPreview() {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(MaterialTheme.spacing.medium)
+                .pointerInput(Unit) {
+                    detectTapGestures(onPress = {
+                        focusManager.clearFocus()
+                    })
+                }
         ) {
             TitleSection()
 
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.extraLarge))
 
-            BottomSection(
-                email = email,
-                onEmailChange = { email = it },
-                password = password,
-                onPasswordChange = { password = it },
-                errorMessage = "Veuillez remplir tous les champs",
-                onConnectionClick = { isLoading = !isLoading },
-                onRegistrationClick = { },
-                keyboardActions = KeyboardActions.Default,
-                isError = false,
-                isEnable = !isLoading,
-                isLoading = isLoading
-            )
+            Column {
+                InputsSection(
+                    email = email,
+                    onEmailChange = { email = it },
+                    password = password,
+                    onPasswordChange = { password = it },
+                    keyboardActions = KeyboardActions(onDone = { }),
+                    errorMessage = "",
+                    isError = false,
+                    focusRequester = focusRequester
+                )
+
+                Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))
+
+                LoginButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = stringResource(id = R.string.login),
+                    isLoading = isLoading,
+                    onClick = { isLoading = !isLoading }
+                )
+
+                Spacer(modifier = Modifier.height(MaterialTheme.spacing.smallMedium))
+
+                RegistrationSection(
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    onRegistrationClick = { }
+                )
+            }
         }
     }
 }

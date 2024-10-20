@@ -12,25 +12,21 @@ class UpdateUserProfilePictureUseCase(
     private val imageRepository: ImageRepository,
     private val userRepository: UserRepository
 ) {
-    suspend operator fun invoke(
-        userId: Int,
-        profilePictureUri: Uri,
-        currentUserProfilePictureUrl: String?
-    ): Result<Unit> {
+    suspend operator fun invoke(profilePictureUri: Uri): Result<Unit> {
+        val currentUser = userRepository.currentUser ?: return Result.failure(IllegalArgumentException("User not logged in"))
+
         val currentTime = System.currentTimeMillis()
-        val fileName = "$userId-profile-picture-$currentTime"
+        val fileName = "${currentUser.id}-profile-picture-$currentTime"
         val profilePictureFile = fileRepository.createFileFromUri(fileName, profilePictureUri)
         val uploadImageResult = imageRepository.uploadImage(profilePictureFile)
 
         return if (uploadImageResult.isSuccess) {
             val profilePictureUrl = formatProfilePictureUrl(fileName, profilePictureFile.extension)
-            userRepository.updateProfilePictureUrl(userId, profilePictureUrl)
-                .onSuccess {
-                    currentUserProfilePictureUrl?.let { deleteProfilePictureImage(it) }
-                }
+
+            userRepository.updateProfilePictureUrl(currentUser.id, profilePictureUrl)
+                .onSuccess { currentUser.profilePictureUrl?.let { deleteProfilePictureImage(it) } }
         } else {
-            val exception =
-                uploadImageResult.exceptionOrNull() ?: IOException("Error uploading image")
+            val exception = uploadImageResult.exceptionOrNull() ?: IOException("Error uploading image")
             Result.failure(exception)
         }
     }

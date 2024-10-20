@@ -12,7 +12,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.upsaclay.common.domain.model.User
 import com.upsaclay.common.presentation.components.ProfilePicture
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
@@ -30,7 +29,7 @@ fun UserItem(user: com.upsaclay.common.domain.model.User, onClick: () -> Unit) {
             ),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        ProfilePicture(imageUrl = user.profilePictureUrl, scaleImage = 0.5f)
+        ProfilePicture(imageUrl = user.profilePictureUrl, scale = 0.5f)
 
         Spacer(modifier = Modifier.width(MaterialTheme.spacing.smallMedium))
 

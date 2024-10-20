@@ -5,11 +5,17 @@ import com.upsaclay.message.data.local.model.LocalMessage
 import kotlinx.coroutines.flow.Flow
 
 internal class MessageLocalDataSource(private val messageDao: MessageDao) {
-    fun getLastMessages(conversationId: String): Flow<List<LocalMessage>> = messageDao.getLastMessages(conversationId)
+    fun getLastMessages(conversationId: String): Flow<List<LocalMessage>> =
+        messageDao.getLastMessages(conversationId)
 
-    suspend fun getMessages(conversationId: String, offset: Int): List<LocalMessage> = messageDao.getMessages(conversationId, offset)
+    suspend fun getMessages(conversationId: String, offset: Int = 0): List<LocalMessage> =
+        messageDao.getMessages(conversationId, offset)
 
-    suspend fun addMessage(localMessage: LocalMessage) {
+    suspend fun insertMessage(localMessage: LocalMessage) {
         messageDao.insertMessage(localMessage)
+    }
+
+    suspend fun updateMessage(localMessage: LocalMessage) {
+        messageDao.updateMessage(localMessage)
     }
 }

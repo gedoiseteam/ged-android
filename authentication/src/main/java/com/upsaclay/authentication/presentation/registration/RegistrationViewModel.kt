@@ -7,22 +7,44 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.upsaclay.authentication.domain.model.RegistrationState
-import com.upsaclay.authentication.domain.usecase.IsAccountExistUseCase
-import com.upsaclay.authentication.domain.usecase.RegistrationUseCase
+import com.upsaclay.authentication.domain.model.exception.AuthenticationException
+import com.upsaclay.authentication.domain.model.exception.FirebaseAuthErrorCode
+import com.upsaclay.authentication.domain.model.exception.TooManyRequestException
+import com.upsaclay.authentication.domain.usecase.IsUserEmailVerifiedUseCase
+import com.upsaclay.common.domain.usecase.CreateUserUseCase
+import com.upsaclay.authentication.domain.usecase.RegisterUseCase
+import com.upsaclay.authentication.domain.usecase.SendVerificationEmailUseCase
+import com.upsaclay.authentication.domain.usecase.SetUserAuthenticatedUseCase
+import com.upsaclay.authentication.domain.usecase.VerifyEmailFormatUseCase
+import com.upsaclay.common.domain.uppercaseFirstLetter
 import com.upsaclay.common.domain.model.User
+import com.upsaclay.common.domain.usecase.GetCurrentUserFlowUseCase
+import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
+import com.upsaclay.common.domain.usecase.IsUserExistUseCase
+import com.upsaclay.common.domain.usecase.UpdateUserProfilePictureUseCase
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-internal const val MAX_REGISTRATION_STEP = 3
-
 class RegistrationViewModel(
-    private val isAccountExistUseCase: IsAccountExistUseCase,
-    private val registrationUseCase: RegistrationUseCase
+    private val createUserUseCase: CreateUserUseCase,
+    private val registerUseCase: RegisterUseCase,
+    private val verifyEmailFormatUseCase: VerifyEmailFormatUseCase,
+    private val isUserExistUseCase: IsUserExistUseCase,
+    private val updateUserProfilePictureUseCase: UpdateUserProfilePictureUseCase,
+    private val sendVerificationEmailUseCase: SendVerificationEmailUseCase,
+    private val isUserEmailVerifiedUseCase: IsUserEmailVerifiedUseCase,
+    private val setUserAuthenticatedUseCase: SetUserAuthenticatedUseCase,
+    private val getCurrentUserUseCase: GetCurrentUserUseCase,
 ) : ViewModel() {
     private val _registrationState = MutableStateFlow(RegistrationState.NOT_REGISTERED)
     val registrationState: StateFlow<RegistrationState> = _registrationState
+    var firstName by mutableStateOf("")
+        private set
+    var lastName by mutableStateOf("")
+        private set
     var email by mutableStateOf("")
         private set
     var password by mutableStateOf("")
@@ -32,8 +54,14 @@ class RegistrationViewModel(
         private set
     var profilePictureUri: Uri? by mutableStateOf(null)
         private set
-    var fullName by mutableStateOf("")
-        private set
+
+    fun updateFirstName(firstName: String) {
+        this.firstName = firstName
+    }
+
+    fun updateLastName(lastName: String) {
+        this.lastName = lastName
+    }
 
     fun updateEmail(email: String) {
         this.email = email
@@ -51,6 +79,14 @@ class RegistrationViewModel(
         uri?.let { profilePictureUri = it }
     }
 
+    fun resetFirstName() {
+        firstName = ""
+    }
+
+    fun resetLastName() {
+        lastName = ""
+    }
+
     fun resetEmail() {
         email = ""
     }
@@ -63,44 +99,169 @@ class RegistrationViewModel(
         profilePictureUri = null
     }
 
-    fun verifyAccount(email: String, password: String) {
+    fun resetSchoolLevel() {
+        schoolLevel = schoolLevels[0]
+    }
+
+    fun resetRegistrationState() {
+        _registrationState.value = RegistrationState.NOT_REGISTERED
+    }
+
+    fun getCurrentUserIfNeeded() {
+        if(email.isBlank()) {
+            _registrationState.value = RegistrationState.LOADING
+
+            viewModelScope.launch {
+                getCurrentUserUseCase()?.let { user ->
+                    firstName = user.firstName
+                    lastName = user.lastName
+                    email = user.email
+                    schoolLevel = user.schoolLevel
+                    _registrationState.value = RegistrationState.OK
+                } ?: run {
+                    _registrationState.value = RegistrationState.UNRECOGNIZED_ACCOUNT
+                }
+            }
+        }
+    }
+
+    fun verifyNamesInputs(): Boolean {
+        return if(firstName.isBlank() || lastName.isBlank()) {
+            _registrationState.value = RegistrationState.INPUTS_EMPTY_ERROR
+            false
+        } else {
+            firstName = firstName.uppercaseFirstLetter().trim()
+            lastName = lastName.uppercaseFirstLetter().trim()
+            true
+        }
+    }
+
+    fun verifyPasswordFormat(): Boolean {
+        return when {
+            !checkEmptyEmailAndPassword() -> {
+                _registrationState.value = RegistrationState.INPUTS_EMPTY_ERROR
+                false
+            }
+            password.length >= 8 -> true
+            else -> {
+                _registrationState.value = RegistrationState.PASSWORD_LENGTH_ERROR
+                false
+            }
+        }
+    }
+
+    fun verifyEmailFormat(): Boolean {
+        return when {
+            !checkEmptyEmailAndPassword() -> {
+                _registrationState.value = RegistrationState.INPUTS_EMPTY_ERROR
+                false
+            }
+            verifyEmailFormatUseCase(email.trim()) -> true
+            else -> {
+                _registrationState.value = RegistrationState.EMAIL_FORMAT_ERROR
+                false
+            }
+        }
+    }
+
+    private fun checkEmptyEmailAndPassword(): Boolean = email.isNotBlank() && password.isNotBlank()
+
+    fun verifyIsUserAlreadyExist() {
         _registrationState.value = RegistrationState.LOADING
 
-        if (email.isBlank() || password.isBlank()) {
-            _registrationState.value = RegistrationState.INPUT_ERROR
-            return
-        }
-
         viewModelScope.launch {
-            _registrationState.value = if (isAccountExistUseCase(email, password)) {
-                val splitName = email.split(".")
-                val splitMail = splitName[1].split("@")
-
-                val firstname = splitName[0].replaceFirstChar { it.uppercase() }
-                val lastname = splitMail[0].replaceFirstChar { it.uppercase() }
-
-                fullName = String.format("%s %s", firstname, lastname)
-                RegistrationState.RECOGNIZED_ACCOUNT
-            } else {
-                RegistrationState.UNRECOGNIZED_ACCOUNT
-            }
+            isUserExistUseCase(email.trim())
+                .onSuccess { isExist ->
+                    _registrationState.value = if(isExist) {
+                         RegistrationState.USER_ALREADY_EXIST
+                    } else {
+                        RegistrationState.USER_NOT_EXIST
+                    }
+                }
+                .onFailure { _registrationState.value = RegistrationState.ERROR }
         }
     }
 
     fun register() {
         _registrationState.value = RegistrationState.LOADING
 
-        val user = User(
-            firstName = fullName.split(" ")[0],
-            lastName = fullName.split(" ")[1],
-            email = email,
-            schoolLevel = schoolLevel
-        )
+        viewModelScope.launch {
+            val user = User(
+                firstName = firstName,
+                lastName = lastName,
+                email = email.trim(),
+                schoolLevel = schoolLevel
+            )
+
+            registerUseCase(email.trim(), password)
+                .onSuccess {
+                    createUserUseCase(user)
+                        .onSuccess {
+                            setUserAuthenticatedUseCase(true)
+                            _registrationState.value = RegistrationState.REGISTERED
+                        }
+                        .onFailure {
+                            setUserAuthenticatedUseCase(false)
+                            _registrationState.value = RegistrationState.ERROR
+                        }
+                }
+                .onFailure { e ->
+                    if(e is AuthenticationException) {
+                        _registrationState.value = when(e.code) {
+                            FirebaseAuthErrorCode.EMAIL_ALREADY_EXIST -> RegistrationState.USER_ALREADY_EXIST
+                            else -> RegistrationState.ERROR
+                        }
+                    }
+                    _registrationState.value = RegistrationState.ERROR
+                }
+        }
+    }
+
+    fun sendVerificationEmail() {
+        _registrationState.value = RegistrationState.LOADING
 
         viewModelScope.launch {
-            registrationUseCase(user, profilePictureUri)
-                .onSuccess { _registrationState.value = RegistrationState.REGISTERED }
-                .onFailure { _registrationState.value = RegistrationState.REGISTRATION_ERROR }
+            sendVerificationEmailUseCase.sendVerificationEmail()
+                .onSuccess { _registrationState.value = RegistrationState.OK }
+                .onFailure { e ->
+                    when(e) {
+                        is AuthenticationException -> {
+                            _registrationState.value = when(e.code) {
+                                FirebaseAuthErrorCode.EMAIL_ALREADY_EXIST -> RegistrationState.USER_ALREADY_EXIST
+                                else -> RegistrationState.ERROR
+                            }
+                        }
+                        is TooManyRequestException -> _registrationState.value = RegistrationState.TOO_MANY_REQUESTS
+
+                        else -> _registrationState.value = RegistrationState.ERROR
+                    }
+                }
         }
+    }
+
+    fun verifyIsEmailVerified() {
+        _registrationState.value = RegistrationState.LOADING
+
+        viewModelScope.launch {
+            if(isUserEmailVerifiedUseCase()) {
+                delay(900)
+                _registrationState.value = RegistrationState.EMAIL_VERIFIED
+            } else {
+                delay(900)
+                _registrationState.value = RegistrationState.EMAIL_NOT_VERIFIED
+            }
+        }
+    }
+
+    fun updateUserProfilePicture() {
+        _registrationState.value = RegistrationState.LOADING
+
+        profilePictureUri?.let {
+            viewModelScope.launch {
+                updateUserProfilePictureUseCase(profilePictureUri!!)
+                    .onSuccess { _registrationState.value = RegistrationState.OK }
+                    .onFailure { _registrationState.value = RegistrationState.ERROR }
+            }
+        } ?: run { _registrationState.value = RegistrationState.OK }
     }
 }

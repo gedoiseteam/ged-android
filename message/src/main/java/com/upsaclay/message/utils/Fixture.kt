@@ -4,34 +4,34 @@ import com.upsaclay.common.utils.userFixture
 import com.upsaclay.common.utils.userFixture2
 import com.upsaclay.message.domain.model.Conversation
 import com.upsaclay.message.domain.model.Message
+import com.upsaclay.message.domain.model.MessageType
 import java.time.LocalDateTime
 
 val messageFixture = Message(
     id = "1",
-    senderId = userFixture.id,
-    text = "Salut, bien et toi ? Oui bien sûr.",
+    content = "Salut, bien et toi ? Oui bien sûr.",
     date = LocalDateTime.of(2024, 7, 20, 10, 0),
     isRead = true,
-    type = "text"
+    type = MessageType.TEXT
 )
 
 val messageFixture2 = Message(
     id = "2",
-    senderId = userFixture2.id,
-    text = "Salut ça va ? Cela fait longtemps que j'attend de te parler. Pourrait-on se voir ?",
+    sentByUser = false,
+    content = "Salut ça va ? Cela fait longtemps que j'attend de te parler. Pourrait-on se voir ?",
     date = LocalDateTime.now(),
     isRead = false,
-    type = "text"
+    type = MessageType.TEXT
 )
 
 val messagesFixture = listOf(
     messageFixture,
-    messageFixture.copy(text = "Yes"),
+    messageFixture.copy(content = "Yes"),
     messageFixture,
     messageFixture2,
     messageFixture2,
     messageFixture2,
-    messageFixture2.copy(text = "T'es dispo ?"),
+    messageFixture2.copy(content = "T'es dispo ?"),
     messageFixture,
     messageFixture2,
     messageFixture,

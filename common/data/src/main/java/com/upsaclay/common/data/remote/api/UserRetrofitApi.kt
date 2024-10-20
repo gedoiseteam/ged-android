@@ -3,6 +3,7 @@ package com.upsaclay.common.data.remote.api
 import com.upsaclay.common.data.model.UserDTO
 import com.upsaclay.common.domain.model.ServerResponse.EmptyResponse
 import com.upsaclay.common.domain.model.ServerResponse.IntResponse
+import com.upsaclay.common.domain.model.User
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -16,6 +17,10 @@ internal interface UserRetrofitApi {
 
     @GET("users/{id}")
     suspend fun getUser(@Path("id") userId: Int): Response<UserDTO>
+
+    @FormUrlEncoded
+    @POST("users/get-user-with-email")
+    suspend fun getUser(@Field("USER_EMAIL") userEmail: String): Response<UserDTO>
 
     @POST("users/create")
     suspend fun createUser(@Body user: UserDTO): Response<IntResponse>

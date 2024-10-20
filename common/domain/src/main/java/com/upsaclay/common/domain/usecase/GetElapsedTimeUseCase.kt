@@ -4,7 +4,7 @@ import com.upsaclay.common.domain.model.ElapsedTime
 import java.time.Duration
 import java.time.LocalDateTime
 
-class GetElapsedTimeUseCase {
+object GetElapsedTimeUseCase {
     fun fromLocalDateTime(localDateTime: LocalDateTime): ElapsedTime {
         val duration = Duration.between(localDateTime, LocalDateTime.now())
         return when {

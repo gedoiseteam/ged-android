@@ -1,30 +1,51 @@
 package com.upsaclay.gedoise.presentation
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavController
+import androidx.navigation.NavType.Companion.IntType
 import androidx.navigation.NavType.Companion.StringType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.upsaclay.authentication.presentation.AuthenticationScreen
+import com.upsaclay.authentication.presentation.registration.EmailVerificationScreen
 import com.upsaclay.authentication.presentation.registration.FirstRegistrationScreen
-import com.upsaclay.authentication.presentation.registration.RegistrationViewModel
 import com.upsaclay.authentication.presentation.registration.SecondRegistrationScreen
+import com.upsaclay.authentication.presentation.registration.RegistrationViewModel
 import com.upsaclay.authentication.presentation.registration.ThirdRegistrationScreen
+import com.upsaclay.authentication.presentation.registration.FourthRegistrationScreen
 import com.upsaclay.common.domain.model.Screen
 import com.upsaclay.common.domain.model.User
 import com.upsaclay.common.presentation.components.SmallTopBarBack
+import com.upsaclay.common.utils.showToast
+import com.upsaclay.gedoise.R
 import com.upsaclay.gedoise.data.BottomNavigationItem
+import com.upsaclay.gedoise.presentation.components.MainBottomBar
+import com.upsaclay.gedoise.presentation.components.HomeTopBar
+import com.upsaclay.gedoise.presentation.components.SplashScreen
 import com.upsaclay.gedoise.presentation.profile.ProfileScreen
-import com.upsaclay.gedoise.presentation.profile.account.AccountScreen
+import com.upsaclay.gedoise.presentation.account.AccountScreen
+import com.upsaclay.message.presentation.screen.ChatScreen
 import com.upsaclay.message.presentation.screen.ConversationScreen
 import com.upsaclay.message.presentation.screen.CreateConversationScreen
 import com.upsaclay.message.presentation.screen.CreateGroupConversationScreen
@@ -36,15 +57,17 @@ import com.upsaclay.news.presentation.screen.NewsScreen
 import com.upsaclay.news.presentation.screen.ReadAnnouncementScreen
 import com.upsaclay.news.presentation.viewmodel.EditAnnouncementViewModel
 import com.upsaclay.news.presentation.viewmodel.NewsViewModel
+import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 import org.koin.java.KoinJavaComponent.inject
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Navigation(mainViewModel: MainViewModel = koinViewModel()) {
     val navController = rememberNavController()
     val user = mainViewModel.user.collectAsState(null).value
-    val isAuthenticated = mainViewModel.isAuthenticated.collectAsState(false).value
+    val isAuthenticated = mainViewModel.isAuthenticated.collectAsState(null).value
 
     val sharedRegistrationViewModel: RegistrationViewModel = koinViewModel()
     val sharedNewsViewModel: NewsViewModel = koinViewModel()
@@ -53,16 +76,28 @@ fun Navigation(mainViewModel: MainViewModel = koinViewModel()) {
     val convertAnnouncementToJsonUseCase: ConvertAnnouncementToJsonUseCase by inject(
         ConvertAnnouncementToJsonUseCase::class.java
     )
-    val startDestination = if (isAuthenticated) {
-        Screen.NEWS.route
-    } else {
-        Screen.NEWS.route
+
+    var startDestination by remember { mutableStateOf(Screen.SPLASH.route) }
+
+    LaunchedEffect(key1 = isAuthenticated) {
+        if(startDestination == Screen.SPLASH.route) {
+            delay(1000)
+            startDestination = if (isAuthenticated == true) {
+                Screen.NEWS.route
+            } else {
+                Screen.AUTHENTICATION.route
+            }
+        }
     }
 
     NavHost(
         navController = navController,
         startDestination = startDestination
     ) {
+        composable(Screen.SPLASH.route) {
+            SplashScreen()
+        }
+
         composable(Screen.AUTHENTICATION.route) {
             AuthenticationScreen(navController = navController)
         }
@@ -88,12 +123,26 @@ fun Navigation(mainViewModel: MainViewModel = koinViewModel()) {
             )
         }
 
+        composable(Screen.CHECK_EMAIL_VERIFIED_SCREEN.route) {
+            EmailVerificationScreen(
+                navController = navController,
+                registrationViewModel = sharedRegistrationViewModel
+            )
+        }
+
+        composable(Screen.FOURTH_REGISTRATION_SCREEN.route) {
+            FourthRegistrationScreen(
+                navController = navController,
+                registrationViewModel = sharedRegistrationViewModel
+            )
+        }
+
         composable(Screen.NEWS.route) {
             user?.let {
                 MainNavigationBars(
                     navController = navController,
+                    topBar = { HomeTopBar(navController = navController, user = user) },
                     bottomNavigationItems = mainViewModel.bottomNavigationItem.values.toList(),
-                    user = user
                 ) {
                     NewsScreen(
                         navController = navController,
@@ -145,17 +194,25 @@ fun Navigation(mainViewModel: MainViewModel = koinViewModel()) {
         }
 
         composable(Screen.CONVERSATIONS.route) {
-            user?.let {
-                MainNavigationBars(
-                    navController = navController,
-                    bottomNavigationItems = mainViewModel.bottomNavigationItem.values.toList(),
-                    user = user
-                ) {
-                    ConversationScreen(
-                        navController = navController,
-                        conversationViewModel = sharedConversationViewModel
+            MainNavigationBars(
+                navController = navController,
+                topBar = {
+                    TopAppBar(
+                        title = {
+                            Text(
+                                text = stringResource(R.string.messages),
+                                fontWeight = FontWeight.Bold,
+                                style = MaterialTheme.typography.titleLarge
+                            )
+                        }
                     )
-                }
+                },
+                bottomNavigationItems = mainViewModel.bottomNavigationItem.values.toList(),
+            ) {
+                ConversationScreen(
+                    navController = navController,
+                    conversationViewModel = sharedConversationViewModel
+                )
             }
         }
 
@@ -193,51 +250,54 @@ fun Navigation(mainViewModel: MainViewModel = koinViewModel()) {
             }
         }
 
-//        composable(
-//            route = Screen.CHAT.route + "?conversationId={conversationId}",
-//            arguments = listOf(navArgument("conversationId") { type = StringType })
-//        ) { backStackEntry ->
-//            val conversationId = backStackEntry.arguments?.getString("conversationId")
-//            val chatViewModel: ChatViewModel = koinViewModel(
-//                parameters = { parametersOf(conversationId, null) }
-//            )
-//            ChatScreen(navController, chatViewModel)
-//        }
-//
-//        composable(
-//            route = Screen.CHAT.route + "?userId={userId}",
-//            arguments = listOf(navArgument("userId") { type = IntType })
-//        ) { backStackEntry ->
-//            val interlocutorId = backStackEntry.arguments?.getInt("userId")
-//            val chatViewModel: ChatViewModel = koinViewModel(
-//                parameters = { parametersOf(null, interlocutorId) }
-//            )
-//            ChatScreen(navController, chatViewModel)
-//        }
-
-        composable(Screen.CALENDAR.route) {
-            user?.let {
-                MainNavigationBars(
-                    navController = navController,
-                    bottomNavigationItems = mainViewModel.bottomNavigationItem.values.toList(),
-                    user = user
-                ) {
-                    Text(text = "Calendar")
-                }
+        composable(
+            route = Screen.CHAT.route + "?interlocutorId={interlocutorId}",
+            arguments = listOf(navArgument("interlocutorId") { type = IntType })
+        ) { backStackEntry ->
+            val interlocutorId = backStackEntry.arguments?.getInt("interlocutorId")
+            interlocutorId?.let {
+                ChatScreen(interlocutorId = interlocutorId, navController = navController)
+            } ?: run {
+                navController.navigate(Screen.CONVERSATIONS.route)
+                showToast(context = LocalContext.current, stringRes = R.string.occurred_error)
             }
         }
 
-        composable(Screen.FORUM.route) {
-            user?.let {
-                MainNavigationBars(
-                    navController = navController,
-                    bottomNavigationItems = mainViewModel.bottomNavigationItem.values.toList(),
-                    user = user
-                ) {
-                    Text(text = "Forum")
-                }
-            }
-        }
+//        composable(Screen.CALENDAR.route) {
+//            MainNavigationBars(
+//                navController = navController,
+//                topBar = {
+//                    TopAppBar(
+//                        title = {
+//                            Text(
+//                                text = stringResource(R.string.calendar),
+//                                fontWeight = FontWeight.Bold,
+//                                style = MaterialTheme.typography.titleLarge
+//                            )
+//                        }
+//                    )
+//                },
+//                bottomNavigationItems = mainViewModel.bottomNavigationItem.values.toList(),
+//            ) { }
+//        }
+
+//        composable(Screen.FORUM.route) {
+//            MainNavigationBars(
+//                navController = navController,
+//                topBar = {
+//                    TopAppBar(
+//                        title = {
+//                            Text(
+//                                text = stringResource(R.string.forum),
+//                                fontWeight = FontWeight.Bold,
+//                                style = MaterialTheme.typography.titleLarge
+//                            )
+//                        }
+//                    )
+//                },
+//                bottomNavigationItems = mainViewModel.bottomNavigationItem.values.toList(),
+//            ) { }
+//        }
 
         composable(Screen.PROFILE.route) {
             ProfileScreen(navController = navController)
@@ -252,12 +312,12 @@ fun Navigation(mainViewModel: MainViewModel = koinViewModel()) {
 @Composable
 private fun MainNavigationBars(
     navController: NavController,
+    topBar: @Composable () -> Unit,
     bottomNavigationItems: List<BottomNavigationItem>,
-    user: User,
-    content: @Composable () -> Unit
+    content: @Composable BoxScope.() -> Unit
 ) {
     Scaffold(
-        topBar = { MainTopBar(navController = navController, user = user) },
+        topBar = topBar,
         bottomBar = {
             MainBottomBar(
                 navController = navController,

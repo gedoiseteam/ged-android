@@ -12,7 +12,20 @@
           "package_name": "com.upsaclay.gedoise"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "954607401960-qtbhjc6lb6kp34gc4vr5pn97h308darr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.upsaclay.gedoise",
+            "certificate_hash": "3be9c8d459a9657e3d77c8f8e854f1bedda64980"
+          }
+        },
+        {
+          "client_id": "954607401960-cpqdush7169cccuc9f1rtakt39i008bg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDMy_RYCp3i9QY80_72tUAfVgYvFhmzHfc"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "954607401960-cpqdush7169cccuc9f1rtakt39i008bg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

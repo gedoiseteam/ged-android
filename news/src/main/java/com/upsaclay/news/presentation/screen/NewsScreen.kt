@@ -41,16 +41,17 @@ import com.upsaclay.news.presentation.viewmodel.NewsViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun NewsScreen(newsViewModel: NewsViewModel = koinViewModel(), navController: NavController) {
+fun NewsScreen(
+    newsViewModel: NewsViewModel = koinViewModel(),
+    navController: NavController
+) {
     val announcements = newsViewModel.announcements.collectAsState(emptyList()).value
     val user = newsViewModel.user.collectAsState(null).value
     val isRefreshing = newsViewModel.isRefreshing
-    val onlineUsers = newsViewModel.onlineUsers.collectAsState().value
 
     LaunchedEffect(Unit) {
         newsViewModel.resetAnnouncementState()
         newsViewModel.refreshAnnouncements()
-        newsViewModel.getOnlineUsers()
     }
 
     user?.let {

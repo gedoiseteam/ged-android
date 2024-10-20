@@ -3,8 +3,9 @@ package com.upsaclay.message.data.local.dao
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Update
 import com.upsaclay.message.data.local.model.LocalMessage
-import com.upsaclay.message.data.remote.MessageField
+import com.upsaclay.message.data.model.MessageField
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -28,4 +29,7 @@ interface MessageDao {
 
     @Insert
     suspend fun insertMessage(localMessage: LocalMessage)
+
+    @Update
+    suspend fun updateMessage(localMessage: LocalMessage)
 }

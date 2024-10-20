@@ -2,11 +2,9 @@
 <resources>
     <string name="ic_message_add_description">Nouvelle conversation</string>
     <string name="ic_group_add_description">Nouveau groupe</string>
-    <string name="ic_add_description">Ouvrir le pannel des floating boutons</string>
+    <string name="ic_fab_button_add_description">Ouvrir le pannel des boutons flottants</string>
 
-    <string name="conversation">Conversation</string>
     <string name="message">Message</string>
-    <string name="group">Groupe</string>
     <string name="new_conversation">Nouvelle conversation</string>
     <string name="new_group">Nouveau groupe</string>
     <string name="no_conversation">Commencez une nouvelle discussion avec vos amis.</string>

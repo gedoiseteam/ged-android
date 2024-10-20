@@ -5,26 +5,27 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.upsaclay.news.domain.model.Announcement
+import com.upsaclay.news.domain.model.AnnouncementState
+import com.upsaclay.news.domain.usecase.UpdateAnnouncementUseCase
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 class EditAnnouncementViewModel(
-    val editedAnnouncement: com.upsaclay.news.domain.model.Announcement,
-    private val updateAnnouncementUseCase: com.upsaclay.news.domain.usecase.UpdateAnnouncementUseCase
+    val editedAnnouncement: Announcement,
+    private val updateAnnouncementUseCase: UpdateAnnouncementUseCase
 ) : ViewModel() {
-    private val _announcementState =
-        MutableStateFlow(com.upsaclay.news.domain.model.AnnouncementState.DEFAULT)
-    val announcementState: Flow<com.upsaclay.news.domain.model.AnnouncementState> =
-        _announcementState
+    private val _announcementState = MutableStateFlow(AnnouncementState.DEFAULT)
+    val announcementState: Flow<AnnouncementState> = _announcementState
 
     private val _isAnnouncementModified = MutableStateFlow(false)
     val isAnnouncementModified: Flow<Boolean> = _isAnnouncementModified
 
     var title by mutableStateOf(editedAnnouncement.title ?: "")
         private set
-    var content: String by mutableStateOf(editedAnnouncement.content)
+    var content by mutableStateOf(editedAnnouncement.content)
         private set
 
     fun updateTitle(title: String) {
@@ -37,18 +38,16 @@ class EditAnnouncementViewModel(
         verifyIsAnnouncementModified()
     }
 
-    fun updateAnnouncement(announcement: com.upsaclay.news.domain.model.Announcement) {
-        _announcementState.value = com.upsaclay.news.domain.model.AnnouncementState.LOADING
+    fun updateAnnouncement(announcement: Announcement) {
+        _announcementState.value = AnnouncementState.LOADING
         viewModelScope.launch {
             delay(300)
             updateAnnouncementUseCase(announcement)
                 .onSuccess {
-                    _announcementState.value =
-                        com.upsaclay.news.domain.model.AnnouncementState.ANNOUNCEMENT_UPDATED
+                    _announcementState.value = AnnouncementState.ANNOUNCEMENT_UPDATED
                 }
                 .onFailure {
-                    _announcementState.value =
-                        com.upsaclay.news.domain.model.AnnouncementState.ANNOUNCEMENT_UPDATE_ERROR
+                    _announcementState.value = AnnouncementState.ANNOUNCEMENT_UPDATE_ERROR
                 }
         }
     }

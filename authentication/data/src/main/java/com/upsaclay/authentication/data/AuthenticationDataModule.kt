@@ -1,10 +1,15 @@
 package com.upsaclay.authentication.data
 
 import com.upsaclay.authentication.data.local.AuthenticationLocalDataSource
-import com.upsaclay.authentication.data.remote.AuthenticationApi
 import com.upsaclay.authentication.data.remote.AuthenticationRemoteDataSource
+import com.upsaclay.authentication.data.remote.AuthenticationRetrofitApi
+import com.upsaclay.authentication.data.remote.firebase.FirebaseAuthenticationApi
+import com.upsaclay.authentication.data.remote.firebase.FirebaseAuthenticationApiImpl
+import com.upsaclay.authentication.data.remote.firebase.FirebaseAuthenticationRemoteDataSource
 import com.upsaclay.authentication.data.repository.AuthenticationRepositoryImpl
+import com.upsaclay.authentication.data.repository.FirebaseAuthenticationRepositoryImpl
 import com.upsaclay.authentication.domain.repository.AuthenticationRepository
+import com.upsaclay.authentication.domain.repository.FirebaseAuthenticationRepository
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.qualifier.named
@@ -25,10 +30,14 @@ val authenticationDataModule = module {
 
     single {
         get<Retrofit>(qualifier = named(PARIS_SACLAY_SERVER_QUALIFIER))
-            .create(AuthenticationApi::class.java)
+            .create(AuthenticationRetrofitApi::class.java)
     }
 
     singleOf(::AuthenticationRepositoryImpl) { bind<AuthenticationRepository>() }
     singleOf(::AuthenticationRemoteDataSource)
     singleOf(::AuthenticationLocalDataSource)
+
+    singleOf(::FirebaseAuthenticationRepositoryImpl) { bind<FirebaseAuthenticationRepository>() }
+    singleOf(::FirebaseAuthenticationApiImpl) { bind<FirebaseAuthenticationApi>() }
+    singleOf(::FirebaseAuthenticationRemoteDataSource)
 }

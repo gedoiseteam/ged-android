@@ -113,7 +113,7 @@ fun CreateAnnouncementScreen(
             Column {
                 TransparentFocusedTextField(
                     modifier = Modifier.fillMaxWidth(),
-                    defaultValue = title,
+                    value = title,
                     placeholder = {
                         Text(
                             text = stringResource(id = R.string.title_field_entry),
@@ -176,7 +176,7 @@ private fun CreateAnnouncementScreenPreview() {
                     .fillMaxSize()
             ) {
                 TransparentFocusedTextField(
-                    defaultValue = title,
+                    value = title,
                     onValueChange = { },
                     placeholder = {
                         Text(

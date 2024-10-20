@@ -4,9 +4,8 @@ import com.upsaclay.common.data.local.UserDataStore
 import com.upsaclay.common.data.local.UserLocalDataSource
 import com.upsaclay.common.data.remote.ImageRemoteDataSource
 import com.upsaclay.common.data.remote.UserRemoteDataSource
-import com.upsaclay.common.data.remote.api.ImageApi
-import com.upsaclay.common.data.remote.api.UserFirebaseApi
-import com.upsaclay.common.data.remote.api.UserFirebaseApiImpl
+import com.upsaclay.common.data.remote.api.UserFirestoreApi
+import com.upsaclay.common.data.remote.api.UserFirestoreApiImpl
 import com.upsaclay.common.data.remote.api.UserRetrofitApi
 import com.upsaclay.common.data.repository.DrawableRepositoryImpl
 import com.upsaclay.common.data.repository.FileRepositoryImpl
@@ -47,7 +46,7 @@ val commonDataModule = module {
     }
 
     single {
-        get<Retrofit>(qualifier = named(SERVER_1_RETROFIT_QUALIFIER)).create(ImageApi::class.java)
+        get<Retrofit>(qualifier = named(SERVER_1_RETROFIT_QUALIFIER)).create(com.upsaclay.common.data.remote.api.ImageApi::class.java)
     }
 
     single {
@@ -66,5 +65,5 @@ val commonDataModule = module {
     singleOf(::UserRemoteDataSource)
     singleOf(::UserLocalDataSource)
     singleOf(::UserDataStore)
-    singleOf(::UserFirebaseApiImpl) { bind<UserFirebaseApi>() }
+    singleOf(::UserFirestoreApiImpl) { bind<UserFirestoreApi>() }
 }

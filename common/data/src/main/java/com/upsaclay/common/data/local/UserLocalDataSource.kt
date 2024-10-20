@@ -25,4 +25,8 @@ internal class UserLocalDataSource(private val userDataStore: UserDataStore) {
             userDataStore.storeCurrentUser(userDTO.copy(userProfilePictureUrl = null))
         }
     }
+
+    suspend fun removeCurrentUser() {
+        userDataStore.removeCurrentUser()
+    }
 }

@@ -6,7 +6,7 @@ import com.google.firebase.firestore.firestore
 import com.upsaclay.common.domain.e
 import com.upsaclay.message.data.model.CONVERSATIONS_TABLE_NAME
 import com.upsaclay.message.data.model.MESSAGES_TABLE_NAME
-import com.upsaclay.message.data.remote.MessageField.TIMESTAMP
+import com.upsaclay.message.data.model.MessageField.TIMESTAMP
 import com.upsaclay.message.data.remote.model.RemoteMessage
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -24,7 +24,7 @@ internal class MessageApiImpl : MessageApi {
             .addSnapshotListener { snapshot, error ->
                 error?.let {
                     e("Error getting last messages", it)
-                    close(it)
+                    trySend(emptyList())
                 }
 
                 snapshot?.toObjects(RemoteMessage::class.java)?.let { trySend(it) }
@@ -54,13 +54,13 @@ internal class MessageApiImpl : MessageApi {
     override suspend fun addMessage(
         conversationId: String,
         remoteMessage: RemoteMessage
-    ): Result<String> = suspendCoroutine { continuation ->
+    ): Result<Unit> = suspendCoroutine { continuation ->
         conversationCollection.document(conversationId)
             .collection(MESSAGES_TABLE_NAME)
-            .add(remoteMessage)
+            .document(remoteMessage.messageId)
+            .set(remoteMessage)
             .addOnSuccessListener {
-                val messageId = it.id
-                continuation.resume(Result.success(messageId))
+                continuation.resume(Result.success(Unit))
             }
             .addOnFailureListener { e ->
                 e("Error adding message", e)

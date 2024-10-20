@@ -110,7 +110,7 @@ fun EditAnnouncementScreen(navController: NavController, editAnnouncementViewMod
 
                 TransparentFocusedTextField(
                     modifier = Modifier.fillMaxWidth(),
-                    defaultValue = title,
+                    value = title,
                     placeholder = {
                         Text(
                             text = stringResource(id = R.string.title_field_entry),
@@ -175,7 +175,7 @@ private fun EditAnnouncementScreenPreview() {
                 Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
 
                 TransparentFocusedTextField(
-                    defaultValue = title ?: "",
+                    value = title ?: "",
                     onValueChange = { title = it },
                     placeholder = {
                         Text(

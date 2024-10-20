@@ -34,7 +34,7 @@ internal data class AnnouncementRemoteWithUser(
         id = announcementId,
         title = announcementTitle,
         content = announcementContent,
-        date = ConvertTimestampUseCase().toLocalDateTime(announcementDate),
+        date = ConvertTimestampUseCase.toLocalDateTime(announcementDate),
         author = User(
             id = userId,
             firstName = userFirstName,
@@ -64,7 +64,7 @@ internal data class RemoteAnnouncement(
             announcementId = announcement.id,
             announcementTitle = announcement.title,
             announcementContent = announcement.content,
-            announcementDate = ConvertLocalDateTimeUseCase().toTimestamp(announcement.date),
+            announcementDate = ConvertLocalDateTimeUseCase.toTimestamp(announcement.date),
             userId = announcement.author.id
         )
     }

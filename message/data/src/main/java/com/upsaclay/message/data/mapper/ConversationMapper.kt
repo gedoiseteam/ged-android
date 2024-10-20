@@ -12,32 +12,47 @@ import com.upsaclay.message.domain.model.Message
 internal object ConversationMapper {
     private val gson = Gson()
 
-    fun fromLocal(localConversation: LocalConversation): ConversationDTO {
-        val type = object : TypeToken<List<Int>>() {}.type
-        return ConversationDTO(
-            conversationId = localConversation.conversationId,
-            participants = gson.fromJson(localConversation.participants, type)
-        )
-    }
-
     fun toLocal(conversationDTO: ConversationDTO) = LocalConversation(
         conversationId = conversationDTO.conversationId,
-        participants = gson.toJson(conversationDTO.participants)
-    )
-
-    fun toLocal(remoteConversation: RemoteConversation) = LocalConversation(
-        conversationId = remoteConversation.conversationId,
-        participants = gson.toJson(remoteConversation.participants)
+        interlocutorJson = gson.toJson(conversationDTO.interlocutor),
+        isSynchronized = conversationDTO.isSynchronized,
+        isActive = conversationDTO.isActive
     )
 
     fun toRemote(conversationDTO: ConversationDTO) = RemoteConversation(
         conversationId = conversationDTO.conversationId,
-        participants = conversationDTO.participants
+        participants = conversationDTO.participantsId,
+        isActive = conversationDTO.isActive
     )
 
-    fun toDomain(conversationId: String, interlocutor: User, messages: List<Message>) = Conversation(
-        id = conversationId,
+    fun toDomain(conversationDTO: ConversationDTO, messages: List<Message>) = Conversation(
+        id = conversationDTO.conversationId,
+        interlocutor = conversationDTO.interlocutor,
+        messages = messages,
+        isActive = conversationDTO.isActive
+    )
+
+    fun toDTO(localConversation: LocalConversation) = ConversationDTO(
+        conversationId = localConversation.conversationId,
+        interlocutor = gson.fromJson(localConversation.interlocutorJson, User::class.java),
+        isSynchronized = localConversation.isSynchronized,
+        participantsId = emptyList(),
+        isActive = localConversation.isActive
+    )
+
+    fun toDTO(remoteConversation: RemoteConversation, interlocutor: User) = ConversationDTO(
+        conversationId = remoteConversation.conversationId,
         interlocutor = interlocutor,
-        messages = messages
+        isSynchronized = true,
+        participantsId = remoteConversation.participants,
+        isActive = true
+    )
+
+    fun toDTO(conversation: Conversation, currentUserId: Int) = ConversationDTO(
+        conversationId = conversation.id,
+        interlocutor = conversation.interlocutor,
+        isSynchronized = false,
+        participantsId = listOf(currentUserId, conversation.interlocutor.id),
+        isActive = conversation.isActive
     )
 }

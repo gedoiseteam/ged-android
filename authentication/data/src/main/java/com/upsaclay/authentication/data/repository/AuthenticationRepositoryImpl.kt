@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 
 internal class AuthenticationRepositoryImpl(
     private val authenticationRemoteDataSource: AuthenticationRemoteDataSource,
-    private val authenticationLocalDataSource: AuthenticationLocalDataSource
+    private val authenticationLocalDataSource: AuthenticationLocalDataSource,
 ) : AuthenticationRepository {
     private val _isAuthenticated = MutableStateFlow(false)
     override val isAuthenticated: Flow<Boolean> = _isAuthenticated
@@ -24,10 +24,11 @@ internal class AuthenticationRepositoryImpl(
         }
     }
 
-    override suspend fun login(email: String, password: String, hash: String): Result<Unit> =
-        authenticationRemoteDataSource.login(email, password, hash)
+    override suspend fun loginWithParisSaclay(email: String, password: String, hash: String): Result<Unit> {
+        return authenticationRemoteDataSource.loginWithParisSaclay(email, password, hash)
+    }
 
-    override suspend fun logout() {
-        authenticationLocalDataSource.setAuthenticationState(false)
+    override suspend fun setAuthenticated(isAuthenticated: Boolean) {
+        authenticationLocalDataSource.setAuthenticationState(isAuthenticated)
     }
 }

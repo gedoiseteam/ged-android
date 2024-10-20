@@ -8,6 +8,7 @@
     <string name="delete">Supprimer</string>
     <string name="save">Enregistrer</string>
     <string name="accept">Accepter</string>
+    <string name="keep_going">Continuer</string>
     <string name="cancel">Annuler</string>
     <string name="modify">Modifier</string>
     <string name="publish">Publier</string>
@@ -19,8 +20,10 @@
     <string name="arrow_back_icon_description">Retour en arrière</string>
     <string name="ged_logo_description">Logo de l\'université de La Grande École du Droit</string>
     <string name="profile_picture_description">Photo de profil de l\'utilisateur</string>
-    <string name="error_empty_fields">Veuillez remplir tous les champs</string>
-    <string name="error_empty_field">Veuillez remplir le champ</string>
+    <string name="empty_fields_error">Veuillez remplir tous les champs</string>
+    <string name="empty_field_error">Veuillez remplir le champ</string>
+    <string name="unknown_error">Une erreur inconnue est survenue</string>
+    <string name="network_error">Une erreur réseau est survenue</string>
     <string name="icon_add_descrption">Icône d\'ajout</string>
 
     <string name="school_level">Niveau d\'étude</string>
@@ -41,4 +44,6 @@
     <string name="hour_ago_medium">%d heures</string>
     <string name="day_ago_medium">%d jours</string>
     <string name="week_ago_medium">%d semaines</string>
+
+    <string name="no_user_found">Aucun utilisateur trouvé</string>
 </resources>

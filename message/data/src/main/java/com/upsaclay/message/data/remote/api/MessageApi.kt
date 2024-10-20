@@ -8,5 +8,5 @@ internal interface MessageApi {
 
     suspend fun getMessages(conversationId: String, limit: Long): List<RemoteMessage>
 
-    suspend fun addMessage(conversationId: String, remoteMessage: RemoteMessage): Result<String>
+    suspend fun addMessage(conversationId: String, remoteMessage: RemoteMessage): Result<Unit>
 }

@@ -4,10 +4,11 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
 
-class ConvertTimestampUseCase {
+object ConvertTimestampUseCase {
     fun toLocalDateTime(timestamp: Long): LocalDateTime {
-        return LocalDateTime.ofEpochSecond(timestamp, 0, ZoneOffset.ofHours(2))
-            .atZone(ZoneId.systemDefault())
+        return LocalDateTime.ofEpochSecond(timestamp, 0, ZoneOffset.UTC)
+            .atZone(ZoneId.of("UTC"))
+            .withZoneSameInstant(ZoneId.systemDefault())
             .toLocalDateTime()
     }
 }
