@@ -7,7 +7,7 @@
     <string name="calendar">Calendrier</string>
     <string name="forum">Forum</string>
     <string name="profile">Profil</string>
-    <string name="object">objet</string>
+    <string name="support_mail_subject">objet</string>
     <string name="content_message">contenu du message</string>
     <string name="edit_profile">Editer profil</string>
     <string name="send_message_support">envoyer un message au support</string>

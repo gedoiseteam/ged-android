@@ -39,6 +39,7 @@ import androidx.navigation.compose.rememberNavController
 import com.upsaclay.authentication.domain.repository.AuthenticationRepository
 import com.upsaclay.common.domain.model.User
 import com.upsaclay.common.domain.usecase.GetCurrentUserFlowUseCase
+import com.upsaclay.common.presentation.components.SmallTopBarBack
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.gedoise.R
@@ -49,57 +50,33 @@ import org.koin.androidx.compose.koinViewModel
 fun SupportScreen(modifier: Modifier = Modifier, navController: NavController)
 {
     Column{
-        var objet by remember { mutableStateOf("") }
-        var body by remember { mutableStateOf("") }
-        val context = LocalContext.current
-        val viewModel : SupportViewModel = SupportViewModel(context)
-        Scaffold (topBar = { TopAppBar(navController = navController) }) {
+        val viewModel : SupportViewModel = koinViewModel()
+        Scaffold (topBar = { SmallTopBarBack(onBackClick = { navController.popBackStack() }, title = stringResource(id = R.string.support))}) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(top = it.calculateTopPadding())
             ){
-                Text(text = stringResource(id = R.string.`object`))
-                TextField(modifier = Modifier.padding(vertical = 7.5.dp), value = objet, onValueChange = { newObject -> objet = newObject })
+                Text(text = stringResource(id = R.string.support_mail_subject))
+                Spacer(modifier = Modifier.heightIn(MaterialTheme.spacing.extraSmall,MaterialTheme.spacing.small))
+                TextField(modifier = Modifier.padding(vertical = MaterialTheme.spacing.small),
+                    value = "",
+                    onValueChange = { newObject -> viewModel.apply { object_message = newObject } })
                 Spacer(modifier = Modifier.heightIn(MaterialTheme.spacing.large))
-                Text(modifier = Modifier.padding(vertical = 7.5.dp),text = stringResource(id = R.string.content_message))
-                TextField(modifier = Modifier.
-                size(500.dp,500.dp),
-                    value = body,
-                    onValueChange = { newBody -> body = newBody })
+                Text(modifier = Modifier.padding(vertical = MaterialTheme.spacing.small),text = stringResource(id = R.string.content_message))
+                TextField(modifier = Modifier.size(MaterialTheme.spacing.ultraLarge,MaterialTheme.spacing.ultraLarge),
+                    value = "",
+                    onValueChange = { newBody -> viewModel.apply { message = newBody } })
                 Spacer(modifier = Modifier.heightIn(MaterialTheme.spacing.large))
                 Button(
                     modifier = Modifier.align(Alignment.CenterHorizontally),
-                    onClick = { viewModel.contactSupport(body,objet) },
+                    onClick = { viewModel.contactSupport() },
                     content = { Text(text = stringResource(id = R.string.send_message_support)) })
             }
         }
 
     }
-        TODO("résoudre le problème de l'objet context")
-    }
 
-
-@Composable
-@OptIn(ExperimentalMaterial3Api::class)
-fun TopAppBar(navController: NavController)
-{
-    TopAppBar(
-        title = {
-            Text(
-                text = stringResource(id = R.string.support),
-                textAlign = TextAlign.Center
-            )
-        },
-        navigationIcon = {
-            IconButton(onClick = { navController.popBackStack() }) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = stringResource(id = com.upsaclay.common.R.string.arrow_back_icon_description)
-                )
-            }
-        }
-    )
 }
 
 
@@ -111,21 +88,28 @@ fun SupportScreenPreview()
         Column{
             var objet by remember { mutableStateOf("") }
             var body by remember { mutableStateOf("") }
-            Scaffold (topBar = { TopAppBar(navController = rememberNavController()) }) {
+
+            Scaffold (topBar = { SmallTopBarBack(onBackClick = {  }, title = stringResource(id = R.string.support)) }) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(top = it.calculateTopPadding())
                 ){
-                    Text(text = stringResource(id = R.string.`object`))
-                    TextField(modifier = Modifier.padding(vertical = 7.5.dp), value = objet, onValueChange = { newObject -> objet = newObject })
-                    Spacer(modifier = Modifier.heightIn(MaterialTheme.spacing.large))
-                    Text(modifier = Modifier.padding(vertical = 7.5.dp),text = stringResource(id = R.string.content_message))
+                    Text(text = stringResource(id = R.string.support_mail_subject))
+                    Spacer(modifier = Modifier.heightIn(MaterialTheme.spacing.extraSmall,MaterialTheme.spacing.small))
+                    TextField(modifier = Modifier.padding(vertical = MaterialTheme.spacing.small),
+                        value = objet,
+                        onValueChange = { newObject -> objet = newObject })
+                    Spacer(modifier = Modifier.heightIn(MaterialTheme.spacing.large,MaterialTheme.spacing.extraLarge))
+                    Text(modifier = Modifier.padding(vertical = MaterialTheme.spacing.small),text = stringResource(id = R.string.content_message))
+                    Spacer(modifier = Modifier.heightIn(MaterialTheme.spacing.extraSmall,MaterialTheme.spacing.small))
                     TextField(modifier = Modifier.
-                                        size(500.dp,500.dp),
+                                        size(MaterialTheme.spacing.ultraLarge,MaterialTheme.spacing.ultraLarge),
                         value = body,
-                        onValueChange = { newBody -> body = newBody })
-                    Spacer(modifier = Modifier.heightIn(MaterialTheme.spacing.large))
+                        onValueChange = { newBody -> body = newBody },
+
+                    )
+                    Spacer(modifier = Modifier.heightIn(MaterialTheme.spacing.extraLarge))
                     Button(
                         modifier = Modifier.align(Alignment.CenterHorizontally),
                         onClick = { },

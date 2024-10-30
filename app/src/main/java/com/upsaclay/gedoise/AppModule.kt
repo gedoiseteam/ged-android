@@ -5,6 +5,7 @@ import com.upsaclay.gedoise.data.GedoiseDatabase
 import com.upsaclay.gedoise.presentation.MainViewModel
 import com.upsaclay.gedoise.presentation.profile.ProfileViewModel
 import com.upsaclay.gedoise.presentation.profile.account.AccountViewModel
+import com.upsaclay.gedoise.presentation.profile.support.SupportViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.dsl.module
@@ -27,5 +28,5 @@ val appModule = module {
     viewModelOf(::MainViewModel)
     viewModelOf(::ProfileViewModel)
     viewModelOf(::AccountViewModel)
-    // rajouter SupportViewModel
+    viewModelOf(::SupportViewModel)
 }

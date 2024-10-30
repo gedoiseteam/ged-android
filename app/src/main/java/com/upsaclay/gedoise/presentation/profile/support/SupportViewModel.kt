@@ -7,11 +7,15 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 
-class SupportViewModel(@SuppressLint("StaticFieldLeak") var contexte: Context) : ViewModel() {
+class SupportViewModel (
+    @SuppressLint("StaticFieldLeak") var contexte: Context,
+    var message: String,
+    var object_message: String
+) : ViewModel() {
     @SuppressLint("QueryPermissionsNeeded")
-    fun contactSupport(message: String, objet: String) {
+    fun contactSupport() {
         // Encodage des paramètres pour éviter les erreurs dans l'URI
-        val encodedSubject = Uri.encode(objet)
+        val encodedSubject = Uri.encode(object_message)
         val encodedBody = Uri.encode(message)
 
 
