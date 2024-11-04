@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -301,7 +302,7 @@ private fun ProfilePictureWithBubblePreview() {
             )
             ProfilePictureWithBubble(
                 imageUrl = null,
-                bubbleBackgroundColor = GedoiseColor.OnlineColor,
+                bubbleBackgroundColor = if (isSystemInDarkTheme()) GedoiseColor.outlineDark else GedoiseColor.outlineLight,
                 contentDescription = "",
                 onClick = {}
             )

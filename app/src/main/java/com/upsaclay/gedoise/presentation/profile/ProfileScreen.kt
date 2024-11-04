@@ -204,13 +204,13 @@ private fun buildProfileMenuItemData(
     ),
     ClickableMenuItemData(
         text = {
-            Text(text = stringResource(id = R.string.logout), color = GedoiseColor.Red)
+            Text(text = stringResource(id = R.string.logout), color = Color.Red)
         },
         icon = {
             Icon(
                 painter = painterResource(id = com.upsaclay.common.R.drawable.ic_logout),
                 contentDescription = stringResource(id = R.string.logout_icon_description),
-                tint = GedoiseColor.Red
+                tint = Color.Red
             )
         },
         onClick = onLogoutClick
@@ -304,14 +304,14 @@ private val profileMenuItemsDataFixture: ImmutableList<ClickableMenuItemData> = 
         text = {
             Text(
                 text = stringResource(id = R.string.logout),
-                color = GedoiseColor.Red
+                color = Color.Red
             )
         },
         icon = {
             Icon(
                 painter = painterResource(id = com.upsaclay.common.R.drawable.ic_logout),
                 contentDescription = stringResource(id = R.string.logout_icon_description),
-                tint = GedoiseColor.Red
+                tint = Color.Red
             )
         },
         onClick = {}

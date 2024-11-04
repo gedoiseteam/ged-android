@@ -1,6 +1,7 @@
 package com.upsaclay.common.presentation.theme
 
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 
 object GedoiseColor {
     // for light theme
@@ -75,6 +76,7 @@ object GedoiseColor {
     val surfaceContainerDark = Color(0xFF1F1F21)
     val surfaceContainerHighDark = Color(0xFF2A2A2C)
     val surfaceContainerHighestDark = Color(0xFF353436)
+
 
     // il y a d'autres thèmes générés par le site matherial, on peut les utiliser si cela est souhaité
 }

@@ -9,6 +9,7 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.slideIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -67,10 +68,11 @@ fun ConversationScreen(navController: NavController, conversationViewModel: Conv
 
     Box(modifier = Modifier.fillMaxSize()) {
         if (expanded) {
+            val Color = if (isSystemInDarkTheme()) GedoiseColor.tertiaryDark else GedoiseColor.tertiaryLight
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(GedoiseColor.LittleTransparentWhite)
+                    .background(Color)
                     .zIndex(1000f)
                     .pointerInput(Unit) {
                         detectTapGestures(onPress = { expanded = !expanded })
@@ -233,10 +235,11 @@ private fun ConversationsScreenPreview() {
     GedoiseTheme {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             if (expanded) {
+                val Color = if (isSystemInDarkTheme()) GedoiseColor.tertiaryDark else GedoiseColor.tertiaryLight
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(GedoiseColor.LittleTransparentWhite)
+                        .background(Color)
                         .zIndex(1000f)
                         .pointerInput(Unit) {
                             detectTapGestures(onPress = { expanded = !expanded })

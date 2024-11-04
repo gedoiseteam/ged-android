@@ -1,6 +1,7 @@
 package com.upsaclay.news.presentation.components
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -89,7 +90,7 @@ internal fun AnnouncementItem(modifier: Modifier = Modifier, announcement: com.u
         Text(
             text = elapsedTimeValue,
             style = MaterialTheme.typography.bodyMedium,
-            color = GedoiseColor.PreviewText
+            color = if (isSystemInDarkTheme()) GedoiseColor.surfaceContainerLowDark else GedoiseColor.surfaceContainerLowLight
         )
     }
 }
@@ -160,7 +161,7 @@ internal fun AnnouncementItemWithContent(announcement: com.upsaclay.news.domain.
                 Text(
                     text = elapsedTimeValue,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = GedoiseColor.PreviewText
+                    color = if (isSystemInDarkTheme()) GedoiseColor.surfaceContainerLowDark else GedoiseColor.surfaceContainerLowLight
                 )
             }
 
@@ -168,7 +169,7 @@ internal fun AnnouncementItemWithContent(announcement: com.upsaclay.news.domain.
 
             Text(
                 text = announcement.title ?: announcement.content,
-                color = GedoiseColor.PreviewText,
+                color = if (isSystemInDarkTheme()) GedoiseColor.surfaceContainerLowDark else GedoiseColor.surfaceContainerLowLight,
                 style = MaterialTheme.typography.bodyMedium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis

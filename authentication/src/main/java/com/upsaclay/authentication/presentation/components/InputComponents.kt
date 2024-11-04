@@ -1,6 +1,7 @@
 package com.upsaclay.authentication.presentation.components
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -92,7 +93,7 @@ fun OutlinedPasswordInput(
                 painter = icon,
                 contentDescription = contentDescription,
                 modifier = Modifier.clickable { passwordVisible = !passwordVisible },
-                tint = GedoiseColor.BlackIconColor
+                tint = if (isSystemInDarkTheme()) GedoiseColor.onTertiaryDark else GedoiseColor.onTertiaryLight
             )
         },
         visualTransformation = if (passwordVisible) {

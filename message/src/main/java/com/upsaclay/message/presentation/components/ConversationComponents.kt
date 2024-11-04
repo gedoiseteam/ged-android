@@ -3,6 +3,7 @@ package com.upsaclay.message.presentation.components
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -158,7 +159,7 @@ fun ConversationItem(modifier: Modifier = Modifier, conversation: Conversation, 
                         Text(
                             text = elapsedTimeValue,
                             style = MaterialTheme.typography.bodySmall,
-                            color = GedoiseColor.PreviewText
+                            color = if (isSystemInDarkTheme()) GedoiseColor.surfaceContainerLowDark else GedoiseColor.surfaceContainerLowLight
                         )
                     }
 
@@ -168,7 +169,7 @@ fun ConversationItem(modifier: Modifier = Modifier, conversation: Conversation, 
                         Text(
                             text = lastMessage.text,
                             style = MaterialTheme.typography.bodyMedium,
-                            color = GedoiseColor.PreviewText,
+                            color = if (isSystemInDarkTheme()) GedoiseColor.surfaceContainerLowDark else GedoiseColor.surfaceContainerLowLight,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -176,7 +177,7 @@ fun ConversationItem(modifier: Modifier = Modifier, conversation: Conversation, 
                         Text(
                             text = stringResource(id = R.string.tap_to_chat),
                             style = MaterialTheme.typography.bodyMedium,
-                            color = GedoiseColor.PreviewText,
+                            color = if (isSystemInDarkTheme()) GedoiseColor.surfaceContainerLowDark else GedoiseColor.surfaceContainerLowLight,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )

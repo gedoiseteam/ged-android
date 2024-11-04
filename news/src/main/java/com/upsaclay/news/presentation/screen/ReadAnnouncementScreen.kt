@@ -128,14 +128,14 @@ fun ReadAnnouncementScreen(modifier: Modifier = Modifier, navController: NavCont
             text = {
                 Text(
                     text = stringResource(id = R.string.delete_announcement),
-                    color = GedoiseColor.Red
+                    color = Color.Red
                 )
             },
             icon = {
                 Icon(
                     imageVector = Icons.Default.Delete,
                     contentDescription = null,
-                    tint = GedoiseColor.Red
+                    tint = Color.Red
                 )
             },
             onClick = {

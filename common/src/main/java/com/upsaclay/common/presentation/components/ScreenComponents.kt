@@ -39,11 +39,7 @@ fun OverlayCircularLoadingScreen(
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun OverlayLinearLoadingScreen() {
-    val backgroundColor = if (isSystemInDarkTheme()) {
-        GedoiseColor.DarkBackground
-    } else {
-        GedoiseColor.LittleTransparentWhite
-    }
+    val backgroundColor = if (isSystemInDarkTheme()) GedoiseColor.backgroundDark else GedoiseColor.backgroundLight
     Box(
         modifier = Modifier
             .fillMaxSize()

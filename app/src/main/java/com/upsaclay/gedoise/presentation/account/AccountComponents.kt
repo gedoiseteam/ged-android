@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.upsaclay.common.presentation.components.SimpleClickableItem
@@ -57,14 +58,14 @@ internal fun AccountModelBottomSheet(
                 text = {
                     Text(
                         text = stringResource(id = R.string.delete_profile_picture),
-                        color = GedoiseColor.Red
+                        color = Color.Red
                     )
                 },
                 icon = {
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = null,
-                        tint = GedoiseColor.Red
+                        tint = Color.Red
                     )
                 },
                 onClick = onDeleteProfilePictureClick
@@ -81,7 +82,7 @@ internal fun AccountInfoItem(modifier: Modifier = Modifier, accountInfo: Account
     ) {
         Text(
             text = accountInfo.label,
-            color = GedoiseColor.DarkGray,
+            color = Color.DarkGray,
             style = MaterialTheme.typography.labelLarge
         )
         Text(

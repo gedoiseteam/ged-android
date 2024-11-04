@@ -5,6 +5,7 @@ import android.view.ViewTreeObserver
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -57,7 +58,7 @@ import com.upsaclay.authentication.presentation.components.OutlinedPasswordInput
 import com.upsaclay.common.domain.model.Screen
 import com.upsaclay.common.presentation.components.ErrorTextWithIcon
 import com.upsaclay.common.presentation.components.SimpleDialog
-import com.upsaclay.common.presentation.theme.GedoiseColor.Primary
+import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.common.utils.showToast
@@ -252,7 +253,7 @@ private fun TitleSection() {
             text = stringResource(id = R.string.presentation_text),
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
-            color = Primary
+            color = if (isSystemInDarkTheme()) GedoiseColor.primaryDark else GedoiseColor.primaryLight
         )
     }
 }
