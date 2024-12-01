@@ -42,12 +42,13 @@ internal class AnnouncementRepositoryImpl(
         }
     }
 
-    override suspend fun getAnnouncement(announcementId: Int): Announcement? = announcementLocalDataSource.getAnnouncement(announcementId)
+    override suspend fun getAnnouncement(announcementId: String): Announcement? =
+        announcementLocalDataSource.getAnnouncement(announcementId)
 
-    override suspend fun createAnnouncement(announcement: Announcement): Result<Int> =
+    override suspend fun createAnnouncement(announcement: Announcement): Result<Unit> =
         announcementRemoteDataSource.createAnnouncement(announcement)
-            .onSuccess { announcementId ->
-                announcementLocalDataSource.upsertAnnouncement(announcement.copy(id = announcementId))
+            .onSuccess {
+                announcementLocalDataSource.upsertAnnouncement(announcement)
             }
 
     override suspend fun updateAnnouncement(announcement: Announcement): Result<Unit> =

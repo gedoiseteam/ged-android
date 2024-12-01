@@ -3,7 +3,7 @@ package com.upsaclay.common.domain.model
 import com.upsaclay.common.domain.uppercaseFirstLetter
 
 data class User(
-    val id: Int = -1,
+    val id: String = "",
     val firstName: String,
     val lastName: String,
     val email: String,

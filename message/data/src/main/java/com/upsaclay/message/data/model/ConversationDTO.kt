@@ -6,6 +6,6 @@ data class ConversationDTO(
     val conversationId: String,
     val interlocutor: User,
     val isSynchronized: Boolean,
-    val participantsId: List<Int>,
+    val participantsId: List<String>,
     val isActive: Boolean
 )

@@ -32,21 +32,12 @@ internal class AnnouncementRemoteDataSource(private val announcementApi: Announc
         }
     }
 
-    suspend fun createAnnouncement(announcement: Announcement): Result<Int> = withContext(Dispatchers.IO) {
+    suspend fun createAnnouncement(announcement: Announcement): Result<Unit> = withContext(Dispatchers.IO) {
         try {
             val remoteAnnouncement = RemoteAnnouncement.fromDomain(announcement)
             val response = announcementApi.createAnnouncement(remoteAnnouncement)
             if (response.isSuccessful) {
-                val announcementId = response.body()?.data
-
-                announcementId?.let { id ->
-                    Result.success(id)
-                } ?: run {
-                    val errorMessage = response.body()?.error
-                        ?: "Error creating remote announcement: id is null"
-                    e(errorMessage)
-                    Result.failure(IOException(errorMessage))
-                }
+                Result.success(Unit)
             } else {
                 val errorMessage =
                     formatHttpError("Error creating remote announcement", response)
@@ -60,7 +51,8 @@ internal class AnnouncementRemoteDataSource(private val announcementApi: Announc
         }
     }
 
-    suspend fun deleteAnnouncement(id: Int): Result<Unit> = withContext(Dispatchers.IO) {
+
+    suspend fun deleteAnnouncement(id: String): Result<Unit> = withContext(Dispatchers.IO) {
         try {
             val response = announcementApi.deleteAnnouncement(id)
             if (response.isSuccessful) {

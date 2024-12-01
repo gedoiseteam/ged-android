@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 
 class GetConversationUseCase(private val conversationRepository: ConversationRepository) {
-    operator fun invoke(interlocutorId: Int): Flow<Conversation> =
+    operator fun invoke(interlocutorId: String): Flow<Conversation> =
         conversationRepository.conversations.map { conversations ->
             conversations.find { it.interlocutor.id == interlocutorId }
         }.filterNotNull()

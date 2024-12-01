@@ -7,7 +7,7 @@ import com.upsaclay.common.domain.model.User
 internal data class UserFirestoreModel(
     @get:PropertyName("user_id")
     @set:PropertyName("user_id")
-    var userId: Int = -1,
+    var userId: String = "",
 
     @get:PropertyName("first_name")
     @set:PropertyName("first_name")

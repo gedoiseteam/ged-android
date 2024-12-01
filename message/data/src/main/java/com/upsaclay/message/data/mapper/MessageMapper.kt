@@ -34,7 +34,7 @@ internal object MessageMapper {
         type = localMessage.type
     )
 
-    fun toDTO(conversationId: String, message: Message, currentUserId: Int) = MessageDTO(
+    fun toDTO(conversationId: String, message: Message, currentUserId: String) = MessageDTO(
         messageId = message.id,
         senderId = currentUserId,
         conversationId = conversationId,
@@ -45,7 +45,7 @@ internal object MessageMapper {
         type = message.type.name
     )
 
-    fun toDomain(messageDTO: MessageDTO, currentUserId: Int) = Message(
+    fun toDomain(messageDTO: MessageDTO, currentUserId: String) = Message(
         id = messageDTO.messageId,
         sentByUser = messageDTO.senderId == currentUserId,
         content = messageDTO.content,

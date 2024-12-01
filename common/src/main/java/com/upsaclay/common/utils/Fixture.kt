@@ -1,7 +1,7 @@
 package com.upsaclay.common.utils
 
 val userFixture = com.upsaclay.common.domain.model.User(
-    12,
+    "12",
     "Pierre",
     "Dupont",
     "pierre.dupont@universite-paris-saclay.fr",
@@ -11,7 +11,7 @@ val userFixture = com.upsaclay.common.domain.model.User(
 )
 
 val userFixture2 = com.upsaclay.common.domain.model.User(
-    13,
+    "13",
     "Alain",
     "Robert",
     "alain.robert@universite-paris-saclay.fr",

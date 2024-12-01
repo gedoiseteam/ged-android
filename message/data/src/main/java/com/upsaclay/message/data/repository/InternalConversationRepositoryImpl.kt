@@ -30,7 +30,7 @@ internal class InternalConversationRepositoryImpl(
         }
     }
 
-    override suspend fun listenRemoteConversations(userId: Int) =
+    override suspend fun listenRemoteConversations(userId: String) =
         conversationRemoteDataSource.listenAllConversations(userId)
 
     override suspend fun insertLocalConversation(localConversation: LocalConversation) {

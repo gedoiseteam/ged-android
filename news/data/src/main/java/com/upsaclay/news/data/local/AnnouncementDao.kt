@@ -12,7 +12,7 @@ interface AnnouncementDao {
     fun getAllAnnouncements(): Flow<List<LocalAnnouncement>>
 
     @Query("SELECT * FROM $ANNOUNCEMENTS_TABLE WHERE ANNOUNCEMENT_ID = :id")
-    suspend fun getAnnouncement(id: Int): LocalAnnouncement?
+    suspend fun getAnnouncement(id: String): LocalAnnouncement?
 
     @Upsert
     suspend fun upsertAnnouncement(localAnnouncement: LocalAnnouncement)

@@ -8,7 +8,7 @@ import com.upsaclay.news.domain.model.Announcement
 
 internal data class AnnouncementRemoteWithUser(
     @SerializedName("ANNOUNCEMENT_ID")
-    val announcementId: Int,
+    val announcementId: String,
     @SerializedName("ANNOUNCEMENT_TITLE")
     val announcementTitle: String?,
     @SerializedName("ANNOUNCEMENT_CONTENT")
@@ -16,7 +16,7 @@ internal data class AnnouncementRemoteWithUser(
     @SerializedName("ANNOUNCEMENT_DATE")
     val announcementDate: Long,
     @SerializedName("USER_ID")
-    val userId: Int,
+    val userId: String,
     @SerializedName("USER_FIRST_NAME")
     val userFirstName: String,
     @SerializedName("USER_LAST_NAME")
@@ -49,7 +49,7 @@ internal data class AnnouncementRemoteWithUser(
 
 internal data class RemoteAnnouncement(
     @SerializedName("ANNOUNCEMENT_ID")
-    val announcementId: Int,
+    val announcementId: String,
     @SerializedName("ANNOUNCEMENT_TITLE")
     val announcementTitle: String?,
     @SerializedName("ANNOUNCEMENT_CONTENT")
@@ -57,7 +57,7 @@ internal data class RemoteAnnouncement(
     @SerializedName("ANNOUNCEMENT_DATE")
     val announcementDate: Long,
     @SerializedName("USER_ID")
-    val userId: Int
+    val userId: String
 ) {
     companion object {
         fun fromDomain(announcement: Announcement) = RemoteAnnouncement(

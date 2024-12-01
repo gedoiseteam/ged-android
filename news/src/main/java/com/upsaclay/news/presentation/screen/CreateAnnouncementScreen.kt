@@ -24,6 +24,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
+import com.upsaclay.common.domain.model.User
 import com.upsaclay.common.presentation.components.LoadingDialog
 import com.upsaclay.common.presentation.components.SmallTopBarEdit
 import com.upsaclay.common.presentation.components.TransparentFocusedTextField
@@ -32,6 +33,8 @@ import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.common.utils.showToast
 import com.upsaclay.news.R
+import com.upsaclay.news.domain.model.Announcement
+import com.upsaclay.news.domain.model.AnnouncementState
 import com.upsaclay.news.presentation.viewmodel.CreateAnnouncementViewModel
 import java.time.LocalDateTime
 import org.koin.androidx.compose.koinViewModel
@@ -40,10 +43,9 @@ import org.koin.androidx.compose.koinViewModel
 fun CreateAnnouncementScreen(
     navController: NavController,
     createAnnouncementViewModel: CreateAnnouncementViewModel = koinViewModel(),
-    user: com.upsaclay.common.domain.model.User
+    user: User
 ) {
-    val state =
-        createAnnouncementViewModel.announcementState.collectAsState(com.upsaclay.news.domain.model.AnnouncementState.DEFAULT).value
+    val state = createAnnouncementViewModel.announcementState.collectAsState(AnnouncementState.DEFAULT).value
     val title: String = createAnnouncementViewModel.title
     val content: String = createAnnouncementViewModel.content
     val context = LocalContext.current
@@ -53,19 +55,19 @@ fun CreateAnnouncementScreen(
 
     LaunchedEffect(state) {
         when (state) {
-            com.upsaclay.news.domain.model.AnnouncementState.ANNOUNCEMENT_CREATION_ERROR -> {
+            AnnouncementState.ANNOUNCEMENT_CREATION_ERROR -> {
                 showLoadingDialog = false
                 showToast(context, R.string.announcement_creation_error)
             }
 
-            com.upsaclay.news.domain.model.AnnouncementState.ANNOUNCEMENT_CREATED -> {
+            AnnouncementState.ANNOUNCEMENT_CREATED -> {
                 showLoadingDialog = false
                 focusManager.clearFocus()
                 keyboardController?.hide()
                 navController.popBackStack()
             }
 
-            com.upsaclay.news.domain.model.AnnouncementState.LOADING -> showLoadingDialog = true
+            AnnouncementState.LOADING -> showLoadingDialog = true
 
             else -> {}
         }
@@ -87,8 +89,8 @@ fun CreateAnnouncementScreen(
                 },
                 onSaveClick = {
                     createAnnouncementViewModel.createAnnouncement(
-                        com.upsaclay.news.domain.model.Announcement(
-                            id = -1,
+                        Announcement(
+                            id = "",
                             title = if (title.isBlank()) null else title.trim(),
                             content = content.trim(),
                             date = LocalDateTime.now(),

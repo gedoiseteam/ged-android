@@ -19,7 +19,7 @@ internal interface AnnouncementApi {
     suspend fun createAnnouncement(@Body remoteAnnouncement: RemoteAnnouncement): Response<IntResponse>
 
     @DELETE("announcements/{id}")
-    suspend fun deleteAnnouncement(@Path("id") id: Int): Response<EmptyResponse>
+    suspend fun deleteAnnouncement(@Path("id") id: String): Response<EmptyResponse>
 
     @POST("announcements/update")
     suspend fun updateAnnouncement(@Body remoteAnnouncement: RemoteAnnouncement): Response<EmptyResponse>

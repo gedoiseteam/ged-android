@@ -15,7 +15,7 @@ internal data class RemoteMessage(
 
     @get:PropertyName(MessageField.SENDER_ID)
     @set:PropertyName(MessageField.SENDER_ID)
-    var senderId: Int = -1,
+    var senderId: String = "",
 
     @get:PropertyName(MessageField.CONTENT)
     @set:PropertyName(MessageField.CONTENT)

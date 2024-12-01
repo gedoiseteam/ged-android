@@ -27,7 +27,7 @@ internal class UserFirestoreApiImpl : UserFirestoreApi {
                 }
         }
 
-    override suspend fun getUser(userEmail: String): UserFirestoreModel? = suspendCoroutine { continuation ->
+    override suspend fun getUserWithEmail(userEmail: String): UserFirestoreModel? = suspendCoroutine { continuation ->
         users.whereEqualTo(UserFieldsRemote.EMAIL, userEmail).get()
             .addOnSuccessListener { querySnapshot ->
                 val user = querySnapshot.documents.firstOrNull()?.toObject(UserFirestoreModel::class.java)

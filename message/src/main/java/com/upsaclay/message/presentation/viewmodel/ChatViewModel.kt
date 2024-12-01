@@ -51,7 +51,7 @@ class ChatViewModel(
         }
     }
 
-    fun getConversation(interlocutorId: Int) {
+    fun getConversation(interlocutorId: String) {
         viewModelScope.launch {
             getConversationUseCase(interlocutorId).collect {
                 _conversation.value = it

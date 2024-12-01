@@ -10,7 +10,7 @@ internal class MessageRepositoryImpl(
     private val messageLocalDataSource: MessageLocalDataSource,
     private val messageRemoteDataSource: MessageRemoteDataSource
 ): MessageRepository {
-    override suspend fun sendMessage(conversationId: String, message: Message, currentUserId: Int): Result<Unit> {
+    override suspend fun sendMessage(conversationId: String, message: Message, currentUserId: String): Result<Unit> {
         val messageDTO = MessageMapper.toDTO(conversationId, message, currentUserId)
         val localMessage = MessageMapper.toLocal(messageDTO)
         messageLocalDataSource.insertMessage(localMessage)

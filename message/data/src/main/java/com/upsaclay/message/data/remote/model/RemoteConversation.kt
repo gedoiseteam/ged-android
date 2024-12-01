@@ -10,7 +10,7 @@ internal data class RemoteConversation(
 
     @get:PropertyName(ConversationField.Remote.PARTICIPANTS)
     @set:PropertyName(ConversationField.Remote.PARTICIPANTS)
-    var participants: List<Int> = emptyList(),
+    var participants: List<String> = emptyList(),
 
     @get:PropertyName(ConversationField.IS_ACTIVE)
     @set:PropertyName(ConversationField.IS_ACTIVE)

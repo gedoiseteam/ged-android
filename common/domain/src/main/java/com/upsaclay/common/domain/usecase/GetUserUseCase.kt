@@ -6,7 +6,7 @@ import com.upsaclay.common.domain.repository.UserRepository
 class GetUserUseCase(
     private val userRepository: UserRepository
 ) {
-    suspend fun withId(userId: Int): User? = userRepository.getUser(userId)
+    suspend fun withId(userId: String): User? = userRepository.getUser(userId)
 
-    suspend fun withEmail(email: String): User? = userRepository.getUser(email)
+    suspend fun withEmail(email: String): User? = userRepository.getUserWithEmail(email)
 }

@@ -11,7 +11,7 @@ import kotlinx.coroutines.withContext
 internal class ConversationRemoteDataSource(
     private val conversationApi: ConversationApi
 ) {
-    fun listenAllConversations(userId: Int): Flow<List<RemoteConversation>> =
+    fun listenAllConversations(userId: String): Flow<List<RemoteConversation>> =
         conversationApi.listenAllConversations(userId)
 
     suspend fun createConversation(remoteConversation: RemoteConversation): Result<Unit> = withContext(Dispatchers.IO) {

@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 import com.upsaclay.common.domain.model.User
 
 internal data class UserDTO(
-    @SerializedName("USER_ID") val userId: Int? = null,
+    @SerializedName("USER_ID") val userId: String? = null,
     @SerializedName("USER_FIRST_NAME") val userFirstName: String,
     @SerializedName("USER_LAST_NAME") val userLastName: String,
     @SerializedName("USER_EMAIL") val userEmail: String,

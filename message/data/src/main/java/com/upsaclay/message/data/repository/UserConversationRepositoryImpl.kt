@@ -47,7 +47,7 @@ internal class UserConversationRepositoryImpl(
         internalConversationRepository.createConversation(conversationDTO)
     }
 
-    private suspend fun fetchRemoteConversations(currentUserId: Int) {
+    private suspend fun fetchRemoteConversations(currentUserId: String) {
         internalConversationRepository.listenRemoteConversations(currentUserId).collect { remoteConversations ->
             remoteConversations.forEach { remoteConversation ->
                 val interlocutor = userRepository.getUser(remoteConversation.participants.first { it != currentUserId})

@@ -14,7 +14,7 @@ const val ANNOUNCEMENTS_TABLE = "announcements_table"
 data class LocalAnnouncement(
     @PrimaryKey
     @ColumnInfo(name = "ANNOUNCEMENT_ID")
-    val announcementId: Int,
+    val announcementId: String,
     @ColumnInfo(name = "ANNOUNCEMENT_TITLE")
     val announcementTitle: String?,
     @ColumnInfo(name = "ANNOUNCEMENT_CONTENT")
@@ -22,7 +22,7 @@ data class LocalAnnouncement(
     @ColumnInfo(name = "ANNOUNCEMENT_DATE")
     val announcementDate: Long,
     @ColumnInfo("USER_ID")
-    val userId: Int,
+    val userId: String,
     @ColumnInfo("USER_FIRST_NAME")
     val userFirstName: String,
     @ColumnInfo("USER_LAST_NAME")

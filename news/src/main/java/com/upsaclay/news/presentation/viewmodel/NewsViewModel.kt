@@ -44,7 +44,7 @@ class NewsViewModel(
         }
     }
 
-    fun refreshDisplayAnnouncement(id: Int) {
+    fun refreshDisplayAnnouncement(id: String) {
         viewModelScope.launch {
             displayedAnnouncement = getAnnouncementUseCase(id)
         }

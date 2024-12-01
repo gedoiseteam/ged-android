@@ -1,7 +1,6 @@
 package com.upsaclay.common.data.remote
 
 import com.google.firebase.firestore.FirebaseFirestoreException
-import com.upsaclay.common.data.formatHttpError
 import com.upsaclay.common.data.model.UserDTO
 import com.upsaclay.common.data.remote.api.UserFirestoreApi
 import com.upsaclay.common.data.remote.api.UserRetrofitApi
@@ -15,9 +14,9 @@ internal class UserRemoteDataSource(
     private val userRetrofitApi: UserRetrofitApi,
     private val userFirestoreApi: UserFirestoreApi
 ) {
-    suspend fun getUserWithFirestore(userId: Int): UserFirestoreModel? = withContext(Dispatchers.IO) {
+    suspend fun getUserFirestore(userId: String): UserFirestoreModel? = withContext(Dispatchers.IO) {
         try {
-            userFirestoreApi.getUser(userId)
+            userFirestoreApi.getUserWithEmail(userId)
         } catch (e: IOException) {
             e("Error getting user: ${e.message}")
             null
@@ -27,9 +26,9 @@ internal class UserRemoteDataSource(
         }
     }
 
-    suspend fun getUserWithFirestore(userEmail: String): UserFirestoreModel? = withContext(Dispatchers.IO) {
+    suspend fun getUserFirestoreWithEmail(userEmail: String): UserFirestoreModel? = withContext(Dispatchers.IO) {
         try {
-            userFirestoreApi.getUser(userEmail)
+            userFirestoreApi.getUserWithEmail(userEmail)
         } catch (e: IOException) {
             e("Error getting user: ${e.message}")
             null
@@ -43,12 +42,14 @@ internal class UserRemoteDataSource(
         userFirestoreApi.getAllUsers()
     }
 
-    suspend fun createUserWithOracle(userDTO: UserDTO): Int? = withContext(Dispatchers.IO) {
-        try {
-            userRetrofitApi.createUser(userDTO).body()?.data
-        } catch (e: IOException) {
-            e("Error creating user with Oracle: ${e.message}", e)
-            null
+    suspend fun createUserWithOracle(userDTO: UserDTO) {
+        withContext(Dispatchers.IO) {
+            try {
+                userRetrofitApi.createUser(userDTO).body()
+            } catch (e: IOException) {
+                e("Error creating user with Oracle: ${e.message}", e)
+                null
+            }
         }
     }
 
@@ -64,10 +65,10 @@ internal class UserRemoteDataSource(
         }
     }
 
-    suspend fun updateProfilePictureUrl(userId: Int, newProfilePictureUrl: String): Result<Unit> = withContext(Dispatchers.IO) {
+    suspend fun updateProfilePictureUrl(userId: String, newProfilePictureUrl: String): Result<Unit> = withContext(Dispatchers.IO) {
         try {
             userRetrofitApi.updateProfilePictureUrl(userId, newProfilePictureUrl)
-            userFirestoreApi.updateProfilePictureUrl(userId.toString(), newProfilePictureUrl)
+            userFirestoreApi.updateProfilePictureUrl(userId, newProfilePictureUrl)
         } catch (e: IOException) {
             e("Error updating user profile picture url: ${e.message}", e)
             Result.failure(e)
@@ -77,10 +78,10 @@ internal class UserRemoteDataSource(
         }
     }
 
-    suspend fun deleteProfilePictureUrl(userId: Int): Result<Unit> = withContext(Dispatchers.IO) {
+    suspend fun deleteProfilePictureUrl(userId: String): Result<Unit> = withContext(Dispatchers.IO) {
         try {
             userRetrofitApi.deleteProfilePictureUrl(userId)
-            userFirestoreApi.updateProfilePictureUrl(userId.toString(), null)
+            userFirestoreApi.updateProfilePictureUrl(userId, null)
         } catch (e: IOException) {
             e("Error deleting user profile picture url: ${e.message}", e)
             Result.failure(e)

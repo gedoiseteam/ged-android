@@ -8,19 +8,19 @@ interface UserRepository {
     val currentUser: User?
     val users: Flow<List<User>>
 
-    suspend fun getUser(userId: Int): User?
+    suspend fun getUser(userId: String): User?
 
-    suspend fun getUser(userEmail: String): User?
+    suspend fun getUserWithEmail(userEmail: String): User?
 
-    suspend fun createUser(user: User): Result<Int>
+    suspend fun createUser(user: User): Result<Unit>
 
     suspend fun setCurrentUser(user: User)
 
     suspend fun removeCurrentUser()
 
-    suspend fun updateProfilePictureUrl(userId: Int, profilePictureUrl: String): Result<Unit>
+    suspend fun updateProfilePictureUrl(userId: String, profilePictureUrl: String): Result<Unit>
 
-    suspend fun deleteProfilePictureUrl(userId: Int): Result<Unit>
+    suspend fun deleteProfilePictureUrl(userId: String): Result<Unit>
 
     suspend fun isUserExist(email: String): Result<Boolean>
 }

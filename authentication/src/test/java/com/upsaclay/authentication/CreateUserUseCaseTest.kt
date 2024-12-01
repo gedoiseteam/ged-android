@@ -1,5 +1,6 @@
 package com.upsaclay.authentication
 
+import com.upsaclay.common.domain.repository.UserRepository
 import com.upsaclay.common.domain.usecase.CreateUserUseCase
 import com.upsaclay.common.domain.usecase.UpdateUserProfilePictureUseCase
 import com.upsaclay.common.utils.userFixture
@@ -12,7 +13,7 @@ import org.junit.Test
 
 class CreateUserUseCaseTest {
     private lateinit var createUserUseCase: CreateUserUseCase
-    private lateinit var userRepository: com.upsaclay.common.domain.repository.UserRepository
+    private lateinit var userRepository: UserRepository
     private lateinit var updateUserProfilePictureUseCase: UpdateUserProfilePictureUseCase
 
     @Before
@@ -21,7 +22,7 @@ class CreateUserUseCaseTest {
         updateUserProfilePictureUseCase = mockk()
         createUserUseCase = CreateUserUseCase(userRepository)
 
-        coEvery { userRepository.createUser(any()) } returns Result.success(0)
+        coEvery { userRepository.createUser(any()) } returns Result.success(Unit)
         coEvery { updateUserProfilePictureUseCase(any()) } returns Result.success(Unit)
     }
 

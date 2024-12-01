@@ -6,7 +6,7 @@ import com.upsaclay.common.domain.model.User
 
 internal object UserMapper {
     fun toDTO(user: User) = UserDTO(
-        userId = if (user.id == -1) null else user.id,
+        userId = if (user.id == "") null else user.id,
         userFirstName = user.firstName,
         userLastName = user.lastName,
         userEmail = user.email,
@@ -26,7 +26,7 @@ internal object UserMapper {
     )
 
     fun toFirestoreModel(userDTO: UserDTO) = UserFirestoreModel(
-        userId = userDTO.userId ?: -1,
+        userId = userDTO.userId ?: "",
         firstName = userDTO.userFirstName,
         lastName = userDTO.userLastName,
         email = userDTO.userEmail,
@@ -36,7 +36,7 @@ internal object UserMapper {
     )
 
     fun toDomain(userDTO: UserDTO) = User(
-        id = userDTO.userId ?: -1,
+        id = userDTO.userId ?: "",
         firstName = userDTO.userFirstName,
         lastName = userDTO.userLastName,
         email = userDTO.userEmail,

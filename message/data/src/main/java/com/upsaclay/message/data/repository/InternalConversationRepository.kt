@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 internal interface InternalConversationRepository {
     val conversationsDTO: Flow<List<ConversationDTO>>
 
-    suspend fun listenRemoteConversations(userId: Int): Flow<List<RemoteConversation>>
+    suspend fun listenRemoteConversations(userId: String): Flow<List<RemoteConversation>>
 
     suspend fun insertLocalConversation(localConversation: LocalConversation)
 

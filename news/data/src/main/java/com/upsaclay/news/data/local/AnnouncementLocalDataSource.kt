@@ -13,7 +13,7 @@ internal class AnnouncementLocalDataSource(private val announcementDao: Announce
         }
     }
 
-    suspend fun getAnnouncement(id: Int): Announcement? = withContext(Dispatchers.IO) {
+    suspend fun getAnnouncement(id: String): Announcement? = withContext(Dispatchers.IO) {
         announcementDao.getAnnouncement(id)?.toDomain()
     }
 

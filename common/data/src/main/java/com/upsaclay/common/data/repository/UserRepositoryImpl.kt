@@ -7,6 +7,7 @@ import com.upsaclay.common.domain.model.User
 import com.upsaclay.common.domain.repository.UserRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -16,7 +17,8 @@ import okio.IOException
 
 internal class UserRepositoryImpl(
     private val userRemoteDataSource: UserRemoteDataSource,
-    private val userLocalDataSource: UserLocalDataSource
+    private val userLocalDataSource: UserLocalDataSource,
+    private val scope: CoroutineScope
 ): UserRepository {
     private val _currentUserFlow = MutableStateFlow<User?>(null)
     override val currentUserFlow: Flow<User> = _currentUserFlow.filterNotNull()
@@ -40,20 +42,24 @@ internal class UserRepositoryImpl(
         }
     }
 
-    override suspend fun getUser(userId: Int): User? =
-        userRemoteDataSource.getUserWithFirestore(userId)?.let { UserMapper.toDomain(it) }
+    override suspend fun getUser(userId: String): User? =
+        userRemoteDataSource.getUserFirestoreWithEmail(userId)?.let { UserMapper.toDomain(it) }
 
-    override suspend fun getUser(userEmail: String): User? =
-        userRemoteDataSource.getUserWithFirestore(userEmail)?.let { UserMapper.toDomain(it) }
+    override suspend fun getUserWithEmail(userEmail: String): User? =
+        userRemoteDataSource.getUserFirestoreWithEmail(userEmail)?.let { UserMapper.toDomain(it) }
 
-    override suspend fun createUser(user: User): Result<Int> {
+    override suspend fun createUser(user: User): Result<Unit> {
         val userDTO = UserMapper.toDTO(user)
-        val userId = userRemoteDataSource.createUserWithOracle(userDTO)
-        return userId?.let {
-            val userFirestoreModel = UserMapper.toFirestoreModel(user.copy(id = it))
-            userRemoteDataSource.createUserWithFirestore(userFirestoreModel)
-            Result.success(it)
-        } ?: Result.failure(IOException())
+        val userFirestoreModel = UserMapper.toFirestoreModel(user)
+        val oracleResult = scope.launch { userRemoteDataSource.createUserWithOracle(userDTO) }
+        val firestoreResult = scope.launch { userRemoteDataSource.createUserWithFirestore(userFirestoreModel) }
+        return try {
+            firestoreResult.join()
+            oracleResult.join()
+            Result.success(Unit)
+        } catch (e: IOException) {
+            Result.failure(e)
+        }
     }
 
     override suspend fun setCurrentUser(user: User) {
@@ -64,12 +70,12 @@ internal class UserRepositoryImpl(
         userLocalDataSource.removeCurrentUser()
     }
 
-    override suspend fun updateProfilePictureUrl(userId: Int, profilePictureUrl: String): Result<Unit> {
+    override suspend fun updateProfilePictureUrl(userId: String, profilePictureUrl: String): Result<Unit> {
         return userRemoteDataSource.updateProfilePictureUrl(userId, profilePictureUrl)
             .onSuccess { userLocalDataSource.updateProfilePictureUrl(profilePictureUrl) }
     }
 
-    override suspend fun deleteProfilePictureUrl(userId: Int): Result<Unit> {
+    override suspend fun deleteProfilePictureUrl(userId: String): Result<Unit> {
         return userRemoteDataSource.deleteProfilePictureUrl(userId)
             .onSuccess { userLocalDataSource.deleteProfilePictureUrl() }
     }

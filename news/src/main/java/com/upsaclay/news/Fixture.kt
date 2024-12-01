@@ -1,9 +1,11 @@
 package com.upsaclay.news
 
+import com.upsaclay.common.domain.model.User
+import com.upsaclay.news.domain.model.Announcement
 import java.time.LocalDateTime
 
-internal val announcementFixture = com.upsaclay.news.domain.model.Announcement(
-    id = 1,
+internal val announcementFixture = Announcement(
+    id = "1",
     title = "Rappel : Visite de cabinet le 23/03.",
     date = LocalDateTime.of(2024, 7, 20, 10, 0),
     content = "Nous vous informons que la visite de votre " +
@@ -18,8 +20,8 @@ internal val announcementFixture = com.upsaclay.news.domain.model.Announcement(
         "sans heurts et de manière efficace. N'hésitez pas à nous contacter si " +
         "vous avez des questions ou si vous avez besoin de plus amples informations" +
         " avant la date prévue",
-    author = com.upsaclay.common.domain.model.User(
-        id = 1,
+    author = User(
+        id = "1",
         firstName = "Patrick",
         lastName = "Dupont",
         email = "patrick.dupont@example.com",

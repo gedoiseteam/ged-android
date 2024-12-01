@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.callbackFlow
 internal class ConversationApiImpl : ConversationApi {
     private val conversationsCollection = Firebase.firestore.collection(CONVERSATIONS_TABLE_NAME)
 
-    override fun listenAllConversations(userId: Int): Flow<List<RemoteConversation>> = callbackFlow {
+    override fun listenAllConversations(userId: String): Flow<List<RemoteConversation>> = callbackFlow {
         val listener = conversationsCollection
             .whereArrayContains(ConversationField.Remote.PARTICIPANTS, userId)
             .addSnapshotListener { value, error ->

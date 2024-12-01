@@ -48,7 +48,7 @@ internal object ConversationMapper {
         isActive = true
     )
 
-    fun toDTO(conversation: Conversation, currentUserId: Int) = ConversationDTO(
+    fun toDTO(conversation: Conversation, currentUserId: String) = ConversationDTO(
         conversationId = conversation.id,
         interlocutor = conversation.interlocutor,
         isSynchronized = false,

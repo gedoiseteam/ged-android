@@ -252,9 +252,9 @@ fun Navigation(mainViewModel: MainViewModel = koinViewModel()) {
 
         composable(
             route = Screen.CHAT.route + "?interlocutorId={interlocutorId}",
-            arguments = listOf(navArgument("interlocutorId") { type = IntType })
+            arguments = listOf(navArgument("interlocutorId") { type = StringType })
         ) { backStackEntry ->
-            val interlocutorId = backStackEntry.arguments?.getInt("interlocutorId")
+            val interlocutorId = backStackEntry.arguments?.getString("interlocutorId")
             interlocutorId?.let {
                 ChatScreen(interlocutorId = interlocutorId, navController = navController)
             } ?: run {

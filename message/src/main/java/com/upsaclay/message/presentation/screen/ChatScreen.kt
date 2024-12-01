@@ -43,7 +43,7 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun ChatScreen(
-    interlocutorId: Int,
+    interlocutorId: String,
     navController: NavController,
     chatViewModel: ChatViewModel = koinViewModel()
 ) {
