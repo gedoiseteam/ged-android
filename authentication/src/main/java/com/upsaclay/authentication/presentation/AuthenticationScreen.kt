@@ -68,6 +68,7 @@ fun AuthenticationScreen(
     navController: NavController,
     authenticationViewModel: AuthenticationViewModel = koinViewModel()
 ) {
+
     val authenticationState = authenticationViewModel.authenticationState.collectAsState().value
     var inputsError by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
@@ -226,6 +227,8 @@ fun AuthenticationScreen(
             )
         }
     }
+    TODO("une fois authentifier, transmettre le même Flow lors de chaque changement de page, en le transmettant en parametre du navigator, il devra donc être le paramètre de chaque viewModel pour qu'ils se recon" +
+            "construisent le même objet flow du début de la connexion")
 }
 
 @Composable
