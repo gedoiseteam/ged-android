@@ -18,7 +18,6 @@ import com.upsaclay.authentication.domain.usecase.SetUserAuthenticatedUseCase
 import com.upsaclay.authentication.domain.usecase.VerifyEmailFormatUseCase
 import com.upsaclay.common.domain.uppercaseFirstLetter
 import com.upsaclay.common.domain.model.User
-import com.upsaclay.common.domain.usecase.GetCurrentUserFlowUseCase
 import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
 import com.upsaclay.common.domain.usecase.IsUserExistUseCase
 import com.upsaclay.common.domain.usecase.UpdateUserProfilePictureUseCase

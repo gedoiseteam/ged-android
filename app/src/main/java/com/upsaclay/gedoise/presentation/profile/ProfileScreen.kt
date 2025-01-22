@@ -41,12 +41,11 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.upsaclay.common.domain.model.Screen
-import com.upsaclay.common.presentation.ClickableMenuItemData
 import com.upsaclay.common.presentation.components.CircularProgressBar
 import com.upsaclay.common.presentation.components.LoadingDialog
 import com.upsaclay.common.presentation.components.ProfilePicture
 import com.upsaclay.common.presentation.components.SensibleActionDialog
-import com.upsaclay.common.presentation.components.SimpleClickableItem
+import com.upsaclay.common.presentation.components.ClickableItem
 import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
@@ -64,7 +63,7 @@ fun ProfileScreen(navController: NavController, profileViewModel: ProfileViewMod
     var showLoadingDialog by remember { mutableStateOf(false) }
     val profileState = profileViewModel.profileState.collectAsState().value
 
-    val clickableMenuItemsData: ImmutableList<ClickableMenuItemData> =
+    val clickableMenuItemsData: ImmutableList<ItemData> =
         buildProfileMenuItemData(
             onAccountClick = { navController.navigate(Screen.ACCOUNT.route) },
             onLogoutClick = { showLogoutDialog = true }
@@ -122,7 +121,7 @@ fun ProfileScreen(navController: NavController, profileViewModel: ProfileViewMod
                     HorizontalDivider()
 
                     clickableMenuItemsData.forEach { menuItem ->
-                        SimpleClickableItem(
+                        ClickableItem(
                             modifier = Modifier.fillMaxWidth(),
                             text = menuItem.text,
                             icon = menuItem.icon,
@@ -190,8 +189,8 @@ fun ProfileTopBar(navController: NavController) {
 private fun buildProfileMenuItemData(
     onAccountClick: () -> Unit,
     onLogoutClick: () -> Unit
-): ImmutableList<ClickableMenuItemData> = persistentListOf(
-    ClickableMenuItemData(
+): ImmutableList<ItemData> = persistentListOf(
+    ItemData(
         text = { Text(text = stringResource(id = R.string.account_informations)) },
         icon = {
             Icon(
@@ -202,7 +201,7 @@ private fun buildProfileMenuItemData(
         },
         onClick = onAccountClick
     ),
-    ClickableMenuItemData(
+    ItemData(
         text = {
             Text(text = stringResource(id = R.string.logout), color = GedoiseColor.Red)
         },
@@ -274,7 +273,7 @@ fun ProfileScreenPreview() {
                         HorizontalDivider()
 
                         profileMenuItemsDataFixture.forEach { menuItem ->
-                            SimpleClickableItem(
+                            ClickableItem(
                                 modifier = Modifier.fillMaxWidth(),
                                 text = menuItem.text,
                                 icon = menuItem.icon,
@@ -288,8 +287,8 @@ fun ProfileScreenPreview() {
     }
 }
 
-private val profileMenuItemsDataFixture: ImmutableList<ClickableMenuItemData> = persistentListOf(
-    ClickableMenuItemData(
+private val profileMenuItemsDataFixture: ImmutableList<ItemData> = persistentListOf(
+    ItemData(
         text = { Text(text = stringResource(id = R.string.account_informations)) },
         icon = {
             Icon(
@@ -300,7 +299,7 @@ private val profileMenuItemsDataFixture: ImmutableList<ClickableMenuItemData> = 
         },
         onClick = {}
     ),
-    ClickableMenuItemData(
+    ItemData(
         text = {
             Text(
                 text = stringResource(id = R.string.logout),

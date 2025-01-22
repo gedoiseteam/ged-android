@@ -6,33 +6,29 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.upsaclay.common.domain.model.User
-import com.upsaclay.common.domain.usecase.GetCurrentUserFlowUseCase
-import com.upsaclay.news.domain.model.Announcement
-import com.upsaclay.news.domain.model.AnnouncementState
+import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
+import com.upsaclay.news.domain.entity.Announcement
+import com.upsaclay.news.domain.entity.AnnouncementScreenState
 import com.upsaclay.news.domain.usecase.ConvertAnnouncementToJsonUseCase
 import com.upsaclay.news.domain.usecase.DeleteAnnouncementUseCase
-import com.upsaclay.news.domain.usecase.GetAllAnnouncementsUseCase
-import com.upsaclay.news.domain.usecase.GetAnnouncementUseCase
+import com.upsaclay.news.domain.usecase.GetAnnouncementsUseCase
 import com.upsaclay.news.domain.usecase.RefreshAnnouncementsUseCase
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class NewsViewModel(
-    getAllAnnouncementUseCase: GetAllAnnouncementsUseCase,
-    getCurrentUserFlowUseCase: GetCurrentUserFlowUseCase,
+    getAllAnnouncementUseCase: GetAnnouncementsUseCase,
+    getCurrentUserUseCase: GetCurrentUserUseCase,
     private val refreshAnnouncementsUseCase: RefreshAnnouncementsUseCase,
     private val deleteAnnouncementUseCase: DeleteAnnouncementUseCase,
-    private val convertAnnouncementToJsonUseCase: ConvertAnnouncementToJsonUseCase,
-    private val getAnnouncementUseCase: GetAnnouncementUseCase
+    private val convertAnnouncementToJsonUseCase: ConvertAnnouncementToJsonUseCase
 ) : ViewModel() {
-    private val _announcementState = MutableStateFlow(AnnouncementState.DEFAULT)
-    val announcementState: Flow<AnnouncementState> = _announcementState
+    private val _announcementScreenState = MutableStateFlow(AnnouncementScreenState.DEFAULT)
+    val announcementScreenState: Flow<AnnouncementScreenState> = _announcementScreenState
     val announcements: Flow<List<Announcement>> = getAllAnnouncementUseCase()
-    val user: Flow<User> = getCurrentUserFlowUseCase()
-    var displayedAnnouncement: Announcement? = null
-        private set
+    val user: StateFlow<User?> = getCurrentUserUseCase()
     var isRefreshing by mutableStateOf(false)
         private set
 
@@ -44,35 +40,14 @@ class NewsViewModel(
         }
     }
 
-    fun refreshDisplayAnnouncement(id: String) {
-        viewModelScope.launch {
-            displayedAnnouncement = getAnnouncementUseCase(id)
-        }
-    }
+    fun convertAnnouncementToJson(announcement: Announcement): String =
+        convertAnnouncementToJsonUseCase.toJson(announcement)
 
-    fun setDisplayedAnnouncement(announcement: Announcement?) {
-        displayedAnnouncement = announcement
-    }
-
-    fun convertAnnouncementToJson(announcement: Announcement): String = convertAnnouncementToJsonUseCase.toJson(announcement)
-
-    fun updateAnnouncementState(state: AnnouncementState) {
-        _announcementState.value = state
+    fun updateAnnouncementState(state: AnnouncementScreenState) {
+        _announcementScreenState.value = state
     }
 
     fun resetAnnouncementState() {
-        _announcementState.value = AnnouncementState.DEFAULT
-    }
-
-    fun deleteAnnouncement(announcement: Announcement) {
-        _announcementState.value = AnnouncementState.LOADING
-        viewModelScope.launch {
-            delay(300)
-            deleteAnnouncementUseCase(announcement)
-                .onSuccess { _announcementState.value = AnnouncementState.ANNOUNCEMENT_DELETED }
-                .onFailure {
-                    _announcementState.value = AnnouncementState.ANNOUNCEMENT_DELETE_ERROR
-                }
-        }
+        _announcementScreenState.value = AnnouncementScreenState.DEFAULT
     }
 }

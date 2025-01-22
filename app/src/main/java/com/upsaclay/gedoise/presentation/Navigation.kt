@@ -55,7 +55,7 @@ import com.upsaclay.news.presentation.screen.CreateAnnouncementScreen
 import com.upsaclay.news.presentation.screen.EditAnnouncementScreen
 import com.upsaclay.news.presentation.screen.NewsScreen
 import com.upsaclay.news.presentation.screen.ReadAnnouncementScreen
-import com.upsaclay.news.presentation.viewmodel.EditAnnouncementViewModel
+import com.upsaclay.news.presentation.viewmodel.AnnouncementViewModel
 import com.upsaclay.news.presentation.viewmodel.NewsViewModel
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
@@ -70,7 +70,7 @@ fun Navigation(mainViewModel: MainViewModel = koinViewModel()) {
     val isAuthenticated = mainViewModel.isAuthenticated.collectAsState(null).value
 
     val sharedRegistrationViewModel: RegistrationViewModel = koinViewModel()
-    val sharedNewsViewModel: NewsViewModel = koinViewModel()
+    val sharedAnnouncementViewModel: AnnouncementViewModel = koinViewModel()
     val sharedConversationViewModel: ConversationViewModel = koinViewModel()
 
     val convertAnnouncementToJsonUseCase: ConvertAnnouncementToJsonUseCase by inject(
@@ -144,10 +144,7 @@ fun Navigation(mainViewModel: MainViewModel = koinViewModel()) {
                     topBar = { HomeTopBar(navController = navController, user = user) },
                     bottomNavigationItems = mainViewModel.bottomNavigationItem.values.toList(),
                 ) {
-                    NewsScreen(
-                        navController = navController,
-                        newsViewModel = sharedNewsViewModel
-                    )
+                    NewsScreen(navController = navController)
                 }
             }
         }
@@ -164,7 +161,7 @@ fun Navigation(mainViewModel: MainViewModel = koinViewModel()) {
                 ReadAnnouncementScreen(
                     modifier = Modifier.padding(top = contentPadding.calculateTopPadding()),
                     navController = navController,
-                    newsViewModel = sharedNewsViewModel
+                    announcementViewModel = sharedAnnouncementViewModel
                 )
             }
         }

@@ -68,7 +68,7 @@ fun AuthenticationScreen(
     navController: NavController,
     authenticationViewModel: AuthenticationViewModel = koinViewModel()
 ) {
-    val authenticationState = authenticationViewModel.authenticationState.collectAsState().value
+    val authenticationState = authenticationViewModel.authenticationState.collectAsState()
     var inputsError by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
     var showVerifyEmailDialog by remember { mutableStateOf(false) }
@@ -80,10 +80,10 @@ fun AuthenticationScreen(
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
 
-    inputsError = authenticationState == AuthenticationState.AUTHENTICATION_ERROR ||
-            authenticationState == AuthenticationState.INPUTS_EMPTY_ERROR
+    inputsError = authenticationState.value == AuthenticationState.AUTHENTICATION_ERROR ||
+            authenticationState.value == AuthenticationState.INPUTS_EMPTY_ERROR
 
-    errorMessage = when (authenticationState) {
+    errorMessage = when (authenticationState.value) {
         AuthenticationState.AUTHENTICATION_ERROR ->
             stringResource(id = R.string.error_connection)
 
@@ -104,7 +104,7 @@ fun AuthenticationScreen(
     }
 
     LaunchedEffect(authenticationState) {
-        when(authenticationState) {
+        when(authenticationState.value) {
             AuthenticationState.AUTHENTICATED -> {
                 navController.navigate(Screen.NEWS.route) {
                     popUpTo(navController.graph.id) {
@@ -210,8 +210,8 @@ fun AuthenticationScreen(
             LoginButton(
                 modifier = Modifier.fillMaxWidth(),
                 text = stringResource(id = R.string.login),
-                isLoading = authenticationState == AuthenticationState.LOADING ||
-                        authenticationState == AuthenticationState.AUTHENTICATED,
+                isLoading = authenticationState.value == AuthenticationState.LOADING ||
+                        authenticationState.value == AuthenticationState.AUTHENTICATED,
                 onClick = {
                     keyboardController?.hide()
                     authenticationViewModel.login()

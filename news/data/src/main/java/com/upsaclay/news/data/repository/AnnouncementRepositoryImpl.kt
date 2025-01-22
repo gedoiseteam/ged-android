@@ -2,7 +2,8 @@ package com.upsaclay.news.data.repository
 
 import com.upsaclay.news.data.local.AnnouncementLocalDataSource
 import com.upsaclay.news.data.remote.AnnouncementRemoteDataSource
-import com.upsaclay.news.domain.model.Announcement
+import com.upsaclay.news.domain.entity.Announcement
+import com.upsaclay.news.domain.entity.AnnouncementState
 import com.upsaclay.news.domain.repository.AnnouncementRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -10,6 +11,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.io.IOException
 
 internal class AnnouncementRepositoryImpl(
     private val announcementRemoteDataSource: AnnouncementRemoteDataSource,
@@ -20,46 +22,36 @@ internal class AnnouncementRepositoryImpl(
 
     init {
         CoroutineScope(Dispatchers.IO).launch {
-            announcementLocalDataSource.getAllAnnouncements().collect {
+            announcementLocalDataSource.getAnnouncements().collect {
                 _announcements.value = it
             }
         }
     }
 
     override suspend fun refreshAnnouncements() {
-        val remoteAnnouncements = announcementRemoteDataSource.getAllAnnouncement()
-        if (remoteAnnouncements.isNotEmpty()) {
-            val localAnnouncements = announcementLocalDataSource.getAllAnnouncements().first()
-
-            val announcementsToUpdate = remoteAnnouncements.filter { remoteValue ->
-                localAnnouncements.any { localValue ->
-                    localValue.isUpdated(remoteValue) ||
-                        localValue.author.isUpdated(remoteValue.author)
-                }
-            }
-
+        val announcements = announcementRemoteDataSource.getAnnouncement()
+        if (announcements.isNotEmpty()) {
+            val announcementsToUpdate = announcements.filterNot { _announcements.value.contains(it) }
             announcementsToUpdate.forEach { announcementLocalDataSource.upsertAnnouncement(it) }
         }
     }
 
-    override suspend fun getAnnouncement(announcementId: String): Announcement? =
-        announcementLocalDataSource.getAnnouncement(announcementId)
+    override suspend fun createAnnouncement(announcement: Announcement) {
+        try {
+            announcementLocalDataSource.insertAnnouncement(announcement)
+            announcementRemoteDataSource.createAnnouncement(announcement)
+        } catch (e: Exception) {
+            announcementLocalDataSource.updateAnnouncement(announcement.copy(state = AnnouncementState.ERROR))
+        }
+    }
 
-    override suspend fun createAnnouncement(announcement: Announcement): Result<Unit> =
-        announcementRemoteDataSource.createAnnouncement(announcement)
-            .onSuccess {
-                announcementLocalDataSource.upsertAnnouncement(announcement)
-            }
-
-    override suspend fun updateAnnouncement(announcement: Announcement): Result<Unit> =
+    override suspend fun updateAnnouncement(announcement: Announcement) {
         announcementRemoteDataSource.updateAnnouncement(announcement)
-            .onSuccess {
-                announcementLocalDataSource.upsertAnnouncement(announcement)
-            }
+        announcementLocalDataSource.updateAnnouncement(announcement)
+    }
 
-    override suspend fun deleteAnnouncement(announcement: Announcement): Result<Unit> =
+    override suspend fun deleteAnnouncement(announcement: Announcement) {
         announcementRemoteDataSource.deleteAnnouncement(announcement.id)
-            .onSuccess {
-                announcementLocalDataSource.deleteAnnouncement(announcement)
-            }
+        announcementLocalDataSource.deleteAnnouncement(announcement)
+    }
 }

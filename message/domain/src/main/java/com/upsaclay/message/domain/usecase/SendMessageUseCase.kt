@@ -2,7 +2,6 @@ package com.upsaclay.message.domain.usecase
 
 import com.upsaclay.common.domain.repository.UserRepository
 import com.upsaclay.common.domain.usecase.GenerateIDUseCase
-import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
 import com.upsaclay.message.domain.model.Conversation
 import com.upsaclay.message.domain.model.Message
 import com.upsaclay.message.domain.repository.ConversationRepository

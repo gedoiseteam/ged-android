@@ -5,14 +5,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.upsaclay.common.domain.usecase.GetCurrentUserFlowUseCase
+import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
 import com.upsaclay.message.domain.model.Conversation
 import com.upsaclay.message.domain.model.Message
 import com.upsaclay.message.domain.model.MessageType
 import com.upsaclay.message.domain.usecase.DeleteConversationUseCase
 import com.upsaclay.message.domain.usecase.GetConversationUseCase
 import com.upsaclay.message.domain.usecase.SendMessageUseCase
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
@@ -21,7 +20,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
 class ChatViewModel(
-    getCurrentUserFlowUseCase: GetCurrentUserFlowUseCase,
+    getCurrentUserUseCase: GetCurrentUserUseCase,
     private val getConversationUseCase: GetConversationUseCase,
     private val sendMessageUseCase: SendMessageUseCase,
     private val deleteConversationUseCase: DeleteConversationUseCase

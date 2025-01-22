@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.upsaclay.common.domain.model.User
 import com.upsaclay.common.domain.usecase.DeleteUserProfilePictureUseCase
-import com.upsaclay.common.domain.usecase.GetCurrentUserFlowUseCase
+import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
 import com.upsaclay.common.domain.usecase.UpdateUserProfilePictureUseCase
 import com.upsaclay.gedoise.data.account.AccountScreenState
 import kotlinx.coroutines.flow.Flow
@@ -20,11 +20,11 @@ import kotlinx.coroutines.launch
 class AccountViewModel(
     private val updateUserProfilePictureUseCase: UpdateUserProfilePictureUseCase,
     private val deleteUserProfilePictureUseCase: DeleteUserProfilePictureUseCase,
-    getCurrentUserFlowUseCase: GetCurrentUserFlowUseCase
+    getCurrentUserUseCase: GetCurrentUserUseCase
 ) : ViewModel() {
     private val _accountScreenState = MutableStateFlow(AccountScreenState.READ)
     val accountScreenState = _accountScreenState.asStateFlow()
-    val user: Flow<User> = getCurrentUserFlowUseCase()
+    val user: Flow<User> = getCurrentUserUseCase()
     var profilePictureUri by mutableStateOf<Uri?>(null)
         private set
 

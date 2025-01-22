@@ -72,7 +72,7 @@ fun PullToRefreshComponent(
 }
 
 @Composable
-fun SimpleClickableItem(
+fun ClickableItem(
     modifier: Modifier = Modifier,
     text: @Composable () -> Unit,
     icon: @Composable () -> Unit,
@@ -100,7 +100,7 @@ fun SimpleClickableItem(
 @Composable
 private fun ClickableMenuItemPreview() {
     GedoiseTheme {
-        SimpleClickableItem(
+        ClickableItem(
             modifier = Modifier.width(300.dp),
             text = { Text(text = "Item") },
             icon = {

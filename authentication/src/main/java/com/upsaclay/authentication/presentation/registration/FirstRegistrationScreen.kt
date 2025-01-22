@@ -47,9 +47,9 @@ fun FirstRegistrationScreen(
     registrationViewModel: RegistrationViewModel = koinViewModel()
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
-    val registrationState = registrationViewModel.registrationState.collectAsState().value
-    val isError = registrationState == RegistrationState.INPUTS_EMPTY_ERROR
-    val isLoading = registrationState == RegistrationState.LOADING
+    val registrationState = registrationViewModel.registrationState.collectAsState()
+    val isError = registrationState.value == RegistrationState.INPUTS_EMPTY_ERROR
+    val isLoading = registrationState.value == RegistrationState.LOADING
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
 

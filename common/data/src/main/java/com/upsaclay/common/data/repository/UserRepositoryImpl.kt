@@ -10,6 +10,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
@@ -21,8 +22,7 @@ internal class UserRepositoryImpl(
     private val scope: CoroutineScope
 ): UserRepository {
     private val _currentUserFlow = MutableStateFlow<User?>(null)
-    override val currentUserFlow: Flow<User> = _currentUserFlow.filterNotNull()
-    override val currentUser: User? get() = _currentUserFlow.value
+    override val currentUserFlow: StateFlow<User?> = _currentUserFlow
 
     private val _users = MutableStateFlow<List<User>>(emptyList())
     override val users: Flow<List<User>> = _users

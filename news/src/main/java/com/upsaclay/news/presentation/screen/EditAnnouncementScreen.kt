@@ -34,37 +34,40 @@ import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.common.utils.showToast
 import com.upsaclay.news.R
 import com.upsaclay.news.announcementFixture
-import com.upsaclay.news.presentation.viewmodel.EditAnnouncementViewModel
+import com.upsaclay.news.domain.entity.AnnouncementScreenState
+import com.upsaclay.news.presentation.viewmodel.AnnouncementViewModel
 import java.time.LocalDateTime
 
 @Composable
-fun EditAnnouncementScreen(navController: NavController, editAnnouncementViewModel: EditAnnouncementViewModel) {
+fun EditAnnouncementScreen(
+    navController: NavController,
+    announcementViewModel: AnnouncementViewModel
+) {
     val context = LocalContext.current
-    val state =
-        editAnnouncementViewModel.announcementState.collectAsState(com.upsaclay.news.domain.model.AnnouncementState.DEFAULT).value
-    val title: String = editAnnouncementViewModel.title
-    val content: String = editAnnouncementViewModel.content
-    val isAnnouncementModified =
-        editAnnouncementViewModel.isAnnouncementModified.collectAsState(initial = false).value
-    var showLoadingDialog by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
+    var showLoadingDialog by remember { mutableStateOf(false) }
+    val state by announcementViewModel.screenState.collectAsState()
+    val isAnnouncementModified by announcementViewModel.isAnnouncementModified.collectAsState()
+    val announcement by announcementViewModel.announcement.collectAsState()
 
     LaunchedEffect(state) {
         when (state) {
-            com.upsaclay.news.domain.model.AnnouncementState.ANNOUNCEMENT_UPDATE_ERROR -> {
+            AnnouncementScreenState.UPDATE_ERROR -> {
                 showLoadingDialog = false
                 showToast(context, R.string.announcement_update_error)
             }
 
-            com.upsaclay.news.domain.model.AnnouncementState.ANNOUNCEMENT_UPDATED -> {
+            AnnouncementScreenState.UPDATED -> {
                 showLoadingDialog = false
                 focusManager.clearFocus()
-                keyboardController?.hide()
                 navController.popBackStack()
             }
 
-            com.upsaclay.news.domain.model.AnnouncementState.LOADING -> showLoadingDialog = true
+            AnnouncementScreenState.LOADING -> {
+                keyboardController?.hide()
+                showLoadingDialog = true
+            }
 
             else -> {}
         }
@@ -83,15 +86,15 @@ fun EditAnnouncementScreen(navController: NavController, editAnnouncementViewMod
                     navController.popBackStack()
                 },
                 onSaveClick = {
-                    editAnnouncementViewModel.updateAnnouncement(
-                        editAnnouncementViewModel.editedAnnouncement.copy(
-                            title = title,
-                            content = content,
+                    announcementViewModel.updateAnnouncement(
+                        announcement.copy(
+                            title = announcementViewModel.title,
+                            content = announcementViewModel.content,
                             date = LocalDateTime.now()
                         )
                     )
                 },
-                isButtonEnable = content.isNotBlank() && isAnnouncementModified
+                isButtonEnable = announcementViewModel.content.isNotBlank() && isAnnouncementModified
             )
         }
     ) { contentPadding ->
@@ -110,7 +113,7 @@ fun EditAnnouncementScreen(navController: NavController, editAnnouncementViewMod
 
                 TransparentFocusedTextField(
                     modifier = Modifier.fillMaxWidth(),
-                    value = title,
+                    value = announcementViewModel.title,
                     placeholder = {
                         Text(
                             text = stringResource(id = R.string.title_field_entry),
@@ -118,7 +121,7 @@ fun EditAnnouncementScreen(navController: NavController, editAnnouncementViewMod
                             style = MaterialTheme.typography.titleMedium
                         )
                     },
-                    onValueChange = { editAnnouncementViewModel.updateTitle(it) },
+                    onValueChange = { announcementViewModel.updateTitle(it) },
                     textStyle = MaterialTheme.typography.titleMedium
                 )
 
@@ -126,14 +129,14 @@ fun EditAnnouncementScreen(navController: NavController, editAnnouncementViewMod
 
                 TransparentTextField(
                     modifier = Modifier.fillMaxWidth(),
-                    value = content,
+                    value = announcementViewModel.content,
                     placeholder = {
                         Text(
                             text = stringResource(id = R.string.content_field_entry),
                             style = MaterialTheme.typography.bodyLarge
                         )
                     },
-                    onValueChange = { editAnnouncementViewModel.updateContent(it) },
+                    onValueChange = { announcementViewModel.updateContent(it) },
                     textStyle = MaterialTheme.typography.bodyLarge
                 )
             }

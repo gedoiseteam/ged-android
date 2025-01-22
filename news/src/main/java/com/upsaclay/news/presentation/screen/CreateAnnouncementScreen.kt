@@ -33,8 +33,9 @@ import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.common.utils.showToast
 import com.upsaclay.news.R
-import com.upsaclay.news.domain.model.Announcement
-import com.upsaclay.news.domain.model.AnnouncementState
+import com.upsaclay.news.domain.entity.Announcement
+import com.upsaclay.news.domain.entity.AnnouncementScreenState
+import com.upsaclay.news.domain.entity.AnnouncementState
 import com.upsaclay.news.presentation.viewmodel.CreateAnnouncementViewModel
 import java.time.LocalDateTime
 import org.koin.androidx.compose.koinViewModel
@@ -42,32 +43,31 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun CreateAnnouncementScreen(
     navController: NavController,
-    createAnnouncementViewModel: CreateAnnouncementViewModel = koinViewModel(),
-    user: User
+    createAnnouncementViewModel: CreateAnnouncementViewModel = koinViewModel()
 ) {
-    val state = createAnnouncementViewModel.announcementState.collectAsState(AnnouncementState.DEFAULT).value
-    val title: String = createAnnouncementViewModel.title
-    val content: String = createAnnouncementViewModel.content
     val context = LocalContext.current
-    var showLoadingDialog by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
+    var showLoadingDialog by remember { mutableStateOf(false) }
+    val state by createAnnouncementViewModel.screenState.collectAsState()
+    val title = createAnnouncementViewModel.title
+    val content = createAnnouncementViewModel.content
 
     LaunchedEffect(state) {
         when (state) {
-            AnnouncementState.ANNOUNCEMENT_CREATION_ERROR -> {
+            AnnouncementScreenState.CREATION_ERROR -> {
                 showLoadingDialog = false
                 showToast(context, R.string.announcement_creation_error)
             }
 
-            AnnouncementState.ANNOUNCEMENT_CREATED -> {
+            AnnouncementScreenState.CREATED -> {
                 showLoadingDialog = false
                 focusManager.clearFocus()
                 keyboardController?.hide()
                 navController.popBackStack()
             }
 
-            AnnouncementState.LOADING -> showLoadingDialog = true
+            AnnouncementScreenState.LOADING -> showLoadingDialog = true
 
             else -> {}
         }
@@ -88,15 +88,7 @@ fun CreateAnnouncementScreen(
                     navController.popBackStack()
                 },
                 onSaveClick = {
-                    createAnnouncementViewModel.createAnnouncement(
-                        Announcement(
-                            id = "",
-                            title = if (title.isBlank()) null else title.trim(),
-                            content = content.trim(),
-                            date = LocalDateTime.now(),
-                            author = user
-                        )
-                    )
+                    createAnnouncementViewModel.createAnnouncement()
                 },
                 isButtonEnable = content.isNotBlank()
             )

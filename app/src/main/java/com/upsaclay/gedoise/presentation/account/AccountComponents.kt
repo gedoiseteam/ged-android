@@ -17,7 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import com.upsaclay.common.presentation.components.SimpleClickableItem
+import com.upsaclay.common.presentation.components.ClickableItem
 import com.upsaclay.common.presentation.components.SmallTopBarBack
 import com.upsaclay.common.presentation.components.SmallTopBarEdit
 import com.upsaclay.common.presentation.theme.GedoiseColor
@@ -39,7 +39,7 @@ internal fun AccountModelBottomSheet(
         onDismissRequest = onDismissRequest,
         sheetState = sheetState
     ) {
-        SimpleClickableItem(
+        ClickableItem(
             modifier = Modifier.fillMaxWidth(),
             text = { Text(text = stringResource(id = R.string.new_profile_picture)) },
             icon = {
@@ -52,7 +52,7 @@ internal fun AccountModelBottomSheet(
         )
 
         if (showDeleteProfilePicture) {
-            SimpleClickableItem(
+            ClickableItem(
                 modifier = Modifier.fillMaxWidth(),
                 text = {
                     Text(

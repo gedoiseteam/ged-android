@@ -22,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,12 +32,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.upsaclay.common.domain.model.Screen
 import com.upsaclay.common.presentation.components.PullToRefreshComponent
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.news.R
 import com.upsaclay.news.announcementsFixture
-import com.upsaclay.news.presentation.components.AnnouncementItemWithContent
+import com.upsaclay.news.domain.entity.Announcement
+import com.upsaclay.news.presentation.components.AnnouncementItem
 import com.upsaclay.news.presentation.viewmodel.NewsViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -46,7 +49,7 @@ fun NewsScreen(
     navController: NavController
 ) {
     val announcements = newsViewModel.announcements.collectAsState(emptyList()).value
-    val user = newsViewModel.user.collectAsState(null).value
+    val user by newsViewModel.user.collectAsState()
     val isRefreshing = newsViewModel.isRefreshing
 
     LaunchedEffect(Unit) {
@@ -54,45 +57,42 @@ fun NewsScreen(
         newsViewModel.refreshAnnouncements()
     }
 
-    user?.let {
-        PullToRefreshComponent(
-            onRefresh = { newsViewModel.refreshAnnouncements() },
-            isRefreshing = isRefreshing
+    PullToRefreshComponent(
+        onRefresh = { newsViewModel.refreshAnnouncements() },
+        isRefreshing = isRefreshing
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-            ) {
-                RecentAnnouncementSection(
-                    announcements = announcements,
-                    onClickAnnouncement = { announcement ->
-                        newsViewModel.setDisplayedAnnouncement(announcement)
-                        navController.navigate(com.upsaclay.common.domain.model.Screen.READ_ANNOUNCEMENT.route)
-                    }
-                )
-                PostSection()
-            }
-
-            if (user.isMember) {
-                Box(
-                    modifier = Modifier
-                        .padding(MaterialTheme.spacing.medium)
-                        .fillMaxSize()
-                ) {
-                    ExtendedFloatingActionButton(
-                        modifier = Modifier.align(Alignment.BottomEnd),
-                        text = { Text(text = stringResource(id = R.string.new_announcement)) },
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                        icon = {
-                            Icon(
-                                Icons.Filled.Edit,
-                                stringResource(id = R.string.new_announcement)
-                            )
-                        },
-                        onClick = { navController.navigate(com.upsaclay.common.domain.model.Screen.CREATE_ANNOUNCEMENT.route) }
-                    )
+            RecentAnnouncementSection(
+                announcements = announcements,
+                onClickAnnouncement = {
+                    navController.navigate(Screen.READ_ANNOUNCEMENT.route + "announcementId=${it.id}")
                 }
+            )
+            PostSection()
+        }
+
+        if (user?.isMember == true) {
+            Box(
+                modifier = Modifier
+                    .padding(MaterialTheme.spacing.medium)
+                    .fillMaxSize()
+            ) {
+                ExtendedFloatingActionButton(
+                    modifier = Modifier.align(Alignment.BottomEnd),
+                    text = { Text(text = stringResource(id = R.string.new_announcement)) },
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    icon = {
+                        Icon(
+                            Icons.Filled.Edit,
+                            stringResource(id = R.string.new_announcement)
+                        )
+                    },
+                    onClick = { navController.navigate(Screen.CREATE_ANNOUNCEMENT.route) }
+                )
             }
         }
     }
@@ -116,8 +116,8 @@ fun NewsScreen(
 
 @Composable
 private fun RecentAnnouncementSection(
-    announcements: List<com.upsaclay.news.domain.model.Announcement>,
-    onClickAnnouncement: (com.upsaclay.news.domain.model.Announcement) -> Unit
+    announcements: List<Announcement>,
+    onClickAnnouncement: (Announcement) -> Unit
 ) {
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
     val sortedAnnouncements = announcements.sortedByDescending { it.date }
@@ -149,7 +149,7 @@ private fun RecentAnnouncementSection(
                 }
             } else {
                 items(sortedAnnouncements) { announcement ->
-                    AnnouncementItemWithContent(
+                    AnnouncementItem(
                         announcement = announcement,
                         onClick = { onClickAnnouncement(announcement) }
                     )

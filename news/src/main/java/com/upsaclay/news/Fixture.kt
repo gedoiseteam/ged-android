@@ -1,7 +1,8 @@
 package com.upsaclay.news
 
 import com.upsaclay.common.domain.model.User
-import com.upsaclay.news.domain.model.Announcement
+import com.upsaclay.news.domain.entity.Announcement
+import com.upsaclay.news.domain.entity.AnnouncementState
 import java.time.LocalDateTime
 
 internal val announcementFixture = Announcement(
@@ -20,6 +21,7 @@ internal val announcementFixture = Announcement(
         "sans heurts et de manière efficace. N'hésitez pas à nous contacter si " +
         "vous avez des questions ou si vous avez besoin de plus amples informations" +
         " avant la date prévue",
+    state = AnnouncementState.DEFAULT,
     author = User(
         id = "1",
         firstName = "Patrick",

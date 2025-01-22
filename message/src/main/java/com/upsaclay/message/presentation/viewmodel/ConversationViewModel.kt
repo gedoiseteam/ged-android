@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.upsaclay.common.domain.model.User
 import com.upsaclay.common.domain.usecase.GetAllUserUseCase
-import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
 import com.upsaclay.message.domain.model.Conversation
 import com.upsaclay.message.domain.model.ConversationState
 import com.upsaclay.message.domain.usecase.GetAllConversationsUseCase

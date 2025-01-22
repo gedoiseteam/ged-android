@@ -7,7 +7,7 @@ import com.upsaclay.message.data.local.dao.MessageDao
 import com.upsaclay.message.data.local.model.LocalConversation
 import com.upsaclay.message.data.local.model.LocalMessage
 import com.upsaclay.news.data.local.AnnouncementDao
-import com.upsaclay.news.data.local.LocalAnnouncement
+import com.upsaclay.news.data.model.LocalAnnouncement
 
 @Database(
     entities = [
