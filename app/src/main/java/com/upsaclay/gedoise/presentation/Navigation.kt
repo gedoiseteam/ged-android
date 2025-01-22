@@ -15,13 +15,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavController
-import androidx.navigation.NavType.Companion.IntType
 import androidx.navigation.NavType.Companion.StringType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -30,52 +28,44 @@ import androidx.navigation.navArgument
 import com.upsaclay.authentication.presentation.AuthenticationScreen
 import com.upsaclay.authentication.presentation.registration.EmailVerificationScreen
 import com.upsaclay.authentication.presentation.registration.FirstRegistrationScreen
-import com.upsaclay.authentication.presentation.registration.SecondRegistrationScreen
-import com.upsaclay.authentication.presentation.registration.RegistrationViewModel
-import com.upsaclay.authentication.presentation.registration.ThirdRegistrationScreen
 import com.upsaclay.authentication.presentation.registration.FourthRegistrationScreen
+import com.upsaclay.authentication.presentation.registration.RegistrationViewModel
+import com.upsaclay.authentication.presentation.registration.SecondRegistrationScreen
+import com.upsaclay.authentication.presentation.registration.ThirdRegistrationScreen
 import com.upsaclay.common.domain.model.Screen
-import com.upsaclay.common.domain.model.User
 import com.upsaclay.common.presentation.components.SmallTopBarBack
 import com.upsaclay.common.utils.showToast
 import com.upsaclay.gedoise.R
 import com.upsaclay.gedoise.data.BottomNavigationItem
-import com.upsaclay.gedoise.presentation.components.MainBottomBar
 import com.upsaclay.gedoise.presentation.components.HomeTopBar
+import com.upsaclay.gedoise.presentation.components.MainBottomBar
 import com.upsaclay.gedoise.presentation.components.SplashScreen
-import com.upsaclay.gedoise.presentation.profile.ProfileScreen
-import com.upsaclay.gedoise.presentation.account.AccountScreen
-import com.upsaclay.message.presentation.screen.ChatScreen
-import com.upsaclay.message.presentation.screen.ConversationScreen
-import com.upsaclay.message.presentation.screen.CreateConversationScreen
-import com.upsaclay.message.presentation.screen.CreateGroupConversationScreen
-import com.upsaclay.message.presentation.viewmodel.ConversationViewModel
-import com.upsaclay.news.domain.usecase.ConvertAnnouncementToJsonUseCase
-import com.upsaclay.news.presentation.screen.CreateAnnouncementScreen
-import com.upsaclay.news.presentation.screen.EditAnnouncementScreen
-import com.upsaclay.news.presentation.screen.NewsScreen
-import com.upsaclay.news.presentation.screen.ReadAnnouncementScreen
-import com.upsaclay.news.presentation.viewmodel.AnnouncementViewModel
-import com.upsaclay.news.presentation.viewmodel.NewsViewModel
+import com.upsaclay.message.presentation.screens.ChatScreen
+import com.upsaclay.message.presentation.screens.ConversationScreen
+import com.upsaclay.message.presentation.screens.CreateConversationScreen
+import com.upsaclay.message.presentation.screens.CreateGroupConversationScreen
+import com.upsaclay.message.presentation.viewmodels.ConversationViewModel
+import com.upsaclay.news.presentation.screens.CreateAnnouncementScreen
+import com.upsaclay.news.presentation.screens.EditAnnouncementScreen
+import com.upsaclay.news.presentation.screens.EditAnnouncementViewModel
+import com.upsaclay.news.presentation.screens.NewsScreen
+import com.upsaclay.news.presentation.screens.ReadAnnouncementScreen
+import com.upsaclay.news.presentation.viewmodels.ReadAnnouncementViewModel
+import com.upsaclay.profile.presentation.screens.AccountScreen
+import com.upsaclay.profile.presentation.screens.ProfileScreen
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
-import org.koin.java.KoinJavaComponent.inject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Navigation(mainViewModel: MainViewModel = koinViewModel()) {
     val navController = rememberNavController()
-    val user = mainViewModel.user.collectAsState(null).value
-    val isAuthenticated = mainViewModel.isAuthenticated.collectAsState(null).value
+    val user by mainViewModel.user.collectAsState()
+    val isAuthenticated by mainViewModel.isAuthenticated.collectAsState()
 
     val sharedRegistrationViewModel: RegistrationViewModel = koinViewModel()
-    val sharedAnnouncementViewModel: AnnouncementViewModel = koinViewModel()
     val sharedConversationViewModel: ConversationViewModel = koinViewModel()
-
-    val convertAnnouncementToJsonUseCase: ConvertAnnouncementToJsonUseCase by inject(
-        ConvertAnnouncementToJsonUseCase::class.java
-    )
 
     var startDestination by remember { mutableStateOf(Screen.SPLASH.route) }
 
@@ -138,50 +128,55 @@ fun Navigation(mainViewModel: MainViewModel = koinViewModel()) {
         }
 
         composable(Screen.NEWS.route) {
-            user?.let {
-                MainNavigationBars(
-                    navController = navController,
-                    topBar = { HomeTopBar(navController = navController, user = user) },
-                    bottomNavigationItems = mainViewModel.bottomNavigationItem.values.toList(),
-                ) {
-                    NewsScreen(navController = navController)
-                }
-            }
-        }
-
-        composable(Screen.READ_ANNOUNCEMENT.route) {
-            Scaffold(
-                topBar = {
-                    SmallTopBarBack(
-                        onBackClick = { navController.popBackStack() },
-                        title = stringResource(id = com.upsaclay.news.R.string.announcement)
-                    )
-                }
-            ) { contentPadding ->
-                ReadAnnouncementScreen(
-                    modifier = Modifier.padding(top = contentPadding.calculateTopPadding()),
-                    navController = navController,
-                    announcementViewModel = sharedAnnouncementViewModel
-                )
-            }
-        }
-
-        composable(Screen.CREATE_ANNOUNCEMENT.route) {
-            user?.let {
-                CreateAnnouncementScreen(navController = navController, user = user)
+            MainNavigationBars(
+                navController = navController,
+                topBar = { user?.let { HomeTopBar(navController = navController, user = it) } },
+                bottomNavigationItems = mainViewModel.bottomNavigationItem.values.toList(),
+            ) {
+                NewsScreen(navController = navController)
             }
         }
 
         composable(
-            route = Screen.EDIT_ANNOUNCEMENT.route + "?editedAnnouncement={editedAnnouncement}",
-            arguments = listOf(navArgument("editedAnnouncement") { type = StringType })
+            Screen.READ_ANNOUNCEMENT.route + "?announcementId={announcementId}",
+            arguments = listOf(navArgument("announcementId") { type = StringType })
         ) { backStackEntry ->
-            val jsonAnnouncement = backStackEntry.arguments?.getString("editedAnnouncement")
+            val announcementId = backStackEntry.arguments?.getString("announcementId")
 
-            jsonAnnouncement?.let {
-                val announcement = convertAnnouncementToJsonUseCase.fromJson(jsonAnnouncement)
+            announcementId?.let {
+                val readAnnouncementViewModel: ReadAnnouncementViewModel = koinViewModel(
+                    parameters = { parametersOf(announcementId) }
+                )
+                Scaffold(
+                    topBar = {
+                        SmallTopBarBack(
+                            onBackClick = { navController.popBackStack() },
+                            title = stringResource(id = com.upsaclay.news.R.string.announcement)
+                        )
+                    }
+                ) { contentPadding ->
+                    ReadAnnouncementScreen(
+                        modifier = Modifier.padding(top = contentPadding.calculateTopPadding()),
+                        navController = navController,
+                        readAnnouncementViewModel = readAnnouncementViewModel
+                    )
+                }
+            } ?: navController.popBackStack()
+        }
+
+        composable(Screen.CREATE_ANNOUNCEMENT.route) {
+            CreateAnnouncementScreen(navController = navController)
+        }
+
+        composable(
+            route = Screen.EDIT_ANNOUNCEMENT.route + "?announcementId={announcementId}",
+            arguments = listOf(navArgument("announcementId") { type = StringType })
+        ) { backStackEntry ->
+            val announcementId = backStackEntry.arguments?.getString("announcementId")
+
+            announcementId?.let {
                 val editAnnouncementViewModel: EditAnnouncementViewModel = koinViewModel(
-                    parameters = { parametersOf(announcement) }
+                    parameters = { parametersOf(announcementId) }
                 )
                 EditAnnouncementScreen(
                     navController = navController,
@@ -256,7 +251,7 @@ fun Navigation(mainViewModel: MainViewModel = koinViewModel()) {
                 ChatScreen(interlocutorId = interlocutorId, navController = navController)
             } ?: run {
                 navController.navigate(Screen.CONVERSATIONS.route)
-                showToast(context = LocalContext.current, stringRes = R.string.occurred_error)
+                showToast(context = LocalContext.current, stringRes = com.upsaclay.common.R.string.occurred_error)
             }
         }
 

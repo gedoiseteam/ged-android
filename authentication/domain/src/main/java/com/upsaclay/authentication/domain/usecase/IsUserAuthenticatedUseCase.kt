@@ -7,5 +7,5 @@ import kotlinx.coroutines.flow.StateFlow
 class IsUserAuthenticatedUseCase(
     private val authenticationRepository: AuthenticationRepository
 ) {
-    operator fun invoke(): Flow<Boolean> = authenticationRepository.isAuthenticated
+    operator fun invoke(): StateFlow<Boolean> = authenticationRepository.isAuthenticated
 }

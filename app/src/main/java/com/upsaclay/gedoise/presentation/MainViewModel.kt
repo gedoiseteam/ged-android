@@ -7,6 +7,7 @@ import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
 import com.upsaclay.gedoise.data.BottomNavigationItem
 import com.upsaclay.gedoise.data.BottomNavigationItemType
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 class MainViewModel(
     isUserAuthenticatedUseCase: IsUserAuthenticatedUseCase,
@@ -18,6 +19,6 @@ class MainViewModel(
 //        BottomNavigationItemType.CALENDAR to BottomNavigationItem.Calendar(),
 //        BottomNavigationItemType.FORUM to BottomNavigationItem.Forum()
     )
-    val isAuthenticated: Flow<Boolean> = isUserAuthenticatedUseCase()
-    val user: Flow<User> = getCurrentUserUseCase()
+    val isAuthenticated: StateFlow<Boolean> = isUserAuthenticatedUseCase()
+    val user: StateFlow<User?> = getCurrentUserUseCase()
 }

@@ -28,6 +28,9 @@ internal class AnnouncementRepositoryImpl(
         }
     }
 
+    override fun getAnnouncement(announcementId: String): Announcement? =
+        _announcements.value.firstOrNull { it.id == announcementId }
+
     override suspend fun refreshAnnouncements() {
         val announcements = announcementRemoteDataSource.getAnnouncement()
         if (announcements.isNotEmpty()) {

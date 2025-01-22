@@ -7,9 +7,9 @@ import com.upsaclay.news.domain.usecase.DeleteAnnouncementUseCase
 import com.upsaclay.news.domain.usecase.GetAnnouncementsUseCase
 import com.upsaclay.news.domain.usecase.RefreshAnnouncementsUseCase
 import com.upsaclay.news.domain.usecase.UpdateAnnouncementUseCase
-import com.upsaclay.news.presentation.viewmodel.AnnouncementViewModel
-import com.upsaclay.news.presentation.viewmodel.CreateAnnouncementViewModel
-import com.upsaclay.news.presentation.viewmodel.NewsViewModel
+import com.upsaclay.news.presentation.viewmodels.ReadAnnouncementViewModel
+import com.upsaclay.news.presentation.viewmodels.CreateAnnouncementViewModel
+import com.upsaclay.news.presentation.viewmodels.NewsViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.core.module.dsl.singleOf
@@ -19,7 +19,7 @@ val newsModule = module {
     viewModelOf(::NewsViewModel)
     viewModelOf(::CreateAnnouncementViewModel)
     viewModel { (announcement: Announcement) ->
-        AnnouncementViewModel(
+        ReadAnnouncementViewModel(
             announcement = announcement,
             updateAnnouncementUseCase = get(),
             deleteAnnouncementUseCase = get(),

@@ -5,8 +5,8 @@ import com.upsaclay.message.domain.usecase.DeleteConversationUseCase
 import com.upsaclay.message.domain.usecase.GetAllConversationsUseCase
 import com.upsaclay.message.domain.usecase.GetConversationUseCase
 import com.upsaclay.message.domain.usecase.SendMessageUseCase
-import com.upsaclay.message.presentation.viewmodel.ChatViewModel
-import com.upsaclay.message.presentation.viewmodel.ConversationViewModel
+import com.upsaclay.message.presentation.viewmodels.ChatViewModel
+import com.upsaclay.message.presentation.viewmodels.ConversationViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import org.koin.androidx.viewmodel.dsl.viewModelOf

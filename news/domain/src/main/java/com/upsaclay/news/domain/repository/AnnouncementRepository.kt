@@ -6,6 +6,8 @@ import kotlinx.coroutines.flow.Flow
 interface AnnouncementRepository {
     val announcements: Flow<List<Announcement>>
 
+    fun getAnnouncement(announcementId: String): Announcement?
+
     suspend fun refreshAnnouncements()
 
     suspend fun createAnnouncement(announcement: Announcement)

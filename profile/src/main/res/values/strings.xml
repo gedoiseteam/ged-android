@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="profile">Profil</string>
+    <string name="edit_profile">Editer profil</string>
+
+    <string name="account_informations">Informations compte</string>
+    <string name="support">Support</string>
+    <string name="settings">Paramètres</string>
+    <string name="logout">Se déconnecter</string>
+    <string name="disconnection">Déconnexion...</string>
+
+    <string name="account_icon_description">Icône pour accéder à la page de compte</string>
+    <string name="support_icon_description">Icône pour accéder à la page de support</string>
+    <string name="settings_icon_description">Icône pour accéder à la page de paramètres</string>
+    <string name="logout_icon_description">Icône pour se déconnecter</string>
+    <string name="check_icon_description">Accepter les changements</string>
+
+    <string name="delete_profile_picture">Supprimer photo de profil</string>
+    <string name="new_profile_picture">Nouvelle photo de profil</string>
+    <string name="profile_picture_updated">Photo de profil mise à jour</string>
+    <string name="error_updating_profile_picture">Une erreur est survenue lors de la mise à jour de la photo de profil</string>
+    <string name="delete_profile_picture_dialog_text">Voulez-vous supprimer la photo de profil ?</string>
+    <string name="logout_dialog_message">Êtes-vous sûr de vouloir vous déconnecter ?</string>
+</resources>
