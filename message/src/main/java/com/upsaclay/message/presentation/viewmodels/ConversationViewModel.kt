@@ -3,43 +3,50 @@ package com.upsaclay.message.presentation.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.upsaclay.common.domain.model.User
-import com.upsaclay.common.domain.usecase.GetAllUserUseCase
-import com.upsaclay.message.domain.model.Conversation
-import com.upsaclay.message.domain.model.ConversationState
-import com.upsaclay.message.domain.usecase.GetAllConversationsUseCase
+import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
+import com.upsaclay.common.domain.usecase.GetUsersUseCase
+import com.upsaclay.message.domain.entity.ConversationScreenState
+import com.upsaclay.message.domain.entity.ConversationUser
+import com.upsaclay.message.domain.entity.ConversationState
+import com.upsaclay.message.domain.entity.ConversationUI
+import com.upsaclay.message.domain.usecase.GetConversationsUseCase
 import com.upsaclay.message.domain.usecase.CreateConversationUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 
 class ConversationViewModel(
-    getAllConversationsUseCase: GetAllConversationsUseCase,
-    private val createConversationUseCase: CreateConversationUseCase,
-    private val getAllUserUseCase: GetAllUserUseCase,
+    private val getConversationsUseCase: GetConversationsUseCase,
     private val getCurrentUserUseCase: GetCurrentUserUseCase
 ) : ViewModel() {
-    private val _users = MutableStateFlow<List<User>>(emptyList())
-    val users: Flow<List<User>> = _users
-    private val currentUser: User? get() = getCurrentUserUseCase()
-    private val _conversationState = MutableStateFlow(ConversationState.DEFAULT)
-    val conversationState: Flow<ConversationState> = _conversationState
-    val conversations: Flow<List<Conversation>> = getAllConversationsUseCase()
+    private val _currentUser = MutableStateFlow<User?>(null)
+    val currentUser: Flow<User?> = _currentUser
+    private val _screenState = MutableStateFlow(ConversationScreenState.DEFAULT)
+    val screenState: Flow<ConversationScreenState> = _screenState
+    private val _conversations = MutableStateFlow<List<ConversationUI>>(emptyList())
+    val conversations: Flow<List<ConversationUI>> = _conversations
 
-    fun createNewConversation(interlocutor: User) {
-        _conversationState.value = ConversationState.LOADING
+    init {
+        initCurrentUser()
+        fetchConversations()
+    }
+
+    private fun initCurrentUser() {
         viewModelScope.launch {
-            createConversationUseCase(interlocutor)
-            _conversationState.value = ConversationState.CREATED
+            getCurrentUserUseCase().collectLatest { user ->
+                _currentUser.value = user
+            }
         }
     }
 
-    fun getAllUsers() {
+    private fun fetchConversations() {
         viewModelScope.launch {
-            getAllUserUseCase().collectLatest {
-                currentUser?.let { currentUser ->
-                    _users.value = it.filter { user -> user.id != currentUser.id }
-                }
+            _screenState.value = ConversationScreenState.LOADING
+            getConversationsUseCase().collect { conversationUI ->
+                _conversations.value = _conversations.value.toMutableList().apply { add(conversationUI) }
+                _screenState.value = ConversationScreenState.DEFAULT
             }
         }
     }

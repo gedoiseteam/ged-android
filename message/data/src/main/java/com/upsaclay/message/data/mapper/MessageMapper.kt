@@ -2,77 +2,55 @@ package com.upsaclay.message.data.mapper
 
 import com.google.firebase.Timestamp
 import com.upsaclay.message.data.local.model.LocalMessage
-import com.upsaclay.message.data.model.MessageDTO
 import com.upsaclay.message.data.remote.model.RemoteMessage
-import com.upsaclay.message.domain.model.Message
-import com.upsaclay.message.domain.model.MessageType
+import com.upsaclay.message.domain.entity.Message
+import com.upsaclay.message.domain.entity.MessageState
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
 
 internal object MessageMapper {
-    fun toDTO(remoteMessage: RemoteMessage) = MessageDTO(
-        messageId = remoteMessage.messageId,
+    fun toDomain(remoteMessage: RemoteMessage) = Message(
+        id = remoteMessage.messageId,
         senderId = remoteMessage.senderId,
         conversationId = remoteMessage.conversationId,
         content = remoteMessage.content,
         date = LocalDateTime.ofInstant(remoteMessage.timestamp.toInstant(), ZoneId.systemDefault()),
         isRead = remoteMessage.isRead,
-        isSent = true,
+        state = MessageState.SENT,
         type = remoteMessage.type
     )
 
-    fun toDTO(localMessage: LocalMessage) = MessageDTO(
-        messageId = localMessage.messageId,
+    fun toDomain(localMessage: LocalMessage) = Message(
+        id = localMessage.messageId,
         senderId = localMessage.senderId,
         conversationId = localMessage.conversationId,
         content = localMessage.content,
         date = Instant.ofEpochMilli(localMessage.timestamp).atZone(ZoneId.systemDefault()).toLocalDateTime(),
         isRead = localMessage.isRead,
-        isSent = localMessage.isSent,
+        state = MessageState.valueOf(localMessage.state),
         type = localMessage.type
     )
 
-    fun toDTO(conversationId: String, message: Message, currentUserId: String) = MessageDTO(
+    fun toLocal(message: Message) = LocalMessage(
         messageId = message.id,
-        senderId = currentUserId,
-        conversationId = conversationId,
+        senderId = message.senderId,
+        conversationId = message.conversationId,
         content = message.content,
-        date = message.date,
+        timestamp = message.date.toInstant(ZoneOffset.UTC).toEpochMilli(),
         isRead = message.isRead,
-        isSent = message.isSent,
-        type = message.type.name
+        state = message.state.name,
+        type = message.type
     )
 
-    fun toDomain(messageDTO: MessageDTO, currentUserId: String) = Message(
-        id = messageDTO.messageId,
-        sentByUser = messageDTO.senderId == currentUserId,
-        content = messageDTO.content,
-        date = messageDTO.date,
-        isRead = messageDTO.isRead,
-        isSent = messageDTO.isSent,
-        type = MessageType.valueOf(messageDTO.type.uppercase())
-    )
-
-    fun toLocal(messageDTO: MessageDTO) = LocalMessage(
-        messageId = messageDTO.messageId,
-        senderId = messageDTO.senderId,
-        conversationId = messageDTO.conversationId,
-        content = messageDTO.content,
-        timestamp = messageDTO.date.toInstant(ZoneOffset.UTC).toEpochMilli(),
-        isRead = messageDTO.isRead,
-        isSent = messageDTO.isSent,
-        type = messageDTO.type.lowercase()
-    )
-
-    fun toRemote(messageDTO: MessageDTO) = RemoteMessage(
-        messageId = messageDTO.messageId,
-        conversationId = messageDTO.conversationId,
-        senderId = messageDTO.senderId,
-        content = messageDTO.content,
-        timestamp = Timestamp(messageDTO.date.toInstant(ZoneOffset.UTC)),
-        isRead = messageDTO.isRead,
-        type = messageDTO.type.lowercase()
+    fun toRemote(message: Message) = RemoteMessage(
+        messageId = message.id,
+        conversationId = message.conversationId,
+        senderId = message.senderId,
+        content = message.content,
+        timestamp = Timestamp(message.date.toInstant(ZoneOffset.UTC)),
+        isRead = message.isRead,
+        type = message.type
     )
 }

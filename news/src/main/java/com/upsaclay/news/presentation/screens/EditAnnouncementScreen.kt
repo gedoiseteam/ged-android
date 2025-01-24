@@ -35,6 +35,7 @@ import com.upsaclay.common.utils.showToast
 import com.upsaclay.news.R
 import com.upsaclay.news.announcementFixture
 import com.upsaclay.news.domain.entity.AnnouncementScreenState
+import com.upsaclay.news.presentation.viewmodels.EditAnnouncementViewModel
 import java.time.LocalDateTime
 
 @Composable

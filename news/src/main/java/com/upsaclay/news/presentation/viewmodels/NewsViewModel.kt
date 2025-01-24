@@ -28,7 +28,7 @@ class NewsViewModel(
     private val _announcementScreenState = MutableStateFlow(AnnouncementScreenState.DEFAULT)
     val announcementScreenState: Flow<AnnouncementScreenState> = _announcementScreenState
     val announcements: Flow<List<Announcement>> = getAllAnnouncementUseCase()
-    val user: StateFlow<User?> = getCurrentUserUseCase()
+    val user: Flow<User?> = getCurrentUserUseCase()
     var isRefreshing by mutableStateOf(false)
         private set
 

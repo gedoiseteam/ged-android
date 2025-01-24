@@ -7,40 +7,31 @@ import com.upsaclay.common.domain.model.User
 import com.upsaclay.common.domain.repository.UserRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
 import okio.IOException
 
 internal class UserRepositoryImpl(
     private val userRemoteDataSource: UserRemoteDataSource,
     private val userLocalDataSource: UserLocalDataSource,
-    private val scope: CoroutineScope
+    private val scope: CoroutineScope = (GlobalScope + Dispatchers.IO)
 ): UserRepository {
     private val _currentUserFlow = MutableStateFlow<User?>(null)
-    override val currentUserFlow: StateFlow<User?> = _currentUserFlow
-
-    private val _users = MutableStateFlow<List<User>>(emptyList())
-    override val users: Flow<List<User>> = _users
+    override val currentUser: Flow<User?> = _currentUserFlow
 
     init {
-        CoroutineScope(Dispatchers.IO).launch {
-            launch {
-                userLocalDataSource.getCurrentUserFlow().collectLatest { userDTO ->
-                    _currentUserFlow.value = UserMapper.toDomain(userDTO)
-                }
-            }
-            launch {
-                userRemoteDataSource.getAllUsers().collectLatest {
-                    _users.value = it.map(UserMapper::toDomain)
-                }
+        scope.launch {
+            userLocalDataSource.getCurrentUserFlow().collectLatest { userDTO ->
+                _currentUserFlow.value = UserMapper.toDomain(userDTO)
             }
         }
     }
+
+    override suspend fun getUsers(): List<User> = userRemoteDataSource.getUsers().map(UserMapper::toDomain)
 
     override suspend fun getUser(userId: String): User? =
         userRemoteDataSource.getUserFirestoreWithEmail(userId)?.let { UserMapper.toDomain(it) }

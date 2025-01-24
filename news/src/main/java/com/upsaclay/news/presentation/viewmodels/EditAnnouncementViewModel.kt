@@ -1,4 +1,4 @@
-package com.upsaclay.news.presentation.screens
+package com.upsaclay.news.presentation.viewmodels
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf

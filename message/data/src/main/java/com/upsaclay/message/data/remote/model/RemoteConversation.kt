@@ -1,5 +1,6 @@
 package com.upsaclay.message.data.remote.model
 
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.PropertyName
 import com.upsaclay.message.data.model.ConversationField
 
@@ -12,7 +13,7 @@ internal data class RemoteConversation(
     @set:PropertyName(ConversationField.Remote.PARTICIPANTS)
     var participants: List<String> = emptyList(),
 
-    @get:PropertyName(ConversationField.IS_ACTIVE)
-    @set:PropertyName(ConversationField.IS_ACTIVE)
-    var isActive: Boolean = false
+    @get:PropertyName(ConversationField.CREATED_AT)
+    @set:PropertyName(ConversationField.CREATED_AT)
+    var createdAt: Timestamp
 )

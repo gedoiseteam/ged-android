@@ -21,62 +21,59 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
+import com.google.gson.Gson
 import com.upsaclay.common.domain.model.Screen
 import com.upsaclay.common.domain.model.User
+import com.upsaclay.common.presentation.components.CircularProgressBar
 import com.upsaclay.common.presentation.components.SmallTopBarBack
 import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.common.utils.usersFixture
 import com.upsaclay.message.R
-import com.upsaclay.message.domain.model.ConversationState
+import com.upsaclay.message.domain.entity.ConversationScreenState
+import com.upsaclay.message.domain.entity.ConversationState
 import com.upsaclay.message.presentation.components.UserItem
 import com.upsaclay.message.presentation.viewmodels.ConversationViewModel
+import com.upsaclay.message.presentation.viewmodels.CreateConversationViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun CreateConversationScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
-    conversationViewModel: ConversationViewModel
+    createConversationViewModel: CreateConversationViewModel = koinViewModel()
 ) {
-    val users = conversationViewModel.users.collectAsState(emptyList()).value
-    val conversationState = conversationViewModel.conversationState.collectAsState(ConversationState.DEFAULT).value
-    var userClicked: User? by remember { mutableStateOf(null) }
+    val users by createConversationViewModel.users.collectAsState(emptyList())
+    val screenState by createConversationViewModel.screenState.collectAsState(ConversationState.DEFAULT)
 
-    LaunchedEffect(conversationState) {
-        if (conversationState == ConversationState.CREATED) {
-            userClicked?.let {
-                navController.navigate(Screen.CHAT.route + "?interlocutorId=${it.id}") {
-                    popUpTo(Screen.CREATE_CONVERSATION.route) { inclusive = true }
+    if(screenState == ConversationScreenState.LOADING) {
+        CircularProgressBar()
+    } else {
+        LazyColumn(modifier = modifier) {
+            if (users.isNotEmpty()) {
+                items(users) { user ->
+                    UserItem(
+                        user = user,
+                        onClick = {
+                            val conversation = createConversationViewModel.generateConversation(user)
+                            val conversationJson = Gson().toJson(conversation)
+                            navController.navigate(Screen.CHAT.route + "conversation=$conversationJson") {
+                                popUpTo(Screen.CREATE_CONVERSATION.route) { inclusive = true }
+                            }
+                        }
+                    )
                 }
-            }
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        conversationViewModel.getAllUsers()
-    }
-
-    LazyColumn(modifier = modifier) {
-        if(users.isNotEmpty()) {
-            items(users) { user ->
-                UserItem(
-                    user = user,
-                    onClick = {
-                        userClicked = user
-                        conversationViewModel.createNewConversation(user)
-                    }
-                )
-            }
-        } else {
-            item {
-                Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = stringResource(id = com.upsaclay.common.R.string.no_user_found),
-                    textAlign = TextAlign.Center,
-                    color = GedoiseColor.PreviewText
-                )
+            } else {
+                item {
+                    Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = stringResource(id = com.upsaclay.common.R.string.no_user_found),
+                        textAlign = TextAlign.Center,
+                        color = GedoiseColor.PreviewText
+                    )
+                }
             }
         }
     }

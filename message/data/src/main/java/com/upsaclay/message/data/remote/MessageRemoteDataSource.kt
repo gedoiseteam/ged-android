@@ -1,17 +1,25 @@
 package com.upsaclay.message.data.remote
 
+import com.upsaclay.message.data.mapper.MessageMapper
 import com.upsaclay.message.data.remote.api.MessageApi
-import com.upsaclay.message.data.remote.model.RemoteMessage
+import com.upsaclay.message.domain.entity.Message
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 
 internal class MessageRemoteDataSource(private val messageApi: MessageApi) {
-    fun listenLastMessages(conversationId: String): Flow<List<RemoteMessage>> =
-        messageApi.listenLastMessages(conversationId)
+    fun listenMessages(conversationId: String): Flow<List<Message>> =
+        messageApi.listenMessages(conversationId).map { messages ->
+            messages.map(MessageMapper::toDomain)
+        }
 
-    suspend fun getMessages(conversationId: String, limit: Long): List<RemoteMessage> =
-        messageApi.getMessages(conversationId, limit)
+    suspend fun getMessages(conversationId: String, limit: Long): List<Message> =
+        messageApi.getMessages(conversationId, limit).map(MessageMapper::toDomain)
 
-    suspend fun addMessage(conversationId: String, remoteMessage: RemoteMessage): Result<Unit> {
-        return messageApi.addMessage(conversationId, remoteMessage)
+    suspend fun createMessage(message: Message) {
+        withContext(Dispatchers.IO) {
+            messageApi.createMessage(MessageMapper.toRemote(message))
+        }
     }
 }

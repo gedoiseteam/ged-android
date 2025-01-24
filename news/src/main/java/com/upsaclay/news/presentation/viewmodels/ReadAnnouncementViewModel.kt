@@ -2,11 +2,13 @@ package com.upsaclay.news.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.upsaclay.common.domain.model.User
 import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
 import com.upsaclay.news.domain.entity.Announcement
 import com.upsaclay.news.domain.entity.AnnouncementScreenState
 import com.upsaclay.news.domain.usecase.DeleteAnnouncementUseCase
 import com.upsaclay.news.domain.usecase.GetAnnouncementUseCase
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -23,7 +25,7 @@ class ReadAnnouncementViewModel(
 
     val announcement: StateFlow<Announcement?> = _announcement
     val screenState: StateFlow<AnnouncementScreenState> = _screenState
-    val currentUser = getCurrentUserUseCase()
+    val currentUser: Flow<User?> = getCurrentUserUseCase()
 
     fun deleteAnnouncement() {
         if (_announcement.value == null) {

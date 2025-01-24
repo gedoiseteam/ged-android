@@ -1,4 +1,4 @@
-package com.upsaclay.news.data.model
+package com.upsaclay.news.data.remote.model
 
 import com.google.gson.annotations.SerializedName
 

@@ -12,12 +12,13 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 internal class MessageApiImpl : MessageApi {
     private val conversationCollection = Firebase.firestore.collection(CONVERSATIONS_TABLE_NAME)
 
-    override fun listenLastMessages(conversationId: String): Flow<List<RemoteMessage>> = callbackFlow {
+    override fun listenMessages(conversationId: String): Flow<List<RemoteMessage>> = callbackFlow {
         val listener = conversationCollection.document(conversationId)
             .collection(MESSAGES_TABLE_NAME)
             .orderBy(TIMESTAMP, Query.Direction.DESCENDING)
@@ -51,20 +52,19 @@ internal class MessageApiImpl : MessageApi {
             }
     }
 
-    override suspend fun addMessage(
-        conversationId: String,
-        remoteMessage: RemoteMessage
-    ): Result<Unit> = suspendCoroutine { continuation ->
-        conversationCollection.document(conversationId)
-            .collection(MESSAGES_TABLE_NAME)
-            .document(remoteMessage.messageId)
-            .set(remoteMessage)
-            .addOnSuccessListener {
-                continuation.resume(Result.success(Unit))
-            }
-            .addOnFailureListener { e ->
-                e("Error adding message", e)
-                continuation.resume(Result.failure(e))
-            }
+    override suspend fun createMessage(remoteMessage: RemoteMessage) {
+        suspendCoroutine { continuation ->
+            conversationCollection.document(remoteMessage.conversationId)
+                .collection(MESSAGES_TABLE_NAME)
+                .document(remoteMessage.messageId)
+                .set(remoteMessage)
+                .addOnSuccessListener {
+                    continuation.resume(Unit)
+                }
+                .addOnFailureListener { e ->
+                    e("Error creating remote message", e)
+                    continuation.resumeWithException(e)
+                }
+        }
     }
 }

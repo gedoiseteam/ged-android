@@ -6,7 +6,6 @@ import com.upsaclay.common.data.remote.api.UserFirestoreApi
 import com.upsaclay.common.data.remote.api.UserRetrofitApi
 import com.upsaclay.common.domain.e
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import java.io.IOException
 
@@ -38,8 +37,8 @@ internal class UserRemoteDataSource(
         }
     }
 
-    suspend fun getAllUsers(): Flow<List<UserFirestoreModel>> = withContext(Dispatchers.IO) {
-        userFirestoreApi.getAllUsers()
+    suspend fun getUsers(): List<UserFirestoreModel> = withContext(Dispatchers.IO) {
+        userFirestoreApi.getUsers()
     }
 
     suspend fun createUserWithOracle(userDTO: UserDTO) {

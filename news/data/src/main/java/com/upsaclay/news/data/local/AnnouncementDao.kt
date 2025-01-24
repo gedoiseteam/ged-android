@@ -6,8 +6,8 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
 import androidx.room.Upsert
-import com.upsaclay.news.data.model.ANNOUNCEMENTS_TABLE
-import com.upsaclay.news.data.model.LocalAnnouncement
+import com.upsaclay.news.data.local.model.ANNOUNCEMENTS_TABLE
+import com.upsaclay.news.data.local.model.LocalAnnouncement
 import kotlinx.coroutines.flow.Flow
 
 @Dao

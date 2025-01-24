@@ -45,11 +45,9 @@ import com.upsaclay.message.R
 @Composable
 fun MessageInput(
     modifier: Modifier = Modifier,
-    value: String = "",
+    value: String,
     onValueChange: (String) -> Unit,
-    placeholder: @Composable () -> Unit,
-    onSendClick: () -> Unit,
-    showSendButton: Boolean
+    onSendClick: () -> Unit
 ) {
     val colors: TextFieldColors = TextFieldDefaults.colors()
     val backgroundColor = GedoiseColor.LightGray
@@ -74,7 +72,12 @@ fun MessageInput(
             TextFieldDefaults.DecorationBox(
                 value = value,
                 innerTextField = innerTextField,
-                placeholder = placeholder,
+                placeholder = {
+                    Text(
+                        text = stringResource(id = R.string.message_placeholder),
+                        style = TextStyle(platformStyle = PlatformTextStyle(false))
+                    )
+                },
                 enabled = true,
                 singleLine = false,
                 colors = TextFieldDefaults.colors(
@@ -92,7 +95,7 @@ fun MessageInput(
             )
         }
 
-        if(showSendButton) {
+        if(value.isNotBlank()) {
             Spacer(modifier = Modifier.width(MaterialTheme.spacing.extraSmall))
             IconButton(
                 onClick = onSendClick,
@@ -128,18 +131,7 @@ private fun MessageTextFieldPreview() {
             modifier = Modifier.fillMaxWidth(),
             value = text,
             onValueChange = { text = it },
-            placeholder = {
-                Text(
-                    text = "Placeholder",
-                    style = TextStyle(
-                        platformStyle = PlatformTextStyle(
-                            includeFontPadding = false
-                        )
-                    )
-                )
-            },
             onSendClick = { },
-            showSendButton = text.isNotEmpty()
         )
     }
 }

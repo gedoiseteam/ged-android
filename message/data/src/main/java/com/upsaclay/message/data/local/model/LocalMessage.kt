@@ -21,8 +21,8 @@ data class LocalMessage(
     val timestamp: Long,
     @ColumnInfo(name = MessageField.IS_READ)
     val isRead: Boolean,
-    @ColumnInfo(name = MessageField.Local.IS_SENT)
-    val isSent: Boolean,
+    @ColumnInfo(name = MessageField.STATE)
+    val state: String,
     @ColumnInfo(name = MessageField.TYPE)
     val type: String
 )

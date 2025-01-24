@@ -1,8 +1,7 @@
 package com.upsaclay.message.presentation.components
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,21 +31,17 @@ import com.upsaclay.common.presentation.components.ProfilePicture
 import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
-import com.upsaclay.common.utils.userFixture
-import com.upsaclay.common.utils.userFixture2
 import com.upsaclay.message.R
-import com.upsaclay.message.domain.model.Conversation
-import com.upsaclay.message.utils.messagesFixture
+import com.upsaclay.message.domain.entity.ConversationUI
+import com.upsaclay.message.conversationFixture
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ConversationItem(
     modifier: Modifier = Modifier,
-    conversation: Conversation,
-    onClick: () -> Unit,
-    onLongClick: () -> Unit
+    conversation: ConversationUI,
+    onClick: () -> Unit
 ) {
-    val lastMessage = conversation.messages.firstOrNull()
+    val lastMessage = conversation.lastMessage
 
     val elapsedTimeValue: String = if (lastMessage != null) {
         val elapsedTime = GetElapsedTimeUseCase.fromLocalDateTime(lastMessage.date)
@@ -80,16 +75,13 @@ fun ConversationItem(
         ""
     }
 
-    val unreadMessage = lastMessage?.let {
-        !(it.sentByUser && it.isRead)
+    val readMessage = lastMessage?.let {
+        it.senderId == conversation.interlocutor.id && it.isRead
     } ?: false
 
     Row(
         modifier = modifier
-            .combinedClickable(
-                onClick = onClick,
-                onLongClick = onLongClick
-            )
+            .clickable(onClick = onClick)
             .padding(
                 horizontal = MaterialTheme.spacing.medium,
                 vertical = MaterialTheme.spacing.smallMedium
@@ -107,7 +99,7 @@ fun ConversationItem(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium)
         ) {
-            if (unreadMessage) {
+            if (!readMessage) {
                 Column(modifier = Modifier.weight(1f)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
@@ -201,18 +193,11 @@ fun ConversationItem(
 @Preview(showBackground = true)
 @Composable
 private fun ReadConversationItemPreview() {
-    val conversation = Conversation(
-        id = "1",
-        interlocutor = userFixture2,
-        messages = messagesFixture
-            .map { it.copy(isRead = true, date = it.date.minusDays(2)) }
-    )
     GedoiseTheme {
         ConversationItem(
             modifier = Modifier.fillMaxWidth(),
-            conversation = conversation,
-            onClick = { },
-            onLongClick = { }
+            conversation = conversationFixture,
+            onClick = { }
         )
     }
 }
@@ -220,18 +205,11 @@ private fun ReadConversationItemPreview() {
 @Preview(showBackground = true)
 @Composable
 private fun UnreadConversationItemPreview() {
-    val conversation = Conversation(
-        id = "1",
-        interlocutor = userFixture,
-        messages = messagesFixture
-            .map { it.copy(isRead = false, date = it.date.minusDays(2)) }
-    )
     GedoiseTheme {
         ConversationItem(
             modifier = Modifier.fillMaxWidth(),
-            conversation = conversation,
-            onClick = { },
-            onLongClick = { }
+            conversation = conversationFixture.copy(lastMessage = conversationFixture.lastMessage!!.copy(isRead = false)),
+            onClick = { }
         )
     }
 }

@@ -1,58 +1,76 @@
 package com.upsaclay.message.data.mapper
 
+import com.google.firebase.Timestamp
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import com.upsaclay.common.domain.model.User
 import com.upsaclay.message.data.local.model.LocalConversation
-import com.upsaclay.message.data.model.ConversationDTO
+import com.upsaclay.message.data.remote.model.Conversation
 import com.upsaclay.message.data.remote.model.RemoteConversation
-import com.upsaclay.message.domain.model.Conversation
-import com.upsaclay.message.domain.model.Message
+import com.upsaclay.message.domain.entity.ConversationState
+import com.upsaclay.message.domain.entity.ConversationUser
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZoneOffset
 
 internal object ConversationMapper {
     private val gson = Gson()
 
-    fun toLocal(conversationDTO: ConversationDTO) = LocalConversation(
-        conversationId = conversationDTO.conversationId,
-        interlocutorJson = gson.toJson(conversationDTO.interlocutor),
-        isSynchronized = conversationDTO.isSynchronized,
-        isActive = conversationDTO.isActive
-    )
-
-    fun toRemote(conversationDTO: ConversationDTO) = RemoteConversation(
-        conversationId = conversationDTO.conversationId,
-        participants = conversationDTO.participantsId,
-        isActive = conversationDTO.isActive
-    )
-
-    fun toDomain(conversationDTO: ConversationDTO, messages: List<Message>) = Conversation(
-        id = conversationDTO.conversationId,
-        interlocutor = conversationDTO.interlocutor,
-        messages = messages,
-        isActive = conversationDTO.isActive
-    )
-
-    fun toDTO(localConversation: LocalConversation) = ConversationDTO(
-        conversationId = localConversation.conversationId,
-        interlocutor = gson.fromJson(localConversation.interlocutorJson, User::class.java),
-        isSynchronized = localConversation.isSynchronized,
-        participantsId = emptyList(),
-        isActive = localConversation.isActive
-    )
-
-    fun toDTO(remoteConversation: RemoteConversation, interlocutor: User) = ConversationDTO(
-        conversationId = remoteConversation.conversationId,
-        interlocutor = interlocutor,
-        isSynchronized = true,
-        participantsId = remoteConversation.participants,
-        isActive = true
-    )
-
-    fun toDTO(conversation: Conversation, currentUserId: String) = ConversationDTO(
+    fun toLocal(conversation: Conversation, interlocutor: User) = LocalConversation(
         conversationId = conversation.id,
-        interlocutor = conversation.interlocutor,
-        isSynchronized = false,
-        participantsId = listOf(currentUserId, conversation.interlocutor.id),
-        isActive = conversation.isActive
+        interlocutorJson = gson.toJson(interlocutor),
+        createdAt = conversation.createdAt.toInstant(ZoneOffset.UTC).toEpochMilli(),
+        state = conversation.state.name
+    )
+
+    fun toRemote(conversation: Conversation, currentUserId: String) = RemoteConversation(
+        conversationId = conversation.id,
+        participants = listOf(currentUserId, conversation.interlocutorId),
+        createdAt = Timestamp(conversation.createdAt.toInstant(ZoneOffset.UTC))
+    )
+
+    fun toConversationUser(conversation: Conversation, interlocutor: User) = ConversationUser(
+        id = conversation.id,
+        interlocutor = interlocutor,
+        createdAt = conversation.createdAt,
+        state = conversation.state
+    )
+
+    fun toConversationWithInterlocutor(localConversation: LocalConversation): Pair<Conversation, User> {
+        val interlocutor = Gson().fromJson(localConversation.interlocutorJson, User::class.java)
+        val conversation = Conversation(
+            id = localConversation.conversationId,
+            interlocutorId = interlocutor.id,
+            createdAt = Instant.ofEpochMilli(localConversation.createdAt).atZone(ZoneId.systemDefault()).toLocalDateTime(),
+            state = ConversationState.valueOf(localConversation.state)
+        )
+        return Pair<Conversation, User>(conversation, interlocutor)
+    }
+
+    fun toConversation(localConversation: LocalConversation): Conversation {
+        val interlocutor = Gson().fromJson(localConversation.interlocutorJson, User::class.java)
+        return Conversation(
+            id = localConversation.conversationId,
+            interlocutorId = interlocutor.id,
+            createdAt = Instant.ofEpochMilli(localConversation.createdAt).atZone(ZoneId.systemDefault()).toLocalDateTime(),
+            state = ConversationState.valueOf(localConversation.state)
+        )
+    }
+
+    fun toConversation(remoteConversation: RemoteConversation, currentUserId: String): Conversation? {
+        val interlocutorId = remoteConversation.participants.firstOrNull { it == currentUserId } ?: return null
+        return Conversation(
+            id = remoteConversation.conversationId,
+            interlocutorId = interlocutorId,
+            createdAt = LocalDateTime.ofInstant(remoteConversation.createdAt.toInstant(), ZoneId.systemDefault()),
+            state = ConversationState.CREATED
+        )
+    }
+
+    fun toConversation(conversationUser: ConversationUser) = Conversation(
+        id = conversationUser.id,
+        interlocutorId = conversationUser.interlocutor.id,
+        createdAt = conversationUser.createdAt,
+        state = conversationUser.state
     )
 }

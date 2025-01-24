@@ -3,10 +3,9 @@ package com.upsaclay.news.data
 import com.upsaclay.common.domain.model.User
 import com.upsaclay.common.domain.usecase.ConvertLocalDateTimeUseCase
 import com.upsaclay.common.domain.usecase.ConvertTimestampUseCase
-import com.upsaclay.news.data.model.ANNOUNCEMENTS_TABLE
-import com.upsaclay.news.data.model.RemoteAnnouncementWithUser
-import com.upsaclay.news.data.model.LocalAnnouncement
-import com.upsaclay.news.data.model.RemoteAnnouncement
+import com.upsaclay.news.data.remote.model.RemoteAnnouncementWithUser
+import com.upsaclay.news.data.local.model.LocalAnnouncement
+import com.upsaclay.news.data.remote.model.RemoteAnnouncement
 import com.upsaclay.news.domain.entity.Announcement
 import com.upsaclay.news.domain.entity.AnnouncementState
 
@@ -57,7 +56,7 @@ internal object AnnouncementMapper {
             isMember = remoteAnnouncement.userIsMember == 1,
             profilePictureUrl = remoteAnnouncement.profilePictureUrl
         ),
-        state = AnnouncementState.CREATED
+        state = AnnouncementState.DEFAULT
     )
 
     fun toRemote(announcement: Announcement) = RemoteAnnouncement(

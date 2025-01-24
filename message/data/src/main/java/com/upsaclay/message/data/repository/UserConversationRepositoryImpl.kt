@@ -2,100 +2,74 @@ package com.upsaclay.message.data.repository
 
 import com.upsaclay.common.domain.repository.UserRepository
 import com.upsaclay.message.data.mapper.ConversationMapper
-import com.upsaclay.message.data.mapper.MessageMapper
-import com.upsaclay.message.data.model.ConversationDTO
-import com.upsaclay.message.domain.model.Conversation
-import com.upsaclay.message.domain.repository.ConversationRepository
+import com.upsaclay.message.domain.entity.ConversationUser
+import com.upsaclay.message.domain.repository.UserConversationRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 
+@OptIn(ExperimentalCoroutinesApi::class)
 internal class UserConversationRepositoryImpl(
-    private val internalConversationRepository: InternalConversationRepository,
-    private val internalMessageRepository: InternalMessageRepository,
+    private val conversationRepository: ConversationRepository,
     private val userRepository: UserRepository,
     private val scope: CoroutineScope = (GlobalScope + Dispatchers.IO)
-) : ConversationRepository {
-    private val _conversations = MutableStateFlow<Set<Conversation>>(emptySet())
-    override val conversations: Flow<Set<Conversation>> = _conversations
-    private val currentUser = userRepository.currentUserFlow.filterNotNull()
-    private var previousConversations = emptyList<ConversationDTO>()
+): UserConversationRepository  {
+    private val _userConversations = MutableStateFlow<List<ConversationUser>>(emptyList())
+    override val userConversations: Flow<ConversationUser> = _userConversations
+        .flatMapConcat { conversations ->
+            flow { conversations.forEach { emit(it) } }
+        }
 
     init {
+        listenLocalConversations()
+        listenRemoteConversations()
+    }
+
+    override fun getConversation(conversationId: String): ConversationUser? =
+        _userConversations.value.find { it.id == conversationId }
+
+    override suspend fun createConversation(conversationUser: ConversationUser) {
+        val conversation = ConversationMapper.toConversation(conversationUser)
+        val currentUser = userRepository.currentUser.first() ?: throw Exception()
+        conversationRepository.createConversation(conversation, conversationUser.interlocutor, currentUser)
+    }
+
+    override suspend fun updateConversation(conversationUser: ConversationUser) {
+        val conversation = ConversationMapper.toConversation(conversationUser)
+        conversationRepository.upsertLocalConversation(conversation, conversationUser.interlocutor)
+    }
+
+    override suspend fun deleteConversation(conversationUser: ConversationUser) {
+        val conversation = ConversationMapper.toConversation(conversationUser)
+        conversationRepository.deleteConversation(conversation, conversationUser.interlocutor)
+    }
+
+    private fun listenLocalConversations() {
         scope.launch {
-            currentUser.collect { currentUser ->
-                fetchRemoteConversations(currentUser.id)
+            conversationRepository.getConversationFromLocal().collect { conversationsInterlocutor ->
+                _userConversations.value = conversationsInterlocutor.map { ConversationMapper.toConversationUser(it.first, it.second) }
             }
         }
+    }
 
+    private fun listenRemoteConversations() {
         scope.launch {
-            fetchLocalConversations()
-        }
-    }
-
-    override suspend fun createConversation(conversation: Conversation) {
-        val conversationDTO = ConversationMapper.toDTO(conversation, currentUser.first().id)
-        internalConversationRepository.createConversation(conversationDTO)
-    }
-
-    private suspend fun fetchRemoteConversations(currentUserId: String) {
-        internalConversationRepository.listenRemoteConversations(currentUserId).collect { remoteConversations ->
-            remoteConversations.forEach { remoteConversation ->
-                val interlocutor = userRepository.getUser(remoteConversation.participants.first { it != currentUserId})
-                interlocutor?.let {
-                    val conversationDTO = ConversationMapper.toDTO(remoteConversation, interlocutor)
-                    val localConversation = ConversationMapper.toLocal(conversationDTO)
-                    internalConversationRepository.insertLocalConversation(localConversation)
+            val user = userRepository.currentUser.first() ?: return@launch
+            conversationRepository.getConversationsFromRemote(user.id).collect { conversations ->
+                conversations.forEach {
+                    conversationRepository.upsertLocalConversation(it, user)
                 }
             }
         }
-    }
-
-    private suspend fun fetchLocalConversations() {
-        internalConversationRepository.conversationsDTO.collectLatest { conversationsDTO ->
-            _conversations.value = conversationsDTO.map { ConversationMapper.toDomain(it, emptyList()) }.toSet()
-            val newsConversationsDTO = conversationsDTO - previousConversations.toSet()
-
-            newsConversationsDTO.forEach { conversationDTO ->
-                listenConversationMessages(conversationDTO)
-            }
-
-            previousConversations = conversationsDTO
-        }
-    }
-
-    private suspend fun listenConversationMessages(conversationDTO: ConversationDTO) {
-        internalMessageRepository.listenLastMessages(conversationDTO.conversationId)
-            .map { messagesDTO ->
-                messagesDTO.map { MessageMapper.toDomain(it, currentUser.first().id) }
-            }
-            .collect { messages ->
-                val conversation = ConversationMapper.toDomain(conversationDTO, messages)
-                updateConversations(conversation)
-            }
-    }
-
-    private fun updateConversations(conversation: Conversation) {
-        _conversations.update {
-            it.toMutableSet().apply { add(conversation) }
-        }
-    }
-
-    override suspend fun setConversationActive(conversation: Conversation) {
-        internalConversationRepository.setConversationActive(ConversationMapper.toDTO(conversation, currentUser.first().id))
-    }
-
-    override suspend fun deleteConversation(conversation: Conversation) {
-        val conversationDTO = ConversationMapper.toDTO(conversation, currentUser.first().id)
-        internalConversationRepository.deleteConversation(conversationDTO)
     }
 }

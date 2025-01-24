@@ -1,9 +1,8 @@
 package com.upsaclay.news.data.remote.api
 
 import com.upsaclay.common.domain.model.ServerResponse.EmptyResponse
-import com.upsaclay.common.domain.model.ServerResponse.IntResponse
-import com.upsaclay.news.data.model.RemoteAnnouncementWithUser
-import com.upsaclay.news.data.model.RemoteAnnouncement
+import com.upsaclay.news.data.remote.model.RemoteAnnouncementWithUser
+import com.upsaclay.news.data.remote.model.RemoteAnnouncement
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE

@@ -2,7 +2,7 @@ package com.upsaclay.message
 
 import com.upsaclay.message.domain.usecase.CreateConversationUseCase
 import com.upsaclay.message.domain.usecase.DeleteConversationUseCase
-import com.upsaclay.message.domain.usecase.GetAllConversationsUseCase
+import com.upsaclay.message.domain.usecase.GetConversationsUseCase
 import com.upsaclay.message.domain.usecase.GetConversationUseCase
 import com.upsaclay.message.domain.usecase.SendMessageUseCase
 import com.upsaclay.message.presentation.viewmodels.ChatViewModel
@@ -20,7 +20,7 @@ val messageModule = module {
     single<CoroutineScope> { CoroutineScope(Dispatchers.IO) }
     singleOf(::CreateConversationUseCase)
     singleOf(::DeleteConversationUseCase)
-    singleOf(::GetAllConversationsUseCase)
+    singleOf(::GetConversationsUseCase)
     singleOf(::GetConversationUseCase)
     singleOf(::SendMessageUseCase)
 }

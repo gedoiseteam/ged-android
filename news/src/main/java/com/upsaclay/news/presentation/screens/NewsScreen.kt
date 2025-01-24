@@ -49,7 +49,7 @@ fun NewsScreen(
     navController: NavController
 ) {
     val announcements = newsViewModel.announcements.collectAsState(emptyList()).value
-    val user by newsViewModel.user.collectAsState()
+    val user by newsViewModel.user.collectAsState(null)
     val isRefreshing = newsViewModel.isRefreshing
 
     LaunchedEffect(Unit) {

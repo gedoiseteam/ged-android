@@ -1,9 +1,8 @@
-package com.upsaclay.news.data.model
+package com.upsaclay.news.data.local.model
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.upsaclay.news.domain.entity.Announcement
 import com.upsaclay.news.domain.entity.AnnouncementState
 
 const val ANNOUNCEMENTS_TABLE = "announcements_table"

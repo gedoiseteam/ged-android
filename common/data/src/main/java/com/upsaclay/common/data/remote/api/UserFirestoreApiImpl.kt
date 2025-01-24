@@ -38,25 +38,25 @@ internal class UserFirestoreApiImpl : UserFirestoreApi {
             }
     }
 
-    override suspend fun getAllUsers(): Flow<List<UserFirestoreModel>> = callbackFlow {
-            val listener = users.addSnapshotListener { value, error ->
-                error?.let {
-                    e("Error getting all users", it)
-                    trySend(emptyList())
+    override suspend fun getUsers(): List<UserFirestoreModel> {
+        return suspendCoroutine { continuation ->
+            users.get()
+                .addOnSuccessListener { snapshot ->
+                    val users = snapshot?.documents?.mapNotNull {
+                        it.toObject(UserFirestoreModel::class.java)
+                    } ?: emptyList()
+
+                    continuation.resume(users)
                 }
-
-                val allUsers = value?.documents?.mapNotNull {
-                    it.toObject(UserFirestoreModel::class.java)
-                } ?: emptyList()
-
-                trySend(allUsers)
-            }
-
-            awaitClose { listener.remove() }
+                .addOnFailureListener {
+                    e("Error getting all users", it)
+                    continuation.resume(emptyList())
+                }
         }
+    }
 
     override suspend fun createUser(userFirestoreModel: UserFirestoreModel): Result<Unit> = suspendCoroutine { continuation ->
-        users.document(userFirestoreModel.userId.toString()).set(userFirestoreModel)
+        users.document(userFirestoreModel.userId).set(userFirestoreModel)
             .addOnSuccessListener {
                 continuation.resume(Result.success(Unit))
             }

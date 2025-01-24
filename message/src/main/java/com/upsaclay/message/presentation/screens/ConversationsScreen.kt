@@ -54,7 +54,7 @@ import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.message.R
 import com.upsaclay.message.presentation.components.ConversationItem
 import com.upsaclay.message.presentation.viewmodels.ConversationViewModel
-import com.upsaclay.message.utils.conversationsFixture
+import com.upsaclay.message.conversationsFixture
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -63,7 +63,7 @@ fun ConversationScreen(
     navController: NavController,
     conversationViewModel: ConversationViewModel = koinViewModel()
 ) {
-    val conversations = conversationViewModel.conversations.collectAsState(emptyList()).value
+    val conversations by conversationViewModel.conversations.collectAsState(emptyList())
     var expanded by remember { mutableStateOf(false) }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -114,8 +114,7 @@ fun ConversationScreen(
                         conversation = conversation,
                         onClick = {
                             navController.navigate(Screen.CHAT.route + "?interlocutorId=${conversation.interlocutor.id}")
-                        },
-                        onLongClick = { }
+                        }
                     )
                 }
             }
@@ -224,7 +223,7 @@ private fun FloatingActionButtonSection(
 @Preview(showBackground = true)
 @Composable
 private fun ConversationsScreenPreview() {
-    val conversations = conversationsFixture.sortedByDescending { it.messages.last().date }
+    val conversations = conversationsFixture.sortedByDescending { it.lastMessage?.date ?: it.createdAt }
     var expanded by remember { mutableStateOf(false) }
 
     GedoiseTheme {
@@ -271,8 +270,7 @@ private fun ConversationsScreenPreview() {
                         ConversationItem(
                             modifier = Modifier.fillMaxWidth(),
                             conversation = conversation,
-                            onClick = { },
-                            onLongClick = { }
+                            onClick = { }
                         )
                     }
                 }

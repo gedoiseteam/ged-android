@@ -4,10 +4,8 @@ import com.upsaclay.message.data.local.dao.ConversationDao
 import com.upsaclay.message.data.local.model.LocalConversation
 import kotlinx.coroutines.flow.Flow
 
-internal class ConversationLocalDataSource(
-    private val conversationDao: ConversationDao
-) {
-    fun getAllConversations(): Flow<List<LocalConversation>> = conversationDao.getAllConversationsFlow()
+internal class ConversationLocalDataSource(private val conversationDao: ConversationDao) {
+    fun getConversations(): Flow<List<LocalConversation>> = conversationDao.getConversations()
 
     suspend fun insertConversation(localConversation: LocalConversation) {
         conversationDao.insertConversation(localConversation)
@@ -17,11 +15,11 @@ internal class ConversationLocalDataSource(
         conversationDao.updateConversation(localConversation)
     }
 
-    suspend fun deleteConversation(localConversation: LocalConversation) {
-        conversationDao.deleteConversation(localConversation)
+    suspend fun upsertConversation(localConversation: LocalConversation) {
+        conversationDao.upsertConversation(localConversation)
     }
 
-    suspend fun setConversationActive(localConversation: LocalConversation) {
-        conversationDao.updateConversation(localConversation.copy(isActive = true))
+    suspend fun deleteConversation(localConversation: LocalConversation) {
+        conversationDao.deleteConversation(localConversation)
     }
 }

@@ -21,8 +21,8 @@ import com.upsaclay.common.presentation.components.ProfilePicture
 import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
-import com.upsaclay.message.domain.model.Message
-import com.upsaclay.message.utils.messageFixture
+import com.upsaclay.message.domain.entity.Message
+import com.upsaclay.message.messageFixture
 
 @Composable
 fun SentMessageItem(

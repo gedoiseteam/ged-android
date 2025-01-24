@@ -47,7 +47,7 @@ import com.upsaclay.message.presentation.screens.CreateGroupConversationScreen
 import com.upsaclay.message.presentation.viewmodels.ConversationViewModel
 import com.upsaclay.news.presentation.screens.CreateAnnouncementScreen
 import com.upsaclay.news.presentation.screens.EditAnnouncementScreen
-import com.upsaclay.news.presentation.screens.EditAnnouncementViewModel
+import com.upsaclay.news.presentation.viewmodels.EditAnnouncementViewModel
 import com.upsaclay.news.presentation.screens.NewsScreen
 import com.upsaclay.news.presentation.screens.ReadAnnouncementScreen
 import com.upsaclay.news.presentation.viewmodels.ReadAnnouncementViewModel
@@ -72,7 +72,7 @@ fun Navigation(mainViewModel: MainViewModel = koinViewModel()) {
     LaunchedEffect(key1 = isAuthenticated) {
         if(startDestination == Screen.SPLASH.route) {
             delay(1000)
-            startDestination = if (isAuthenticated == true) {
+            startDestination = if (isAuthenticated) {
                 Screen.NEWS.route
             } else {
                 Screen.AUTHENTICATION.route

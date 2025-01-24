@@ -71,7 +71,7 @@ fun ReadAnnouncementScreen(
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
 
-    val user by readAnnouncementViewModel.currentUser.collectAsState()
+    val user by readAnnouncementViewModel.currentUser.collectAsState(null)
     val screenState by readAnnouncementViewModel.screenState.collectAsState()
     val announcement by readAnnouncementViewModel.announcement.collectAsState()
     val hideBottomSheet: () -> Unit = {

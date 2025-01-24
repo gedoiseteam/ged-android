@@ -8,7 +8,7 @@ internal interface UserFirestoreApi {
 
     suspend fun getUserWithEmail(userEmail: String): UserFirestoreModel?
 
-    suspend fun getAllUsers(): Flow<List<UserFirestoreModel>>
+    suspend fun getUsers(): List<UserFirestoreModel>
 
     suspend fun createUser(userFirestoreModel: UserFirestoreModel): Result<Unit>
 
