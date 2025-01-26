@@ -14,6 +14,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -35,17 +38,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import com.upsaclay.common.domain.model.Screen
+import com.upsaclay.common.domain.entity.Screen
 import com.upsaclay.common.presentation.components.CircularProgressBar
 import com.upsaclay.common.presentation.components.LoadingDialog
 import com.upsaclay.common.presentation.components.ProfilePicture
 import com.upsaclay.common.presentation.components.SensibleActionDialog
 import com.upsaclay.common.presentation.components.ClickableItem
+import com.upsaclay.common.presentation.components.SmallTopBarBack
 import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
@@ -60,7 +64,7 @@ fun ProfileScreen(
     navController: NavController,
     profileViewModel: ProfileViewModel = koinViewModel()
 ) {
-    val user by profileViewModel.user.collectAsState()
+    val user by profileViewModel.currentUser.collectAsState()
     var showLogoutDialog by remember { mutableStateOf(false) }
     var showLoadingDialog by remember { mutableStateOf(false) }
     val profileState by profileViewModel.screenState.collectAsState()
@@ -68,15 +72,6 @@ fun ProfileScreen(
     LaunchedEffect(profileState) {
         when(profileState) {
             ProfileScreenState.LOADING -> showLoadingDialog = true
-
-            ProfileScreenState.LOGGED_OUT -> {
-                showLoadingDialog = false
-                navController.navigate(Screen.AUTHENTICATION.route) {
-                    popUpTo(navController.graph.id) {
-                        inclusive = true
-                    }
-                }
-            }
 
             else -> {}
         }
@@ -102,7 +97,12 @@ fun ProfileScreen(
     }
 
     Scaffold(
-        topBar = { ProfileTopBar(navController = navController) }
+        topBar = {
+            SmallTopBarBack(
+                onBackClick = { navController.popBackStack() },
+                title = stringResource(id = R.string.profile)
+            )
+        }
     ) {
         Box(
             modifier = Modifier
@@ -115,20 +115,18 @@ fun ProfileScreen(
                     userFullName = user?.fullName ?: "Unknown"
                 )
 
-                HorizontalDivider()
-
-                ClickableItem(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = { Text(text = stringResource(id = R.string.account_informations)) },
-                    icon = {
-                        Icon(
-                            modifier = Modifier.size(28.dp),
-                            painter = painterResource(id = com.upsaclay.common.R.drawable.ic_person),
-                            contentDescription = stringResource(id = R.string.account_icon_description)
-                        )
-                    },
-                    onClick = { navController.navigate(Screen.ACCOUNT.route) }
-                )
+            ClickableItem(
+                modifier = Modifier.fillMaxWidth(),
+                text = { Text(text = stringResource(id = R.string.account_informations)) },
+                icon = {
+                    Icon(
+                        modifier = Modifier.size(28.dp),
+                        painter = painterResource(id = com.upsaclay.common.R.drawable.ic_person),
+                        contentDescription = stringResource(id = R.string.account_icon_description)
+                    )
+                },
+                onClick = { navController.navigate(Screen.ACCOUNT.route) }
+            )
 
                 ClickableItem(
                     modifier = Modifier.fillMaxWidth(),
@@ -161,7 +159,7 @@ private fun TopSection(profilePictureUrl: String?, userFullName: String) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             ProfilePicture(
-                imageUrl = profilePictureUrl,
+                url = profilePictureUrl,
                 scale = 0.7f
             )
 
@@ -169,31 +167,13 @@ private fun TopSection(profilePictureUrl: String?, userFullName: String) {
 
             Text(
                 text = userFullName,
-                style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Medium
             )
         }
-    }
-}
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ProfileTopBar(navController: NavController) {
-    TopAppBar(
-        title = {
-            Text(
-                text = stringResource(id = R.string.profile),
-                textAlign = TextAlign.Center
-            )
-        },
-        navigationIcon = {
-            IconButton(onClick = { navController.popBackStack() }) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = stringResource(id = com.upsaclay.common.R.string.arrow_back_icon_description)
-                )
-            }
-        }
-    )
+        HorizontalDivider(color = GedoiseColor.LightGray)
+    }
 }
 
 /*
@@ -202,83 +182,75 @@ fun ProfileTopBar(navController: NavController) {
  =====================================================================
  */
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun ProfileScreenPreview() {
     val isLoading = false
 
     GedoiseTheme {
-        Scaffold(
-            topBar = { ProfileTopBar(navController = rememberNavController()) }
+        Box(
+            modifier = Modifier.fillMaxSize().padding(top = MaterialTheme.spacing.medium)
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = it.calculateTopPadding())
-            ) {
-                if (isLoading) {
-                    CircularProgressBar(
-                        modifier = Modifier.align(Alignment.Center),
-                        scale = 3f
+            Column {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            start = MaterialTheme.spacing.medium,
+                            end = MaterialTheme.spacing.medium,
+                            bottom = MaterialTheme.spacing.medium
+                        ),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Image(
+                        painter = painterResource(id = com.upsaclay.common.R.drawable.default_profile_picture),
+                        contentDescription = "",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(70.dp)
                     )
-                } else {
-                    Column {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(
-                                    start = MaterialTheme.spacing.medium,
-                                    end = MaterialTheme.spacing.medium,
-                                    bottom = MaterialTheme.spacing.medium
-                                ),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Image(
-                                painter = painterResource(id = com.upsaclay.common.R.drawable.default_profile_picture),
-                                contentDescription = "",
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier
-                                    .size(70.dp)
-                                    .border(1.dp, Color.LightGray, CircleShape)
-                            )
 
-                            Spacer(modifier = Modifier.width(MaterialTheme.spacing.medium))
+                    Spacer(modifier = Modifier.width(MaterialTheme.spacing.medium))
 
-                            Text(
-                                text = userFixture.firstName + " " + userFixture.lastName,
-                                style = MaterialTheme.typography.titleLarge
-                            )
-                        }
-
-                        HorizontalDivider()
-
-                        ClickableItem(
-                            modifier = Modifier.fillMaxWidth(),
-                            text = { Text(text = stringResource(id = R.string.account_informations)) },
-                            icon = {
-                                Icon(
-                                    modifier = Modifier.size(28.dp),
-                                    painter = painterResource(id = com.upsaclay.common.R.drawable.ic_person),
-                                    contentDescription = stringResource(id = R.string.account_icon_description)
-                                )
-                            },
-                            onClick = {  }
-                        )
-
-                        ClickableItem(
-                            modifier = Modifier.fillMaxWidth(),
-                            text = { Text(text = stringResource(id = R.string.logout), color = GedoiseColor.Red) },
-                            icon = {
-                                Icon(
-                                    painter = painterResource(id = com.upsaclay.common.R.drawable.ic_logout),
-                                    contentDescription = stringResource(id = R.string.logout_icon_description),
-                                    tint = GedoiseColor.Red
-                                )
-                            },
-                            onClick = { }
-                        )
-                    }
+                    Text(
+                        text = userFixture.firstName + " " + userFixture.lastName,
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Medium
+                    )
                 }
+
+                HorizontalDivider(color = GedoiseColor.LightGray)
+
+                ClickableItem(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = { Text(text = stringResource(id = R.string.account_informations)) },
+                    icon = {
+                        Icon(
+                            modifier = Modifier.size(28.dp),
+                            painter = painterResource(id = com.upsaclay.common.R.drawable.ic_person),
+                            contentDescription = stringResource(id = R.string.account_icon_description)
+                        )
+                    },
+                    onClick = { }
+                )
+
+                ClickableItem(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = {
+                        Text(
+                            text = stringResource(id = R.string.logout),
+                            color = GedoiseColor.Red
+                        )
+                    },
+                    icon = {
+                        Icon(
+                            painter = painterResource(id = com.upsaclay.common.R.drawable.ic_logout),
+                            contentDescription = stringResource(id = R.string.logout_icon_description),
+                            tint = GedoiseColor.Red
+                        )
+                    },
+                    onClick = { }
+                )
             }
         }
     }

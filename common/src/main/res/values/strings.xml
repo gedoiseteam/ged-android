@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">La Grande Ecole du Droit</string>
+
     <string name="close">Fermer</string>
     <string name="show">Voir</string>
     <string name="next">Suivant</string>

@@ -1,6 +1,6 @@
 package com.upsaclay.news.domain.entity
 
-import com.upsaclay.common.domain.model.User
+import com.upsaclay.common.domain.entity.User
 import java.time.LocalDateTime
 
 data class Announcement(

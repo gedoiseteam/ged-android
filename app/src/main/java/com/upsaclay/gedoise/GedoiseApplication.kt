@@ -9,6 +9,7 @@ import com.upsaclay.message.data.messageDataModule
 import com.upsaclay.message.messageModule
 import com.upsaclay.news.data.newsDataModule
 import com.upsaclay.news.newsModule
+import com.upsaclay.profile.profileModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -31,7 +32,8 @@ class GedoiseApplication : Application() {
                     newsModule,
                     newsDataModule,
                     messageModule,
-                    messageDataModule
+                    messageDataModule,
+                    profileModule
                 )
             )
         }

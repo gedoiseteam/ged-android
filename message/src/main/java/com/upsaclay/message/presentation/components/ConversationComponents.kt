@@ -24,9 +24,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.upsaclay.common.domain.model.ElapsedTime
+import com.upsaclay.common.domain.entity.ElapsedTime
+import com.upsaclay.common.domain.entity.User
 import com.upsaclay.common.domain.usecase.GetElapsedTimeUseCase
-import com.upsaclay.common.domain.usecase.LocalDateTimeFormatterUseCase
+import com.upsaclay.common.domain.usecase.FormatLocalDateTimeUseCase
 import com.upsaclay.common.presentation.components.ProfilePicture
 import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
@@ -34,6 +35,7 @@ import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.message.R
 import com.upsaclay.message.domain.entity.ConversationUI
 import com.upsaclay.message.conversationFixture
+import com.upsaclay.message.domain.entity.Message
 
 @Composable
 fun ConversationItem(
@@ -41,12 +43,8 @@ fun ConversationItem(
     conversation: ConversationUI,
     onClick: () -> Unit
 ) {
-    val lastMessage = conversation.lastMessage
-
-    val elapsedTimeValue: String = if (lastMessage != null) {
-        val elapsedTime = GetElapsedTimeUseCase.fromLocalDateTime(lastMessage.date)
-
-        when (elapsedTime) {
+    val elapsedTimeValue = conversation.lastMessage?.let { lastMessage ->
+        when (val elapsedTime = GetElapsedTimeUseCase.fromLocalDateTime(lastMessage.date)) {
             is ElapsedTime.Now -> stringResource(id = com.upsaclay.common.R.string.now)
 
             is ElapsedTime.Minute -> stringResource(
@@ -69,15 +67,9 @@ fun ConversationItem(
                 elapsedTime.value
             )
 
-            is ElapsedTime.Later -> LocalDateTimeFormatterUseCase.formatDayMonthYear(elapsedTime.value)
+            is ElapsedTime.Later -> FormatLocalDateTimeUseCase.formatDayMonthYear(elapsedTime.value)
         }
-    } else {
-        ""
-    }
-
-    val readMessage = lastMessage?.let {
-        it.senderId == conversation.interlocutor.id && it.isRead
-    } ?: false
+    } ?: ""
 
     Row(
         modifier = modifier
@@ -89,7 +81,7 @@ fun ConversationItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         ProfilePicture(
-            imageUrl = conversation.interlocutor.profilePictureUrl,
+            url = conversation.interlocutor.profilePictureUrl,
             scale = 0.5f
         )
 
@@ -99,88 +91,146 @@ fun ConversationItem(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium)
         ) {
-            if (!readMessage) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            modifier = Modifier.weight(1f, fill = false),
-                            text = conversation.interlocutor.fullName,
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.SemiBold,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-
-                        Spacer(modifier = Modifier.width(MaterialTheme.spacing.smallMedium))
-
-                        Text(
-                            text = elapsedTimeValue,
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(2.dp))
-
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            modifier = Modifier.weight(1f),
-                            text = lastMessage!!.content,
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.SemiBold,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    }
+            conversation.lastMessage?.let {
+                if (it.isRead || it.senderId != conversation.interlocutor.id) {
+                    ReadConversationItem(
+                        modifier = Modifier.weight(1f),
+                        interlocutor = conversation.interlocutor,
+                        lastMessage = it,
+                        elapsedTime = elapsedTimeValue
+                    )
+                } else {
+                    UnreadConversationItem(
+                        modifier = Modifier.weight(1f),
+                        interlocutor = conversation.interlocutor,
+                        lastMessage = it,
+                        elapsedTime = elapsedTimeValue
+                    )
                 }
-
-                Box(
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.error)
-                        .size(10.dp)
+            } ?: run {
+                EmptyConversationItem(
+                    modifier = Modifier.weight(1f),
+                    interlocutor = conversation.interlocutor
                 )
-            } else {
-                Column(modifier = Modifier.weight(1f)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            modifier = Modifier.weight(1f, fill = false),
-                            text = conversation.interlocutor.fullName,
-                            style = MaterialTheme.typography.bodyMedium,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-
-                        Spacer(modifier = Modifier.width(MaterialTheme.spacing.smallMedium))
-
-                        Text(
-                            text = elapsedTimeValue,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = GedoiseColor.PreviewText
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(2.dp))
-
-                    lastMessage?.let {
-                        Text(
-                            text = lastMessage.content,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = GedoiseColor.PreviewText,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    } ?: run {
-                        Text(
-                            text = stringResource(id = R.string.tap_to_chat),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = GedoiseColor.PreviewText,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    }
-                }
             }
         }
+    }
+}
+
+@Composable
+private fun ReadConversationItem(
+    modifier: Modifier = Modifier,
+    interlocutor: User,
+    lastMessage: Message,
+    elapsedTime: String
+) {
+    Column(modifier = modifier) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                modifier = Modifier.weight(1f, fill = false),
+                text = interlocutor.fullName,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            Spacer(modifier = Modifier.width(MaterialTheme.spacing.smallMedium))
+
+            Text(
+                text = elapsedTime,
+                style = MaterialTheme.typography.bodyMedium,
+                color = GedoiseColor.PreviewText
+            )
+        }
+
+        Spacer(modifier = Modifier.height(2.dp))
+
+        Text(
+            text = lastMessage.content,
+            style = MaterialTheme.typography.bodyMedium,
+            color = GedoiseColor.PreviewText,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+    }
+}
+
+@Composable
+private fun UnreadConversationItem(
+    modifier: Modifier = Modifier,
+    interlocutor: User,
+    lastMessage: Message,
+    elapsedTime: String
+) {
+    Column(modifier = modifier) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                modifier = Modifier.weight(1f, fill = false),
+                text = interlocutor.fullName,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            Spacer(modifier = Modifier.width(MaterialTheme.spacing.smallMedium))
+
+            Text(
+                text = elapsedTime,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold
+            )
+        }
+
+        Spacer(modifier = Modifier.height(2.dp))
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                modifier = Modifier.weight(1f),
+                text = lastMessage.content,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+    }
+
+    Box(
+        modifier = Modifier
+            .clip(CircleShape)
+            .background(MaterialTheme.colorScheme.error)
+            .size(10.dp)
+    )
+}
+
+@Composable
+private fun EmptyConversationItem(
+    modifier: Modifier = Modifier,
+    interlocutor: User
+) {
+    Column(modifier = modifier) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                modifier = Modifier.weight(1f, fill = false),
+                text = interlocutor.fullName,
+                style = MaterialTheme.typography.bodyMedium,
+                maxLines = 1,
+                fontWeight = FontWeight.SemiBold,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+
+        Spacer(modifier = Modifier.height(2.dp))
+
+        Text(
+            text = stringResource(id = R.string.tap_to_chat),
+            style = MaterialTheme.typography.bodyMedium,
+            color = GedoiseColor.PreviewText,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
     }
 }
 
@@ -209,6 +259,18 @@ private fun UnreadConversationItemPreview() {
         ConversationItem(
             modifier = Modifier.fillMaxWidth(),
             conversation = conversationFixture.copy(lastMessage = conversationFixture.lastMessage!!.copy(isRead = false)),
+            onClick = { }
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun EmptyConversationPreview() {
+    GedoiseTheme {
+        ConversationItem(
+            modifier = Modifier.fillMaxWidth(),
+            conversation = conversationFixture.copy(lastMessage = null),
             onClick = { }
         )
     }

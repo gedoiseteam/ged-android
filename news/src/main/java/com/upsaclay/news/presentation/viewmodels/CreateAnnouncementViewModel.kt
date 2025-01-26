@@ -5,8 +5,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.upsaclay.common.domain.model.User
-import com.upsaclay.common.domain.usecase.GenerateIDUseCase
+import com.upsaclay.common.domain.entity.User
+import com.upsaclay.common.domain.usecase.GenerateIdUseCase
 import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
 import com.upsaclay.news.domain.entity.Announcement
 import com.upsaclay.news.domain.entity.AnnouncementScreenState
@@ -51,7 +51,7 @@ class CreateAnnouncementViewModel(
         }
 
         val announcement = Announcement(
-            id = GenerateIDUseCase(),
+            id = GenerateIdUseCase(),
             title = if (title.isBlank()) null else title.trim(),
             content = content.trim(),
             date = LocalDateTime.now(),

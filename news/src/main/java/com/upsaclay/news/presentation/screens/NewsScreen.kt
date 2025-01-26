@@ -32,7 +32,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.upsaclay.common.domain.model.Screen
+import com.upsaclay.common.domain.entity.Screen
 import com.upsaclay.common.presentation.components.PullToRefreshComponent
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
@@ -49,7 +49,7 @@ fun NewsScreen(
     navController: NavController
 ) {
     val announcements = newsViewModel.announcements.collectAsState(emptyList()).value
-    val user by newsViewModel.user.collectAsState(null)
+    val user by newsViewModel.currentUser.collectAsState()
     val isRefreshing = newsViewModel.isRefreshing
 
     LaunchedEffect(Unit) {
@@ -97,22 +97,6 @@ fun NewsScreen(
         }
     }
 }
-
-// @Composable
-// fun OnlineUserSection(user: User) {
-//    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-//        ProfilePictureWithBubble(
-//            imageUrl = user.profilePictureUrl,
-//            bubbleBackgroundColor = GedoiseColor.OnlineColor,
-//            contentDescription = "",
-//            scale = 0.5f
-//        )
-//        Text(
-//            text = user.shortName,
-//            style = MaterialTheme.typography.bodySmall
-//        )
-//    }
-// }
 
 @Composable
 private fun RecentAnnouncementSection(

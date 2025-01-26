@@ -1,6 +1,6 @@
 package com.upsaclay.news.data
 
-import com.upsaclay.common.domain.model.User
+import com.upsaclay.common.domain.entity.User
 import com.upsaclay.common.domain.usecase.ConvertLocalDateTimeUseCase
 import com.upsaclay.common.domain.usecase.ConvertTimestampUseCase
 import com.upsaclay.news.data.remote.model.RemoteAnnouncementWithUser

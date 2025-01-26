@@ -2,12 +2,14 @@ package com.upsaclay.message.data.mapper
 
 import com.google.firebase.Timestamp
 import com.google.gson.Gson
-import com.upsaclay.common.domain.model.User
+import com.upsaclay.common.domain.entity.User
 import com.upsaclay.message.data.local.model.LocalConversation
 import com.upsaclay.message.data.remote.model.Conversation
 import com.upsaclay.message.data.remote.model.RemoteConversation
 import com.upsaclay.message.domain.entity.ConversationState
 import com.upsaclay.message.domain.entity.ConversationUser
+import com.upsaclay.message.domain.entity.ConversationUI
+import com.upsaclay.message.domain.entity.Message
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -58,7 +60,7 @@ internal object ConversationMapper {
     }
 
     fun toConversation(remoteConversation: RemoteConversation, currentUserId: String): Conversation? {
-        val interlocutorId = remoteConversation.participants.firstOrNull { it == currentUserId } ?: return null
+        val interlocutorId = remoteConversation.participants.firstOrNull { it != currentUserId } ?: return null
         return Conversation(
             id = remoteConversation.conversationId,
             interlocutorId = interlocutorId,
@@ -70,6 +72,22 @@ internal object ConversationMapper {
     fun toConversation(conversationUser: ConversationUser) = Conversation(
         id = conversationUser.id,
         interlocutorId = conversationUser.interlocutor.id,
+        createdAt = conversationUser.createdAt,
+        state = conversationUser.state
+    )
+
+    fun toConversationUser(conversationUI: ConversationUI) =
+        ConversationUser(
+            id = conversationUI.id,
+            interlocutor = conversationUI.interlocutor,
+            createdAt = conversationUI.createdAt,
+            state = conversationUI.state
+        )
+
+    fun toConversationUI(conversationUser: ConversationUser, message: Message?) = ConversationUI(
+        id = conversationUser.id,
+        interlocutor = conversationUser.interlocutor,
+        lastMessage = message,
         createdAt = conversationUser.createdAt,
         state = conversationUser.state
     )

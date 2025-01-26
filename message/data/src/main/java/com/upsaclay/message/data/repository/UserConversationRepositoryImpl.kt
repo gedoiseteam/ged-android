@@ -13,8 +13,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 
@@ -24,10 +22,10 @@ internal class UserConversationRepositoryImpl(
     private val userRepository: UserRepository,
     private val scope: CoroutineScope = (GlobalScope + Dispatchers.IO)
 ): UserConversationRepository  {
-    private val _userConversations = MutableStateFlow<List<ConversationUser>>(emptyList())
+    private val _userConversations = MutableStateFlow<Map<String, ConversationUser>>(mapOf())
     override val userConversations: Flow<ConversationUser> = _userConversations
         .flatMapConcat { conversations ->
-            flow { conversations.forEach { emit(it) } }
+            flow { conversations.forEach { emit(it.value) } }
         }
 
     init {
@@ -35,39 +33,48 @@ internal class UserConversationRepositoryImpl(
         listenRemoteConversations()
     }
 
-    override fun getConversation(conversationId: String): ConversationUser? =
-        _userConversations.value.find { it.id == conversationId }
+    override fun getUserConversation(conversationId: String): ConversationUser? =
+        _userConversations.value.values.find { it.id == conversationId }
 
     override suspend fun createConversation(conversationUser: ConversationUser) {
-        val conversation = ConversationMapper.toConversation(conversationUser)
         val currentUser = userRepository.currentUser.first() ?: throw Exception()
-        conversationRepository.createConversation(conversation, conversationUser.interlocutor, currentUser)
+        conversationRepository.createConversation(
+            ConversationMapper.toConversation(conversationUser),
+            conversationUser.interlocutor,
+            currentUser
+        )
     }
 
     override suspend fun updateConversation(conversationUser: ConversationUser) {
-        val conversation = ConversationMapper.toConversation(conversationUser)
-        conversationRepository.upsertLocalConversation(conversation, conversationUser.interlocutor)
+        conversationRepository.upsertLocalConversation(
+            ConversationMapper.toConversation(conversationUser),
+            conversationUser.interlocutor
+        )
     }
 
     override suspend fun deleteConversation(conversationUser: ConversationUser) {
-        val conversation = ConversationMapper.toConversation(conversationUser)
-        conversationRepository.deleteConversation(conversation, conversationUser.interlocutor)
+        conversationRepository.deleteConversation(
+            ConversationMapper.toConversation(conversationUser),
+            conversationUser.interlocutor
+        )
     }
 
     private fun listenLocalConversations() {
         scope.launch {
-            conversationRepository.getConversationFromLocal().collect { conversationsInterlocutor ->
-                _userConversations.value = conversationsInterlocutor.map { ConversationMapper.toConversationUser(it.first, it.second) }
+            conversationRepository.getConversationFromLocal().collect { (conversation, interlocutor) ->
+                val conversationUser = ConversationMapper.toConversationUser(conversation, interlocutor)
+                _userConversations.value += (conversationUser.id to conversationUser)
             }
         }
     }
 
     private fun listenRemoteConversations() {
         scope.launch {
-            val user = userRepository.currentUser.first() ?: return@launch
-            conversationRepository.getConversationsFromRemote(user.id).collect { conversations ->
-                conversations.forEach {
-                    conversationRepository.upsertLocalConversation(it, user)
+            val currentUser = userRepository.currentUser.first() ?: return@launch
+
+            conversationRepository.getConversationsFromRemote(currentUser.id).collect { conversation ->
+                userRepository.getUserFlow(conversation.interlocutorId).collect { interlocutor ->
+                    conversationRepository.upsertLocalConversation(conversation, interlocutor)
                 }
             }
         }

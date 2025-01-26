@@ -4,5 +4,6 @@ enum class BottomNavigationItemType {
     HOME,
     MESSAGE,
     CALENDAR,
-    FORUM
+    FORUM,
+    PROFILE
 }

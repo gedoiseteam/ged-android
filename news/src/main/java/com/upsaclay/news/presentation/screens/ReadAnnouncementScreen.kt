@@ -21,6 +21,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -40,10 +41,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.upsaclay.common.domain.model.Screen
+import com.upsaclay.common.domain.entity.Screen
 import com.upsaclay.common.presentation.components.LoadingDialog
 import com.upsaclay.common.presentation.components.SensibleActionDialog
 import com.upsaclay.common.presentation.components.ClickableItem
+import com.upsaclay.common.presentation.components.SmallTopBarBack
 import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
@@ -56,13 +58,16 @@ import com.upsaclay.news.presentation.components.HeaderAnnouncement
 import com.upsaclay.news.presentation.viewmodels.ReadAnnouncementViewModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReadAnnouncementScreen(
+    announcementId: String,
     modifier: Modifier = Modifier,
     navController: NavController,
-    readAnnouncementViewModel: ReadAnnouncementViewModel = koinViewModel()
+    readAnnouncementViewModel: ReadAnnouncementViewModel =
+        koinViewModel(parameters = { parametersOf(announcementId) })
 ) {
     val context = LocalContext.current
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -71,7 +76,7 @@ fun ReadAnnouncementScreen(
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
 
-    val user by readAnnouncementViewModel.currentUser.collectAsState(null)
+    val user by readAnnouncementViewModel.currentUser.collectAsState()
     val screenState by readAnnouncementViewModel.screenState.collectAsState()
     val announcement by readAnnouncementViewModel.announcement.collectAsState()
     val hideBottomSheet: () -> Unit = {
@@ -114,82 +119,96 @@ fun ReadAnnouncementScreen(
         )
     }
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(
-                start = MaterialTheme.spacing.medium,
-                end = MaterialTheme.spacing.medium,
-                bottom = MaterialTheme.spacing.medium
+    Scaffold(
+        topBar = {
+            SmallTopBarBack(
+                onBackClick = { navController.popBackStack() },
+                title = stringResource(id = com.upsaclay.news.R.string.announcement)
             )
-            .verticalScroll(rememberScrollState())
-    ) {
-        if (user?.isMember == true && announcement?.author == user) {
-            announcement?.let {
-                EditableTopSection(
-                    announcement = it,
-                    onEditClick = { showBottomSheet = true }
+        }
+    ) { contentPadding ->
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(
+                    top = contentPadding.calculateTopPadding(),
+                    start = MaterialTheme.spacing.medium,
+                    end = MaterialTheme.spacing.medium,
+                    bottom = MaterialTheme.spacing.medium
+                )
+                .verticalScroll(rememberScrollState())
+        ) {
+            if (user?.isMember == true && announcement?.author == user) {
+                announcement?.let {
+                    EditableTopSection(
+                        announcement = it,
+                        onEditClick = { showBottomSheet = true }
+                    )
+                }
+            } else {
+                announcement?.let { HeaderAnnouncement(announcement = it) }
+            }
+
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
+
+            announcement?.title?.let {
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
+            }
+
+            announcement?.content?.let {
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.bodyLarge
                 )
             }
-        } else {
-            announcement?.let { HeaderAnnouncement(announcement = it) }
-        }
 
-        Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
-
-        announcement?.title?.let {
-            Text(
-                text = it,
-                style = MaterialTheme.typography.titleMedium
-            )
-            Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
-        }
-
-        announcement?.content?.let {
-            Text(
-                text = it,
-                style = MaterialTheme.typography.bodyLarge
-            )
-        }
-
-        if (showBottomSheet) {
-            ModalBottomSheet(
-                onDismissRequest = { showBottomSheet = false },
-                sheetState = sheetState
-            ) {
-                ClickableItem(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = { Text(text = stringResource(id = R.string.edit_announcement)) },
-                    icon = { Icon(imageVector = Icons.Default.Edit, contentDescription = null) },
-                    onClick = {
-                        navController.navigate(Screen.EDIT_ANNOUNCEMENT.route)
-                        hideBottomSheet()
-                    }
-                )
-                ClickableItem(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = {
-                        Text(
-                            text = stringResource(id = R.string.delete_announcement),
-                            color = GedoiseColor.Red
-                        )
-                    },
-                    icon = {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = null,
-                            tint = GedoiseColor.Red
-                        )
-                    },
-                    onClick = {
-                        hideBottomSheet()
-                        showDeleteAnnouncementDialog = true
-                    }
-                )
+            if (showBottomSheet) {
+                ModalBottomSheet(
+                    onDismissRequest = { showBottomSheet = false },
+                    sheetState = sheetState
+                ) {
+                    ClickableItem(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = { Text(text = stringResource(id = R.string.edit_announcement)) },
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = null
+                            )
+                        },
+                        onClick = {
+                            navController.navigate(Screen.EDIT_ANNOUNCEMENT.route)
+                            hideBottomSheet()
+                        }
+                    )
+                    ClickableItem(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = {
+                            Text(
+                                text = stringResource(id = R.string.delete_announcement),
+                                color = GedoiseColor.Red
+                            )
+                        },
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = null,
+                                tint = GedoiseColor.Red
+                            )
+                        },
+                        onClick = {
+                            hideBottomSheet()
+                            showDeleteAnnouncementDialog = true
+                        }
+                    )
+                }
             }
         }
     }
-
 }
 
 @Composable

@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import com.upsaclay.common.presentation.components.ClickableItem
 import com.upsaclay.common.presentation.components.SmallTopBarBack
 import com.upsaclay.common.presentation.components.SmallTopBarEdit
@@ -85,6 +86,7 @@ internal fun AccountInfoItem(
         Text(
             text = accountInfo.label,
             color = GedoiseColor.DarkGray,
+            fontWeight = FontWeight.SemiBold,
             style = MaterialTheme.typography.labelLarge
         )
         Text(
@@ -103,7 +105,7 @@ internal fun AccountTopBar(
 ) {
     if (isEdited) {
         SmallTopBarEdit(
-            title = stringResource(id = R.string.account_informations),
+            title = stringResource(id = R.string.edit_profile),
             onCancelClick = onCancelClick,
             onSaveClick = onSaveClick
         )

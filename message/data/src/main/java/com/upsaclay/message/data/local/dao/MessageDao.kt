@@ -17,7 +17,7 @@ interface MessageDao {
             "ORDER BY timestamp DESC " +
             "LIMIT 1"
     )
-    fun getLastMessage(conversationId: String): Flow<LocalMessage>
+    fun getLastMessage(conversationId: String): Flow<LocalMessage?>
 
     @Query(
         "SELECT * FROM messages " +

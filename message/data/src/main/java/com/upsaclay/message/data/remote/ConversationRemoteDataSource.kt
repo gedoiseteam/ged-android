@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 
 internal class ConversationRemoteDataSource(private val conversationApi: ConversationApi) {
-    fun listenConversations(userId: String): Flow<List<RemoteConversation>> =
+    fun listenConversations(userId: String): Flow<RemoteConversation> =
         conversationApi.listenConversations(userId)
 
     suspend fun createConversation(remoteConversation: RemoteConversation) {

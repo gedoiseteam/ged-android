@@ -1,8 +1,8 @@
 package com.upsaclay.common.data
 
-import com.upsaclay.common.data.model.UserDTO
-import com.upsaclay.common.data.remote.UserFirestoreModel
-import com.upsaclay.common.domain.model.User
+import com.upsaclay.common.data.entity.UserDTO
+import com.upsaclay.common.data.remote.FirestoreUser
+import com.upsaclay.common.domain.entity.User
 
 internal object UserMapper {
     fun toDTO(user: User) = UserDTO(
@@ -15,7 +15,7 @@ internal object UserMapper {
         userProfilePictureUrl = user.profilePictureUrl
     )
 
-    fun toFirestoreModel(user: User) = UserFirestoreModel(
+    fun toFirestoreUser(user: User) = FirestoreUser(
         userId = user.id,
         firstName = user.firstName,
         lastName = user.lastName,
@@ -25,7 +25,7 @@ internal object UserMapper {
         profilePictureUrl = user.profilePictureUrl
     )
 
-    fun toFirestoreModel(userDTO: UserDTO) = UserFirestoreModel(
+    fun toFirestoreUser(userDTO: UserDTO) = FirestoreUser(
         userId = userDTO.userId ?: "",
         firstName = userDTO.userFirstName,
         lastName = userDTO.userLastName,
@@ -45,13 +45,13 @@ internal object UserMapper {
         profilePictureUrl = userDTO.userProfilePictureUrl
     )
 
-    fun toDomain(userFirestoreModel: UserFirestoreModel) = User(
-        id = userFirestoreModel.userId,
-        firstName = userFirestoreModel.firstName,
-        lastName = userFirestoreModel.lastName,
-        email = userFirestoreModel.email,
-        schoolLevel = userFirestoreModel.schoolLevel,
-        isMember = userFirestoreModel.isMember,
-        profilePictureUrl = userFirestoreModel.profilePictureUrl
+    fun toDomain(firestoreUser: FirestoreUser) = User(
+        id = firestoreUser.userId,
+        firstName = firestoreUser.firstName,
+        lastName = firestoreUser.lastName,
+        email = firestoreUser.email,
+        schoolLevel = firestoreUser.schoolLevel,
+        isMember = firestoreUser.isMember,
+        profilePictureUrl = firestoreUser.profilePictureUrl
     )
 }

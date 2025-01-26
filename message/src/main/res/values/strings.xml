@@ -7,7 +7,7 @@
     <string name="message">Message</string>
     <string name="new_conversation">Nouvelle conversation</string>
     <string name="new_group">Nouveau groupe</string>
-    <string name="no_conversation">Commencez une nouvelle discussion avec vos amis.</string>
+    <string name="no_conversation">Démarrer une conversation avec vos amis.</string>
 
     <string name="message_placeholder">Envoyer un message</string>
     <string name="send_message_icon_description">Bouton d\'envoi de message</string>

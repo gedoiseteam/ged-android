@@ -23,7 +23,7 @@ internal class MessageRepositoryImpl(
     }
 
     override fun getLastMessage(conversationId: String): Flow<Message?> =
-        messageLocalDataSource.getLastMessage(conversationId)
+        messageRemoteDataSource.listenLastMessage(conversationId)
 
     override suspend fun createMessage(message: Message) {
         messageLocalDataSource.insertMessage(message)
@@ -41,10 +41,8 @@ internal class MessageRepositoryImpl(
 
     private fun listenRemoteMessage(conversationId: String) {
         scope.launch {
-            messageRemoteDataSource.listenMessages(conversationId).collect { messages ->
-                messages.forEach {
-                    messageLocalDataSource.upsertMessage(it)
-                }
+            messageRemoteDataSource.listenMessages(conversationId).collect {
+                messageLocalDataSource.upsertMessage(it)
             }
         }
     }

@@ -22,8 +22,8 @@ class CreateUserUseCaseTest {
         updateUserProfilePictureUseCase = mockk()
         createUserUseCase = CreateUserUseCase(userRepository)
 
-        coEvery { userRepository.createUser(any()) } returns Result.success(Unit)
-        coEvery { updateUserProfilePictureUseCase(any()) } returns Result.success(Unit)
+        coEvery { userRepository.createUser(any()) } returns Unit
+        coEvery { updateUserProfilePictureUseCase(any()) } returns Unit
     }
 
     @Test

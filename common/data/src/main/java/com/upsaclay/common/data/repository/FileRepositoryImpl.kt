@@ -9,21 +9,19 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 
 internal class FileRepositoryImpl(private val context: Context) : FileRepository {
-    override suspend fun createFileFromUri(fileName: String, uri: Uri): File =
-        withContext(Dispatchers.IO) {
-            val extension = getFileType(uri) ?: "jpg"
-            val fileByteArray = getFileByteArray(uri)
-            return@withContext createFileFromByteArray("$fileName.$extension", fileByteArray)
-        }
+    override suspend fun createFileFromUri(fileName: String, uri: Uri): File = withContext(Dispatchers.IO) {
+        val extension = getFileType(uri) ?: "jpg"
+        val fileByteArray = getFileByteArray(uri)
+        return@withContext createFileFromByteArray("$fileName.$extension", fileByteArray)
+    }
 
-    override suspend fun createFileFromByteArray(fileName: String, byteArray: ByteArray): File =
-        withContext(Dispatchers.IO) {
-            val file = File(context.cacheDir, fileName)
-            val outPutStream = file.outputStream()
-            outPutStream.write(byteArray)
-            outPutStream.close()
-            file
-        }
+    override suspend fun createFileFromByteArray(fileName: String, byteArray: ByteArray): File = withContext(Dispatchers.IO) {
+        val file = File(context.cacheDir, fileName)
+        val outPutStream = file.outputStream()
+        outPutStream.write(byteArray)
+        outPutStream.close()
+        file
+    }
 
     private fun getFileByteArray(uri: Uri): ByteArray {
         val inputStream = context.contentResolver.openInputStream(uri)

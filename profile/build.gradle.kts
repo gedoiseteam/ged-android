@@ -9,7 +9,7 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        minSdk = 24
+        minSdk = 29
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
@@ -35,6 +35,10 @@ android {
     }
     kotlinOptions {
         jvmTarget = "19"
+    }
+
+    packaging {
+        resources.excludes.add("META-INF/*")
     }
 }
 

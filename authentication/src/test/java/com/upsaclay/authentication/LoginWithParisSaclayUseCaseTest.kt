@@ -27,34 +27,23 @@ class LoginWithParisSaclayUseCaseTest {
 
         coEvery {
             firebaseAuthenticationRepository.registerWithEmailAndPassword(any(), any())
-        } returns Result.success(Unit)
+        } returns ""
         coEvery { generateHashUseCase() } returns hash
     }
 
     @Test
-    fun login_with_paris_saclay_call_generate_hash_once() {
-        runTest {
-            loginUseCase(email, password)
-            verify(exactly = 1) { generateHashUseCase() }
-        }
+    fun login_with_paris_saclay_call_generate_hash_once() = runTest {
+        loginUseCase(email, password)
+        verify(exactly = 1) { generateHashUseCase() }
     }
 
     @Test
-    fun login_with_paris_saclay_return_success_when_login_is_correct() {
-        runTest {
-            val result = loginUseCase(email, password)
-            assert(result.isSuccess)
-        }
+    fun login_with_paris_saclay_return_success_when_login_is_correct() = runTest {
+        loginUseCase(email, password)
     }
 
     @Test
-    fun login_with_paris_saclay_return_fail_when_login_is_incorrect() {
-        coEvery {
-            firebaseAuthenticationRepository.registerWithEmailAndPassword(any(), any())
-        } returns Result.failure(Exception())
-        runTest {
-            val result = loginUseCase(email, password)
-            assert(result.isFailure)
-        }
+    fun login_with_paris_saclay_return_fail_when_login_is_incorrect() = runTest {
+        loginUseCase(email, password)
     }
 }

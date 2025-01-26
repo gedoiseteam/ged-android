@@ -28,8 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.upsaclay.common.domain.model.Screen
-import com.upsaclay.common.domain.model.User
+import com.upsaclay.common.domain.entity.Screen
 import com.upsaclay.common.presentation.components.ProfilePicture
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.gedoise.R
@@ -37,15 +36,14 @@ import com.upsaclay.gedoise.data.BottomNavigationItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeTopBar(navController: NavController, user: User) {
+fun HomeTopBar(navController: NavController, profilePictureUrl: String?) {
     TopAppBar(
         title = {
             Text(
-                text = stringResource(id = R.string.school_name),
+                text = stringResource(id = R.string.app_name),
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.fillMaxWidth()
             )
         },
         navigationIcon = {
@@ -68,7 +66,7 @@ fun HomeTopBar(navController: NavController, user: User) {
                 onClick = { navController.navigate(Screen.PROFILE.route) },
                 modifier = Modifier.clip(shape = CircleShape)
             ) {
-                ProfilePicture(imageUrl = user.profilePictureUrl)
+                ProfilePicture(url = profilePictureUrl)
             }
         }
     )
@@ -85,8 +83,11 @@ fun MainBottomBar(
 
     NavigationBar {
         bottomNavigationItems.forEachIndexed { _, navigationItem ->
+            val selected = navigationItem.screen.route == currentRoute
+            val iconRes = if(selected) navigationItem.filledIcon else navigationItem.outlinedIcon
+
             NavigationBarItem(
-                selected = navigationItem.screen.route == currentRoute,
+                selected = selected,
                 onClick = {
                     navController.navigate(navigationItem.screen.route) {
                         launchSingleTop = true
@@ -103,7 +104,7 @@ fun MainBottomBar(
                         }
                     ) {
                         Icon(
-                            painter = painterResource(id = navigationItem.icon),
+                            painter = painterResource(id = iconRes),
                             contentDescription = stringResource(id = navigationItem.iconDescription)
                         )
                     }
@@ -128,7 +129,7 @@ private fun MainTopBarPreview() {
         TopAppBar(
             title = {
                 Text(
-                    text = stringResource(id = R.string.school_name),
+                    text = stringResource(id = R.string.app_name),
                     textAlign = TextAlign.Center,
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.titleLarge,

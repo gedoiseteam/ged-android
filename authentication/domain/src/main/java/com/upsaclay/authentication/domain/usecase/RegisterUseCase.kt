@@ -5,7 +5,6 @@ import com.upsaclay.authentication.domain.repository.FirebaseAuthenticationRepos
 class RegisterUseCase(
     private val firebaseAuthenticationRepository: FirebaseAuthenticationRepository
 ) {
-    suspend operator fun invoke(email: String, password: String): Result<Unit> {
-        return firebaseAuthenticationRepository.registerWithEmailAndPassword(email, password)
-    }
+    suspend operator fun invoke(email: String, password: String): String =
+        firebaseAuthenticationRepository.registerWithEmailAndPassword(email, password)
 }

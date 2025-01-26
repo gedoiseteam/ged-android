@@ -10,20 +10,15 @@ import kotlinx.coroutines.withContext
 internal class AuthenticationRemoteDataSource(
     private val authenticationRetrofitApi: AuthenticationRetrofitApi
 ) {
-    suspend fun loginWithParisSaclay(email: String, password: String, hash: String): Result<Unit> = withContext(Dispatchers.IO) {
-        i("Logging in with Paris-Saclay...")
-        try {
+    suspend fun loginWithParisSaclay(email: String, password: String, hash: String) {
+        withContext(Dispatchers.IO) {
+            i("Logging in with Paris-Saclay...")
             val response = authenticationRetrofitApi.login(email, password, hash)
-            if (response.isSuccessful) {
-                Result.success(Unit)
-            } else {
+            if (!response.isSuccessful) {
                 val errorMessage = formatHttpError("Error logging in with Paris-Saclay", response)
                 e(errorMessage)
-                Result.failure(IOException(errorMessage))
+                throw IOException(errorMessage)
             }
-        } catch (e: Exception) {
-            e("Error logging in with Paris-Saclay: ${e.message}")
-            Result.failure(e)
         }
     }
 }

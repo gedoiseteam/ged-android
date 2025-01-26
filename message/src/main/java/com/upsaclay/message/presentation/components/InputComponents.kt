@@ -6,11 +6,13 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -36,6 +38,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
@@ -54,14 +57,14 @@ fun MessageInput(
     val interactionSource = remember { MutableInteractionSource() }
 
     Row(
-        modifier = modifier,
+        modifier = modifier
+            .clip(ShapeDefaults.ExtraLarge)
+            .background(backgroundColor)
+            .padding(end = MaterialTheme.spacing.small),
         verticalAlignment = Alignment.CenterVertically
     ) {
         BasicTextField(
-            modifier = modifier
-                .weight(1f)
-                .clip(ShapeDefaults.ExtraLarge)
-                .background(backgroundColor),
+            modifier = modifier.weight(1f),
             value = value,
             onValueChange = onValueChange,
             keyboardOptions = KeyboardOptions(
@@ -96,16 +99,9 @@ fun MessageInput(
         }
 
         if(value.isNotBlank()) {
-            Spacer(modifier = Modifier.width(MaterialTheme.spacing.extraSmall))
-            IconButton(
+            Button(
                 onClick = onSendClick,
-                modifier = Modifier
-                    .clip(ShapeDefaults.ExtraLarge)
-                    .background(GedoiseColor.Primary),
-                colors = IconButtonDefaults.iconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = Color.White
-                )
+                contentPadding = PaddingValues()
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Default.Send,
@@ -113,6 +109,23 @@ fun MessageInput(
                 )
             }
         }
+//            IconButton(
+//                onClick = onSendClick,
+//                modifier = Modifier
+//                    .clip(ShapeDefaults.Large)
+//                    .background(MaterialTheme.colorScheme.secondary)
+//                    .padding(horizontal = MaterialTheme.spacing.extraSmall, vertical = 0.dp),
+//                colors = IconButtonDefaults.iconButtonColors(
+////                    containerColor = MaterialTheme.colorScheme.primary,
+//                    contentColor = Color.White
+//                )
+//            ) {
+//                Icon(
+//                    imageVector = Icons.AutoMirrored.Default.Send,
+//                    contentDescription = stringResource(id = R.string.send_message_icon_description)
+//                )
+//            }
+//        }
     }
 }
 

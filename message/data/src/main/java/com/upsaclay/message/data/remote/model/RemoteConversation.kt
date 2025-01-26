@@ -15,5 +15,5 @@ internal data class RemoteConversation(
 
     @get:PropertyName(ConversationField.CREATED_AT)
     @set:PropertyName(ConversationField.CREATED_AT)
-    var createdAt: Timestamp
+    var createdAt: Timestamp = Timestamp.now()
 )

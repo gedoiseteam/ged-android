@@ -21,7 +21,7 @@ fun PrimaryButton(
     onClick: () -> Unit
 ) {
     Button(
-        modifier = modifier.height(45.dp),
+        modifier = modifier,
         shape = shape,
         enabled = isEnable,
         onClick = onClick

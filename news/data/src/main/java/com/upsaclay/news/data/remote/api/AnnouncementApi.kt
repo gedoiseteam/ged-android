@@ -1,6 +1,6 @@
 package com.upsaclay.news.data.remote.api
 
-import com.upsaclay.common.domain.model.ServerResponse.EmptyResponse
+import com.upsaclay.common.domain.entity.ServerResponse.EmptyResponse
 import com.upsaclay.news.data.remote.model.RemoteAnnouncementWithUser
 import com.upsaclay.news.data.remote.model.RemoteAnnouncement
 import retrofit2.Response

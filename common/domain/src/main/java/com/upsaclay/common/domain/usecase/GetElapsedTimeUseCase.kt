@@ -1,6 +1,6 @@
 package com.upsaclay.common.domain.usecase
 
-import com.upsaclay.common.domain.model.ElapsedTime
+import com.upsaclay.common.domain.entity.ElapsedTime
 import java.time.Duration
 import java.time.LocalDateTime
 

@@ -32,18 +32,8 @@ val messageFixture2 = Message(
 
 val messagesFixture = listOf(
     messageFixture,
-    messageFixture.copy(content = "Yes"),
-    messageFixture,
     messageFixture2,
-    messageFixture2,
-    messageFixture2,
-    messageFixture2.copy(content = "T'es dispo ?"),
-    messageFixture,
-    messageFixture2,
-    messageFixture,
-    messageFixture2,
-    messageFixture2,
-    messageFixture2
+    messageFixture.copy(id = "2", date = LocalDateTime.now())
 )
 
 val conversationFixture = ConversationUI(

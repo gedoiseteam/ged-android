@@ -48,33 +48,6 @@ fun LoginButton(
 }
 
 @Composable
-fun GoogleLoginInButton(
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
-) {
-    OutlinedButton(
-        modifier = modifier.height(45.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Color.White,
-            contentColor = Color.Black
-        ),
-        border = BorderStroke(1.dp, Color.LightGray),
-        onClick = onClick
-    ) {
-        Icon(
-            modifier = Modifier.width(MaterialTheme.spacing.large),
-            painter = painterResource(R.drawable.g_logo),
-            contentDescription = null,
-            tint = Color.Unspecified
-        )
-
-        Spacer(modifier = Modifier.width(MaterialTheme.spacing.medium))
-
-        Text(text = stringResource(id = R.string.continue_with_google))
-    }
-}
-
-@Composable
 private fun LoadingLargeButton(modifier: Modifier = Modifier) {
     Button(
         onClick = { },
@@ -111,17 +84,6 @@ private fun LoginButtonPreview() {
             isLoading = isLoading,
             text = "Se connecter",
             onClick = { isLoading = !isLoading }
-        )
-    }
-}
-
-@Preview
-@Composable
-private fun GoogleLoginButtonPreview() {
-    GedoiseTheme {
-        GoogleLoginInButton(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = { }
         )
     }
 }

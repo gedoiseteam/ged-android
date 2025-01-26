@@ -1,6 +1,6 @@
 package com.upsaclay.common.utils
 
-val userFixture = com.upsaclay.common.domain.model.User(
+val userFixture = com.upsaclay.common.domain.entity.User(
     "12",
     "Pierre",
     "Dupont",
@@ -10,7 +10,7 @@ val userFixture = com.upsaclay.common.domain.model.User(
     "https://i-mom.unimedias.fr/2020/09/16/dragon-ball-songoku.jpg"
 )
 
-val userFixture2 = com.upsaclay.common.domain.model.User(
+val userFixture2 = com.upsaclay.common.domain.entity.User(
     "13",
     "Alain",
     "Robert",

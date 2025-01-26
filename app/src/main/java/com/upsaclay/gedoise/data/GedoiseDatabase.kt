@@ -15,7 +15,7 @@ import com.upsaclay.news.data.local.model.LocalAnnouncement
         LocalConversation::class,
         LocalMessage::class
     ],
-    version = 1
+    version = 2
 )
 internal abstract class GedoiseDatabase : RoomDatabase() {
     abstract fun announcementDao(): AnnouncementDao

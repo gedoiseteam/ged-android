@@ -5,11 +5,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.upsaclay.common.domain.model.User
+import com.upsaclay.common.domain.entity.User
 import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
 import com.upsaclay.news.domain.entity.Announcement
 import com.upsaclay.news.domain.entity.AnnouncementScreenState
-import com.upsaclay.news.domain.usecase.ConvertAnnouncementToJsonUseCase
 import com.upsaclay.news.domain.usecase.DeleteAnnouncementUseCase
 import com.upsaclay.news.domain.usecase.GetAnnouncementsUseCase
 import com.upsaclay.news.domain.usecase.RefreshAnnouncementsUseCase
@@ -22,13 +21,11 @@ class NewsViewModel(
     getAllAnnouncementUseCase: GetAnnouncementsUseCase,
     getCurrentUserUseCase: GetCurrentUserUseCase,
     private val refreshAnnouncementsUseCase: RefreshAnnouncementsUseCase,
-    private val deleteAnnouncementUseCase: DeleteAnnouncementUseCase,
-    private val convertAnnouncementToJsonUseCase: ConvertAnnouncementToJsonUseCase
 ) : ViewModel() {
     private val _announcementScreenState = MutableStateFlow(AnnouncementScreenState.DEFAULT)
     val announcementScreenState: Flow<AnnouncementScreenState> = _announcementScreenState
     val announcements: Flow<List<Announcement>> = getAllAnnouncementUseCase()
-    val user: Flow<User?> = getCurrentUserUseCase()
+    val currentUser: StateFlow<User?> = getCurrentUserUseCase()
     var isRefreshing by mutableStateOf(false)
         private set
 
@@ -38,13 +35,6 @@ class NewsViewModel(
             refreshAnnouncementsUseCase()
             isRefreshing = false
         }
-    }
-
-    fun convertAnnouncementToJson(announcement: Announcement): String =
-        convertAnnouncementToJsonUseCase.toJson(announcement)
-
-    fun updateAnnouncementState(state: AnnouncementScreenState) {
-        _announcementScreenState.value = state
     }
 
     fun resetAnnouncementState() {

@@ -66,9 +66,8 @@ fun AccountScreen(
     val accountScreenState by accountViewModel.accountScreenState.collectAsState()
     var showBottomSheet by remember { mutableStateOf(false) }
     var showDeleteProfilePictureDialog by remember { mutableStateOf(false) }
-    var showCancelModificationDialog by remember { mutableStateOf(false) }
     var showLoadingDialog by remember { mutableStateOf(false) }
-    val user by accountViewModel.user.collectAsState()
+    val user by accountViewModel.currentUser.collectAsState()
 
     val hideBottomSheet: () -> Unit = {
         scope.launch { sheetState.hide() }.invokeOnCompletion {
@@ -119,20 +118,6 @@ fun AccountScreen(
         )
     }
 
-    if (showCancelModificationDialog) {
-        SensibleActionDialog(
-            message = stringResource(id = com.upsaclay.common.R.string.discard_modification_dialog_text),
-            confirmText = stringResource(id = com.upsaclay.common.R.string.discard),
-            onConfirm = {
-                accountViewModel.resetProfilePictureUri()
-                accountViewModel.updateAccountScreenState(AccountScreenState.READ)
-                showCancelModificationDialog = false
-            },
-            onCancel = { showCancelModificationDialog = false },
-            onDismiss = { showCancelModificationDialog = false }
-        )
-    }
-
     if (showLoadingDialog) {
         LoadingDialog()
     }
@@ -161,7 +146,10 @@ fun AccountScreen(
             AccountTopBar(
                 isEdited = accountScreenState == AccountScreenState.EDIT,
                 onSaveClick = { accountViewModel.updateUserProfilePicture() },
-                onCancelClick = { showCancelModificationDialog = true },
+                onCancelClick = {
+                    accountViewModel.resetProfilePictureUri()
+                    accountViewModel.updateAccountScreenState(AccountScreenState.READ)
+                },
                 onBackClick = { navController.popBackStack() }
             )
         }
@@ -236,24 +224,22 @@ private fun ProfilePictureSection(
     profilePictureUri?.let { uri ->
         if (isEdited) {
             ProfilePictureWithIcon(
-                imageUri = uri,
+                uri = uri,
                 iconVector = Icons.Default.Edit,
-                contentDescription = "",
                 scale = scaleImage,
                 onClick = onClick
             )
         } else {
             ProfilePicture(
-                imageUri = uri,
+                uri = uri,
                 scale = scaleImage,
                 onClick = onClick
             )
         }
     } ?: run {
         ProfilePictureWithIcon(
-            imageUrl = profilePictureUrl,
+            url = profilePictureUrl,
             iconVector = Icons.Default.Edit,
-            contentDescription = "",
             scale = scaleImage,
             onClick = onClick
         )
@@ -329,8 +315,7 @@ private fun AccountScreenPreview() {
                     )
                     if (!hasPictureChanged) {
                         ProfilePictureWithIcon(
-                            imageUrl = "",
-                            contentDescription = "",
+                            url = "",
                             scale = scaleImage,
                             iconVector = Icons.Default.Edit,
                             onClick = {}

@@ -7,14 +7,15 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 internal class AuthenticationRepositoryImpl(
     private val authenticationRemoteDataSource: AuthenticationRemoteDataSource,
     private val authenticationLocalDataSource: AuthenticationLocalDataSource,
 ) : AuthenticationRepository {
-    private val _isAuthenticated = MutableStateFlow(false)
-    override val isAuthenticated: Flow<Boolean> = _isAuthenticated
+    private val _isAuthenticated = MutableStateFlow<Boolean?>(null)
+    override val isAuthenticated: Flow<Boolean?> = _isAuthenticated
 
     init {
         CoroutineScope(Dispatchers.IO).launch {
@@ -24,8 +25,8 @@ internal class AuthenticationRepositoryImpl(
         }
     }
 
-    override suspend fun loginWithParisSaclay(email: String, password: String, hash: String): Result<Unit> {
-        return authenticationRemoteDataSource.loginWithParisSaclay(email, password, hash)
+    override suspend fun loginWithParisSaclay(email: String, password: String, hash: String) {
+        authenticationRemoteDataSource.loginWithParisSaclay(email, password, hash)
     }
 
     override suspend fun setAuthenticated(isAuthenticated: Boolean) {

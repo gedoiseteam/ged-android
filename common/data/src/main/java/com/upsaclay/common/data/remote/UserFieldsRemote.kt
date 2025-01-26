@@ -1,6 +1,6 @@
 package com.upsaclay.common.data.remote
 
-object UserFieldsRemote {
+internal object UserFieldsRemote {
     const val USER_ID = "user_id"
     const val FIRST_NAME = "first_name"
     const val LAST_NAME = "last_name"

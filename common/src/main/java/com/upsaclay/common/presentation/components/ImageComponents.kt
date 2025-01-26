@@ -22,7 +22,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
+import coil3.compose.AsyncImage
 import com.upsaclay.common.R
 import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
@@ -32,7 +32,7 @@ import com.upsaclay.common.presentation.theme.spacing
 fun ProfilePictureWithIcon(
     modifier: Modifier = Modifier,
     scale: Float = 1f,
-    imageUri: Uri?,
+    uri: Uri?,
     iconVector: ImageVector = Icons.Default.Edit,
     iconBackgroundColor: Color = MaterialTheme.colorScheme.primary,
     iconColor: Color = Color.White,
@@ -41,7 +41,7 @@ fun ProfilePictureWithIcon(
 ) {
     ImageWithIcon(
         modifier = modifier,
-        model = imageUri ?: R.drawable.default_profile_picture,
+        model = uri ?: R.drawable.default_profile_picture,
         scale = scale,
         iconVector = iconVector,
         iconBackgroundColor = iconBackgroundColor,
@@ -55,7 +55,7 @@ fun ProfilePictureWithIcon(
 fun ProfilePictureWithIcon(
     modifier: Modifier = Modifier,
     scale: Float = 1f,
-    imageUrl: String?,
+    url: String?,
     iconVector: ImageVector = Icons.Default.Edit,
     iconBackgroundColor: Color = MaterialTheme.colorScheme.primary,
     iconColor: Color = Color.White,
@@ -64,7 +64,7 @@ fun ProfilePictureWithIcon(
 ) {
     ImageWithIcon(
         modifier = modifier,
-        model = imageUrl ?: R.drawable.default_profile_picture,
+        model = url ?: R.drawable.default_profile_picture,
         scale = scale,
         iconVector = iconVector,
         iconBackgroundColor = iconBackgroundColor,
@@ -78,11 +78,11 @@ fun ProfilePictureWithIcon(
 fun ProfilePicture(
     modifier: Modifier = Modifier,
     scale: Float = 1f,
-    imageUrl: String?,
+    url: String?,
     onClick: (() -> Unit)? = null
 ) {
     AsyncImage(
-        model = imageUrl ?: R.drawable.default_profile_picture,
+        model = url ?: R.drawable.default_profile_picture,
         contentDescription = "",
         contentScale = ContentScale.Crop,
         modifier = onClick?.let {
@@ -102,11 +102,11 @@ fun ProfilePicture(
 fun ProfilePicture(
     modifier: Modifier = Modifier,
     scale: Float = 1f,
-    imageUri: Uri?,
+    uri: Uri?,
     onClick: (() -> Unit)? = null
 ) {
     AsyncImage(
-        model = imageUri ?: R.drawable.default_profile_picture,
+        model = uri ?: R.drawable.default_profile_picture,
         contentDescription = "",
         contentScale = ContentScale.Crop,
         modifier = onClick?.let {
@@ -126,14 +126,14 @@ fun ProfilePicture(
 fun ProfilePictureWithBubble(
     modifier: Modifier = Modifier,
     scale: Float = 1f,
-    imageUrl: String?,
+    url: String?,
     bubbleBackgroundColor: Color,
     contentDescription: String,
     onClick: (() -> Unit)? = null
 ) {
     ImageWithBubble(
         modifier = modifier,
-        model = imageUrl ?: R.drawable.default_profile_picture,
+        model = url ?: R.drawable.default_profile_picture,
         scale = scale,
         bubbleBackgroundColor = bubbleBackgroundColor,
         contentDescription = contentDescription,
@@ -263,7 +263,7 @@ private fun ProfilePicturePreview() {
                 contentDescription = ""
             )
             ProfilePicture(
-                imageUrl = null,
+                url = null,
                 onClick = {}
             )
         }
@@ -280,7 +280,7 @@ private fun ProfilePictureWithIconPreview() {
                 contentDescription = ""
             )
             ProfilePictureWithIcon(
-                imageUrl = null,
+                url = null,
                 iconVector = Icons.Default.Edit,
                 contentDescription = "",
                 iconBackgroundColor = MaterialTheme.colorScheme.primary,
@@ -300,7 +300,7 @@ private fun ProfilePictureWithBubblePreview() {
                 contentDescription = ""
             )
             ProfilePictureWithBubble(
-                imageUrl = null,
+                url = null,
                 bubbleBackgroundColor = GedoiseColor.OnlineColor,
                 contentDescription = "",
                 onClick = {}

@@ -12,13 +12,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.upsaclay.common.domain.entity.User
 import com.upsaclay.common.presentation.components.ProfilePicture
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.common.utils.userFixture
 
 @Composable
-fun UserItem(user: com.upsaclay.common.domain.model.User, onClick: () -> Unit) {
+fun UserItem(user: User, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -29,7 +30,7 @@ fun UserItem(user: com.upsaclay.common.domain.model.User, onClick: () -> Unit) {
             ),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        ProfilePicture(imageUrl = user.profilePictureUrl, scale = 0.5f)
+        ProfilePicture(url = user.profilePictureUrl, scale = 0.5f)
 
         Spacer(modifier = Modifier.width(MaterialTheme.spacing.smallMedium))
 

@@ -9,9 +9,9 @@ import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.performClick
 import androidx.navigation.NavController
-import com.upsaclay.authentication.domain.model.AuthenticationState
-import com.upsaclay.authentication.presentation.AuthenticationScreen
-import com.upsaclay.authentication.presentation.AuthenticationViewModel
+import com.upsaclay.authentication.domain.entity.AuthenticationState
+import com.upsaclay.authentication.presentation.screens.AuthenticationScreen
+import com.upsaclay.authentication.presentation.viewmodels.AuthenticationViewModel
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.MutableStateFlow

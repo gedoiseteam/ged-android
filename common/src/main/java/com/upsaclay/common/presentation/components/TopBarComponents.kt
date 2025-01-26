@@ -16,6 +16,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.upsaclay.common.presentation.theme.GedoiseTheme
@@ -34,7 +35,7 @@ fun SmallTopBarBack(
     }
 ) {
     TopAppBar(
-        title = { Text(text = title) },
+        title = { Text(text = title, fontWeight = FontWeight.Bold) },
         navigationIcon = {
             IconButton(onClick = onBackClick) {
                 icon()
@@ -53,7 +54,7 @@ fun SmallTopBarEdit(
     confirmText: String = stringResource(id = com.upsaclay.common.R.string.save)
 ) {
     TopAppBar(
-        title = { Text(text = title) },
+        title = { Text(text = title, fontWeight = FontWeight.Bold) },
         navigationIcon = {
             IconButton(onClick = onCancelClick) {
                 Icon(
@@ -64,9 +65,6 @@ fun SmallTopBarEdit(
         },
         actions = {
             Button(
-                modifier = Modifier
-                    .padding(end = MaterialTheme.spacing.small)
-                    .height(36.dp),
                 enabled = isButtonEnable,
                 contentPadding = PaddingValues(
                     vertical = MaterialTheme.spacing.default,

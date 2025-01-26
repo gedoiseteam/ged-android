@@ -1,6 +1,6 @@
 package com.upsaclay.common
 
-import com.upsaclay.common.domain.usecase.DeleteUserProfilePictureUseCase
+import com.upsaclay.common.domain.usecase.DeleteProfilePictureUseCase
 import com.upsaclay.common.domain.usecase.GetUsersUseCase
 import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
 import com.upsaclay.common.domain.usecase.GetDrawableUriUseCase
@@ -13,7 +13,7 @@ import org.koin.dsl.module
 
 val commonModule = module {
 
-    singleOf(::DeleteUserProfilePictureUseCase)
+    singleOf(::DeleteProfilePictureUseCase)
     singleOf(::GetUsersUseCase)
     singleOf(::GetCurrentUserUseCase)
     singleOf(::GetDrawableUriUseCase)

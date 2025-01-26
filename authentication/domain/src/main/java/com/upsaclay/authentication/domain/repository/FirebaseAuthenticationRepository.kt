@@ -1,13 +1,13 @@
 package com.upsaclay.authentication.domain.repository
 
 interface FirebaseAuthenticationRepository {
-    suspend fun loginWithEmailAndPassword(email: String, password: String): Result<Unit>
+    suspend fun loginWithEmailAndPassword(email: String, password: String)
 
-    suspend fun registerWithEmailAndPassword(email: String, password: String): Result<Unit>
+    suspend fun registerWithEmailAndPassword(email: String, password: String): String
 
-    suspend fun logout(): Result<Unit>
+    suspend fun logout()
 
-    suspend fun sendVerificationEmail(): Result<Unit>
+    suspend fun sendVerificationEmail()
 
     fun isUserEmailVerified(): Boolean
 }
