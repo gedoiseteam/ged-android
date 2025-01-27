@@ -55,6 +55,7 @@ dependencies {
     implementation(libs.koin.core)
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.coil.compose)
+    implementation(libs.coil.network)
     implementation(libs.jakewharton.timber)
 
     testImplementation(libs.junit)

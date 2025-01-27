@@ -60,7 +60,7 @@ class AccountViewModel(
         _accountScreenState.value = AccountScreenState.LOADING
 
         viewModelScope.launch {
-            val (id, url) = currentUser.first()?.id to currentUser.first()?.profilePictureUrl
+            val (id, url) = currentUser.value?.id to currentUser.value?.profilePictureUrl
             try {
                 deleteUserProfilePictureUseCase(id!!, url!!)
                 _accountScreenState.value = AccountScreenState.PROFILE_PICTURE_UPDATED

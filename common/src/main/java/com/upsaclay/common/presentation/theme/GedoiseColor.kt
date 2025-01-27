@@ -23,6 +23,7 @@ object GedoiseColor {
     val LightGray = Color(0xFFEFEFEF)
     val DarkGray = Color(0xFF3C3C3C)
     val PreviewText = Color(0xFF6F7181)
+    val ProfilePictureErrorLight = Color(0xFFF2F4F5)
     val OnlineColor = Color(0xFF4ACB1B)
     val ButtonShowColor = Color(0xFFF3F2F8)
     val PastelBlue = Color(0xFFDBF2F1)

@@ -102,18 +102,18 @@ fun ProfileScreen(
                     userFullName = user?.fullName ?: "Unknown"
                 )
 
-            ClickableItem(
-                modifier = Modifier.fillMaxWidth(),
-                text = { Text(text = stringResource(id = R.string.account_informations)) },
-                icon = {
-                    Icon(
-                        modifier = Modifier.size(28.dp),
-                        painter = painterResource(id = com.upsaclay.common.R.drawable.ic_person),
-                        contentDescription = stringResource(id = R.string.account_icon_description)
-                    )
-                },
-                onClick = { navController.navigate(Screen.ACCOUNT.route) }
-            )
+                ClickableItem(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = { Text(text = stringResource(id = R.string.account_informations)) },
+                    icon = {
+                        Icon(
+                            modifier = Modifier.size(28.dp),
+                            painter = painterResource(id = com.upsaclay.common.R.drawable.ic_person),
+                            contentDescription = stringResource(id = R.string.account_icon_description)
+                        )
+                    },
+                    onClick = { navController.navigate(Screen.ACCOUNT.route) }
+                )
 
                 ClickableItem(
                     modifier = Modifier.fillMaxWidth(),

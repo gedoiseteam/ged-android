@@ -1,7 +1,6 @@
 package com.upsaclay.common.presentation.components
 
 import android.net.Uri
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -17,9 +16,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
@@ -94,7 +93,8 @@ fun ProfilePicture(
             modifier
                 .size(100.dp * scale)
                 .clip(CircleShape)
-        }
+        },
+        error = ColorPainter(GedoiseColor.ProfilePictureErrorLight)
     )
 }
 
@@ -118,7 +118,8 @@ fun ProfilePicture(
             modifier
                 .size(100.dp * scale)
                 .clip(CircleShape)
-        }
+        },
+        error = ColorPainter(GedoiseColor.ProfilePictureErrorLight)
     )
 }
 
@@ -168,7 +169,8 @@ private fun ImageWithIcon(
                     .align(Alignment.Center)
                     .size(100.dp * scale)
                     .clip(CircleShape)
-            }
+            },
+            error = ColorPainter(GedoiseColor.ProfilePictureErrorLight)
         )
 
         Box(
@@ -225,7 +227,8 @@ private fun ImageWithBubble(
                     .align(Alignment.Center)
                     .size(100.dp * scale)
                     .clip(CircleShape)
-            }
+            },
+            error = ColorPainter(GedoiseColor.ProfilePictureErrorLight)
         )
 
         Box(
@@ -258,10 +261,6 @@ private fun ImageWithBubble(
 private fun ProfilePicturePreview() {
     GedoiseTheme {
         Box(Modifier.size(100.dp)) {
-            Image(
-                painter = painterResource(id = R.drawable.default_profile_picture),
-                contentDescription = ""
-            )
             ProfilePicture(
                 url = null,
                 onClick = {}
@@ -275,10 +274,6 @@ private fun ProfilePicturePreview() {
 private fun ProfilePictureWithIconPreview() {
     GedoiseTheme {
         Box(Modifier.size(100.dp)) {
-            Image(
-                painter = painterResource(id = R.drawable.default_profile_picture),
-                contentDescription = ""
-            )
             ProfilePictureWithIcon(
                 url = null,
                 iconVector = Icons.Default.Edit,
@@ -295,10 +290,6 @@ private fun ProfilePictureWithIconPreview() {
 private fun ProfilePictureWithBubblePreview() {
     GedoiseTheme {
         Box(Modifier.size(100.dp)) {
-            Image(
-                painter = painterResource(id = R.drawable.default_profile_picture),
-                contentDescription = ""
-            )
             ProfilePictureWithBubble(
                 url = null,
                 bubbleBackgroundColor = GedoiseColor.OnlineColor,

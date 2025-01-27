@@ -59,7 +59,7 @@ class CreateAnnouncementViewModel(
         )
 
         _screenState.value = AnnouncementScreenState.LOADING
-        
+
         viewModelScope.launch {
             try {
                 createAnnouncementUseCase(announcement)
