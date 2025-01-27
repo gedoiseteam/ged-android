@@ -8,9 +8,15 @@ import com.upsaclay.news.domain.entity.Announcement
 import com.upsaclay.news.domain.entity.AnnouncementScreenState
 import com.upsaclay.news.domain.usecase.DeleteAnnouncementUseCase
 import com.upsaclay.news.domain.usecase.GetAnnouncementUseCase
+import com.upsaclay.news.domain.usecase.GetAnnouncementsUseCase
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import java.io.IOException
 
@@ -18,14 +24,24 @@ class ReadAnnouncementViewModel(
     announcementId: String,
     getCurrentUserUseCase: GetCurrentUserUseCase,
     getAnnouncementUseCase: GetAnnouncementUseCase,
-    private val deleteAnnouncementUseCase: DeleteAnnouncementUseCase
+    getAnnouncementsUseCase: GetAnnouncementsUseCase,
+    private val deleteAnnouncementUseCase: DeleteAnnouncementUseCase,
 ): ViewModel() {
     private val _announcement = MutableStateFlow(getAnnouncementUseCase(announcementId))
     private val _screenState = MutableStateFlow(AnnouncementScreenState.DEFAULT)
-
     val announcement: StateFlow<Announcement?> = _announcement
     val screenState: StateFlow<AnnouncementScreenState> = _screenState
     val currentUser: StateFlow<User?> = getCurrentUserUseCase()
+
+    init {
+        viewModelScope.launch {
+            getAnnouncementsUseCase().mapNotNull { announcements ->
+                announcements.firstOrNull { it.id == announcementId }
+            }.collect {
+                _announcement.value = it
+            }
+        }
+    }
 
     fun deleteAnnouncement() {
         if (_announcement.value == null) {
@@ -36,6 +52,7 @@ class ReadAnnouncementViewModel(
         viewModelScope.launch {
             try {
                 deleteAnnouncementUseCase(_announcement.value!!)
+                _screenState.value = AnnouncementScreenState.DELETED
             } catch (e: IOException) {
                 _screenState.value = AnnouncementScreenState.DELETE_ERROR
             }

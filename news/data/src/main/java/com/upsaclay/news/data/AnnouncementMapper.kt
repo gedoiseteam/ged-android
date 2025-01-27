@@ -1,8 +1,7 @@
 package com.upsaclay.news.data
 
 import com.upsaclay.common.domain.entity.User
-import com.upsaclay.common.domain.usecase.ConvertLocalDateTimeUseCase
-import com.upsaclay.common.domain.usecase.ConvertTimestampUseCase
+import com.upsaclay.common.domain.usecase.ConvertDateUseCase
 import com.upsaclay.news.data.remote.model.RemoteAnnouncementWithUser
 import com.upsaclay.news.data.local.model.LocalAnnouncement
 import com.upsaclay.news.data.remote.model.RemoteAnnouncement
@@ -14,7 +13,7 @@ internal object AnnouncementMapper {
         announcementId = announcement.id,
         announcementTitle = announcement.title,
         announcementContent = announcement.content,
-        announcementDate = ConvertLocalDateTimeUseCase.toTimestamp(announcement.date),
+        announcementDate = ConvertDateUseCase.toTimestamp(announcement.date),
         announcementState = announcement.state,
         userId = announcement.author.id,
         userFirstName = announcement.author.firstName,
@@ -29,7 +28,7 @@ internal object AnnouncementMapper {
         id = localAnnouncement.announcementId,
         title = localAnnouncement.announcementTitle,
         content = localAnnouncement.announcementContent,
-        date = ConvertTimestampUseCase.toLocalDateTime(localAnnouncement.announcementDate),
+        date = ConvertDateUseCase.toLocalDateTime(localAnnouncement.announcementDate),
         author = User(
             id = localAnnouncement.userId,
             firstName = localAnnouncement.userFirstName,
@@ -46,7 +45,7 @@ internal object AnnouncementMapper {
         id = remoteAnnouncement.announcementId,
         title = remoteAnnouncement.announcementTitle,
         content = remoteAnnouncement.announcementContent,
-        date = ConvertTimestampUseCase.toLocalDateTime(remoteAnnouncement.announcementDate),
+        date = ConvertDateUseCase.toLocalDateTime(remoteAnnouncement.announcementDate),
         author = User(
             id = remoteAnnouncement.userId,
             firstName = remoteAnnouncement.userFirstName,
@@ -63,7 +62,7 @@ internal object AnnouncementMapper {
         announcementId = announcement.id,
         announcementTitle = announcement.title,
         announcementContent = announcement.content,
-        announcementDate = ConvertLocalDateTimeUseCase.toTimestamp(announcement.date),
+        announcementDate = ConvertDateUseCase.toTimestamp(announcement.date),
         userId = announcement.author.id
     )
 }

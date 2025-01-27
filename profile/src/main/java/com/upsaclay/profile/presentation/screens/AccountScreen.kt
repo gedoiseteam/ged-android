@@ -107,7 +107,7 @@ fun AccountScreen(
 
     if (showDeleteProfilePictureDialog) {
         SensibleActionDialog(
-            message = stringResource(id = R.string.delete_profile_picture_dialog_text),
+            text = stringResource(id = R.string.delete_profile_picture_dialog_text),
             confirmText = stringResource(id = com.upsaclay.common.R.string.delete),
             onConfirm = {
                 showDeleteProfilePictureDialog = false

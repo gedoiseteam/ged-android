@@ -9,12 +9,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -91,7 +95,7 @@ internal fun HeaderAnnouncement(
 
         Text(
             text = elapsedTimeValue,
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.bodySmall,
             color = GedoiseColor.PreviewText
         )
     }
@@ -138,53 +142,58 @@ internal fun AnnouncementItem(
             .clickable(onClick = onClick)
             .fillMaxWidth()
             .padding(MaterialTheme.spacing.smallMedium),
-        verticalAlignment = Alignment.Top
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        ProfilePicture(
-            url = announcement.author.profilePictureUrl,
-            scale = 0.5f
-        )
+        Row(
+            modifier = Modifier.weight(1f),
+            verticalAlignment = Alignment.Top
+        ) {
+            ProfilePicture(
+                url = announcement.author.profilePictureUrl,
+                scale = 0.5f
+            )
 
-        Spacer(modifier = Modifier.width(MaterialTheme.spacing.smallMedium))
+            Spacer(modifier = Modifier.width(MaterialTheme.spacing.smallMedium))
 
-        Column {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Column {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = announcement.author.fullName,
+                        style = MaterialTheme.typography.titleSmall,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(fill = false, weight = 1f)
+                    )
+
+                    Spacer(modifier = Modifier.width(MaterialTheme.spacing.small))
+
+                    Text(
+                        text = elapsedTimeValue,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = GedoiseColor.PreviewText
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(2.dp))
+
                 Text(
-                    text = announcement.author.fullName,
-                    style = MaterialTheme.typography.titleSmall,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(fill = false, weight = 1f)
-                )
-
-                Spacer(modifier = Modifier.width(MaterialTheme.spacing.small))
-
-                Text(
-                    text = elapsedTimeValue,
+                    text = announcement.title ?: announcement.content,
+                    color = GedoiseColor.PreviewText,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = GedoiseColor.PreviewText
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
-
-            Spacer(modifier = Modifier.height(2.dp))
-
-            Text(
-                text = announcement.title ?: announcement.content,
-                color = GedoiseColor.PreviewText,
-                style = MaterialTheme.typography.bodyMedium,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
         }
 
-        when(announcement.state) {
+        when (announcement.state) {
             AnnouncementState.LOADING -> {
-                CircularProgressBar(color = GedoiseColor.Gray)
+                CircularProgressBar(scale = 0.4f)
             }
 
             AnnouncementState.ERROR -> {
                 Icon(
-                    modifier = Modifier.size(24.dp),
+                    modifier = Modifier.scale(0.8f),
                     painter = painterResource(id = com.upsaclay.common.R.drawable.ic_info_outline),
                     contentDescription = null,
                     tint = GedoiseColor.Red
@@ -214,9 +223,25 @@ private fun AnnouncementItemPreview() {
 @Composable
 private fun AnnouncementItemWithTitlePreview() {
     GedoiseTheme {
-        AnnouncementItem(
-            announcement = announcementFixture,
-            onClick = { }
-        )
+        Column {
+            AnnouncementItem(
+                announcement = announcementFixture,
+                onClick = { }
+            )
+
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
+
+            AnnouncementItem(
+                announcement = announcementFixture.copy(state = AnnouncementState.LOADING),
+                onClick = { }
+            )
+
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
+
+            AnnouncementItem(
+                announcement = announcementFixture.copy(state = AnnouncementState.ERROR),
+                onClick = { }
+            )
+        }
     }
 }

@@ -69,7 +69,7 @@ fun NewsScreen(
             RecentAnnouncementSection(
                 announcements = announcements,
                 onClickAnnouncement = {
-                    navController.navigate(Screen.READ_ANNOUNCEMENT.route + "announcementId=${it.id}")
+                    navController.navigate(Screen.READ_ANNOUNCEMENT.route + "?announcementId=${it.id}")
                 }
             )
             PostSection()

@@ -9,10 +9,16 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,36 +26,59 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import com.upsaclay.common.domain.d
 import com.upsaclay.common.domain.usecase.FormatLocalDateTimeUseCase
 import com.upsaclay.common.presentation.components.ProfilePicture
 import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
+import com.upsaclay.message.R
 import com.upsaclay.message.domain.entity.Message
+import com.upsaclay.message.domain.entity.MessageState
 import com.upsaclay.message.messageFixture
 import java.time.LocalDateTime
 
 @Composable
 fun SentMessageItem(
     modifier: Modifier = Modifier,
-    text: String,
-    date: LocalDateTime
+    message: Message
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.End
+        horizontalArrangement = Arrangement.End,
+        verticalAlignment = Alignment.Bottom
     ) {
         Spacer(modifier = Modifier.fillMaxWidth(0.2f))
 
         MessageText(
-            text = text,
+            text = message.content,
             textColor = Color.White,
-            date = date,
+            date = message.date,
             backgroundColor = MaterialTheme.colorScheme.primary,
             dateTimeTextColor = Color(0xFFD1D3D8)
         )
+
+        when(message.state) {
+            MessageState.LOADING -> Icon(
+                modifier = Modifier.scale(0.7f),
+                painter = painterResource(com.upsaclay.common.R.drawable.ic_outlined_send),
+                contentDescription = "",
+                tint = Color.Gray
+            )
+
+            MessageState.ERROR -> Icon(
+                modifier = Modifier.scale(0.8f),
+                imageVector = Icons.Outlined.Info,
+                contentDescription = "",
+                tint = GedoiseColor.Red
+            )
+
+            else -> {}
+        }
     }
 }
 
@@ -60,8 +89,6 @@ fun ReceiveMessageItem(
     message: Message,
     displayProfilePicture: Boolean
 ) {
-    val backgroundColor = if(isSystemInDarkTheme()) GedoiseColor.DarkGray else GedoiseColor.LightGray
-
     Row(
         modifier = modifier.fillMaxWidth(0.8f),
         verticalAlignment = Alignment.Bottom
@@ -77,7 +104,7 @@ fun ReceiveMessageItem(
         MessageText(
             text = message.content,
             date = message.date,
-            backgroundColor = backgroundColor,
+            backgroundColor = GedoiseColor.LightGray,
             textColor = MaterialTheme.colorScheme.onBackground,
             dateTimeTextColor = Color(0xFF8E8E93)
         )
@@ -142,7 +169,17 @@ private val longtext = "Bonjour, j'espère que vous allez bien. " +
 @Composable
 private fun SentMessageItemPreview() {
     GedoiseTheme {
-        SentMessageItem(text = mediumText, date = LocalDateTime.now())
+        Column(verticalArrangement = Arrangement.SpaceAround) {
+            SentMessageItem(message = messageFixture)
+
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
+
+            SentMessageItem(message = messageFixture.copy(state = MessageState.ERROR))
+
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
+
+            SentMessageItem(message = messageFixture.copy(state = MessageState.LOADING))
+        }
     }
 }
 

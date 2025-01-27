@@ -154,9 +154,11 @@ fun ReadAnnouncementScreen(
             announcement?.title?.let {
                 Text(
                     text = it,
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleMedium,
+                    fontSize = MaterialTheme.typography.titleMedium.fontSize * 1.2f
                 )
-                Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
+
+                Spacer(modifier = Modifier.height(MaterialTheme.spacing.smallMedium))
             }
 
             announcement?.content?.let {
@@ -181,10 +183,11 @@ fun ReadAnnouncementScreen(
                             )
                         },
                         onClick = {
-                            navController.navigate(Screen.EDIT_ANNOUNCEMENT.route)
+                            navController.navigate(Screen.EDIT_ANNOUNCEMENT.route + "?announcementId=$announcementId")
                             hideBottomSheet()
                         }
                     )
+
                     ClickableItem(
                         modifier = Modifier.fillMaxWidth(),
                         text = {
@@ -205,6 +208,8 @@ fun ReadAnnouncementScreen(
                             showDeleteAnnouncementDialog = true
                         }
                     )
+
+                    Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
                 }
             }
         }
@@ -241,9 +246,12 @@ private fun EditableTopSection(
 }
 
 @Composable
-private fun DeleteAnnouncementDialog(onConfirm: () -> Unit, onCancel: () -> Unit) {
+private fun DeleteAnnouncementDialog(
+    onConfirm: () -> Unit,
+    onCancel: () -> Unit
+) {
     SensibleActionDialog(
-        message = stringResource(id = R.string.delete_announcement_dialog_text),
+        text = stringResource(id = R.string.delete_announcement_dialog_text),
         onDismiss = onCancel,
         confirmText = stringResource(id = com.upsaclay.common.R.string.delete),
         onConfirm = onConfirm,
@@ -276,11 +284,12 @@ private fun ReadOnlyAnnouncementScreenPreview() {
             announcement.title?.let {
                 Text(
                     text = it,
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleMedium,
+                    fontSize = MaterialTheme.typography.titleMedium.fontSize * 1.2f
                 )
             }
 
-            Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.smallMedium))
 
             Text(
                 text = announcement.content,
@@ -312,11 +321,12 @@ private fun EditableAnnouncementScreenPreview() {
             announcement.title?.let {
                 Text(
                     text = it,
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleMedium,
+                    fontSize = MaterialTheme.typography.titleMedium.fontSize * 1.2f
                 )
             }
 
-            Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.smallMedium))
 
             Text(
                 text = announcement.content,

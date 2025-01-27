@@ -28,7 +28,6 @@ internal class MessageRepositoryImpl(
     override suspend fun createMessage(message: Message) {
         messageLocalDataSource.insertMessage(message)
         messageRemoteDataSource.createMessage(message)
-        messageLocalDataSource.updateMessage(message.copy(state = MessageState.SENT))
     }
 
     override suspend fun updateMessage(message: Message) {

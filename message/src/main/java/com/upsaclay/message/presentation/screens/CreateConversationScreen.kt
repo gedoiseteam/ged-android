@@ -61,7 +61,7 @@ fun CreateConversationScreen(
                             user = user,
                             onClick = {
                                 val conversationJson = createConversationViewModel.generateConversationJson(user)
-                                navController.navigate(Screen.CHAT.route + "conversation=$conversationJson") {
+                                navController.navigate(Screen.CHAT.route + "?conversation=$conversationJson") {
                                     popUpTo(Screen.CREATE_CONVERSATION.route) { inclusive = true }
                                 }
                             }

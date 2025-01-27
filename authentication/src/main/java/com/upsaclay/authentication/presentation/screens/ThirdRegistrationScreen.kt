@@ -80,7 +80,7 @@ fun ThirdRegistrationScreen(
             }
             RegistrationState.REGISTERED -> {
                 registrationViewModel.resetRegistrationState()
-                navController.navigate(Screen.EMAIL_VERIFICATION.route) {
+                navController.navigate(Screen.EMAIL_VERIFICATION.route + "?email=${registrationViewModel.email}") {
                     popUpTo(navController.graph.id) { inclusive = true }
                 }
             }

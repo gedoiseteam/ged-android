@@ -48,11 +48,8 @@ fun HomeTopBar(navController: NavController, profilePictureUrl: String?) {
         },
         navigationIcon = {
             IconButton(
-                onClick = {
-                    navController.navigate(Screen.NEWS.route) {
-                        launchSingleTop = true
-                    }
-                }
+                onClick = { },
+                enabled = false
             ) {
                 Image(
                     painter = painterResource(id = com.upsaclay.common.R.drawable.ged_logo),
@@ -138,7 +135,8 @@ private fun MainTopBarPreview() {
             },
             navigationIcon = {
                 IconButton(
-                    onClick = { }
+                    onClick = { },
+                    enabled = false
                 ) {
                     Image(
                         painter = painterResource(id = com.upsaclay.common.R.drawable.ged_logo),

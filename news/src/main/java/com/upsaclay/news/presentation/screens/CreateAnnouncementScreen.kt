@@ -106,14 +106,17 @@ fun CreateAnnouncementScreen(
                     placeholder = {
                         Text(
                             text = stringResource(id = R.string.title_field_entry),
-                            style = MaterialTheme.typography.titleMedium
+                            style = MaterialTheme.typography.titleMedium,
+                            fontSize = MaterialTheme.typography.titleMedium.fontSize * 1.2f
                         )
                     },
                     onValueChange = { createAnnouncementViewModel.updateTitle(it) },
-                    textStyle = MaterialTheme.typography.titleMedium
+                    textStyle = MaterialTheme.typography.titleMedium.copy(
+                        fontSize = MaterialTheme.typography.titleMedium.fontSize * 1.2f
+                    )
                 )
 
-                Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
+                Spacer(modifier = Modifier.height(MaterialTheme.spacing.smallMedium))
 
                 TransparentTextField(
                     modifier = Modifier.fillMaxWidth(),
@@ -170,13 +173,16 @@ private fun CreateAnnouncementScreenPreview() {
                     placeholder = {
                         Text(
                             text = stringResource(id = R.string.title_field_entry),
-                            style = MaterialTheme.typography.titleMedium
+                            style = MaterialTheme.typography.titleMedium,
+                            fontSize = MaterialTheme.typography.titleMedium.fontSize * 1.2f
                         )
                     },
-                    textStyle = MaterialTheme.typography.titleMedium
+                    textStyle = MaterialTheme.typography.titleMedium.copy(
+                        fontSize = MaterialTheme.typography.titleMedium.fontSize * 1.2f
+                    )
                 )
 
-                Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
+                Spacer(modifier = Modifier.height(MaterialTheme.spacing.smallMedium))
 
                 TransparentTextField(
                     value = content,

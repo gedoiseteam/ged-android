@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.upsaclay.authentication.domain.entity.RegistrationState
 import com.upsaclay.authentication.domain.entity.exception.AuthenticationException
-import com.upsaclay.authentication.domain.entity.exception.FirebaseAuthErrorCode
+import com.upsaclay.authentication.domain.entity.exception.AuthErrorCode
 import com.upsaclay.authentication.domain.usecase.RegisterUseCase
 import com.upsaclay.authentication.domain.usecase.VerifyEmailFormatUseCase
 import com.upsaclay.common.domain.entity.User
@@ -109,7 +109,7 @@ class RegistrationViewModel(
             } catch (e: Exception) {
                 if(e is AuthenticationException) {
                     _registrationState.value = when(e.code) {
-                        FirebaseAuthErrorCode.EMAIL_ALREADY_EXIST -> RegistrationState.USER_ALREADY_EXIST
+                        AuthErrorCode.EMAIL_ALREADY_EXIST -> RegistrationState.USER_ALREADY_EXIST
                         else -> RegistrationState.ERROR
                     }
                 } else {

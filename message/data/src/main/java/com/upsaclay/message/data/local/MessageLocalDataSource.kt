@@ -14,9 +14,7 @@ import kotlinx.coroutines.flow.map
 internal class MessageLocalDataSource(private val messageDao: MessageDao) {
     fun getMessages(conversationId: String, offset: Int = 0): Flow<Message> =
         messageDao.getMessages(conversationId, offset).flatMapConcat { messages ->
-            flow {
-                messages.forEach { emit(MessageMapper.toDomain(it)) }
-            }
+            flow { messages.forEach { emit(MessageMapper.toDomain(it)) } }
         }
 
     fun getLastMessage(conversationId: String): Flow<Message?> =

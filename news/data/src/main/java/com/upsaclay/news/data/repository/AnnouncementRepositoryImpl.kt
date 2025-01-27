@@ -7,21 +7,24 @@ import com.upsaclay.news.domain.entity.AnnouncementState
 import com.upsaclay.news.domain.repository.AnnouncementRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
 import java.io.IOException
 
 internal class AnnouncementRepositoryImpl(
     private val announcementRemoteDataSource: AnnouncementRemoteDataSource,
-    private val announcementLocalDataSource: AnnouncementLocalDataSource
+    private val announcementLocalDataSource: AnnouncementLocalDataSource,
+    scope: CoroutineScope = (GlobalScope + Dispatchers.IO)
 ) : AnnouncementRepository {
     private val _announcements = MutableStateFlow<List<Announcement>>(emptyList())
     override val announcements: Flow<List<Announcement>> = _announcements
 
     init {
-        CoroutineScope(Dispatchers.IO).launch {
+        scope.launch {
             announcementLocalDataSource.getAnnouncements().collect {
                 _announcements.value = it
             }
@@ -40,12 +43,8 @@ internal class AnnouncementRepositoryImpl(
     }
 
     override suspend fun createAnnouncement(announcement: Announcement) {
-        try {
-            announcementLocalDataSource.insertAnnouncement(announcement)
-            announcementRemoteDataSource.createAnnouncement(announcement)
-        } catch (e: Exception) {
-            announcementLocalDataSource.updateAnnouncement(announcement.copy(state = AnnouncementState.ERROR))
-        }
+        announcementLocalDataSource.insertAnnouncement(announcement)
+        announcementRemoteDataSource.createAnnouncement(announcement)
     }
 
     override suspend fun updateAnnouncement(announcement: Announcement) {
@@ -54,7 +53,7 @@ internal class AnnouncementRepositoryImpl(
     }
 
     override suspend fun deleteAnnouncement(announcement: Announcement) {
-        announcementRemoteDataSource.deleteAnnouncement(announcement.id)
         announcementLocalDataSource.deleteAnnouncement(announcement)
+        announcementRemoteDataSource.deleteAnnouncement(announcement.id)
     }
 }

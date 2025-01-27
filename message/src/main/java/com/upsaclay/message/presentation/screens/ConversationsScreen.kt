@@ -104,7 +104,7 @@ fun ConversationScreen(
                         modifier = Modifier.fillMaxWidth(),
                         conversation = conversation,
                         onClick = {
-                            navController.navigate(Screen.CHAT.route + "conversation=${ConvertConversationJsonUseCase.to(conversation)}")
+                            navController.navigate(Screen.CHAT.route + "?conversation=${ConvertConversationJsonUseCase.to(conversation)}")
                         }
                     )
                 }

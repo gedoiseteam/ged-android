@@ -96,7 +96,7 @@ fun Navigation(mainViewModel: MainViewModel = koinViewModel()) {
             )
         }
 
-        composable(Screen.EMAIL_VERIFICATION.route + "email={email}") { backStackEntry ->
+        composable(Screen.EMAIL_VERIFICATION.route + "?email={email}") { backStackEntry ->
             backStackEntry.arguments?.getString("email")?.let { email ->
                 EmailVerificationScreen(email = email)
             }
@@ -134,12 +134,9 @@ fun Navigation(mainViewModel: MainViewModel = koinViewModel()) {
             val announcementId = backStackEntry.arguments?.getString("announcementId")
 
             announcementId?.let {
-                val editAnnouncementViewModel: EditAnnouncementViewModel = koinViewModel(
-                    parameters = { parametersOf(announcementId) }
-                )
                 EditAnnouncementScreen(
-                    navController = navController,
-                    editAnnouncementViewModel = editAnnouncementViewModel
+                    announcementId = announcementId,
+                    navController = navController
                 )
             } ?: navController.popBackStack()
         }
@@ -168,7 +165,7 @@ fun Navigation(mainViewModel: MainViewModel = koinViewModel()) {
             CreateConversationScreen(navController = navController)
         }
 
-        composable(route = Screen.CHAT.route + "conversation={conversation}") { backStackEntry ->
+        composable(route = Screen.CHAT.route + "?conversation={conversation}") { backStackEntry ->
             backStackEntry.arguments?.getString("conversation")?.let {
                 ChatScreen(conversation = ConvertConversationJsonUseCase.from(it), navController = navController)
             } ?: run {

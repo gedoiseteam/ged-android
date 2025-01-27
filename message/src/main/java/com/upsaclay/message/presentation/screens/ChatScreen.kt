@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -22,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -32,15 +32,15 @@ import com.upsaclay.common.domain.usecase.FormatLocalDateTimeUseCase
 import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
+import com.upsaclay.message.conversationFixture
+import com.upsaclay.message.domain.entity.ConversationUI
 import com.upsaclay.message.domain.entity.Message
+import com.upsaclay.message.messagesFixture
 import com.upsaclay.message.presentation.components.ChatTopBar
 import com.upsaclay.message.presentation.components.MessageInput
 import com.upsaclay.message.presentation.components.ReceiveMessageItem
 import com.upsaclay.message.presentation.components.SentMessageItem
 import com.upsaclay.message.presentation.viewmodels.ChatViewModel
-import com.upsaclay.message.conversationFixture
-import com.upsaclay.message.domain.entity.ConversationUI
-import com.upsaclay.message.messagesFixture
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -72,7 +72,7 @@ fun ChatScreen(
         ) {
             MessageSection(
                 modifier = Modifier.weight(1f),
-                messages = messages.values.toList(),
+                messages = messages.values.toList().sortedByDescending { it.date },
                 interlocutor = chatViewModel.conversation.interlocutor
             )
 
@@ -96,53 +96,45 @@ private fun MessageSection(
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Bottom
+        verticalArrangement = Arrangement.Bottom,
+        reverseLayout = true
     ) {
         if(messages.isNotEmpty()) {
             itemsIndexed(messages) { index, message ->
                 val firstMessage = index == 0
                 val lastMessage = index == messages.size - 1
-                val previousSenderId = if(!firstMessage) messages[index - 1].senderId else ""
+                val previousSenderId = if(!lastMessage) messages[index + 1].senderId else ""
                 val sameSender = previousSenderId == message.senderId
-                val nextSenderId = if(!lastMessage) messages[index + 1].senderId else ""
-                val sameTime = if(!firstMessage) {
+                val nextSenderId = if(!firstMessage) messages[index - 1].senderId else ""
+                val sameTime = if(!lastMessage) {
                     message.date.withSecond(0).withNano(0)
-                        .isEqual(messages[index - 1].date.withSecond(0).withNano(0))
+                        .isEqual(messages[index + 1].date.withSecond(0).withNano(0))
                 } else false
-                val sameDay = if(!firstMessage) message.date.toLocalDate().isEqual(messages[index - 1].date.toLocalDate()) else false
+                val sameDay = if(!lastMessage) message.date.toLocalDate().isEqual(messages[index + 1].date.toLocalDate()) else false
                 val displayProfilePicture = !sameTime || (message.senderId != nextSenderId && message.senderId == interlocutor.id)
 
-                val a = if(sameSender) "sameSender" else "notSameSender"
-                val b = if(sameTime) "sameTime" else "notSameTime"
-                val c = if(sameDay) "sameDay" else "notSameDay"
-
-                if(firstMessage || !sameDay) {
-                    Row(
-                        modifier = Modifier
-                            .padding(vertical = MaterialTheme.spacing.mediumLarge)
-                            .fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            modifier = Modifier.padding(horizontal = MaterialTheme.spacing.medium),
-                            text = FormatLocalDateTimeUseCase.formatDayMonthYear(message.date),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = GedoiseColor.PreviewText
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(messagePadding(sameSender, sameTime, sameDay)))
-
                 if (message.senderId != interlocutor.id) {
-                    SentMessageItem(text = message.content, date = message.date)
+                    SentMessageItem(message = message)
                 } else {
                     ReceiveMessageItem(
                         message = message,
                         displayProfilePicture = displayProfilePicture,
                         profilePictureUrl = interlocutor.profilePictureUrl
                     )
+                }
+
+                if(lastMessage|| !sameDay) {
+                    Text(
+                        modifier = Modifier
+                            .padding(vertical = MaterialTheme.spacing.mediumLarge)
+                            .fillMaxWidth(),
+                        text = FormatLocalDateTimeUseCase.formatDayMonthYear(message.date),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = GedoiseColor.PreviewText,
+                        textAlign = TextAlign.Center
+                    )
+                } else {
+                    Spacer(modifier = Modifier.height(messagePadding(sameSender, sameTime, sameDay)))
                 }
             }
         }
@@ -157,12 +149,10 @@ private fun messagePadding(
 ): Dp {
     val smallPadding = sameSender && sameTime
     val mediumPadding = (sameSender && sameDay && !sameTime) || (!sameSender && sameDay)
-    val noPadding = !sameDay
 
     return when {
-        smallPadding -> MaterialTheme.spacing.extraSmall
+        smallPadding -> 2.dp
         mediumPadding -> MaterialTheme.spacing.smallMedium
-        noPadding -> MaterialTheme.spacing.default
         else -> MaterialTheme.spacing.medium
     }
 }

@@ -18,6 +18,7 @@ import com.upsaclay.message.domain.usecase.SendMessageUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 
 class ChatViewModel(
     conversation: ConversationUI,
@@ -52,8 +53,11 @@ class ChatViewModel(
             conversationId = conversation.id,
             senderId = currentUser.id,
             content = textToSend,
+            date = LocalDateTime.now(),
             state = MessageState.LOADING
         )
+
+        _messages.value = _messages.value.toMutableMap().apply { put(message.id, message) }
 
         viewModelScope.launch {
             if(conversation.state == ConversationState.NOT_CREATED) {
@@ -69,8 +73,8 @@ class ChatViewModel(
 
     private fun fetchMessages() {
         viewModelScope.launch {
-            getMessagesUseCase(conversation.id).collect {
-                _messages.value = _messages.value.toMutableMap().apply { put(it.id, it) }
+            getMessagesUseCase(conversation.id).collect { message ->
+                _messages.value = _messages.value.toMutableMap().apply { put(message.id, message) }
             }
         }
     }

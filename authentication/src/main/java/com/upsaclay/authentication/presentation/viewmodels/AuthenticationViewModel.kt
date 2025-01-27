@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.upsaclay.authentication.domain.entity.AuthenticationState
 import com.upsaclay.authentication.domain.entity.exception.AuthenticationException
-import com.upsaclay.authentication.domain.entity.exception.FirebaseAuthErrorCode
+import com.upsaclay.authentication.domain.entity.exception.AuthErrorCode
 import com.upsaclay.authentication.domain.entity.exception.TooManyRequestException
 import com.upsaclay.authentication.domain.usecase.IsEmailVerifiedUseCase
 import com.upsaclay.authentication.domain.usecase.LoginUseCase
@@ -15,6 +15,7 @@ import com.upsaclay.authentication.domain.usecase.SetUserAuthenticatedUseCase
 import com.upsaclay.common.domain.entity.exception.NetworkException
 import com.upsaclay.common.domain.usecase.GetUserUseCase
 import com.upsaclay.common.domain.usecase.SetCurrentUserUseCase
+import com.upsaclay.common.domain.usecase.VerifyEmailFormatUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -45,11 +46,6 @@ class AuthenticationViewModel(
     fun login() {
         _authenticationState.value = AuthenticationState.LOADING
 
-        if (!verifyInputs()) {
-            _authenticationState.value = AuthenticationState.INPUTS_EMPTY_ERROR
-            return
-        }
-
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 loginUseCase(email, password)
@@ -71,7 +67,7 @@ class AuthenticationViewModel(
                     is TooManyRequestException -> AuthenticationState.TOO_MANY_REQUESTS_ERROR
 
                     is AuthenticationException -> {
-                        if(e.code == FirebaseAuthErrorCode.INVALID_CREDENTIALS) {
+                        if(e.code == AuthErrorCode.INVALID_CREDENTIALS) {
                             AuthenticationState.AUTHENTICATION_ERROR
                         } else {
                             AuthenticationState.UNKNOWN_ERROR
@@ -88,5 +84,19 @@ class AuthenticationViewModel(
         _authenticationState.value = AuthenticationState.UNAUTHENTICATED
     }
 
-    private fun verifyInputs(): Boolean = !(email.isBlank() || password.isBlank())
+    fun verifyInputs(): Boolean {
+        return when {
+            email.isBlank() || password.isBlank() -> {
+                _authenticationState.value = AuthenticationState.INPUTS_EMPTY_ERROR
+                return false
+            }
+
+            !VerifyEmailFormatUseCase(email) -> {
+                _authenticationState.value = AuthenticationState.EMAIL_FORMAT_ERROR
+                return false
+            }
+
+            else -> true
+        }
+    }
 }

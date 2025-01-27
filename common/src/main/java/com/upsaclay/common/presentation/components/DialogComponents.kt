@@ -28,7 +28,7 @@ import com.upsaclay.common.presentation.theme.spacing
 @Composable
 fun SimpleDialog(
     title: String? = null,
-    message: String,
+    text: String? = null,
     confirmText: String = stringResource(id = R.string.accept),
     cancelText: String = stringResource(id = R.string.cancel),
     onConfirm: () -> Unit,
@@ -37,7 +37,7 @@ fun SimpleDialog(
 ) {
     AlertDialog(
         title = { title?.let { Text(text = title)} },
-        text = { Text(text = message) },
+        text = { text?.let { Text(text = text) } },
         onDismissRequest = onDismiss,
         confirmButton = {
             TextButton(onClick = onConfirm) {
@@ -55,7 +55,7 @@ fun SimpleDialog(
 @Composable
 fun SensibleActionDialog(
     title: String? = null,
-    message: String,
+    text: String? = null,
     confirmText: String,
     cancelText: String = stringResource(id = R.string.cancel),
     onDismiss: () -> Unit,
@@ -64,9 +64,7 @@ fun SensibleActionDialog(
 ) {
     AlertDialog(
         title = { title?.let { Text(text = title) } },
-        text = {
-            Text(text = message, style = MaterialTheme.typography.bodyLarge)
-        },
+        text = { text?.let { Text(text = text) } },
         onDismissRequest = onDismiss,
         confirmButton = {
             TextButton(onClick = onConfirm) {
@@ -128,7 +126,7 @@ private fun SimpleDialogPreview() {
     GedoiseTheme {
         SimpleDialog(
             title = "Simple dialog",
-            message = "There is the text area",
+            text = "There is the text area",
             confirmText = "Confirm",
             cancelText = "Cancel",
             onConfirm = { },
@@ -143,7 +141,8 @@ private fun SimpleDialogPreview() {
 private fun SensibleActionDialogPreview() {
     GedoiseTheme {
         SensibleActionDialog(
-            message = "Do you want delete this item ?",
+            title = "Delete item",
+            text = "Do you want delete this item ?",
             confirmText = "Delete",
             cancelText = "Cancel",
             onConfirm = { },

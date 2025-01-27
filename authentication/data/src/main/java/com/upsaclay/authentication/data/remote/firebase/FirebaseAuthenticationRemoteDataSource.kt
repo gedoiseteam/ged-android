@@ -3,6 +3,8 @@ package com.upsaclay.authentication.data.remote.firebase
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.FirebaseAuthException
+import com.upsaclay.authentication.domain.entity.exception.AuthErrorCode
+import com.upsaclay.authentication.domain.entity.exception.AuthenticationException
 import com.upsaclay.common.domain.e
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -16,7 +18,11 @@ class FirebaseAuthenticationRemoteDataSource(
                 firebaseAuthenticationApi.signInWithEmailAndPassword(email, password)
             } catch (e: FirebaseAuthException) {
                 e("Error to sign in with email and password with Firebase: ${e.message}", e)
-                throw e
+                throw AuthenticationException(
+                    message = e.message,
+                    cause = e,
+                    code = AuthErrorCode.fromCode(e.errorCode)
+                )
             } catch (e: FirebaseNetworkException) {
                 e("Error network connection ${e.message}", e)
                 throw e

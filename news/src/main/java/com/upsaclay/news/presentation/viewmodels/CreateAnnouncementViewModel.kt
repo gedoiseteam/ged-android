@@ -20,10 +20,9 @@ import java.time.LocalDateTime
 
 class CreateAnnouncementViewModel(
     getCurrentUserUseCase: GetCurrentUserUseCase,
-    private val createAnnouncementUseCase: CreateAnnouncementUseCase,
-    private val updateAnnouncementUseCase: UpdateAnnouncementUseCase
+    private val createAnnouncementUseCase: CreateAnnouncementUseCase
 ): ViewModel() {
-    private var user: User? = null
+    private var currentUser: User? = null
     private val _screenState = MutableStateFlow(AnnouncementScreenState.DEFAULT)
     val screenState: StateFlow<AnnouncementScreenState> = _screenState
     var title: String by mutableStateOf("")
@@ -33,7 +32,7 @@ class CreateAnnouncementViewModel(
 
     init {
         viewModelScope.launch {
-            getCurrentUserUseCase().collect { user = it }
+            getCurrentUserUseCase().collect { currentUser= it }
         }
     }
 
@@ -46,7 +45,7 @@ class CreateAnnouncementViewModel(
     }
 
     fun createAnnouncement() {
-        if(user == null) {
+        if(currentUser == null) {
             return
         }
 
@@ -55,15 +54,15 @@ class CreateAnnouncementViewModel(
             title = if (title.isBlank()) null else title.trim(),
             content = content.trim(),
             date = LocalDateTime.now(),
-            author = user!!,
+            author = currentUser!!,
             state = AnnouncementState.LOADING
         )
 
         _screenState.value = AnnouncementScreenState.LOADING
+        
         viewModelScope.launch {
             try {
                 createAnnouncementUseCase(announcement)
-                updateAnnouncementUseCase(announcement.copy(state = AnnouncementState.DEFAULT))
                 _screenState.value = AnnouncementScreenState.CREATED
             } catch (e: Exception) {
                 _screenState.value = AnnouncementScreenState.CREATION_ERROR

@@ -22,6 +22,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -34,14 +35,20 @@ import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.common.utils.showToast
 import com.upsaclay.news.R
 import com.upsaclay.news.announcementFixture
+import com.upsaclay.news.domain.entity.Announcement
 import com.upsaclay.news.domain.entity.AnnouncementScreenState
 import com.upsaclay.news.presentation.viewmodels.EditAnnouncementViewModel
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 import java.time.LocalDateTime
 
 @Composable
 fun EditAnnouncementScreen(
+    announcementId: String,
     navController: NavController,
-    editAnnouncementViewModel: EditAnnouncementViewModel
+    editAnnouncementViewModel: EditAnnouncementViewModel = koinViewModel(
+        parameters = { parametersOf(announcementId) }
+    )
 ) {
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
@@ -114,23 +121,23 @@ fun EditAnnouncementScreen(
                 .fillMaxSize()
         ) {
             Column {
-                Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
-
                 TransparentFocusedTextField(
                     modifier = Modifier.fillMaxWidth(),
                     value = editAnnouncementViewModel.title,
                     placeholder = {
                         Text(
                             text = stringResource(id = R.string.title_field_entry),
-                            fontSize = 18.sp,
-                            style = MaterialTheme.typography.titleMedium
+                            style = MaterialTheme.typography.titleMedium,
+                            fontSize = MaterialTheme.typography.titleMedium.fontSize * 1.2f
                         )
                     },
                     onValueChange = { editAnnouncementViewModel.updateTitle(it) },
-                    textStyle = MaterialTheme.typography.titleMedium
+                    textStyle = MaterialTheme.typography.titleMedium.copy(
+                        fontSize = MaterialTheme.typography.titleMedium.fontSize * 1.2f
+                    )
                 )
 
-                Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
+                Spacer(modifier = Modifier.height(MaterialTheme.spacing.smallMedium))
 
                 TransparentTextField(
                     modifier = Modifier.fillMaxWidth(),
@@ -180,21 +187,23 @@ private fun EditAnnouncementScreenPreview() {
                     )
                     .fillMaxSize()
             ) {
-                Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
-
                 TransparentFocusedTextField(
                     value = title ?: "",
                     onValueChange = { title = it },
                     placeholder = {
                         Text(
                             text = stringResource(id = R.string.title_field_entry),
-                            style = MaterialTheme.typography.titleMedium
+                            style = MaterialTheme.typography.titleMedium,
+                            fontSize = MaterialTheme.typography.titleMedium.fontSize * 1.2f
                         )
                     },
-                    textStyle = MaterialTheme.typography.titleMedium
+                    textStyle = MaterialTheme.typography.titleMedium.copy(
+                        fontSize = MaterialTheme.typography.titleMedium.fontSize * 1.2f,
+                        fontWeight = FontWeight.SemiBold
+                    )
                 )
 
-                Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
+                Spacer(modifier = Modifier.height(MaterialTheme.spacing.smallMedium))
 
                 TransparentTextField(
                     value = content,

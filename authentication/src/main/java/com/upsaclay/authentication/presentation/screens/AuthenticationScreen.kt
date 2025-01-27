@@ -44,7 +44,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowInsetsCompat
@@ -97,6 +96,9 @@ fun AuthenticationScreen(
         AuthenticationState.TOO_MANY_REQUESTS_ERROR ->
             stringResource(id = R.string.too_many_request_error)
 
+        AuthenticationState.EMAIL_FORMAT_ERROR ->
+            stringResource(id = R.string.error_incorrect_email_format)
+
         else -> ""
     }
 
@@ -147,14 +149,14 @@ fun AuthenticationScreen(
 
     if(showVerifyEmailDialog) {
         SimpleDialog(
-            message = stringResource(id = R.string.email_not_verified_dialog_message),
+            text = stringResource(id = R.string.email_not_verified_dialog_message),
             confirmText = stringResource(id = com.upsaclay.common.R.string.keep_going),
             onDismiss = {
                 showVerifyEmailDialog = false
                 authenticationViewModel.resetAuthenticationState()
             },
             onConfirm = {
-                navController.navigate(Screen.EMAIL_VERIFICATION.route) {
+                navController.navigate(Screen.EMAIL_VERIFICATION.route + "?email=${authenticationViewModel.email}") {
                     popUpTo(navController.graph.id) { inclusive = true }
                 }
             },
@@ -201,7 +203,9 @@ fun AuthenticationScreen(
                         authenticationState == AuthenticationState.AUTHENTICATED,
                 onClick = {
                     keyboardController?.hide()
-                    authenticationViewModel.login()
+                    if(authenticationViewModel.verifyInputs()) {
+                        authenticationViewModel.login()
+                    }
                 }
             )
 
