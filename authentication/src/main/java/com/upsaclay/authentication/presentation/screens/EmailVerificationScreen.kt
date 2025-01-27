@@ -8,8 +8,10 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -18,12 +20,18 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -55,7 +63,9 @@ import com.upsaclay.authentication.presentation.viewmodels.EmailVerificationView
 import com.upsaclay.authentication.presentation.viewmodels.RegistrationViewModel
 import com.upsaclay.common.domain.entity.Screen
 import com.upsaclay.common.presentation.components.ErrorText
+import com.upsaclay.common.presentation.components.ErrorTextWithIcon
 import com.upsaclay.common.presentation.components.PrimaryButton
+import com.upsaclay.common.presentation.components.SmallTopBarBack
 import com.upsaclay.common.presentation.components.TopLinearLoadingScreen
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
@@ -67,6 +77,7 @@ import org.koin.core.parameter.parametersOf
 @Composable
 fun EmailVerificationScreen(
     email: String,
+    navController: NavController,
     emailVerificationViewModel: EmailVerificationViewModel =
         koinViewModel(parameters = { parametersOf(email) })
 ) {
@@ -86,11 +97,10 @@ fun EmailVerificationScreen(
         label = ""
     )
     val annotatedString = buildAnnotatedString {
-        append(stringResource(id = R.string.email_verification_explanation_begining))
+        append(stringResource(id = R.string.email_verification_explanation_begining) + " ")
         withStyle(
             style = SpanStyle(
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 20.sp
+                fontWeight = FontWeight.SemiBold
             )
         ) {
             append(email)
@@ -117,7 +127,12 @@ fun EmailVerificationScreen(
     }
 
     Scaffold(
-        topBar = { Text(stringResource(id = R.string.email_verification_title)) }
+        topBar = {
+            SmallTopBarBack(
+                onBackClick = { navController.popBackStack() },
+                title = stringResource(id = R.string.email_verification_title)
+            )
+        }
     ) { contentPadding ->
         if (isLoading) {
             TopLinearLoadingScreen()
@@ -146,22 +161,32 @@ fun EmailVerificationScreen(
 
                 Text(text = annotatedString, style = MaterialTheme.typography.bodyLarge)
 
+                if (errorMessage.isNotEmpty()) {
+                    Spacer(Modifier.height(MaterialTheme.spacing.medium))
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Info,
+                            contentDescription = "",
+                            tint = MaterialTheme.colorScheme.error
+                        )
+                        ErrorText(text = errorMessage)
+                    }
+                }
+
                 Spacer(Modifier.height(MaterialTheme.spacing.medium))
 
-                TextButton(
+                OutlinedButton(
                     onClick = {
                         isForwardButtonClicked = true
                         emailVerificationViewModel.sendVerificationEmail()
                     },
                     enabled = !isForwardEmailButtonEnable
                 ) {
-                    Text(text = stringResource(id = R.string.forward_verification_email),)
-                }
-
-                if (errorMessage.isNotEmpty()) {
-                    Spacer(Modifier.height(MaterialTheme.spacing.medium))
-
-                    ErrorText(text = errorMessage)
+                    Text(text = stringResource(id = R.string.forward_verification_email))
                 }
             }
 
@@ -192,7 +217,6 @@ fun EmailVerificationScreen(
 
             PrimaryButton(
                 modifier = Modifier.align(Alignment.BottomEnd),
-                shape = MaterialTheme.shapes.small,
                 isEnable = !isLoading,
                 text = stringResource(id = com.upsaclay.common.R.string.next),
                 onClick = { emailVerificationViewModel.verifyIsEmailVerified() }
@@ -210,7 +234,7 @@ fun EmailVerificationScreen(
 @Preview(showBackground = true)
 @Composable
 private fun EmailVerificationScreenPreview() {
-    var isLoading by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(true) }
     val email = "patrick.dupont@email.com"
     val isError = false
     val infiniteTransition = rememberInfiniteTransition(label = "")
@@ -225,11 +249,10 @@ private fun EmailVerificationScreenPreview() {
     )
 
     val annotatedString = buildAnnotatedString {
-        append(stringResource(id = R.string.email_verification_explanation_begining))
+        append(stringResource(id = R.string.email_verification_explanation_begining) + " ")
         withStyle(
             style = SpanStyle(
                 fontWeight = FontWeight.SemiBold,
-                fontSize = 20.sp
             )
         ) {
             append(email)
@@ -239,7 +262,12 @@ private fun EmailVerificationScreenPreview() {
 
     GedoiseTheme {
         Scaffold(
-            topBar = { Text(stringResource(id = R.string.email_verification_title)) }
+            topBar = {
+                SmallTopBarBack(
+                    onBackClick = { },
+                    title = stringResource(id = R.string.email_verification_title)
+                )
+            }
         ) { contentPadding ->
 
             if (isLoading) {
@@ -257,35 +285,20 @@ private fun EmailVerificationScreenPreview() {
                         bottom = MaterialTheme.spacing.medium
                     )
             ) {
-                Column {
-                    Spacer(Modifier.height(MaterialTheme.spacing.medium))
-
-                    Text(
-                        text = stringResource(id = R.string.email_verification_title),
-                        style = MaterialTheme.typography.titleMedium,
-                    )
-
-                    Spacer(Modifier.height(MaterialTheme.spacing.medium))
-
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium)
+                ) {
                     Text(
                         text = annotatedString,
                         style = MaterialTheme.typography.bodyLarge,
                     )
 
-                    Spacer(Modifier.height(MaterialTheme.spacing.medium))
-
-                    TextButton(
-                        onClick = { }
-                    ) {
-                        Text(
-                            text = stringResource(id = R.string.forward_verification_email),
-                        )
+                    if (isError) {
+                        ErrorTextWithIcon(text = stringResource(id = R.string.email_not_verified))
                     }
 
-                    if (isError) {
-                        Spacer(Modifier.height(MaterialTheme.spacing.medium))
-
-                        ErrorText(text = stringResource(id = R.string.email_not_verified),)
+                    OutlinedButton(onClick = { }) {
+                        Text(text = stringResource(id = R.string.forward_verification_email))
                     }
                 }
 
@@ -301,13 +314,13 @@ private fun EmailVerificationScreenPreview() {
                             .background(MaterialTheme.colorScheme.primary)
                             .padding(MaterialTheme.spacing.medium)
                             .align(Alignment.Center)
-                            .size(100.dp)
+                            .size(110.dp)
                     )
 
                     Image(
                         modifier = Modifier
                             .align(Alignment.Center)
-                            .size(90.dp),
+                            .size(100.dp),
                         imageVector = Icons.Filled.Email,
                         contentDescription = "",
                         colorFilter = ColorFilter.tint(color = Color.White)

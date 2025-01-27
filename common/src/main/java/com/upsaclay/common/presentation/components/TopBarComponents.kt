@@ -35,7 +35,7 @@ fun SmallTopBarBack(
     }
 ) {
     TopAppBar(
-        title = { Text(text = title, fontWeight = FontWeight.Bold) },
+        title = { Text(text = title) },
         navigationIcon = {
             IconButton(onClick = onBackClick) {
                 icon()
@@ -54,7 +54,7 @@ fun SmallTopBarEdit(
     confirmText: String = stringResource(id = com.upsaclay.common.R.string.save)
 ) {
     TopAppBar(
-        title = { Text(text = title, fontWeight = FontWeight.Bold) },
+        title = { Text(text = title) },
         navigationIcon = {
             IconButton(onClick = onCancelClick) {
                 Icon(

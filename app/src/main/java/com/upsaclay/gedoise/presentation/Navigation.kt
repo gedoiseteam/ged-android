@@ -14,7 +14,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavController
 import androidx.navigation.NavType.Companion.StringType
 import androidx.navigation.compose.NavHost
@@ -43,11 +42,9 @@ import com.upsaclay.news.presentation.screens.CreateAnnouncementScreen
 import com.upsaclay.news.presentation.screens.EditAnnouncementScreen
 import com.upsaclay.news.presentation.screens.NewsScreen
 import com.upsaclay.news.presentation.screens.ReadAnnouncementScreen
-import com.upsaclay.news.presentation.viewmodels.EditAnnouncementViewModel
 import com.upsaclay.profile.presentation.screens.AccountScreen
 import com.upsaclay.profile.presentation.screens.ProfileScreen
 import org.koin.androidx.compose.koinViewModel
-import org.koin.core.parameter.parametersOf
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -98,7 +95,7 @@ fun Navigation(mainViewModel: MainViewModel = koinViewModel()) {
 
         composable(Screen.EMAIL_VERIFICATION.route + "?email={email}") { backStackEntry ->
             backStackEntry.arguments?.getString("email")?.let { email ->
-                EmailVerificationScreen(email = email)
+                EmailVerificationScreen(email = email, navController = navController)
             }
         }
 
@@ -149,7 +146,6 @@ fun Navigation(mainViewModel: MainViewModel = koinViewModel()) {
                         title = {
                             Text(
                                 text = stringResource(R.string.messages),
-                                fontWeight = FontWeight.Bold,
                                 style = MaterialTheme.typography.titleLarge
                             )
                         }

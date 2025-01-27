@@ -24,12 +24,9 @@ class EmailVerificationViewModel(
     val screenState: StateFlow<AuthenticationState> = _screenState
 
     fun sendVerificationEmail() {
-        _screenState.value = AuthenticationState.LOADING
-
         viewModelScope.launch {
             try {
                 sendVerificationEmailUseCase()
-                _screenState.value = AuthenticationState.IDLE
             } catch (e: Exception) {
                 when(e) {
                     is TooManyRequestException -> _screenState.value = AuthenticationState.TOO_MANY_REQUESTS_ERROR

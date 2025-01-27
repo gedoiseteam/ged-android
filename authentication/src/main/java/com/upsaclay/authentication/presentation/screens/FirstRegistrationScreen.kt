@@ -1,11 +1,13 @@
 package com.upsaclay.authentication.presentation.screens
 
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -75,15 +77,12 @@ fun FirstRegistrationScreen(
                         keyboardController?.hide()
                     })
                 },
+            verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium)
         ) {
-            Spacer(Modifier.height(MaterialTheme.spacing.large))
-
             Text(
                 text = stringResource(id = R.string.enter_first_last_name),
                 style = MaterialTheme.typography.titleMedium
             )
-
-            Spacer(Modifier.height(MaterialTheme.spacing.medium))
 
             OutlinedTextField(
                 modifier = Modifier
@@ -96,8 +95,6 @@ fun FirstRegistrationScreen(
                 keyboardOptions = KeyboardOptions(KeyboardCapitalization.Sentences),
                 onValueChange = { registrationViewModel.updateLastName(it) },
             )
-
-            Spacer(Modifier.height(MaterialTheme.spacing.medium))
 
             OutlinedTextField(
                 modifier = Modifier
@@ -112,8 +109,6 @@ fun FirstRegistrationScreen(
             )
 
             if (isError) {
-                Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
-
                 ErrorTextWithIcon(
                     modifier = Modifier.align(Alignment.Start),
                     text = stringResource(id = com.upsaclay.common.R.string.empty_fields_error)
@@ -125,7 +120,6 @@ fun FirstRegistrationScreen(
             modifier = Modifier.align(Alignment.BottomEnd),
             text = stringResource(id = com.upsaclay.common.R.string.next),
             isEnable = !isLoading,
-            shape = MaterialTheme.shapes.small,
             onClick = {
                 focusManager.clearFocus()
                 keyboardController?.hide()
@@ -176,15 +170,12 @@ private fun FirstRegistrationScreenPreview() {
                             focusManager.clearFocus()
                         })
                     },
+                verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium)
             ) {
-                Spacer(Modifier.height(MaterialTheme.spacing.large))
-
                 Text(
                     text = stringResource(id = R.string.enter_first_last_name),
                     style = MaterialTheme.typography.titleMedium
                 )
-
-                Spacer(Modifier.height(MaterialTheme.spacing.medium))
 
                 OutlinedTextField(
                     modifier = Modifier
@@ -196,8 +187,6 @@ private fun FirstRegistrationScreenPreview() {
                     enabled = !isLoading,
                     onValueChange = { },
                 )
-
-                Spacer(Modifier.height(MaterialTheme.spacing.medium))
 
                 OutlinedTextField(
                     modifier = Modifier
@@ -211,15 +200,12 @@ private fun FirstRegistrationScreenPreview() {
                 )
 
                 if (isError) {
-                    Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
-
                     ErrorTextWithIcon(text = stringResource(id = com.upsaclay.common.R.string.empty_fields_error))
                 }
             }
 
             PrimaryButton(
                 modifier = Modifier.align(Alignment.BottomEnd),
-                shape = MaterialTheme.shapes.small,
                 isEnable = !isLoading,
                 text = stringResource(id = com.upsaclay.common.R.string.next),
                 onClick = { isLoading = true }

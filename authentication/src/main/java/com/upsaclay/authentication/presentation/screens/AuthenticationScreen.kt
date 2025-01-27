@@ -71,7 +71,6 @@ fun AuthenticationScreen(
     val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
     val view = LocalView.current
-    val focusManager = LocalFocusManager.current
     val scrollState = rememberScrollState()
     var inputsError by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }

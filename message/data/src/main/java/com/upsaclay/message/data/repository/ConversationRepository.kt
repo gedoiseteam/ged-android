@@ -16,4 +16,6 @@ internal interface ConversationRepository {
     suspend fun updateLocalConversation(conversation: Conversation, interlocutor: User)
 
     suspend fun deleteConversation(conversation: Conversation, interlocutor: User)
+
+    suspend fun deleteLocalConversations()
 }

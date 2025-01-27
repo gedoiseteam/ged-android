@@ -22,4 +22,8 @@ internal class ConversationLocalDataSource(private val conversationDao: Conversa
     suspend fun deleteConversation(localConversation: LocalConversation) {
         conversationDao.deleteConversation(localConversation)
     }
+
+    suspend fun deleteConversations() {
+        conversationDao.deleteConversations()
+    }
 }

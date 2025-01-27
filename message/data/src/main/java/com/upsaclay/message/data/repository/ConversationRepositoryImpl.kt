@@ -45,4 +45,8 @@ internal class ConversationRepositoryImpl(
         conversationLocalDataSource.deleteConversation(ConversationMapper.toLocal(conversation, interlocutor))
         conversationRemoteDataSource.deleteConversation(conversation.id)
     }
+
+    override suspend fun deleteLocalConversations() {
+        conversationLocalDataSource.deleteConversations()
+    }
 }

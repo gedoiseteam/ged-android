@@ -22,6 +22,14 @@ internal class MessageRepositoryImpl(
         return messageLocalDataSource.getMessages(conversationId)
     }
 
+    private fun listenRemoteMessage(conversationId: String) {
+        scope.launch {
+            messageRemoteDataSource.listenMessages(conversationId).collect {
+                messageLocalDataSource.upsertMessage(it)
+            }
+        }
+    }
+
     override fun getLastMessage(conversationId: String): Flow<Message?> =
         messageRemoteDataSource.listenLastMessage(conversationId)
 
@@ -38,11 +46,7 @@ internal class MessageRepositoryImpl(
         messageLocalDataSource.upsertMessage(message)
     }
 
-    private fun listenRemoteMessage(conversationId: String) {
-        scope.launch {
-            messageRemoteDataSource.listenMessages(conversationId).collect {
-                messageLocalDataSource.upsertMessage(it)
-            }
-        }
+    override suspend fun deleteLocalMessages() {
+        messageLocalDataSource.deleteMessages()
     }
 }

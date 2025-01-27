@@ -33,6 +33,26 @@ internal class UserConversationRepositoryImpl(
         listenRemoteConversations()
     }
 
+    private fun listenLocalConversations() {
+        scope.launch {
+            conversationRepository.getConversationFromLocal().collect { (conversation, interlocutor) ->
+                val conversationUser = ConversationMapper.toConversationUser(conversation, interlocutor)
+                _userConversations.value += (conversationUser.id to conversationUser)
+            }
+        }
+    }
+
+    private fun listenRemoteConversations() {
+        scope.launch {
+            val currentUser = userRepository.currentUser.first() ?: return@launch
+            conversationRepository.getConversationsFromRemote(currentUser.id).collect { conversation ->
+                userRepository.getUserFlow(conversation.interlocutorId).collect { interlocutor ->
+                    conversationRepository.upsertLocalConversation(conversation, interlocutor)
+                }
+            }
+        }
+    }
+
     override fun getUserConversation(conversationId: String): ConversationUser? =
         _userConversations.value.values.find { it.id == conversationId }
 
@@ -59,24 +79,7 @@ internal class UserConversationRepositoryImpl(
         )
     }
 
-    private fun listenLocalConversations() {
-        scope.launch {
-            conversationRepository.getConversationFromLocal().collect { (conversation, interlocutor) ->
-                val conversationUser = ConversationMapper.toConversationUser(conversation, interlocutor)
-                _userConversations.value += (conversationUser.id to conversationUser)
-            }
-        }
-    }
-
-    private fun listenRemoteConversations() {
-        scope.launch {
-            val currentUser = userRepository.currentUser.first() ?: return@launch
-
-            conversationRepository.getConversationsFromRemote(currentUser.id).collect { conversation ->
-                userRepository.getUserFlow(conversation.interlocutorId).collect { interlocutor ->
-                    conversationRepository.upsertLocalConversation(conversation, interlocutor)
-                }
-            }
-        }
+    override suspend fun deleteLocalConversations() {
+        conversationRepository.deleteLocalConversations()
     }
 }

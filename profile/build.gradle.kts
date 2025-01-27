@@ -60,7 +60,6 @@ dependencies {
     implementation(libs.jakewharton.timber)
     implementation(libs.gson)
     implementation(libs.kotlinx.collections.immutable)
-    implementation(project(":authentication:domain"))
 
     testImplementation(libs.junit)
     testImplementation(libs.mockk)
@@ -78,4 +77,6 @@ dependencies {
 
     implementation(project(":common"))
     implementation(project(":common:domain"))
+    implementation(project(":authentication:domain"))
+    implementation(project(":message:domain"))
 }

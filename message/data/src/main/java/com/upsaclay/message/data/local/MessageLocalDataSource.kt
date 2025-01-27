@@ -33,4 +33,8 @@ internal class MessageLocalDataSource(private val messageDao: MessageDao) {
     suspend fun upsertMessage(message: Message) {
         messageDao.upsertMessage(MessageMapper.toLocal(message))
     }
+
+    suspend fun deleteMessages() {
+        messageDao.deleteMessages()
+    }
 }

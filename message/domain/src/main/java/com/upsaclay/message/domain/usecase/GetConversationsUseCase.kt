@@ -7,7 +7,6 @@ import com.upsaclay.message.domain.repository.UserConversationRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapConcat
-import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.map
 
 class GetConversationsUseCase(

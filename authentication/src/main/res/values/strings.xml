@@ -17,7 +17,7 @@
     <string name="step">Étape %1$d sur %2$d</string>
     <string name="enter_first_last_name">Entrez votre nom et prénom</string>
     <string name="email_verification_text">Un lien de vérification vous a été envoyé à l\'adresse suivante : <b>%s</b>.\nCliquer dessus afin de valider votre adresse mail</string>
-    <string name="email_verification_explanation_begining">Un lien a été à l\'adresse suivante :</string>
+    <string name="email_verification_explanation_begining">Un lien a été à l\'adresse suivante : </string>
     <string name="email_verification_explanation_end">. Veuillez cliquer dessus pour finaliser l\'inscription.</string>
     <string name="email_not_verified">Veuillez valider votre adresse mail avant de continuer.</string>
     <string name="email_not_verified_dialog_message">Veuillez valider votre adresse mail avant de continuer.</string>

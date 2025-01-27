@@ -106,8 +106,6 @@ fun ThirdRegistrationScreen(
                     })
                 }
         ) {
-            Spacer(Modifier.height(MaterialTheme.spacing.large))
-
             Text(
                 text = stringResource(id = R.string.enter_email_password),
                 style = MaterialTheme.typography.titleMedium
@@ -149,7 +147,6 @@ fun ThirdRegistrationScreen(
 
         PrimaryButton(
             modifier = Modifier.align(Alignment.BottomEnd),
-            shape = MaterialTheme.shapes.small,
             isEnable = !isLoading,
             text = stringResource(id = com.upsaclay.common.R.string.next),
             onClick = {
@@ -195,8 +192,6 @@ private fun ThirdRegistrationScreenPreview() {
                         })
                     }
             ) {
-                Spacer(Modifier.height(MaterialTheme.spacing.large))
-
                 Text(
                     text = stringResource(id = R.string.enter_email_password),
                     style = MaterialTheme.typography.titleMedium
@@ -231,7 +226,6 @@ private fun ThirdRegistrationScreenPreview() {
                 modifier = Modifier.align(Alignment.BottomEnd),
                 text = stringResource(id = com.upsaclay.common.R.string.next),
                 isEnable = !isLoading,
-                shape = MaterialTheme.shapes.small,
                 onClick = { isLoading = true }
             )
         }

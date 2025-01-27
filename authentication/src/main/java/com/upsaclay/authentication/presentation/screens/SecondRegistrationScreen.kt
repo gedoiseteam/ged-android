@@ -43,8 +43,6 @@ fun SecondRegistrationScreen(
 ) {
     var selectedItem by remember { mutableStateOf(registrationViewModel.schoolLevel) }
     var expanded by remember { mutableStateOf(false) }
-    val registrationState = registrationViewModel.registrationState.collectAsState().value
-    val isLoading = registrationState == RegistrationState.LOADING
 
     LaunchedEffect(Unit) {
         registrationViewModel.resetRegistrationState()
@@ -60,8 +58,6 @@ fun SecondRegistrationScreen(
                     detectTapGestures(onPress = { expanded = false })
                 },
         ) {
-            Spacer(Modifier.height(MaterialTheme.spacing.large))
-
             Text(
                 text = stringResource(id = R.string.select_level_school),
                 style = MaterialTheme.typography.titleMedium
@@ -76,7 +72,6 @@ fun SecondRegistrationScreen(
                     selectedItem = item
                     expanded = false
                 },
-                isEnable = !isLoading,
                 expanded = expanded,
                 onExpandedChange = { isExpanded ->
                     expanded = isExpanded
@@ -91,8 +86,6 @@ fun SecondRegistrationScreen(
         PrimaryButton(
             modifier = Modifier.align(Alignment.BottomEnd),
             text = stringResource(id = com.upsaclay.common.R.string.next),
-            shape = MaterialTheme.shapes.small,
-            isEnable = !isLoading,
             onClick = {
                 registrationViewModel.updateSchoolLevel(selectedItem)
                 navController.navigate(Screen.THIRD_REGISTRATION.route)
@@ -109,32 +102,18 @@ fun SecondRegistrationScreen(
 
 @Preview
 @Composable
-private fun ThirdRegistrationScreenPreview() {
+private fun SecondRegistrationScreenPreview() {
     val items = persistentListOf("GED 1", "GED 2", "GED 3")
     var selectedItem by remember { mutableStateOf(items[0]) }
     var expanded by remember { mutableStateOf(false) }
-    var isLoading by remember { mutableStateOf(false) }
-
-    LaunchedEffect(isLoading) {
-        if(isLoading) {
-            delay(1000)
-            isLoading = false
-        }
-    }
 
     GedoiseTheme {
-        if(isLoading) {
-            OverlayLinearLoadingScreen()
-        }
-
         RegistrationTopBar(
             navController = rememberNavController()
         ) {
             Column(
                 modifier = Modifier.fillMaxSize(),
             ) {
-                Spacer(Modifier.height(MaterialTheme.spacing.large))
-
                 Text(
                     text = stringResource(id = R.string.select_level_school),
                     style = MaterialTheme.typography.titleMedium
@@ -150,7 +129,6 @@ private fun ThirdRegistrationScreenPreview() {
                         expanded = false
                     },
                     expanded = expanded,
-                    isEnable = !isLoading,
                     onExpandedChange = { isExpanded ->
                         expanded = isExpanded
                     },
@@ -164,9 +142,7 @@ private fun ThirdRegistrationScreenPreview() {
             PrimaryButton(
                 modifier = Modifier.align(Alignment.BottomEnd),
                 text = stringResource(id = com.upsaclay.common.R.string.next),
-                shape = MaterialTheme.shapes.small,
-                isEnable = !isLoading,
-                onClick = { isLoading = true }
+                onClick = { }
             )
         }
     }
