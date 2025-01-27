@@ -28,6 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.upsaclay.common.domain.entity.Screen
 import com.upsaclay.common.presentation.components.ProfilePicture
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.gedoise.R
@@ -35,24 +36,20 @@ import com.upsaclay.gedoise.data.BottomNavigationItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainTopBar(navController: NavController, user: com.upsaclay.common.domain.model.User) {
+fun HomeTopBar(navController: NavController, profilePictureUrl: String?) {
     TopAppBar(
         title = {
             Text(
-                text = stringResource(id = R.string.school_name),
+                text = stringResource(id = R.string.app_name),
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.fillMaxWidth()
             )
         },
         navigationIcon = {
             IconButton(
-                onClick = {
-                    if (navController.currentDestination?.route != com.upsaclay.common.domain.model.Screen.NEWS.route) {
-                        navController.navigate(com.upsaclay.common.domain.model.Screen.NEWS.route)
-                    }
-                }
+                onClick = { },
+                enabled = false
             ) {
                 Image(
                     painter = painterResource(id = com.upsaclay.common.R.drawable.ged_logo),
@@ -63,28 +60,34 @@ fun MainTopBar(navController: NavController, user: com.upsaclay.common.domain.mo
         },
         actions = {
             IconButton(
-                onClick = { navController.navigate(com.upsaclay.common.domain.model.Screen.PROFILE.route) },
+                onClick = { navController.navigate(Screen.PROFILE.route) },
                 modifier = Modifier.clip(shape = CircleShape)
             ) {
-                ProfilePicture(imageUrl = user.profilePictureUrl)
+                ProfilePicture(url = profilePictureUrl)
             }
         }
     )
 }
 
 @Composable
-fun MainBottomBar(navController: NavController, bottomNavigationItems: List<BottomNavigationItem>) {
+fun MainBottomBar(
+    navController: NavController,
+    bottomNavigationItems: List<BottomNavigationItem>
+) {
     val currentRoute = remember {
         navController.currentDestination?.route
     }
 
     NavigationBar {
         bottomNavigationItems.forEachIndexed { _, navigationItem ->
+            val selected = navigationItem.screen.route == currentRoute
+            val iconRes = if(selected) navigationItem.filledIcon else navigationItem.outlinedIcon
+
             NavigationBarItem(
-                selected = navigationItem.screen.route == currentRoute,
+                selected = selected,
                 onClick = {
-                    if (navigationItem.screen.route != currentRoute) {
-                        navController.navigate(navigationItem.screen.route)
+                    navController.navigate(navigationItem.screen.route) {
+                        launchSingleTop = true
                     }
                 },
                 icon = {
@@ -98,7 +101,7 @@ fun MainBottomBar(navController: NavController, bottomNavigationItems: List<Bott
                         }
                     ) {
                         Icon(
-                            painter = painterResource(id = navigationItem.icon),
+                            painter = painterResource(id = iconRes),
                             contentDescription = stringResource(id = navigationItem.iconDescription)
                         )
                     }
@@ -123,7 +126,7 @@ private fun MainTopBarPreview() {
         TopAppBar(
             title = {
                 Text(
-                    text = stringResource(id = R.string.school_name),
+                    text = stringResource(id = R.string.app_name),
                     textAlign = TextAlign.Center,
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.titleLarge,
@@ -132,7 +135,8 @@ private fun MainTopBarPreview() {
             },
             navigationIcon = {
                 IconButton(
-                    onClick = { }
+                    onClick = { },
+                    enabled = false
                 ) {
                     Image(
                         painter = painterResource(id = com.upsaclay.common.R.drawable.ged_logo),

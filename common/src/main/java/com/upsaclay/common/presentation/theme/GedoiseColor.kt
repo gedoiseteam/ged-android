@@ -12,7 +12,7 @@ object GedoiseColor {
     val PrimaryVariant = Color(0xFFDBE0E9)
     val Background = White
 
-//    val Surface = Color(0xFFF4F5F7
+    //    val Surface = Color(0xFFF4F5F7
     val Surface = White
     val BackgroundVariant = Color(0xFFF0F1F8)
     val DarkBackground = Color(0xFF2D2E32)
@@ -23,6 +23,7 @@ object GedoiseColor {
     val LightGray = Color(0xFFEFEFEF)
     val DarkGray = Color(0xFF3C3C3C)
     val PreviewText = Color(0xFF6F7181)
+    val ProfilePictureErrorLight = Color(0xFFF2F4F5)
     val OnlineColor = Color(0xFF4ACB1B)
     val ButtonShowColor = Color(0xFFF3F2F8)
     val PastelBlue = Color(0xFFDBF2F1)

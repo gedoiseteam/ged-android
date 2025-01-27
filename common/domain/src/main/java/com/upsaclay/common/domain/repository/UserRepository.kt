@@ -1,33 +1,29 @@
 package com.upsaclay.common.domain.repository
 
-import com.upsaclay.common.domain.model.User
+import com.upsaclay.common.domain.entity.User
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 interface UserRepository {
-    val currentUserFlow: Flow<User>
-    val currentUser: User?
+    val currentUser: StateFlow<User?>
 
-    suspend fun getUserWithFirestore(userId: Int): User?
+    suspend fun getUsers(): List<User>
 
-    suspend fun getUserWithFirestore(userEmail: String): User?
+    suspend fun getUser(userId: String): User?
 
-    suspend fun getUserWithOracle(email: String): User?
+    suspend fun getUserFlow(userId: String): Flow<User>
 
-    suspend fun getAllUsers(): List<User>
+    suspend fun getUserWithEmail(userEmail: String): User?
 
-    suspend fun getOnlineUsers(): List<User>
-
-    suspend fun createUserWithOracle(user: User): Int?
-
-    suspend fun createUserWithFirestore(user: User): Result<Unit>
+    suspend fun createUser(user: User)
 
     suspend fun setCurrentUser(user: User)
 
     suspend fun removeCurrentUser()
 
-    suspend fun updateProfilePictureUrl(userId: Int, profilePictureUrl: String): Result<Unit>
+    suspend fun updateProfilePictureUrl(userId: String, profilePictureUrl: String)
 
-    suspend fun deleteProfilePictureUrl(userId: Int): Result<Unit>
+    suspend fun deleteProfilePictureUrl(userId: String)
 
-    suspend fun isUserExist(email: String): Result<Boolean>
+    suspend fun isUserExist(email: String): Boolean
 }

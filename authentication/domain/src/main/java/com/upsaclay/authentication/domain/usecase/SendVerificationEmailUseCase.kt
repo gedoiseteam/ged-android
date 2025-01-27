@@ -5,7 +5,7 @@ import com.upsaclay.authentication.domain.repository.FirebaseAuthenticationRepos
 class SendVerificationEmailUseCase(
     private val firebaseAuthenticationRepository: FirebaseAuthenticationRepository
 ) {
-    suspend fun sendVerificationEmail(): Result<Unit> {
-        return firebaseAuthenticationRepository.sendVerificationEmail()
+    suspend operator fun invoke() {
+        firebaseAuthenticationRepository.sendVerificationEmail()
     }
 }

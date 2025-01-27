@@ -2,10 +2,10 @@ package com.upsaclay.common.domain.usecase
 
 import android.net.Uri
 import com.upsaclay.common.domain.formatProfilePictureUrl
-import com.upsaclay.common.domain.i
 import com.upsaclay.common.domain.repository.FileRepository
 import com.upsaclay.common.domain.repository.ImageRepository
 import com.upsaclay.common.domain.repository.UserRepository
+import kotlinx.coroutines.flow.first
 import java.io.IOException
 
 class UpdateUserProfilePictureUseCase(
@@ -13,27 +13,21 @@ class UpdateUserProfilePictureUseCase(
     private val imageRepository: ImageRepository,
     private val userRepository: UserRepository
 ) {
-    suspend operator fun invoke(profilePictureUri: Uri): Result<Unit> {
-        val currentUser = userRepository.currentUser ?: return Result.failure(IllegalArgumentException("User not logged in"))
+    suspend operator fun invoke(profilePictureUri: Uri) {
+        val currentUser = userRepository.currentUser.first() ?: throw IOException("No user logged in")
 
         val currentTime = System.currentTimeMillis()
         val fileName = "${currentUser.id}-profile-picture-$currentTime"
-        val profilePictureFile = fileRepository.createFileFromUri(fileName, profilePictureUri)
-        val uploadImageResult = imageRepository.uploadImage(profilePictureFile)
+        val file = fileRepository.createFileFromUri(fileName, profilePictureUri)
+        val url = formatProfilePictureUrl(fileName, file.extension)
 
-        return if (uploadImageResult.isSuccess) {
-            val profilePictureUrl = formatProfilePictureUrl(fileName, profilePictureFile.extension)
-
-            userRepository.updateProfilePictureUrl(currentUser.id, profilePictureUrl)
-                .onSuccess { currentUser.profilePictureUrl?.let { deleteProfilePictureImage(it) } }
-        } else {
-            val exception = uploadImageResult.exceptionOrNull() ?: IOException("Error uploading image")
-            Result.failure(exception)
-        }
+        imageRepository.uploadImage(file)
+        userRepository.updateProfilePictureUrl(currentUser.id, url)
+        currentUser.profilePictureUrl?.let { deletePreviousProfilePicture(it) }
     }
 
-    private suspend fun deleteProfilePictureImage(userProfilePictureUrl: String): Result<Unit> {
+    private suspend fun deletePreviousProfilePicture(userProfilePictureUrl: String) {
         val fileName = userProfilePictureUrl.substringAfterLast("/")
-        return imageRepository.deleteImage(fileName)
+        imageRepository.deleteImage(fileName)
     }
 }

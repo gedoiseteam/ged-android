@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-<!--    <string name="authentication_screen_title">Connectez-vous avec vos identifiants de l\'Université Paris-Saclay</string>-->
-    <string name="authentication_screen_title">Connectez-vous ou inscrivez-vous sur l\'application Gédoise</string>
     <string name="connect_with_paris_saclay_email">Connectez-vous avec vos identifiants de l\'Université Paris-Saclay</string>
     <string name="presentation_text">L\'application qui réunit toutes les actualités de la GED, faite pour les gédois par les gédois.</string>
     <string name="title_login_screen">Gedoise Application</string>
@@ -11,7 +9,7 @@
     <string name="continue_with_google">Continuer avec Google</string>
     <string name="password">Mot de passe</string>
     <string name="sign_up">S\'inscrire</string>
-    <string name="first_arrival">Première visite ?</string>
+    <string name="not_register_yet">Pas encore inscrit ?</string>
     <string name="error_connection">Adresse mail ou mot de passe incorrect</string>
 
     <string name="registration">Inscription</string>
@@ -19,6 +17,8 @@
     <string name="step">Étape %1$d sur %2$d</string>
     <string name="enter_first_last_name">Entrez votre nom et prénom</string>
     <string name="email_verification_text">Un lien de vérification vous a été envoyé à l\'adresse suivante : <b>%s</b>.\nCliquer dessus afin de valider votre adresse mail</string>
+    <string name="email_verification_explanation_begining">Un lien a été à l\'adresse suivante : </string>
+    <string name="email_verification_explanation_end">. Veuillez cliquer dessus pour finaliser l\'inscription.</string>
     <string name="email_not_verified">Veuillez valider votre adresse mail avant de continuer.</string>
     <string name="email_not_verified_dialog_message">Veuillez valider votre adresse mail avant de continuer.</string>
     <string name="enter_email_password">Entrez votre adresse mail et votre mot de passe</string>
@@ -27,7 +27,6 @@
     <string name="email_verification_title">Vérification de l\'email</string>
     <string name="forward_verification_email">Renvoyez l\'email</string>
     <string name="add_profile_picture">Ajoutez une photo de profil</string>
-    <string name="logout_dialog_message">Êtes-vous sûr de vouloir vous déconnecter ?</string>
 
     <string name="unrecognized_account">Compte universitaire non reconnu</string>
     <string name="error_update_profile_picture">Une erreur est survenue lors de la mise à jour de la photo de profil. Veuillez réesayez.</string>

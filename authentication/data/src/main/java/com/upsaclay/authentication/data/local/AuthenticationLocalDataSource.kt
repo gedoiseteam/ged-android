@@ -10,6 +10,7 @@ import com.upsaclay.common.data.setValue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 internal class AuthenticationLocalDataSource(context: Context) {
@@ -22,6 +23,6 @@ internal class AuthenticationLocalDataSource(context: Context) {
     }
 
     suspend fun getAuthenticationState(): Flow<Boolean> = withContext(Dispatchers.IO) {
-        store.getFlowValue(authenticationKey).filterNotNull()
+        store.getFlowValue(authenticationKey).map { it ?: false }
     }
 }

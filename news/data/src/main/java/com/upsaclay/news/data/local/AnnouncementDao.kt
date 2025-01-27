@@ -2,17 +2,24 @@ package com.upsaclay.news.data.local
 
 import androidx.room.Dao
 import androidx.room.Delete
+import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Update
 import androidx.room.Upsert
+import com.upsaclay.news.data.local.model.ANNOUNCEMENTS_TABLE
+import com.upsaclay.news.data.local.model.LocalAnnouncement
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface AnnouncementDao {
     @Query("SELECT * FROM $ANNOUNCEMENTS_TABLE")
-    fun getAllAnnouncements(): Flow<List<LocalAnnouncement>>
+    fun getAnnouncements(): Flow<List<LocalAnnouncement>>
 
-    @Query("SELECT * FROM $ANNOUNCEMENTS_TABLE WHERE ANNOUNCEMENT_ID = :id")
-    suspend fun getAnnouncement(id: Int): LocalAnnouncement?
+    @Insert
+    suspend fun insertAnnouncement(localAnnouncement: LocalAnnouncement)
+
+    @Update
+    suspend fun updateAnnouncement(localAnnouncement: LocalAnnouncement)
 
     @Upsert
     suspend fun upsertAnnouncement(localAnnouncement: LocalAnnouncement)

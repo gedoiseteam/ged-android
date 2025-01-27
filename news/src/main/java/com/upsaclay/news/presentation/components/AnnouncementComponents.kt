@@ -7,62 +7,69 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.upsaclay.common.domain.entity.ElapsedTime
 import com.upsaclay.common.domain.usecase.GetElapsedTimeUseCase
-import com.upsaclay.common.domain.usecase.LocalDateTimeFormatterUseCase
+import com.upsaclay.common.domain.usecase.FormatLocalDateTimeUseCase
+import com.upsaclay.common.presentation.components.CircularProgressBar
 import com.upsaclay.common.presentation.components.ProfilePicture
 import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.news.announcementFixture
+import com.upsaclay.news.domain.entity.Announcement
+import com.upsaclay.news.domain.entity.AnnouncementState
 
 @Composable
-internal fun AnnouncementItem(modifier: Modifier = Modifier, announcement: com.upsaclay.news.domain.model.Announcement) {
-    val context = LocalContext.current
-    val localDateTimeFormatterUseCase = LocalDateTimeFormatterUseCase()
-    val getElapsedTimeUseCase = GetElapsedTimeUseCase()
-
-    val elapsedTime = getElapsedTimeUseCase.fromLocalDateTime(announcement.date)
+internal fun HeaderAnnouncement(
+    modifier: Modifier = Modifier,
+    announcement: Announcement
+) {
+    val elapsedTime = GetElapsedTimeUseCase.fromLocalDateTime(announcement.date)
 
     val elapsedTimeValue: String = when (elapsedTime) {
-        is com.upsaclay.common.domain.model.ElapsedTime.Now -> stringResource(
+        is ElapsedTime.Now -> stringResource(
             com.upsaclay.common.R.string.second_ago_short,
             elapsedTime.value
         )
 
-        is com.upsaclay.common.domain.model.ElapsedTime.Minute -> stringResource(
+        is ElapsedTime.Minute -> stringResource(
             com.upsaclay.common.R.string.minute_ago_short,
             elapsedTime.value
         )
 
-        is com.upsaclay.common.domain.model.ElapsedTime.Hour -> stringResource(
+        is ElapsedTime.Hour -> stringResource(
             com.upsaclay.common.R.string.hour_ago_short,
             elapsedTime.value
         )
 
-        is com.upsaclay.common.domain.model.ElapsedTime.Day -> stringResource(
+        is ElapsedTime.Day -> stringResource(
             com.upsaclay.common.R.string.day_ago_short,
             elapsedTime.value
         )
 
-        is com.upsaclay.common.domain.model.ElapsedTime.Week -> stringResource(
+        is ElapsedTime.Week -> stringResource(
             com.upsaclay.common.R.string.week_ago_short,
             elapsedTime.value
         )
 
-        is com.upsaclay.common.domain.model.ElapsedTime.Later -> localDateTimeFormatterUseCase.formatDayMonthYear(
-            elapsedTime.value
-        )
+        is ElapsedTime.Later -> FormatLocalDateTimeUseCase.formatDayMonthYear(elapsedTime.value)
     }
 
     Row(
@@ -70,7 +77,7 @@ internal fun AnnouncementItem(modifier: Modifier = Modifier, announcement: com.u
         verticalAlignment = Alignment.CenterVertically
     ) {
         ProfilePicture(
-            imageUrl = announcement.author.profilePictureUrl,
+            url = announcement.author.profilePictureUrl,
             scale = 0.45f
         )
 
@@ -88,47 +95,46 @@ internal fun AnnouncementItem(modifier: Modifier = Modifier, announcement: com.u
 
         Text(
             text = elapsedTimeValue,
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.bodySmall,
             color = GedoiseColor.PreviewText
         )
     }
 }
 
 @Composable
-internal fun AnnouncementItemWithContent(announcement: com.upsaclay.news.domain.model.Announcement, onClick: () -> Unit) {
-    val getElapsedTimeUseCase = GetElapsedTimeUseCase()
-    val localDateTimeFormatterUseCase = LocalDateTimeFormatterUseCase()
-    val elapsedTime = getElapsedTimeUseCase.fromLocalDateTime(announcement.date)
+internal fun AnnouncementItem(
+    announcement: Announcement,
+    onClick: () -> Unit
+) {
+    val elapsedTime = GetElapsedTimeUseCase.fromLocalDateTime(announcement.date)
 
     val elapsedTimeValue = when (elapsedTime) {
-        is com.upsaclay.common.domain.model.ElapsedTime.Now -> stringResource(
+        is ElapsedTime.Now -> stringResource(
             com.upsaclay.common.R.string.second_ago_short,
             elapsedTime.value
         )
 
-        is com.upsaclay.common.domain.model.ElapsedTime.Minute -> stringResource(
+        is ElapsedTime.Minute -> stringResource(
             com.upsaclay.common.R.string.minute_ago_short,
             elapsedTime.value
         )
 
-        is com.upsaclay.common.domain.model.ElapsedTime.Hour -> stringResource(
+        is ElapsedTime.Hour -> stringResource(
             com.upsaclay.common.R.string.hour_ago_short,
             elapsedTime.value
         )
 
-        is com.upsaclay.common.domain.model.ElapsedTime.Day -> stringResource(
+        is ElapsedTime.Day -> stringResource(
             com.upsaclay.common.R.string.day_ago_short,
             elapsedTime.value
         )
 
-        is com.upsaclay.common.domain.model.ElapsedTime.Week -> stringResource(
+        is ElapsedTime.Week -> stringResource(
             com.upsaclay.common.R.string.week_ago_short,
             elapsedTime.value
         )
 
-        is com.upsaclay.common.domain.model.ElapsedTime.Later -> localDateTimeFormatterUseCase.formatDayMonthYear(
-            elapsedTime.value
-        )
+        is ElapsedTime.Later -> FormatLocalDateTimeUseCase.formatDayMonthYear(elapsedTime.value)
     }
 
     Row(
@@ -136,43 +142,65 @@ internal fun AnnouncementItemWithContent(announcement: com.upsaclay.news.domain.
             .clickable(onClick = onClick)
             .fillMaxWidth()
             .padding(MaterialTheme.spacing.smallMedium),
-        verticalAlignment = Alignment.Top
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        ProfilePicture(
-            imageUrl = announcement.author.profilePictureUrl,
-            scale = 0.5f
-        )
+        Row(
+            modifier = Modifier.weight(1f),
+            verticalAlignment = Alignment.Top
+        ) {
+            ProfilePicture(
+                url = announcement.author.profilePictureUrl,
+                scale = 0.5f
+            )
 
-        Spacer(modifier = Modifier.width(MaterialTheme.spacing.smallMedium))
+            Spacer(modifier = Modifier.width(MaterialTheme.spacing.smallMedium))
 
-        Column {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Column {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = announcement.author.fullName,
+                        style = MaterialTheme.typography.titleSmall,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(fill = false, weight = 1f)
+                    )
+
+                    Spacer(modifier = Modifier.width(MaterialTheme.spacing.small))
+
+                    Text(
+                        text = elapsedTimeValue,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = GedoiseColor.PreviewText
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(2.dp))
+
                 Text(
-                    text = announcement.author.fullName,
-                    style = MaterialTheme.typography.titleSmall,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(fill = false, weight = 1f)
-                )
-
-                Spacer(modifier = Modifier.width(MaterialTheme.spacing.small))
-
-                Text(
-                    text = elapsedTimeValue,
+                    text = announcement.title ?: announcement.content,
+                    color = GedoiseColor.PreviewText,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = GedoiseColor.PreviewText
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        }
+
+        when (announcement.state) {
+            AnnouncementState.LOADING -> {
+                CircularProgressBar(scale = 0.4f)
+            }
+
+            AnnouncementState.ERROR -> {
+                Icon(
+                    modifier = Modifier.scale(0.8f),
+                    painter = painterResource(id = com.upsaclay.common.R.drawable.ic_info_outline),
+                    contentDescription = null,
+                    tint = GedoiseColor.Red
                 )
             }
 
-            Spacer(modifier = Modifier.height(2.dp))
-
-            Text(
-                text = announcement.title ?: announcement.content,
-                color = GedoiseColor.PreviewText,
-                style = MaterialTheme.typography.bodyMedium,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
+            else -> {}
         }
     }
 }
@@ -187,7 +215,7 @@ internal fun AnnouncementItemWithContent(announcement: com.upsaclay.news.domain.
 @Composable
 private fun AnnouncementItemPreview() {
     GedoiseTheme {
-        AnnouncementItem(announcement = announcementFixture)
+        HeaderAnnouncement(announcement = announcementFixture)
     }
 }
 
@@ -195,9 +223,25 @@ private fun AnnouncementItemPreview() {
 @Composable
 private fun AnnouncementItemWithTitlePreview() {
     GedoiseTheme {
-        AnnouncementItemWithContent(
-            announcement = announcementFixture,
-            onClick = { }
-        )
+        Column {
+            AnnouncementItem(
+                announcement = announcementFixture,
+                onClick = { }
+            )
+
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
+
+            AnnouncementItem(
+                announcement = announcementFixture.copy(state = AnnouncementState.LOADING),
+                onClick = { }
+            )
+
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
+
+            AnnouncementItem(
+                announcement = announcementFixture.copy(state = AnnouncementState.ERROR),
+                onClick = { }
+            )
+        }
     }
 }

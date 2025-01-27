@@ -9,9 +9,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 
-suspend fun <T> DataStore<Preferences>.getValue(key: Preferences.Key<T>): T? = data.map { it[key] }.firstOrNull()
+suspend fun <T> DataStore<Preferences>.getValue(key: Preferences.Key<T>): T? =
+    data.map { it[key] }.firstOrNull()
 
-fun <T> DataStore<Preferences>.getFlowValue(key: Preferences.Key<T>): Flow<T?> = data.map { it[key] }
+fun <T> DataStore<Preferences>.getFlowValue(key: Preferences.Key<T>): Flow<T?> =
+    data.map { it[key] }
 
 suspend fun <T> DataStore<Preferences>.setValue(key: Preferences.Key<T>, value: T) {
     edit { preferences ->
@@ -31,22 +33,33 @@ suspend fun <T> DataStore<Preferences>.clearAll() {
     }
 }
 
-suspend fun <T> DataStore<Preferences>.contains(key: Preferences.Key<T>): Boolean = data.map { preferences ->
-    preferences.contains(key)
-}.firstOrNull() ?: false
+suspend fun <T> DataStore<Preferences>.contains(key: Preferences.Key<T>): Boolean =
+    data.map { preferences ->
+        preferences.contains(key)
+    }.firstOrNull() ?: false
 
-suspend fun <T> DataStore<Preferences>.setGsonValue(key: Preferences.Key<String>, value: T, gson: Gson = Gson()) {
+suspend fun <T> DataStore<Preferences>.setGsonValue(
+    key: Preferences.Key<String>,
+    value: T,
+    gson: Gson = Gson()
+) {
     setValue(key, gson.toJson(value))
 }
 
-suspend inline fun <reified T> DataStore<Preferences>.getGsonValue(key: Preferences.Key<String>, gson: Gson = Gson()): T? {
+suspend inline fun <reified T> DataStore<Preferences>.getGsonValue(
+    key: Preferences.Key<String>,
+    gson: Gson = Gson()
+): T? {
     val type = object : TypeToken<T>() {}.type
     return getValue(key)?.let {
         runCatching { gson.fromJson<T>(it, type) }.getOrNull()
     }
 }
 
-inline fun <reified T> DataStore<Preferences>.getFlowGsonValue(key: Preferences.Key<String>, gson: Gson = Gson()): Flow<T?> {
+inline fun <reified T> DataStore<Preferences>.getFlowGsonValue(
+    key: Preferences.Key<String>,
+    gson: Gson = Gson()
+): Flow<T?> {
     val type = object : TypeToken<T>() {}.type
     return getFlowValue(key).map {
         runCatching { gson.fromJson<T>(it, type) }.getOrNull()

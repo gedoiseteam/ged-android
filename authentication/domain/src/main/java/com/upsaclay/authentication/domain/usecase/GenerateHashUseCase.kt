@@ -4,8 +4,8 @@ import java.security.MessageDigest
 import java.security.SecureRandom
 
 private const val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZaàäbc" +
-    "deéèëêfghijklmnoôöpqrstuùûüµvwxyz0123456789!" +
-    "@#\\\$£€%^¨{}[]&*()-_ =~+<>?/|.,;:¤"
+        "deéèëêfghijklmnoôöpqrstuùûüµvwxyz0123456789!" +
+        "@#\\\$£€%^¨{}[]&*()-_ =~+<>?/|.,;:¤"
 
 class GenerateHashUseCase {
     private val secureRandom = SecureRandom()

@@ -1,149 +1,90 @@
 package com.upsaclay.common.data.remote
 
-import com.google.firebase.firestore.FirebaseFirestoreException
+import com.upsaclay.common.data.UserMapper
 import com.upsaclay.common.data.formatHttpError
-import com.upsaclay.common.data.model.UserDTO
 import com.upsaclay.common.data.remote.api.UserFirestoreApi
 import com.upsaclay.common.data.remote.api.UserRetrofitApi
 import com.upsaclay.common.domain.e
-import java.io.IOException
+import com.upsaclay.common.domain.entity.User
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.IOException
 
 internal class UserRemoteDataSource(
     private val userRetrofitApi: UserRetrofitApi,
     private val userFirestoreApi: UserFirestoreApi
 ) {
-    suspend fun getCurrentUser(userId: Int): UserDTO? = withContext(Dispatchers.IO) {
-        try {
-            val response = userRetrofitApi.getUser(userId)
-            if (response.isSuccessful) {
-                response.body()
-            } else {
-                val errorMessage = formatHttpError("Error getting current user", response)
-                e(errorMessage)
-                null
+    suspend fun getUser(userId: String): User? = withContext(Dispatchers.IO) {
+        userFirestoreApi.getUser(userId)?.let { UserMapper.toDomain(it) }
+    }
+
+    suspend fun getUserFlow(userId: String): Flow<User> = withContext(Dispatchers.IO) {
+        userFirestoreApi.getUserFlow(userId).mapNotNull {
+            it?.let { UserMapper.toDomain(it) }
+        }
+    }
+
+    suspend fun getUserFirestoreWithEmail(userEmail: String): User? = withContext(Dispatchers.IO) {
+        userFirestoreApi.getUserWithEmail(userEmail)?.let { UserMapper.toDomain(it) }
+    }
+
+    suspend fun getUsers(): List<User> = withContext(Dispatchers.IO) {
+        userFirestoreApi.getUsers().map(UserMapper::toDomain)
+    }
+
+    suspend fun createUser(user: User) {
+        withContext(Dispatchers.IO) {
+            launch { createUserWithOracle(user) }
+            launch { createUserWithFirestore(user) }
+        }
+    }
+
+    suspend fun updateProfilePictureUrl(userId: String, url: String) {
+        withContext(Dispatchers.IO) {
+            launch { userFirestoreApi.updateProfilePictureUrl(userId, url) }
+            launch {
+                val response = userRetrofitApi.updateProfilePictureUrl(userId, url)
+                if (!response.isSuccessful) {
+                    val errorMessage = formatHttpError("Error updating profile picture url", response)
+                    e(errorMessage)
+                    throw IOException(errorMessage)
+                }
             }
-        } catch (e: IOException) {
-            e("Error getting current user: ${e.message}")
-            null
         }
     }
 
-    suspend fun getUserWithOracle(email: String): UserDTO? = withContext(Dispatchers.IO) {
-        try {
-            val response = userRetrofitApi.getUser(email)
-            if(response.isSuccessful) {
-                response.body()
-            } else {
-                val errorMessage = formatHttpError("Error getting current user with email", response)
-                e(errorMessage)
-                null
+    suspend fun deleteProfilePictureUrl(userId: String) {
+        withContext(Dispatchers.IO) {
+            launch { userFirestoreApi.updateProfilePictureUrl(userId, null) }
+            launch {
+                val response = userRetrofitApi.deleteProfilePictureUrl(userId)
+                if (!response.isSuccessful) {
+                    val errorMessage = formatHttpError("Error deleting profile picture url", response)
+                    e(errorMessage)
+                    throw IOException(errorMessage)
+                }
             }
-        } catch (e: IOException) {
-            e("Error getting user with email: ${e.message}")
-            null
         }
     }
 
-    suspend fun getUserWithFirestore(userId: Int): UserFirestoreModel? = withContext(Dispatchers.IO) {
-        try {
-            userFirestoreApi.getUser(userId.toString())
-        } catch (e: IOException) {
-            e("Error getting user: ${e.message}")
-            null
-        } catch (e: FirebaseFirestoreException) {
-            e("Error getting user: ${e.message}")
-            null
+    suspend fun isUserExist(email: String): Boolean = withContext(Dispatchers.IO) {
+        userFirestoreApi.isUserExist(email)
+    }
+
+    private suspend fun createUserWithOracle(user: User) {
+        val response = userRetrofitApi.createUser(UserMapper.toDTO(user))
+        if (!response.isSuccessful) {
+            val errorMessage = formatHttpError("Error creating user with Oracle", response)
+            e(errorMessage)
+            throw IOException(errorMessage)
         }
     }
 
-    suspend fun getUserWithFirestore(userEmail: String): UserFirestoreModel? = withContext(Dispatchers.IO) {
-        try {
-            userFirestoreApi.getUser(userEmail)
-        } catch (e: IOException) {
-            e("Error getting user: ${e.message}")
-            null
-        } catch (e: FirebaseFirestoreException) {
-            e("Error getting user: ${e.message}")
-            null
-        }
-    }
-
-    suspend fun getAllUsersWithFirestore(): List<UserFirestoreModel> = try {
-        userFirestoreApi.getAllUsers()
-    } catch (e: Exception) {
-        e("Error getting all users: ${e.message}", e)
-        emptyList()
-    }
-
-    suspend fun getOnlineUsers(): List<UserFirestoreModel> = try {
-        userFirestoreApi.getOnlineUsers()
-    } catch (e: IOException) {
-        e("Error getting all online users: ${e.message}", e)
-        emptyList()
-    } catch (e: FirebaseFirestoreException) {
-        e("Error getting all online users: ${e.message}", e)
-        emptyList()
-    }
-
-    suspend fun createUserWithOracle(userDTO: UserDTO): Int? = withContext(Dispatchers.IO) {
-        try {
-            userRetrofitApi.createUser(userDTO).body()?.data
-        } catch (e: IOException) {
-            e("Error creating user with Oracle: ${e.message}", e)
-            null
-        }
-    }
-
-    suspend fun createUserWithFirestore(userFirestoreModel: UserFirestoreModel): Result<Unit> = withContext(Dispatchers.IO) {
-        try {
-            userFirestoreApi.createUser(userFirestoreModel)
-        } catch (e: IOException) {
-            e("Error creating user with Firestore: ${e.message}", e)
-            Result.failure(e)
-        } catch (e: FirebaseFirestoreException) {
-            e("Error creating user with Firestore: ${e.message}", e)
-            Result.failure(e)
-        }
-    }
-
-    suspend fun updateProfilePictureUrl(userId: Int, newProfilePictureUrl: String): Result<Unit> = withContext(Dispatchers.IO) {
-        try {
-            userRetrofitApi.updateProfilePictureUrl(userId, newProfilePictureUrl)
-            userFirestoreApi.updateProfilePictureUrl(userId.toString(), newProfilePictureUrl)
-        } catch (e: IOException) {
-            e("Error updating user profile picture url: ${e.message}", e)
-            Result.failure(e)
-        } catch (e: FirebaseFirestoreException) {
-            e("Error updating user profile picture url: ${e.message}", e)
-            Result.failure(e)
-        }
-    }
-
-    suspend fun deleteProfilePictureUrl(userId: Int): Result<Unit> = withContext(Dispatchers.IO) {
-        try {
-            userRetrofitApi.deleteProfilePictureUrl(userId)
-            userFirestoreApi.updateProfilePictureUrl(userId.toString(), null)
-        } catch (e: IOException) {
-            e("Error deleting user profile picture url: ${e.message}", e)
-            Result.failure(e)
-        } catch (e: FirebaseFirestoreException) {
-            e("Error deleting user profile picture url: ${e.message}", e)
-            Result.failure(e)
-        }
-    }
-
-    suspend fun isUserExist(email: String): Result<Boolean> = withContext(Dispatchers.IO) {
-        try {
-            Result.success(userFirestoreApi.isUserExist(email))
-        }
-        catch (e: IOException) {
-            e("Error isUserExist : ${e.message}", e)
-            Result.failure(e)
-        } catch (e: FirebaseFirestoreException) {
-            e("Error isUserExist : ${e.message}", e)
-            Result.failure(e)
-        }
+    private suspend fun createUserWithFirestore(user: User) {
+        userFirestoreApi.createUser(UserMapper.toFirestoreUser(user))
     }
 }

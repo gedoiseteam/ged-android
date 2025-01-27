@@ -1,38 +1,45 @@
 package com.upsaclay.news
 
-import com.upsaclay.news.domain.usecase.ConvertAnnouncementToJsonUseCase
+import com.upsaclay.news.domain.entity.Announcement
 import com.upsaclay.news.domain.usecase.CreateAnnouncementUseCase
 import com.upsaclay.news.domain.usecase.DeleteAnnouncementUseCase
-import com.upsaclay.news.domain.usecase.GetAllAnnouncementsUseCase
 import com.upsaclay.news.domain.usecase.GetAnnouncementUseCase
-import com.upsaclay.news.domain.usecase.GetOnlineUserUseCase
+import com.upsaclay.news.domain.usecase.GetAnnouncementsUseCase
 import com.upsaclay.news.domain.usecase.RefreshAnnouncementsUseCase
 import com.upsaclay.news.domain.usecase.UpdateAnnouncementUseCase
-import com.upsaclay.news.presentation.viewmodel.CreateAnnouncementViewModel
-import com.upsaclay.news.presentation.viewmodel.EditAnnouncementViewModel
-import com.upsaclay.news.presentation.viewmodel.NewsViewModel
+import com.upsaclay.news.presentation.viewmodels.ReadAnnouncementViewModel
+import com.upsaclay.news.presentation.viewmodels.CreateAnnouncementViewModel
+import com.upsaclay.news.presentation.viewmodels.EditAnnouncementViewModel
+import com.upsaclay.news.presentation.viewmodels.NewsViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
 val newsModule = module {
-
     viewModelOf(::NewsViewModel)
-    viewModel { (announcement: com.upsaclay.news.domain.model.Announcement) ->
+    viewModelOf(::CreateAnnouncementViewModel)
+    viewModel { (announcementId: String) ->
+        ReadAnnouncementViewModel(
+            announcementId = announcementId,
+            getCurrentUserUseCase = get(),
+            getAnnouncementUseCase = get(),
+            getAnnouncementsUseCase = get(),
+            deleteAnnouncementUseCase = get(),
+        )
+    }
+    viewModel { (announcementId: String) ->
         EditAnnouncementViewModel(
-            editedAnnouncement = announcement,
+            announcementId = announcementId,
+            getAnnouncementUseCase = get(),
             updateAnnouncementUseCase = get()
         )
     }
-    viewModelOf(::CreateAnnouncementViewModel)
 
-    singleOf(::ConvertAnnouncementToJsonUseCase)
     singleOf(::CreateAnnouncementUseCase)
     singleOf(::DeleteAnnouncementUseCase)
-    singleOf(::GetAllAnnouncementsUseCase)
+    singleOf(::GetAnnouncementsUseCase)
     singleOf(::GetAnnouncementUseCase)
-    singleOf(::GetOnlineUserUseCase)
     singleOf(::RefreshAnnouncementsUseCase)
     singleOf(::UpdateAnnouncementUseCase)
 }

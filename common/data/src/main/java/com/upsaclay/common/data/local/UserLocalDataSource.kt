@@ -1,27 +1,27 @@
 package com.upsaclay.common.data.local
 
-import com.upsaclay.common.data.model.UserDTO
+import com.upsaclay.common.data.UserMapper
+import com.upsaclay.common.domain.entity.User
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 
 internal class UserLocalDataSource(private val userDataStore: UserDataStore) {
+    fun getCurrentUserFlow(): Flow<User> = userDataStore.getCurrentUser().filterNotNull().map(UserMapper::toDomain)
 
-    fun getCurrentUserFlow(): Flow<UserDTO> = userDataStore.getCurrentUserFlow().filterNotNull()
-
-    suspend fun getCurrentUser(): UserDTO? = userDataStore.getCurrentUser()
-
-    suspend fun setUser(userDTO: UserDTO) {
-        userDataStore.storeCurrentUser(userDTO)
+    suspend fun setCurrentUser(user: User) {
+        userDataStore.storeCurrentUser(UserMapper.toDTO(user))
     }
 
-    suspend fun updateProfilePictureUrl(profilePictureUrl: String) {
-        userDataStore.getCurrentUser()?.let { userDTO ->
-            userDataStore.storeCurrentUser(userDTO.copy(userProfilePictureUrl = profilePictureUrl))
+    suspend fun updateProfilePictureUrl(url: String) {
+        userDataStore.getCurrentUser().firstOrNull()?.let { userDTO ->
+            userDataStore.storeCurrentUser(userDTO.copy(userProfilePictureUrl = url))
         }
     }
 
     suspend fun deleteProfilePictureUrl() {
-        userDataStore.getCurrentUser()?.let { userDTO ->
+        userDataStore.getCurrentUser().firstOrNull()?.let { userDTO ->
             userDataStore.storeCurrentUser(userDTO.copy(userProfilePictureUrl = null))
         }
     }

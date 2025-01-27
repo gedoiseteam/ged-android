@@ -3,8 +3,6 @@ package com.upsaclay.gedoise
 import androidx.room.Room
 import com.upsaclay.gedoise.data.GedoiseDatabase
 import com.upsaclay.gedoise.presentation.MainViewModel
-import com.upsaclay.gedoise.presentation.profile.ProfileViewModel
-import com.upsaclay.gedoise.presentation.account.AccountViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.dsl.module
@@ -25,6 +23,4 @@ val appModule = module {
     single { get<GedoiseDatabase>().messageDao() }
 
     viewModelOf(::MainViewModel)
-    viewModelOf(::ProfileViewModel)
-    viewModelOf(::AccountViewModel)
 }

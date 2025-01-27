@@ -3,10 +3,10 @@ package com.upsaclay.common.data.repository
 import android.content.Context
 import android.net.Uri
 import com.upsaclay.common.domain.repository.FileRepository
-import java.io.ByteArrayOutputStream
-import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.io.ByteArrayOutputStream
+import java.io.File
 
 internal class FileRepositoryImpl(private val context: Context) : FileRepository {
     override suspend fun createFileFromUri(fileName: String, uri: Uri): File = withContext(Dispatchers.IO) {
@@ -39,5 +39,6 @@ internal class FileRepositoryImpl(private val context: Context) : FileRepository
         return byteArrayOutputStream.toByteArray()
     }
 
-    override fun getFileType(uri: Uri): String? = context.contentResolver.getType(uri)?.split("/")?.last()
+    override fun getFileType(uri: Uri): String? =
+        context.contentResolver.getType(uri)?.split("/")?.last()
 }

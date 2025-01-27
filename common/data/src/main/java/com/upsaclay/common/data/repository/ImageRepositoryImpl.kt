@@ -8,33 +8,24 @@ import com.upsaclay.common.domain.repository.ImageRepository
 import java.io.File
 import java.io.IOException
 
-internal class ImageRepositoryImpl(private val imageRemoteDataSource: ImageRemoteDataSource) : ImageRepository {
+internal class ImageRepositoryImpl(private val imageRemoteDataSource: ImageRemoteDataSource) :
+    ImageRepository {
 
-    override suspend fun uploadImage(file: File): Result<Unit> {
+    override suspend fun uploadImage(file: File) {
         val response = imageRemoteDataSource.uploadImage(file)
-
-        return if (response.isSuccessful) {
-            val successMessage = response.body()?.message ?: "Image ${file.name} uploaded successful"
-            i(successMessage)
-            Result.success(Unit)
-        } else {
+        if (!response.isSuccessful) {
             val errorMessage = formatHttpError("Error to upload image ${file.name}", response)
             e(errorMessage)
-            Result.failure(IOException(errorMessage))
+            throw IOException(errorMessage)
         }
     }
 
-    override suspend fun deleteImage(fileName: String): Result<Unit> {
+    override suspend fun deleteImage(fileName: String) {
         val response = imageRemoteDataSource.deleteImage(fileName)
-
-        return if (response.isSuccessful) {
-            val successMessage = response.body()?.message ?: "Image $fileName deleted successfully"
-            i(successMessage)
-            Result.success(Unit)
-        } else {
+        if (!response.isSuccessful) {
             val errorMessage = formatHttpError("Error to delete image $fileName", response)
             e(errorMessage)
-            Result.failure(IOException(errorMessage))
+            throw IOException(errorMessage)
         }
     }
 }

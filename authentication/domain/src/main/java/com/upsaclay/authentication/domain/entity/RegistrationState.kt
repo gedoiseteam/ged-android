@@ -1,0 +1,15 @@
+package com.upsaclay.authentication.domain.entity
+
+enum class RegistrationState {
+    OK,
+    ERROR,
+    LOADING,
+    REGISTERED,
+    NOT_REGISTERED,
+    UNRECOGNIZED_ACCOUNT,
+    USER_ALREADY_EXIST,
+    USER_NOT_EXIST,
+    INPUTS_EMPTY_ERROR,
+    EMAIL_FORMAT_ERROR,
+    PASSWORD_LENGTH_ERROR
+}

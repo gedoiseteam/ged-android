@@ -13,7 +13,11 @@ import androidx.compose.ui.unit.dp
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 
 @Composable
-fun CircularProgressBar(modifier: Modifier = Modifier, color: Color = MaterialTheme.colorScheme.primary, scale: Float = 1f) {
+fun CircularProgressBar(
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colorScheme.primary,
+    scale: Float = 1f
+) {
     CircularProgressIndicator(
         modifier = modifier.size(42.dp * scale),
         color = color,

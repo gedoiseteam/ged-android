@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">La Grande Ecole du Droit</string>
+
     <string name="close">Fermer</string>
     <string name="show">Voir</string>
     <string name="next">Suivant</string>
@@ -24,6 +26,7 @@
     <string name="empty_field_error">Veuillez remplir le champ</string>
     <string name="unknown_error">Une erreur inconnue est survenue</string>
     <string name="network_error">Une erreur réseau est survenue</string>
+    <string name="occurred_error">Une erreur est survenue</string>
     <string name="icon_add_descrption">Icône d\'ajout</string>
 
     <string name="school_level">Niveau d\'étude</string>
@@ -44,4 +47,6 @@
     <string name="hour_ago_medium">%d heures</string>
     <string name="day_ago_medium">%d jours</string>
     <string name="week_ago_medium">%d semaines</string>
+
+    <string name="no_user_found">Aucun utilisateur trouvé</string>
 </resources>

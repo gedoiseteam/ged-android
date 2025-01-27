@@ -3,14 +3,17 @@ package com.upsaclay.common.presentation.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -64,14 +67,13 @@ fun TransparentTextField(
         ),
         cursorBrush = SolidColor(colors.cursorColor)
     ) { innerTextField ->
-        val interactionSource = remember { MutableInteractionSource() }
         TextFieldDefaults.DecorationBox(
             value = value,
             innerTextField = innerTextField,
             enabled = true,
             singleLine = false,
             visualTransformation = VisualTransformation.None,
-            interactionSource = interactionSource,
+            interactionSource = remember { MutableInteractionSource() },
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = backgroundColor,
                 unfocusedContainerColor = backgroundColor,
@@ -88,7 +90,7 @@ fun TransparentTextField(
 @Composable
 fun TransparentFocusedTextField(
     modifier: Modifier = Modifier,
-    defaultValue: String,
+    value: String = "",
     onValueChange: (String) -> Unit,
     placeholder: @Composable (() -> Unit),
     textStyle: TextStyle = TextStyle.Default,
@@ -101,8 +103,8 @@ fun TransparentFocusedTextField(
     val textFieldValue = remember {
         mutableStateOf(
             TextFieldValue(
-                text = defaultValue,
-                selection = TextRange(defaultValue.length)
+                text = value,
+                selection = TextRange(value.length)
             )
         )
     }
@@ -177,7 +179,20 @@ private fun TransparentTextFieldPreview() {
             placeholder = { Text("Placeholder") },
             backgroundColor = MaterialTheme.colorScheme.background,
             padding = MaterialTheme.spacing.medium,
-            shape = ShapeDefaults.ExtraLarge
+            shape = ShapeDefaults.ExtraLarge,
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun TransparentFocusedTextFiedl() {
+    var text by remember { mutableStateOf("") }
+    GedoiseTheme {
+        TransparentFocusedTextField(
+            value = "",
+            onValueChange = { text = it },
+            placeholder = { Text(text = "Placeholder") }
         )
     }
 }

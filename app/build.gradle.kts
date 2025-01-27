@@ -70,7 +70,7 @@ dependencies {
     implementation(libs.koin.androidx.compose)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.coil.compose)
-    implementation(libs.kotlinx.collections.immutable)
+    implementation(libs.coil.network)
     implementation(libs.androidx.compose.foundation)
     implementation(libs.gson)
     implementation(libs.jakewharton.timber)
@@ -101,4 +101,6 @@ dependencies {
     implementation(project(":news"))
     implementation(project(":news:domain"))
     implementation(project(":news:data"))
+
+    implementation(project(":profile"))
 }

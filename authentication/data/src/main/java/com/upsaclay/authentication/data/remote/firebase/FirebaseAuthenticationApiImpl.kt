@@ -18,7 +18,11 @@ class FirebaseAuthenticationApiImpl: FirebaseAuthenticationApi {
 
     override suspend fun signUpWithEmailAndPassword(email: String, password: String) = suspendCoroutine { continuation ->
         firebaseAuth.createUserWithEmailAndPassword(email, password)
-            .addOnSuccessListener { continuation.resume(Unit) }
+            .addOnSuccessListener { authResult ->
+                authResult.user?.let {
+                    continuation.resume(it.uid)
+                } ?: throw UserNotAuthenticatedException("User not found")
+            }
             .addOnFailureListener { e -> continuation.resumeWithException(e) }
     }
 

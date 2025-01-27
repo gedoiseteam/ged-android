@@ -1,12 +1,13 @@
 package com.upsaclay.message.data.remote.api
 
 import com.google.firebase.Firebase
+import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.firestore
 import com.upsaclay.common.domain.e
 import com.upsaclay.common.domain.i
 import com.upsaclay.message.data.model.CONVERSATIONS_TABLE_NAME
-import com.upsaclay.message.data.remote.ConversationField
+import com.upsaclay.message.data.model.ConversationField
 import com.upsaclay.message.data.remote.model.RemoteConversation
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -18,35 +19,33 @@ import kotlinx.coroutines.flow.callbackFlow
 internal class ConversationApiImpl : ConversationApi {
     private val conversationsCollection = Firebase.firestore.collection(CONVERSATIONS_TABLE_NAME)
 
-    override fun listenAllConversations(userId: Int): Flow<List<RemoteConversation>> = callbackFlow {
-        val listener = conversationsCollection.whereArrayContains(ConversationField.PARTICIPANTS, userId)
-            .addSnapshotListener { value, error ->
+    override fun listenConversations(userId: String): Flow<RemoteConversation> = callbackFlow {
+        val listener = conversationsCollection
+            .whereArrayContains(ConversationField.Remote.PARTICIPANTS, userId)
+            .addSnapshotListener { snapshot, error ->
                 error?.let {
                     e("Error getting conversations", it)
-                    close(it)
+                    return@addSnapshotListener
                 }
 
-                val conversations = value?.let {
-                    when (it.size()) {
-                        0 -> emptyList()
-                        1 -> {
-                            val conversation = it.documents.first().toObject(RemoteConversation::class.java)
-                            if (conversation != null) listOf(conversation) else emptyList()
-                        }
-                        else -> it.toObjects(RemoteConversation::class.java)
+                snapshot?.documentChanges?.forEach { change ->
+                    val conversation = change.document.toObject(RemoteConversation::class.java)
+                    when(change.type) {
+                        DocumentChange.Type.ADDED -> trySend(conversation)
+                        DocumentChange.Type.MODIFIED -> trySend(conversation)
+                        DocumentChange.Type.REMOVED -> return@forEach
                     }
-                } ?: emptyList()
-
-                trySend(conversations)
+                }
             }
         awaitClose { listener.remove() }
     }
 
-    override suspend fun createConversation(remoteConversation: RemoteConversation): String = suspendCoroutine { continuation ->
-        conversationsCollection.add(remoteConversation)
+    override suspend fun createConversation(remoteConversation: RemoteConversation) = suspendCoroutine { continuation ->
+        conversationsCollection
+            .document(remoteConversation.conversationId)
+            .set(remoteConversation)
             .addOnSuccessListener {
-                i("Conversation created successfully")
-                continuation.resume(it.id)
+                continuation.resume(Unit)
             }
             .addOnFailureListener { e ->
                 e("Error creating conversations", e)
@@ -54,14 +53,15 @@ internal class ConversationApiImpl : ConversationApi {
             }
     }
 
-    override fun updateConversation(remoteConversation: RemoteConversation) {
-        conversationsCollection.document(remoteConversation.conversationId)
-            .set(remoteConversation, SetOptions.merge())
+    override suspend fun deleteConversation(conversationId: String) = suspendCoroutine { continuation ->
+        conversationsCollection.document(conversationId)
+            .delete()
             .addOnSuccessListener {
-                i("Conversation updated successfully")
+                continuation.resume(Unit)
             }
             .addOnFailureListener { e ->
-                e("Error updating conversations", e)
+                e("Error deleting conversation", e)
+                continuation.resumeWithException(e)
             }
     }
 }

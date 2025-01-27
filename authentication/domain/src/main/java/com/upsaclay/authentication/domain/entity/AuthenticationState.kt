@@ -1,0 +1,17 @@
+package com.upsaclay.authentication.domain.entity
+
+enum class AuthenticationState {
+    IDLE,
+    UNAUTHENTICATED,
+    AUTHENTICATED,
+    LOADING,
+    EMAIL_VERIFIED,
+    EMAIL_NOT_VERIFIED,
+    AUTHENTICATION_ERROR,
+    INPUTS_EMPTY_ERROR,
+    EMAIL_FORMAT_ERROR,
+    UNKNOWN_ERROR,
+    NETWORK_ERROR,
+    TOO_MANY_REQUESTS_ERROR,
+    AUTHENTICATED_USER_NOT_FOUND
+}

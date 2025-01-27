@@ -2,6 +2,7 @@ package com.upsaclay.authentication.data
 
 import com.upsaclay.authentication.data.local.AuthenticationLocalDataSource
 import com.upsaclay.authentication.data.remote.AuthenticationRemoteDataSource
+import com.upsaclay.authentication.data.remote.AuthenticationRetrofitApi
 import com.upsaclay.authentication.data.remote.firebase.FirebaseAuthenticationApi
 import com.upsaclay.authentication.data.remote.firebase.FirebaseAuthenticationApiImpl
 import com.upsaclay.authentication.data.remote.firebase.FirebaseAuthenticationRemoteDataSource
@@ -29,7 +30,7 @@ val authenticationDataModule = module {
 
     single {
         get<Retrofit>(qualifier = named(PARIS_SACLAY_SERVER_QUALIFIER))
-            .create(com.upsaclay.authentication.data.remote.AuthenticationRetrofitApi::class.java)
+            .create(AuthenticationRetrofitApi::class.java)
     }
 
     singleOf(::AuthenticationRepositoryImpl) { bind<AuthenticationRepository>() }

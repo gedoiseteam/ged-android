@@ -1,14 +1,10 @@
 package com.upsaclay.news.data.remote.model
 
 import com.google.gson.annotations.SerializedName
-import com.upsaclay.common.domain.model.User
-import com.upsaclay.common.domain.usecase.ConvertLocalDateTimeUseCase
-import com.upsaclay.common.domain.usecase.ConvertTimestampUseCase
-import com.upsaclay.news.domain.model.Announcement
 
-internal data class AnnouncementRemoteWithUser(
+internal data class RemoteAnnouncement(
     @SerializedName("ANNOUNCEMENT_ID")
-    val announcementId: Int,
+    val announcementId: String,
     @SerializedName("ANNOUNCEMENT_TITLE")
     val announcementTitle: String?,
     @SerializedName("ANNOUNCEMENT_CONTENT")
@@ -16,7 +12,20 @@ internal data class AnnouncementRemoteWithUser(
     @SerializedName("ANNOUNCEMENT_DATE")
     val announcementDate: Long,
     @SerializedName("USER_ID")
-    val userId: Int,
+    val userId: String
+)
+
+internal data class RemoteAnnouncementWithUser(
+    @SerializedName("ANNOUNCEMENT_ID")
+    val announcementId: String,
+    @SerializedName("ANNOUNCEMENT_TITLE")
+    val announcementTitle: String?,
+    @SerializedName("ANNOUNCEMENT_CONTENT")
+    val announcementContent: String,
+    @SerializedName("ANNOUNCEMENT_DATE")
+    val announcementDate: Long,
+    @SerializedName("USER_ID")
+    val userId: String,
     @SerializedName("USER_FIRST_NAME")
     val userFirstName: String,
     @SerializedName("USER_LAST_NAME")
@@ -29,43 +38,4 @@ internal data class AnnouncementRemoteWithUser(
     val userIsMember: Int,
     @SerializedName("USER_PROFILE_PICTURE_URL")
     val profilePictureUrl: String?
-) {
-    fun toDomain() = Announcement(
-        id = announcementId,
-        title = announcementTitle,
-        content = announcementContent,
-        date = ConvertTimestampUseCase().toLocalDateTime(announcementDate),
-        author = User(
-            id = userId,
-            firstName = userFirstName,
-            lastName = userLastName,
-            email = userEmail,
-            schoolLevel = userSchoolLevel,
-            isMember = userIsMember == 1,
-            profilePictureUrl = profilePictureUrl
-        )
-    )
-}
-
-internal data class RemoteAnnouncement(
-    @SerializedName("ANNOUNCEMENT_ID")
-    val announcementId: Int,
-    @SerializedName("ANNOUNCEMENT_TITLE")
-    val announcementTitle: String?,
-    @SerializedName("ANNOUNCEMENT_CONTENT")
-    val announcementContent: String,
-    @SerializedName("ANNOUNCEMENT_DATE")
-    val announcementDate: Long,
-    @SerializedName("USER_ID")
-    val userId: Int
-) {
-    companion object {
-        fun fromDomain(announcement: Announcement) = RemoteAnnouncement(
-            announcementId = announcement.id,
-            announcementTitle = announcement.title,
-            announcementContent = announcement.content,
-            announcementDate = ConvertLocalDateTimeUseCase().toTimestamp(announcement.date),
-            userId = announcement.author.id
-        )
-    }
-}
+)

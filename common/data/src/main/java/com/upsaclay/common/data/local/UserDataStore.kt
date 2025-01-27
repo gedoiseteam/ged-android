@@ -7,8 +7,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.upsaclay.common.data.getFlowGsonValue
-import com.upsaclay.common.data.getGsonValue
-import com.upsaclay.common.data.model.UserDTO
+import com.upsaclay.common.data.entity.UserDTO
 import com.upsaclay.common.data.setGsonValue
 import kotlinx.coroutines.flow.Flow
 
@@ -21,9 +20,7 @@ internal class UserDataStore(context: Context) {
         store.setGsonValue(userKey, user)
     }
 
-    fun getCurrentUserFlow(): Flow<UserDTO?> = store.getFlowGsonValue<UserDTO>(userKey)
-
-    suspend fun getCurrentUser(): UserDTO? = store.getGsonValue<UserDTO>(userKey)
+    fun getCurrentUser(): Flow<UserDTO?> = store.getFlowGsonValue<UserDTO>(userKey)
 
     suspend fun removeCurrentUser() {
         store.edit { it.remove(userKey) }
