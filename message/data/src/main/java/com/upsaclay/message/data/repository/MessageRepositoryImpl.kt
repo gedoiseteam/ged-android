@@ -8,6 +8,8 @@ import com.upsaclay.message.domain.repository.MessageRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
@@ -17,17 +19,20 @@ internal class MessageRepositoryImpl(
     private val messageRemoteDataSource: MessageRemoteDataSource,
     private val scope: CoroutineScope = (GlobalScope + Dispatchers.IO)
 ): MessageRepository {
+    private val jobs = mutableListOf<Job>()
+
     override fun getMessages(conversationId: String): Flow<Message> {
         listenRemoteMessage(conversationId)
         return messageLocalDataSource.getMessages(conversationId)
     }
 
     private fun listenRemoteMessage(conversationId: String) {
-        scope.launch {
+        val job = scope.launch {
             messageRemoteDataSource.listenMessages(conversationId).collect {
                 messageLocalDataSource.upsertMessage(it)
             }
         }
+        jobs.add(job)
     }
 
     override fun getLastMessage(conversationId: String): Flow<Message?> =
@@ -48,5 +53,9 @@ internal class MessageRepositoryImpl(
 
     override suspend fun deleteLocalMessages() {
         messageLocalDataSource.deleteMessages()
+    }
+
+    override fun stopListenMessages() {
+        jobs.forEach { it.cancel() }
     }
 }

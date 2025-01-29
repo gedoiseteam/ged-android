@@ -17,6 +17,7 @@ import com.upsaclay.message.domain.usecase.GetMessagesUseCase
 import com.upsaclay.message.domain.usecase.SendMessageUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
@@ -29,7 +30,9 @@ class ChatViewModel(
 ): ViewModel() {
     private val currentUser: User? = getCurrentUserUseCase().value
     private val _messages = MutableStateFlow<Map<String, Message>>(mapOf())
-    val messages: Flow<Map<String, Message>> = _messages
+    val messages: Flow<List<Message>> = _messages.map { messageMap ->
+        messageMap.values.toList().sortedByDescending { it.date }
+    }
     var conversation = conversation
         private set
     var textToSend: String by mutableStateOf("")

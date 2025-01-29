@@ -1,4 +1,4 @@
-package com.upsaclay.profile.presentation.components
+package com.upsaclay.gedoise.presentation.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -23,8 +23,7 @@ import com.upsaclay.common.presentation.components.SmallTopBarBack
 import com.upsaclay.common.presentation.components.SmallTopBarEdit
 import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.spacing
-import com.upsaclay.profile.R
-import com.upsaclay.profile.domain.entities.AccountInfo
+import com.upsaclay.gedoise.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -78,7 +77,7 @@ internal fun AccountModelBottomSheet(
 @Composable
 internal fun AccountInfoItem(
     modifier: Modifier = Modifier,
-    accountInfo: AccountInfo
+    accountInfo: com.upsaclay.gedoise.domain.entities.AccountInfo
 ) {
     Column(
         modifier = modifier.padding(vertical = MaterialTheme.spacing.smallMedium)

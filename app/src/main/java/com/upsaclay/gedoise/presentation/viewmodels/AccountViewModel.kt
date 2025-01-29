@@ -1,4 +1,4 @@
-package com.upsaclay.profile.presentation.viewmodels
+package com.upsaclay.gedoise.presentation.viewmodels
 
 import android.net.Uri
 import androidx.compose.runtime.getValue
@@ -10,11 +10,8 @@ import com.upsaclay.common.domain.entity.User
 import com.upsaclay.common.domain.usecase.DeleteProfilePictureUseCase
 import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
 import com.upsaclay.common.domain.usecase.UpdateUserProfilePictureUseCase
-import com.upsaclay.profile.domain.entities.AccountScreenState
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class AccountViewModel(
@@ -22,8 +19,8 @@ class AccountViewModel(
     private val deleteUserProfilePictureUseCase: DeleteProfilePictureUseCase,
     getCurrentUserUseCase: GetCurrentUserUseCase
 ) : ViewModel() {
-    private val _accountScreenState = MutableStateFlow(AccountScreenState.READ)
-    val accountScreenState: StateFlow<AccountScreenState> = _accountScreenState
+    private val _accountScreenState = MutableStateFlow(com.upsaclay.gedoise.domain.entities.AccountScreenState.READ)
+    val accountScreenState: StateFlow<com.upsaclay.gedoise.domain.entities.AccountScreenState> = _accountScreenState
     val currentUser: StateFlow<User?> = getCurrentUserUseCase()
     var profilePictureUri by mutableStateOf<Uri?>(null)
         private set
@@ -32,7 +29,7 @@ class AccountViewModel(
         profilePictureUri = uri
     }
 
-    fun updateAccountScreenState(screenState: AccountScreenState) {
+    fun updateAccountScreenState(screenState: com.upsaclay.gedoise.domain.entities.AccountScreenState) {
         _accountScreenState.value = screenState
     }
 
@@ -41,15 +38,15 @@ class AccountViewModel(
     }
 
     fun updateUserProfilePicture() {
-        _accountScreenState.value = AccountScreenState.LOADING
+        _accountScreenState.value = com.upsaclay.gedoise.domain.entities.AccountScreenState.LOADING
 
         profilePictureUri?.let { uri ->
             viewModelScope.launch {
                 try {
                     updateUserProfilePictureUseCase(uri)
-                    _accountScreenState.value = AccountScreenState.PROFILE_PICTURE_UPDATED
+                    _accountScreenState.value = com.upsaclay.gedoise.domain.entities.AccountScreenState.PROFILE_PICTURE_UPDATED
                 } catch (e: Exception) {
-                    _accountScreenState.value = AccountScreenState.PROFILE_PICTURE_UPDATE_ERROR
+                    _accountScreenState.value = com.upsaclay.gedoise.domain.entities.AccountScreenState.PROFILE_PICTURE_UPDATE_ERROR
                 }
                 resetProfilePictureUri()
             }
@@ -57,15 +54,15 @@ class AccountViewModel(
     }
 
     fun deleteUserProfilePicture() {
-        _accountScreenState.value = AccountScreenState.LOADING
+        _accountScreenState.value = com.upsaclay.gedoise.domain.entities.AccountScreenState.LOADING
 
         viewModelScope.launch {
             val (id, url) = currentUser.value?.id to currentUser.value?.profilePictureUrl
             try {
                 deleteUserProfilePictureUseCase(id!!, url!!)
-                _accountScreenState.value = AccountScreenState.PROFILE_PICTURE_UPDATED
+                _accountScreenState.value = com.upsaclay.gedoise.domain.entities.AccountScreenState.PROFILE_PICTURE_UPDATED
             } catch (e: Exception) {
-                _accountScreenState.value = AccountScreenState.PROFILE_PICTURE_UPDATE_ERROR
+                _accountScreenState.value = com.upsaclay.gedoise.domain.entities.AccountScreenState.PROFILE_PICTURE_UPDATE_ERROR
             }
             resetProfilePictureUri()
         }

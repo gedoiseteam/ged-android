@@ -39,9 +39,8 @@ internal fun RegistrationTopBar(
                 title = {
                     Text(
                         text = stringResource(id = R.string.registration),
-                        style = MaterialTheme.typography.titleLarge,
                         modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Start
+                        fontWeight = FontWeight.Bold
                     )
                 },
                 navigationIcon = {

@@ -15,4 +15,8 @@ interface UserConversationRepository {
     suspend fun deleteConversation(conversationUser: ConversationUser)
 
     suspend fun deleteLocalConversations()
+
+    fun stopListenConversations()
+
+    fun listenConversations()
 }

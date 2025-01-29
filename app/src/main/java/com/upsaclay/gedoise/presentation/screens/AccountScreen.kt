@@ -1,4 +1,4 @@
-package com.upsaclay.profile.presentation.screens
+package com.upsaclay.gedoise.presentation.screens
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -42,13 +42,12 @@ import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.common.utils.showToast
 import com.upsaclay.common.utils.userFixture
-import com.upsaclay.profile.R
-import com.upsaclay.profile.domain.entities.AccountInfo
-import com.upsaclay.profile.domain.entities.AccountScreenState
-import com.upsaclay.profile.presentation.components.AccountInfoItem
-import com.upsaclay.profile.presentation.components.AccountModelBottomSheet
-import com.upsaclay.profile.presentation.components.AccountTopBar
-import com.upsaclay.profile.presentation.viewmodels.AccountViewModel
+import com.upsaclay.gedoise.R
+import com.upsaclay.gedoise.domain.entities.AccountInfo
+import com.upsaclay.gedoise.domain.entities.AccountScreenState
+import com.upsaclay.gedoise.presentation.components.AccountInfoItem
+import com.upsaclay.gedoise.presentation.components.AccountModelBottomSheet
+import com.upsaclay.gedoise.presentation.viewmodels.AccountViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch
@@ -143,7 +142,7 @@ fun AccountScreen(
 
     Scaffold(
         topBar = {
-            AccountTopBar(
+            com.upsaclay.gedoise.presentation.components.AccountTopBar(
                 isEdited = accountScreenState == AccountScreenState.EDIT,
                 onSaveClick = { accountViewModel.updateUserProfilePicture() },
                 onCancelClick = {
@@ -324,7 +323,7 @@ private fun AccountScreenPreview() {
                 }
 
                 accountInfos.forEach { accountInfo ->
-                    AccountInfoItem(
+                    com.upsaclay.gedoise.presentation.components.AccountInfoItem(
                         modifier = Modifier.fillMaxWidth(),
                         accountInfo = accountInfo
                     )
