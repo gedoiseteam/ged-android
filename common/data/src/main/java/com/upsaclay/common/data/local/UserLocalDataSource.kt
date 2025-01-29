@@ -26,7 +26,7 @@ internal class UserLocalDataSource(private val userDataStore: UserDataStore) {
         }
     }
 
-    suspend fun removeCurrentUser() {
+    suspend fun deleteCurrentUser() {
         userDataStore.removeCurrentUser()
     }
 }

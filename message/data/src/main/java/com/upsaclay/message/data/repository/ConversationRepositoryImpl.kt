@@ -17,7 +17,9 @@ internal class ConversationRepositoryImpl(
     private val conversationRemoteDataSource: ConversationRemoteDataSource
 ): ConversationRepository {
     override fun getConversationsFromRemote(currentUserId: String): Flow<Conversation> =
-        conversationRemoteDataSource.listenConversations(currentUserId).mapNotNull { ConversationMapper.toConversation(it, currentUserId) }
+        conversationRemoteDataSource.listenConversations(currentUserId).mapNotNull {
+            ConversationMapper.toConversation(it, currentUserId)
+        }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun getConversationFromLocal(): Flow<Pair<Conversation, User>> =

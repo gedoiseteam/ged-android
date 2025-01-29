@@ -1,4 +1,4 @@
-package com.upsaclay.profile.presentation.screens
+package com.upsaclay.gedoise.presentation.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -41,9 +41,9 @@ import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.common.utils.userFixture
-import com.upsaclay.profile.R
-import com.upsaclay.profile.domain.entities.ProfileScreenState
-import com.upsaclay.profile.presentation.viewmodels.ProfileViewModel
+import com.upsaclay.gedoise.R
+import com.upsaclay.gedoise.domain.entities.ProfileScreenState
+import com.upsaclay.gedoise.presentation.viewmodels.ProfileViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -172,7 +172,7 @@ private fun TopSection(profilePictureUrl: String?, userFullName: String) {
 @Preview(showBackground = true)
 @Composable
 fun ProfileScreenPreview() {
-    val isLoading = false
+    val isLoading = true
 
     GedoiseTheme {
         Box(

@@ -54,22 +54,9 @@ fun ConversationScreen(
     navController: NavController,
     conversationViewModel: ConversationViewModel = koinViewModel()
 ) {
-    val conversations by conversationViewModel.conversations.collectAsState(mapOf())
-    var expanded by remember { mutableStateOf(false) }
+    val conversations by conversationViewModel.conversations.collectAsState(emptyList())
 
     Box(modifier = Modifier.fillMaxSize()) {
-        if (expanded) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(GedoiseColor.LittleTransparentWhite)
-                    .zIndex(1000f)
-                    .pointerInput(Unit) {
-                        detectTapGestures(onPress = { expanded = !expanded })
-                    }
-            )
-        }
-
         if (conversations.isEmpty()) {
             Column (
                 modifier = Modifier
@@ -99,7 +86,7 @@ fun ConversationScreen(
             }
         } else {
             LazyColumn {
-                items(conversations.toList()) { (_, conversation) ->
+                items(conversations) { conversation ->
                     ConversationItem(
                         modifier = Modifier.fillMaxWidth(),
                         conversation = conversation,
@@ -149,24 +136,12 @@ private fun ConversationFAB(
 @Composable
 private fun ConversationsScreenPreview() {
     val conversations = conversationsFixture.sortedByDescending { it.lastMessage?.date ?: it.createdAt }
-    var expanded by remember { mutableStateOf(false) }
 
     GedoiseTheme {
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            if (expanded) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(GedoiseColor.LittleTransparentWhite)
-                        .zIndex(1000f)
-                        .pointerInput(Unit) {
-                            detectTapGestures(onPress = { expanded = !expanded })
-                        }
-                )
-            }
             if (conversations.isEmpty()) {
                 FlowRow(
                     modifier = Modifier.align(Alignment.Center),

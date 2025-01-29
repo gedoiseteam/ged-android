@@ -1,4 +1,4 @@
-package com.upsaclay.gedoise.presentation
+package com.upsaclay.gedoise.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,14 +8,15 @@ import com.upsaclay.common.domain.entity.User
 import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
 import com.upsaclay.gedoise.data.BottomNavigationItem
 import com.upsaclay.gedoise.data.BottomNavigationItemType
-import kotlinx.coroutines.flow.Flow
+import com.upsaclay.gedoise.domain.usecase.StartDataListeningUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class MainViewModel(
     isUserAuthenticatedUseCase: IsUserAuthenticatedUseCase,
-    getCurrentUserUseCase: GetCurrentUserUseCase
+    getCurrentUserUseCase: GetCurrentUserUseCase,
+    private val startDataListeningUseCase: StartDataListeningUseCase
 ) : ViewModel() {
     val bottomNavigationItem: Map<BottomNavigationItemType, BottomNavigationItem> = mapOf(
         BottomNavigationItemType.HOME to BottomNavigationItem.Home(),
@@ -31,10 +32,13 @@ class MainViewModel(
         viewModelScope.launch {
             isUserAuthenticatedUseCase().collect { authenticated ->
                 authenticated?.let {
-                    _isAuthenticatedState.value = if (it)
+                    _isAuthenticatedState.value = if (it) {
+                        startDataListeningUseCase()
                         AuthenticationState.AUTHENTICATED
-                    else
+                    }
+                    else {
                         AuthenticationState.UNAUTHENTICATED
+                    }
                 }
             }
         }

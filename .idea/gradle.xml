@@ -23,7 +23,6 @@
             <option value="$PROJECT_DIR$/news" />
             <option value="$PROJECT_DIR$/news/data" />
             <option value="$PROJECT_DIR$/news/domain" />
-            <option value="$PROJECT_DIR$/profile" />
           </set>
         </option>
         <option name="resolveExternalAnnotations" value="false" />

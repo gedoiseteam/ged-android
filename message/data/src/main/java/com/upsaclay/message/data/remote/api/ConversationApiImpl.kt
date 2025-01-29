@@ -37,6 +37,7 @@ internal class ConversationApiImpl : ConversationApi {
                     }
                 }
             }
+
         awaitClose { listener.remove() }
     }
 

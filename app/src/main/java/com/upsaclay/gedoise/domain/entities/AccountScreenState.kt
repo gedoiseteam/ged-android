@@ -1,4 +1,4 @@
-package com.upsaclay.profile.domain.entities
+package com.upsaclay.gedoise.domain.entities
 
 enum class AccountScreenState {
     READ,

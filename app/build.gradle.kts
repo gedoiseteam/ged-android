@@ -77,6 +77,7 @@ dependencies {
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.crashlytics)
     implementation(platform(libs.firebase.bom))
+    implementation(libs.kotlinx.collections.immutable)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -101,6 +102,4 @@ dependencies {
     implementation(project(":news"))
     implementation(project(":news:domain"))
     implementation(project(":news:data"))
-
-    implementation(project(":profile"))
 }

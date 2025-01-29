@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 
@@ -48,8 +47,9 @@ internal class UserRepositoryImpl(
         userLocalDataSource.setCurrentUser(user)
     }
 
-    override suspend fun removeCurrentUser() {
-        userLocalDataSource.removeCurrentUser()
+    override suspend fun deleteCurrentUser() {
+        _currentUser.value = null
+        userLocalDataSource.deleteCurrentUser()
     }
 
     override suspend fun updateProfilePictureUrl(userId: String, profilePictureUrl: String) {

@@ -8,8 +8,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flow
@@ -27,30 +29,29 @@ internal class UserConversationRepositoryImpl(
         .flatMapConcat { conversations ->
             flow { conversations.forEach { emit(it.value) } }
         }
-
-    init {
-        listenLocalConversations()
-        listenRemoteConversations()
-    }
+    private val jobs = mutableListOf<Job>()
 
     private fun listenLocalConversations() {
-        scope.launch {
+        val job = scope.launch {
             conversationRepository.getConversationFromLocal().collect { (conversation, interlocutor) ->
                 val conversationUser = ConversationMapper.toConversationUser(conversation, interlocutor)
                 _userConversations.value += (conversationUser.id to conversationUser)
             }
         }
+        jobs.add(job)
     }
 
     private fun listenRemoteConversations() {
-        scope.launch {
-            val currentUser = userRepository.currentUser.first() ?: return@launch
-            conversationRepository.getConversationsFromRemote(currentUser.id).collect { conversation ->
-                userRepository.getUserFlow(conversation.interlocutorId).collect { interlocutor ->
-                    conversationRepository.upsertLocalConversation(conversation, interlocutor)
+        val job = scope.launch {
+            userRepository.currentUser.filterNotNull().collect { currentUser ->
+                conversationRepository.getConversationsFromRemote(currentUser.id).collect { conversation ->
+                    userRepository.getUserFlow(conversation.interlocutorId).collect { interlocutor ->
+                        conversationRepository.upsertLocalConversation(conversation, interlocutor)
+                    }
                 }
             }
         }
+        jobs.add(job)
     }
 
     override fun getUserConversation(conversationId: String): ConversationUser? =
@@ -80,6 +81,17 @@ internal class UserConversationRepositoryImpl(
     }
 
     override suspend fun deleteLocalConversations() {
+        _userConversations.value = emptyMap()
         conversationRepository.deleteLocalConversations()
+    }
+
+    override fun stopListenConversations() {
+        jobs.forEach { it.cancel() }
+    }
+
+    override fun listenConversations() {
+        stopListenConversations()
+        listenLocalConversations()
+        listenRemoteConversations()
     }
 }

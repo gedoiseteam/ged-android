@@ -50,7 +50,7 @@ fun ChatScreen(
         parameters = { parametersOf(conversation) }
     )
 ) {
-    val messages by chatViewModel.messages.collectAsState(emptyMap())
+    val messages by chatViewModel.messages.collectAsState(emptyList())
 
     Scaffold(
         topBar = {
@@ -70,7 +70,7 @@ fun ChatScreen(
         ) {
             MessageSection(
                 modifier = Modifier.weight(1f),
-                messages = messages.values.toList().sortedByDescending { it.date },
+                messages = messages,
                 interlocutor = chatViewModel.conversation.interlocutor
             )
 
