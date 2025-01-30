@@ -4,4 +4,4 @@ class AuthenticationException(
     override val message: String? = null,
     override val cause: Throwable? = null,
     val code: AuthErrorCode = AuthErrorCode.UNKNOWN
-): Exception()
+) : Exception()

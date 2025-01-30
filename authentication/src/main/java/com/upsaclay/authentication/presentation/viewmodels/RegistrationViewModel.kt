@@ -89,7 +89,7 @@ class RegistrationViewModel(
 
         viewModelScope.launch {
             try {
-                if(isUserExistUseCase(email.trim())) {
+                if (isUserExistUseCase(email.trim())) {
                     _registrationState.value = RegistrationState.USER_ALREADY_EXIST
                     return@launch
                 }
@@ -107,8 +107,8 @@ class RegistrationViewModel(
                 createUserUseCase(user)
                 _registrationState.value = RegistrationState.REGISTERED
             } catch (e: Exception) {
-                if(e is AuthenticationException) {
-                    _registrationState.value = when(e.code) {
+                if (e is AuthenticationException) {
+                    _registrationState.value = when (e.code) {
                         AuthErrorCode.EMAIL_ALREADY_EXIST -> RegistrationState.USER_ALREADY_EXIST
                         else -> RegistrationState.ERROR
                     }
@@ -120,7 +120,7 @@ class RegistrationViewModel(
     }
 
     fun verifyNamesInputs(): Boolean {
-        return if(firstName.isBlank() || lastName.isBlank()) {
+        return if (firstName.isBlank() || lastName.isBlank()) {
             _registrationState.value = RegistrationState.INPUTS_EMPTY_ERROR
             false
         } else {

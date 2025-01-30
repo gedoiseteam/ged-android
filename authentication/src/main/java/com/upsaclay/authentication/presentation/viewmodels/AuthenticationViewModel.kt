@@ -61,13 +61,13 @@ class AuthenticationViewModel(
                     _authenticationState.value = AuthenticationState.AUTHENTICATED_USER_NOT_FOUND
                 }
             } catch (e: Exception) {
-                _authenticationState.value = when(e) {
+                _authenticationState.value = when (e) {
                     is NetworkException -> AuthenticationState.NETWORK_ERROR
 
                     is TooManyRequestException -> AuthenticationState.TOO_MANY_REQUESTS_ERROR
 
                     is AuthenticationException -> {
-                        if(e.code == AuthErrorCode.INVALID_CREDENTIALS) {
+                        if (e.code == AuthErrorCode.INVALID_CREDENTIALS) {
                             AuthenticationState.AUTHENTICATION_ERROR
                         } else {
                             AuthenticationState.UNKNOWN_ERROR

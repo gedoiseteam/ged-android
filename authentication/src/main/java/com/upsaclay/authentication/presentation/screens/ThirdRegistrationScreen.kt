@@ -59,7 +59,7 @@ fun ThirdRegistrationScreen(
     val context = LocalContext.current
     val isLoading = registrationState == RegistrationState.LOADING
 
-    val inputsError = when(registrationState) {
+    val inputsError = when (registrationState) {
         RegistrationState.UNRECOGNIZED_ACCOUNT, RegistrationState.INPUTS_EMPTY_ERROR -> true
         else -> false
     }
@@ -78,18 +78,24 @@ fun ThirdRegistrationScreen(
             RegistrationState.USER_NOT_EXIST -> {
                 registrationViewModel.register()
             }
+
             RegistrationState.REGISTERED -> {
                 registrationViewModel.resetRegistrationState()
                 navController.navigate(Screen.EMAIL_VERIFICATION.route + "?email=${registrationViewModel.email}") {
                     popUpTo(navController.graph.id) { inclusive = true }
                 }
             }
-            RegistrationState.ERROR -> showToast(context, com.upsaclay.common.R.string.unknown_error)
+
+            RegistrationState.ERROR -> showToast(
+                context,
+                com.upsaclay.common.R.string.unknown_error
+            )
+
             else -> {}
         }
     }
 
-    if(isLoading) {
+    if (isLoading) {
         TopLinearLoadingScreen()
     }
 
@@ -151,7 +157,7 @@ fun ThirdRegistrationScreen(
             text = stringResource(id = com.upsaclay.common.R.string.next),
             onClick = {
                 keyboardController?.hide()
-                if(registrationViewModel.validateCredentialInputs()) {
+                if (registrationViewModel.validateCredentialInputs()) {
                     registrationViewModel.register()
                 }
             }
@@ -176,7 +182,7 @@ private fun ThirdRegistrationScreenPreview() {
     val focusManager = LocalFocusManager.current
 
     GedoiseTheme {
-        if(isLoading) {
+        if (isLoading) {
             TopLinearLoadingScreen()
         }
 

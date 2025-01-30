@@ -145,12 +145,12 @@ private fun FirstRegistrationScreenPreview() {
     val focusManager = LocalFocusManager.current
 
     GedoiseTheme {
-        if(isLoading) {
+        if (isLoading) {
             OverlayLinearLoadingScreen()
         }
 
         LaunchedEffect(isLoading) {
-            if(isLoading) {
+            if (isLoading) {
                 delay(1000)
                 isLoading = false
             }

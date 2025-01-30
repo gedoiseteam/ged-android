@@ -95,7 +95,7 @@ fun EmailVerificationScreen(
         append(stringResource(id = R.string.email_verification_explanation_end))
     }
 
-    errorMessage = when(screenState) {
+    errorMessage = when (screenState) {
         AuthenticationState.EMAIL_NOT_VERIFIED -> stringResource(id = R.string.email_not_verified)
 
         AuthenticationState.UNKNOWN_ERROR -> stringResource(id = com.upsaclay.common.R.string.unknown_error)
@@ -130,7 +130,7 @@ fun EmailVerificationScreen(
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
                 .padding(
-                    start =  MaterialTheme.spacing.medium,
+                    start = MaterialTheme.spacing.medium,
                     top = contentPadding.calculateTopPadding(),
                     end = MaterialTheme.spacing.medium,
                     bottom = MaterialTheme.spacing.medium

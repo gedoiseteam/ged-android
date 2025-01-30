@@ -16,7 +16,7 @@ class EmailVerificationViewModel(
     private val sendVerificationEmailUseCase: SendVerificationEmailUseCase,
     private val isEmailVerifiedUseCase: IsEmailVerifiedUseCase,
     private val setUserAuthenticatedUseCase: SetUserAuthenticatedUseCase
-): ViewModel() {
+) : ViewModel() {
     private val _screenState = MutableStateFlow(AuthenticationState.IDLE)
     val screenState: StateFlow<AuthenticationState> = _screenState
 
@@ -25,8 +25,9 @@ class EmailVerificationViewModel(
             try {
                 sendVerificationEmailUseCase()
             } catch (e: Exception) {
-                when(e) {
-                    is TooManyRequestException -> _screenState.value = AuthenticationState.TOO_MANY_REQUESTS_ERROR
+                when (e) {
+                    is TooManyRequestException -> _screenState.value =
+                        AuthenticationState.TOO_MANY_REQUESTS_ERROR
 
                     else -> _screenState.value = AuthenticationState.UNKNOWN_ERROR
                 }

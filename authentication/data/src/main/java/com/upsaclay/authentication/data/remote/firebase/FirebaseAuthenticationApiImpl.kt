@@ -7,24 +7,26 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
-class FirebaseAuthenticationApiImpl: FirebaseAuthenticationApi {
+class FirebaseAuthenticationApiImpl : FirebaseAuthenticationApi {
     private val firebaseAuth = Firebase.auth
 
-    override suspend fun signInWithEmailAndPassword(email: String, password: String) = suspendCoroutine { continuation ->
-        firebaseAuth.signInWithEmailAndPassword(email, password)
-            .addOnSuccessListener { continuation.resume(Unit) }
-            .addOnFailureListener { e -> continuation.resumeWithException(e) }
-    }
+    override suspend fun signInWithEmailAndPassword(email: String, password: String) =
+        suspendCoroutine { continuation ->
+            firebaseAuth.signInWithEmailAndPassword(email, password)
+                .addOnSuccessListener { continuation.resume(Unit) }
+                .addOnFailureListener { e -> continuation.resumeWithException(e) }
+        }
 
-    override suspend fun signUpWithEmailAndPassword(email: String, password: String) = suspendCoroutine { continuation ->
-        firebaseAuth.createUserWithEmailAndPassword(email, password)
-            .addOnSuccessListener { authResult ->
-                authResult.user?.let {
-                    continuation.resume(it.uid)
-                } ?: throw UserNotAuthenticatedException("User not found")
-            }
-            .addOnFailureListener { e -> continuation.resumeWithException(e) }
-    }
+    override suspend fun signUpWithEmailAndPassword(email: String, password: String) =
+        suspendCoroutine { continuation ->
+            firebaseAuth.createUserWithEmailAndPassword(email, password)
+                .addOnSuccessListener { authResult ->
+                    authResult.user?.let {
+                        continuation.resume(it.uid)
+                    } ?: throw UserNotAuthenticatedException("User not found")
+                }
+                .addOnFailureListener { e -> continuation.resumeWithException(e) }
+        }
 
     override suspend fun signOut() = suspendCoroutine { continuation ->
         firebaseAuth.signOut()
@@ -33,7 +35,9 @@ class FirebaseAuthenticationApiImpl: FirebaseAuthenticationApi {
 
     override suspend fun sendVerificationEmail() = suspendCoroutine { continuation ->
         val currentUser = firebaseAuth.currentUser
-            ?: return@suspendCoroutine continuation.resumeWithException(UserNotAuthenticatedException("User not found"))
+            ?: return@suspendCoroutine continuation.resumeWithException(
+                UserNotAuthenticatedException("User not found")
+            )
 
         currentUser.reload()
         currentUser.sendEmailVerification()
