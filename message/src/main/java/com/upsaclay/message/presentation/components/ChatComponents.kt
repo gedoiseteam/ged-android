@@ -56,7 +56,7 @@ fun SentMessageItem(
             dateTimeTextColor = Color(0xFFD1D3D8)
         )
 
-        when(message.state) {
+        when (message.state) {
             MessageState.LOADING -> Icon(
                 modifier = Modifier.scale(0.7f),
                 painter = painterResource(com.upsaclay.common.R.drawable.ic_outlined_send),
@@ -87,7 +87,7 @@ fun ReceiveMessageItem(
         modifier = modifier.fillMaxWidth(0.8f),
         verticalAlignment = Alignment.Bottom
     ) {
-        if(displayProfilePicture) {
+        if (displayProfilePicture) {
             ProfilePicture(url = profilePictureUrl, scale = 0.3f)
         } else {
             ProfilePicture(modifier = Modifier.alpha(0f), url = null, scale = 0.3f)

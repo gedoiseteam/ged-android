@@ -18,7 +18,7 @@ internal class UserRepositoryImpl(
     private val userRemoteDataSource: UserRemoteDataSource,
     private val userLocalDataSource: UserLocalDataSource,
     scope: CoroutineScope = (GlobalScope + Dispatchers.IO)
-): UserRepository {
+) : UserRepository {
     private val _currentUser = MutableStateFlow<User?>(null)
     override val currentUser: StateFlow<User?> = _currentUser
 

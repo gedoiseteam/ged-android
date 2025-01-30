@@ -28,7 +28,7 @@ internal class ConversationApiImpl : ConversationApi {
 
                 snapshot?.documentChanges?.forEach { change ->
                     val conversation = change.document.toObject(RemoteConversation::class.java)
-                    when(change.type) {
+                    when (change.type) {
                         DocumentChange.Type.ADDED -> trySend(conversation)
                         DocumentChange.Type.MODIFIED -> trySend(conversation)
                         DocumentChange.Type.REMOVED -> return@forEach

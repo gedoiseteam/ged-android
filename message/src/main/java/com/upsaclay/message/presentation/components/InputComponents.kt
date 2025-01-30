@@ -93,7 +93,7 @@ fun MessageInput(
             )
         }
 
-        if(value.isNotBlank()) {
+        if (value.isNotBlank()) {
             Button(
                 onClick = onSendClick,
                 contentPadding = PaddingValues()

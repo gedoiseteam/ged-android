@@ -27,7 +27,7 @@ class ChatViewModel(
     private val getMessagesUseCase: GetMessagesUseCase,
     private val sendMessageUseCase: SendMessageUseCase,
     private val createConversationUseCase: CreateConversationUseCase
-): ViewModel() {
+) : ViewModel() {
     private val currentUser: User? = getCurrentUserUseCase().value
     private val _messages = MutableStateFlow<Map<String, Message>>(mapOf())
     val messages: Flow<List<Message>> = _messages.map { messageMap ->
@@ -49,7 +49,7 @@ class ChatViewModel(
     fun sendMessage() {
         if (textToSend.isBlank()) return
 
-        if(currentUser == null) throw IllegalArgumentException("User not logged in")
+        if (currentUser == null) throw IllegalArgumentException("User not logged in")
 
         val message = Message(
             id = GenerateIdUseCase(),
@@ -63,7 +63,7 @@ class ChatViewModel(
         _messages.value = _messages.value.toMutableMap().apply { put(message.id, message) }
 
         viewModelScope.launch {
-            if(conversation.state == ConversationState.NOT_CREATED) {
+            if (conversation.state == ConversationState.NOT_CREATED) {
                 createConversationUseCase(conversation)
                 conversation = conversation.copy(state = ConversationState.CREATED)
             }

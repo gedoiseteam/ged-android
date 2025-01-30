@@ -13,7 +13,7 @@ internal class MessageRepositoryImpl(
     private val messageLocalDataSource: MessageLocalDataSource,
     private val messageRemoteDataSource: MessageRemoteDataSource,
     private val scope: CoroutineScope
-): MessageRepository {
+) : MessageRepository {
     private val jobs = mutableListOf<Job>()
 
     override fun getMessages(conversationId: String): Flow<Message> {

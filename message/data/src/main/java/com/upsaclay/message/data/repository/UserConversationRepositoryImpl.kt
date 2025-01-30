@@ -20,7 +20,7 @@ internal class UserConversationRepositoryImpl(
     private val conversationRepository: ConversationRepository,
     private val userRepository: UserRepository,
     private val scope: CoroutineScope
-): UserConversationRepository  {
+) : UserConversationRepository {
     private val _userConversations = MutableStateFlow<Map<String, ConversationUser>>(mapOf())
     override val userConversations: Flow<ConversationUser> = _userConversations
         .flatMapConcat { conversations ->

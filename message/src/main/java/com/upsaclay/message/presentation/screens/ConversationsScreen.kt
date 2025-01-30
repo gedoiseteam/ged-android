@@ -51,7 +51,7 @@ fun ConversationScreen(
 
     Box(modifier = Modifier.fillMaxSize()) {
         if (conversations.isEmpty()) {
-            Column (
+            Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(top = MaterialTheme.spacing.large),
@@ -84,7 +84,10 @@ fun ConversationScreen(
                         modifier = Modifier.fillMaxWidth(),
                         conversation = conversation,
                         onClick = {
-                            navController.navigate(Screen.CHAT.route + "?conversation=${ConvertConversationJsonUseCase.to(conversation)}")
+                            navController.navigate(
+                                Screen.CHAT.route +
+                                        "?conversation=${ConvertConversationJsonUseCase.to(conversation)}"
+                            )
                         }
                     )
                 }
@@ -128,7 +131,9 @@ private fun ConversationFAB(
 @Preview(showBackground = true)
 @Composable
 private fun ConversationsScreenPreview() {
-    val conversations = conversationsFixture.sortedByDescending { it.lastMessage?.date ?: it.createdAt }
+    val conversations = conversationsFixture.sortedByDescending {
+        it.lastMessage?.date ?: it.createdAt
+    }
 
     GedoiseTheme {
         Box(

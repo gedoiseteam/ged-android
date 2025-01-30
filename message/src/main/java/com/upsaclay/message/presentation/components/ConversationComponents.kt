@@ -258,7 +258,9 @@ private fun UnreadConversationItemPreview() {
     GedoiseTheme {
         ConversationItem(
             modifier = Modifier.fillMaxWidth(),
-            conversation = conversationFixture.copy(lastMessage = conversationFixture.lastMessage!!.copy(isRead = false)),
+            conversation = conversationFixture.copy(
+                lastMessage = conversationFixture.lastMessage!!.copy(isRead = false)
+            ),
             onClick = { }
         )
     }
