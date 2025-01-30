@@ -20,18 +20,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -45,23 +39,17 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.upsaclay.authentication.R
 import com.upsaclay.authentication.domain.entity.AuthenticationState
-import com.upsaclay.authentication.domain.entity.RegistrationState
 import com.upsaclay.authentication.presentation.viewmodels.EmailVerificationViewModel
-import com.upsaclay.authentication.presentation.viewmodels.RegistrationViewModel
-import com.upsaclay.common.domain.entity.Screen
 import com.upsaclay.common.presentation.components.ErrorText
 import com.upsaclay.common.presentation.components.ErrorTextWithIcon
 import com.upsaclay.common.presentation.components.PrimaryButton
@@ -69,7 +57,6 @@ import com.upsaclay.common.presentation.components.SmallTopBarBack
 import com.upsaclay.common.presentation.components.TopLinearLoadingScreen
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
-import com.upsaclay.common.utils.showToast
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -108,7 +95,7 @@ fun EmailVerificationScreen(
         append(stringResource(id = R.string.email_verification_explanation_end))
     }
 
-    errorMessage = when(screenState) {
+    errorMessage = when (screenState) {
         AuthenticationState.EMAIL_NOT_VERIFIED -> stringResource(id = R.string.email_not_verified)
 
         AuthenticationState.UNKNOWN_ERROR -> stringResource(id = com.upsaclay.common.R.string.unknown_error)
@@ -143,7 +130,7 @@ fun EmailVerificationScreen(
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
                 .padding(
-                    start =  MaterialTheme.spacing.medium,
+                    start = MaterialTheme.spacing.medium,
                     top = contentPadding.calculateTopPadding(),
                     end = MaterialTheme.spacing.medium,
                     bottom = MaterialTheme.spacing.medium

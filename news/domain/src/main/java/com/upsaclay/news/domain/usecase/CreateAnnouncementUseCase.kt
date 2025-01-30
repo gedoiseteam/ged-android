@@ -1,6 +1,5 @@
 package com.upsaclay.news.domain.usecase
 
-import com.upsaclay.common.domain.e
 import com.upsaclay.news.domain.entity.Announcement
 import com.upsaclay.news.domain.entity.AnnouncementState
 import com.upsaclay.news.domain.repository.AnnouncementRepository

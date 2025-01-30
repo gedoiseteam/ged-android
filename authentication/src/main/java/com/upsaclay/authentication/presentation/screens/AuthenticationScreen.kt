@@ -106,7 +106,7 @@ fun AuthenticationScreen(
     }
 
     LaunchedEffect(authenticationState) {
-        when(authenticationState) {
+        when (authenticationState) {
             AuthenticationState.NETWORK_ERROR -> {
                 showToast(context = context, stringRes = com.upsaclay.common.R.string.network_error)
             }
@@ -146,7 +146,7 @@ fun AuthenticationScreen(
         }
     }
 
-    if(showVerifyEmailDialog) {
+    if (showVerifyEmailDialog) {
         SimpleDialog(
             text = stringResource(id = R.string.email_not_verified_dialog_message),
             confirmText = stringResource(id = com.upsaclay.common.R.string.keep_going),
@@ -202,7 +202,7 @@ fun AuthenticationScreen(
                         authenticationState == AuthenticationState.AUTHENTICATED,
                 onClick = {
                     keyboardController?.hide()
-                    if(authenticationViewModel.verifyInputs()) {
+                    if (authenticationViewModel.verifyInputs()) {
                         authenticationViewModel.login()
                     }
                 }
@@ -308,7 +308,7 @@ private fun InputsSection(
             isError = isError
         )
 
-        if(errorMessage.isNotEmpty()) {
+        if (errorMessage.isNotEmpty()) {
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
 
             ErrorTextWithIcon(text = errorMessage)

@@ -9,6 +9,6 @@ data class Message(
     val content: String,
     val date: LocalDateTime,
     val isRead: Boolean = false,
-    val state:MessageState,
+    val state: MessageState,
     val type: String = "text"
 )

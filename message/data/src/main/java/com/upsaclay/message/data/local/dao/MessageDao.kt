@@ -1,7 +1,6 @@
 package com.upsaclay.message.data.local.dao
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
@@ -15,18 +14,18 @@ import kotlinx.coroutines.flow.Flow
 interface MessageDao {
     @Query(
         "SELECT * FROM $MESSAGES_TABLE_NAME " +
-            "WHERE ${MessageField.CONVERSATION_ID} = :conversationId " +
-            "ORDER BY timestamp DESC " +
-            "LIMIT 1"
+                "WHERE ${MessageField.CONVERSATION_ID} = :conversationId " +
+                "ORDER BY timestamp DESC " +
+                "LIMIT 1"
     )
     fun getLastMessage(conversationId: String): Flow<LocalMessage?>
 
     @Query(
         "SELECT * FROM $MESSAGES_TABLE_NAME " +
-            "WHERE ${MessageField.CONVERSATION_ID} = :conversationId " +
-            "ORDER BY timestamp DESC " +
-            "LIMIT 10 " +
-            "OFFSET :offset"
+                "WHERE ${MessageField.CONVERSATION_ID} = :conversationId " +
+                "ORDER BY timestamp DESC " +
+                "LIMIT 10 " +
+                "OFFSET :offset"
     )
     fun getMessages(conversationId: String, offset: Int): Flow<List<LocalMessage>>
 

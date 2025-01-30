@@ -4,10 +4,10 @@ import com.upsaclay.common.data.formatHttpError
 import com.upsaclay.news.data.AnnouncementMapper
 import com.upsaclay.news.data.remote.api.AnnouncementApi
 import com.upsaclay.news.domain.entity.Announcement
-import java.io.IOException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber.Forest.e
+import java.io.IOException
 
 internal class AnnouncementRemoteDataSource(private val announcementApi: AnnouncementApi) {
     suspend fun getAnnouncement(): List<Announcement> = withContext(Dispatchers.IO) {
@@ -37,7 +37,7 @@ internal class AnnouncementRemoteDataSource(private val announcementApi: Announc
         }
     }
 
-    suspend fun deleteAnnouncement(id: String)  {
+    suspend fun deleteAnnouncement(id: String) {
         withContext(Dispatchers.IO) {
             val response = announcementApi.deleteAnnouncement(id)
             if (!response.isSuccessful) {

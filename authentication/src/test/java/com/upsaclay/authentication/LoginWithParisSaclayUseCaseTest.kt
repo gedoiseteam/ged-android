@@ -1,6 +1,5 @@
 package com.upsaclay.authentication
 
-import com.upsaclay.authentication.domain.repository.AuthenticationRepository
 import com.upsaclay.authentication.domain.repository.FirebaseAuthenticationRepository
 import com.upsaclay.authentication.domain.usecase.GenerateHashUseCase
 import com.upsaclay.authentication.domain.usecase.LoginUseCase

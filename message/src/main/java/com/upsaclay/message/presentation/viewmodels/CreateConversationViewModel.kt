@@ -2,8 +2,6 @@ package com.upsaclay.message.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.gson.GsonBuilder
-import com.upsaclay.common.domain.LocalDateTimeSerializer
 import com.upsaclay.common.domain.entity.User
 import com.upsaclay.common.domain.usecase.GenerateIdUseCase
 import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
@@ -20,7 +18,7 @@ import java.time.LocalDateTime
 class CreateConversationViewModel(
     private val getUsersUseCase: GetUsersUseCase,
     getCurrentUserUseCase: GetCurrentUserUseCase
-): ViewModel() {
+) : ViewModel() {
     private val _screenState = MutableStateFlow(ConversationScreenState.DEFAULT)
     val screenState: Flow<ConversationScreenState> = _screenState
     private val _users = MutableStateFlow<List<User>>(emptyList())
@@ -31,7 +29,7 @@ class CreateConversationViewModel(
         fetchUsers()
     }
 
-    fun generateConversationJson(interlocutor: User) : String {
+    fun generateConversationJson(interlocutor: User): String {
         val conversation = ConversationUI(
             id = GenerateIdUseCase.invoke(),
             interlocutor = interlocutor,

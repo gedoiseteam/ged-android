@@ -12,7 +12,6 @@ import com.upsaclay.news.domain.entity.Announcement
 import com.upsaclay.news.domain.entity.AnnouncementScreenState
 import com.upsaclay.news.domain.entity.AnnouncementState
 import com.upsaclay.news.domain.usecase.CreateAnnouncementUseCase
-import com.upsaclay.news.domain.usecase.UpdateAnnouncementUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -21,7 +20,7 @@ import java.time.LocalDateTime
 class CreateAnnouncementViewModel(
     getCurrentUserUseCase: GetCurrentUserUseCase,
     private val createAnnouncementUseCase: CreateAnnouncementUseCase
-): ViewModel() {
+) : ViewModel() {
     private var currentUser: User? = null
     private val _screenState = MutableStateFlow(AnnouncementScreenState.DEFAULT)
     val screenState: StateFlow<AnnouncementScreenState> = _screenState
@@ -32,7 +31,7 @@ class CreateAnnouncementViewModel(
 
     init {
         viewModelScope.launch {
-            getCurrentUserUseCase().collect { currentUser= it }
+            getCurrentUserUseCase().collect { currentUser = it }
         }
     }
 
@@ -45,7 +44,7 @@ class CreateAnnouncementViewModel(
     }
 
     fun createAnnouncement() {
-        if(currentUser == null) {
+        if (currentUser == null) {
             return
         }
 

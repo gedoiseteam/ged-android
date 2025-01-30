@@ -104,7 +104,7 @@ private fun CreateConversationScreenPreview() {
             }
         ) { innerPadding ->
             LazyColumn(modifier = Modifier.padding(top = innerPadding.calculateTopPadding())) {
-                if(users.isNotEmpty()) {
+                if (users.isNotEmpty()) {
                     items(users) { user ->
                         UserItem(
                             user = user,

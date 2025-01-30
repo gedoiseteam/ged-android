@@ -36,7 +36,7 @@ fun SimpleDialog(
     onDismiss: () -> Unit
 ) {
     AlertDialog(
-        title = { title?.let { Text(text = title)} },
+        title = { title?.let { Text(text = title) } },
         text = { text?.let { Text(text = text) } },
         onDismissRequest = onDismiss,
         confirmButton = {

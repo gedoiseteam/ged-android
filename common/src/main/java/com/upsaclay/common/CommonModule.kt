@@ -1,10 +1,10 @@
 package com.upsaclay.common
 
 import com.upsaclay.common.domain.usecase.DeleteProfilePictureUseCase
-import com.upsaclay.common.domain.usecase.GetUsersUseCase
 import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
 import com.upsaclay.common.domain.usecase.GetDrawableUriUseCase
 import com.upsaclay.common.domain.usecase.GetUserUseCase
+import com.upsaclay.common.domain.usecase.GetUsersUseCase
 import com.upsaclay.common.domain.usecase.IsUserExistUseCase
 import com.upsaclay.common.domain.usecase.SetCurrentUserUseCase
 import com.upsaclay.common.domain.usecase.UpdateUserProfilePictureUseCase

@@ -34,6 +34,9 @@ import com.upsaclay.gedoise.data.BottomNavigationItem
 import com.upsaclay.gedoise.presentation.components.HomeTopBar
 import com.upsaclay.gedoise.presentation.components.MainBottomBar
 import com.upsaclay.gedoise.presentation.components.SplashScreen
+import com.upsaclay.gedoise.presentation.screens.AccountScreen
+import com.upsaclay.gedoise.presentation.screens.ProfileScreen
+import com.upsaclay.gedoise.presentation.viewmodels.MainViewModel
 import com.upsaclay.message.domain.usecase.ConvertConversationJsonUseCase
 import com.upsaclay.message.presentation.screens.ChatScreen
 import com.upsaclay.message.presentation.screens.ConversationScreen
@@ -42,9 +45,6 @@ import com.upsaclay.news.presentation.screens.CreateAnnouncementScreen
 import com.upsaclay.news.presentation.screens.EditAnnouncementScreen
 import com.upsaclay.news.presentation.screens.NewsScreen
 import com.upsaclay.news.presentation.screens.ReadAnnouncementScreen
-import com.upsaclay.gedoise.presentation.screens.AccountScreen
-import com.upsaclay.gedoise.presentation.screens.ProfileScreen
-import com.upsaclay.gedoise.presentation.viewmodels.MainViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -103,7 +103,12 @@ fun Navigation(mainViewModel: MainViewModel = koinViewModel()) {
         composable(Screen.NEWS.route) {
             MainNavigationBars(
                 navController = navController,
-                topBar = { HomeTopBar(navController = navController, currentUser?.profilePictureUrl) },
+                topBar = {
+                    HomeTopBar(
+                        navController = navController,
+                        currentUser?.profilePictureUrl
+                    )
+                },
                 bottomNavigationItems = mainViewModel.bottomNavigationItem.values.toList(),
             ) {
                 NewsScreen(navController = navController)
@@ -154,7 +159,7 @@ fun Navigation(mainViewModel: MainViewModel = koinViewModel()) {
                 },
                 bottomNavigationItems = mainViewModel.bottomNavigationItem.values.toList(),
             ) {
-                ConversationScreen(navController = navController,)
+                ConversationScreen(navController = navController)
             }
         }
 
@@ -164,10 +169,16 @@ fun Navigation(mainViewModel: MainViewModel = koinViewModel()) {
 
         composable(route = Screen.CHAT.route + "?conversation={conversation}") { backStackEntry ->
             backStackEntry.arguments?.getString("conversation")?.let {
-                ChatScreen(conversation = ConvertConversationJsonUseCase.from(it), navController = navController)
+                ChatScreen(
+                    conversation = ConvertConversationJsonUseCase.from(it),
+                    navController = navController
+                )
             } ?: run {
                 navController.navigate(Screen.CONVERSATIONS.route)
-                showToast(context = LocalContext.current, stringRes = com.upsaclay.common.R.string.occurred_error)
+                showToast(
+                    context = LocalContext.current,
+                    stringRes = com.upsaclay.common.R.string.occurred_error
+                )
             }
         }
 

@@ -19,5 +19,5 @@ class GetConversationsUseCase(
             messageRepository.getLastMessage(conversationUser.id).map { message ->
                 ConversationMapper.toConversationUI(conversationUser, message)
             }
-    }
+        }
 }

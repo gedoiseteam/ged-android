@@ -81,7 +81,7 @@ fun MainBottomBar(
     NavigationBar {
         bottomNavigationItems.forEachIndexed { _, navigationItem ->
             val selected = navigationItem.screen.route == currentRoute
-            val iconRes = if(selected) navigationItem.filledIcon else navigationItem.outlinedIcon
+            val iconRes = if (selected) navigationItem.filledIcon else navigationItem.outlinedIcon
 
             NavigationBarItem(
                 selected = selected,

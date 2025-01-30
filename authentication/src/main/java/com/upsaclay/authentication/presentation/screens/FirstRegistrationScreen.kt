@@ -3,11 +3,8 @@ package com.upsaclay.authentication.presentation.screens
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -148,12 +145,12 @@ private fun FirstRegistrationScreenPreview() {
     val focusManager = LocalFocusManager.current
 
     GedoiseTheme {
-        if(isLoading) {
+        if (isLoading) {
             OverlayLinearLoadingScreen()
         }
 
         LaunchedEffect(isLoading) {
-            if(isLoading) {
+            if (isLoading) {
                 delay(1000)
                 isLoading = false
             }

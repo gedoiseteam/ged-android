@@ -5,7 +5,7 @@ import com.upsaclay.authentication.domain.repository.FirebaseAuthenticationRepos
 
 class FirebaseAuthenticationRepositoryImpl(
     private val firebaseAuthenticationRemoteDataSource: FirebaseAuthenticationRemoteDataSource
-): FirebaseAuthenticationRepository {
+) : FirebaseAuthenticationRepository {
     override suspend fun loginWithEmailAndPassword(email: String, password: String) {
         firebaseAuthenticationRemoteDataSource.signInWithEmailAndPassword(email, password)
     }
@@ -14,7 +14,7 @@ class FirebaseAuthenticationRepositoryImpl(
         firebaseAuthenticationRemoteDataSource.signUpWithEmailAndPassword(email, password)
 
     override suspend fun logout() {
-       firebaseAuthenticationRemoteDataSource.signOut()
+        firebaseAuthenticationRemoteDataSource.signOut()
     }
 
     override suspend fun sendVerificationEmail() {

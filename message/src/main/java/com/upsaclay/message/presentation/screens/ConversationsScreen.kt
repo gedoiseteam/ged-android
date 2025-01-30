@@ -1,7 +1,5 @@
 package com.upsaclay.message.presentation.screens
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,13 +22,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -39,7 +33,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import com.upsaclay.common.domain.entity.Screen
-import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.message.R
@@ -58,7 +51,7 @@ fun ConversationScreen(
 
     Box(modifier = Modifier.fillMaxSize()) {
         if (conversations.isEmpty()) {
-            Column (
+            Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(top = MaterialTheme.spacing.large),
@@ -91,7 +84,10 @@ fun ConversationScreen(
                         modifier = Modifier.fillMaxWidth(),
                         conversation = conversation,
                         onClick = {
-                            navController.navigate(Screen.CHAT.route + "?conversation=${ConvertConversationJsonUseCase.to(conversation)}")
+                            navController.navigate(
+                                Screen.CHAT.route +
+                                        "?conversation=${ConvertConversationJsonUseCase.to(conversation)}"
+                            )
                         }
                     )
                 }
@@ -135,7 +131,9 @@ private fun ConversationFAB(
 @Preview(showBackground = true)
 @Composable
 private fun ConversationsScreenPreview() {
-    val conversations = conversationsFixture.sortedByDescending { it.lastMessage?.date ?: it.createdAt }
+    val conversations = conversationsFixture.sortedByDescending {
+        it.lastMessage?.date ?: it.createdAt
+    }
 
     GedoiseTheme {
         Box(

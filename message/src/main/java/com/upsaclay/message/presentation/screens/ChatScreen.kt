@@ -97,19 +97,41 @@ private fun MessageSection(
         verticalArrangement = Arrangement.Bottom,
         reverseLayout = true
     ) {
-        if(messages.isNotEmpty()) {
+        if (messages.isNotEmpty()) {
             itemsIndexed(messages) { index, message ->
                 val firstMessage = index == 0
                 val lastMessage = index == messages.size - 1
-                val previousSenderId = if(!lastMessage) messages[index + 1].senderId else ""
+                val previousSenderId = if (!lastMessage) messages[index + 1].senderId else ""
                 val sameSender = previousSenderId == message.senderId
-                val nextSenderId = if(!firstMessage) messages[index - 1].senderId else ""
-                val sameTime = if(!lastMessage) {
-                    message.date.withSecond(0).withNano(0)
-                        .isEqual(messages[index + 1].date.withSecond(0).withNano(0))
-                } else false
-                val sameDay = if(!lastMessage) message.date.toLocalDate().isEqual(messages[index + 1].date.toLocalDate()) else false
-                val displayProfilePicture = !sameTime || (message.senderId != nextSenderId && message.senderId == interlocutor.id)
+                val nextSenderId = if (!firstMessage) messages[index - 1].senderId else ""
+
+                val sameTime = if (!lastMessage) {
+                    message.date
+                        .withSecond(0)
+                        .withNano(0)
+                        .isEqual(
+                            messages[index + 1].date
+                                .withSecond(0)
+                                .withNano(0)
+                        )
+                } else {
+                    false
+                }
+
+                val sameDay = if (!lastMessage) {
+                    message.date
+                        .toLocalDate()
+                        .isEqual(messages[index + 1].date.toLocalDate())
+                }
+                else {
+                    false
+                }
+
+                val displayProfilePicture =
+                    !sameTime || (
+                            message.senderId != nextSenderId &&
+                                    message.senderId == interlocutor.id
+                            )
 
                 if (message.senderId != interlocutor.id) {
                     SentMessageItem(message = message)
@@ -121,7 +143,7 @@ private fun MessageSection(
                     )
                 }
 
-                if(lastMessage|| !sameDay) {
+                if (lastMessage || !sameDay) {
                     Text(
                         modifier = Modifier
                             .padding(vertical = MaterialTheme.spacing.mediumLarge)
@@ -132,7 +154,7 @@ private fun MessageSection(
                         textAlign = TextAlign.Center
                     )
                 } else {
-                    Spacer(modifier = Modifier.height(messagePadding(sameSender, sameTime, sameDay)))
+                    Spacer(modifier = Modifier.height(messagePadding(sameSender, sameTime)))
                 }
             }
         }
@@ -142,16 +164,12 @@ private fun MessageSection(
 @Composable
 private fun messagePadding(
     sameSender: Boolean,
-    sameTime: Boolean,
-    sameDay: Boolean
+    sameTime: Boolean
 ): Dp {
-    val smallPadding = sameSender && sameTime
-    val mediumPadding = (sameSender && sameDay && !sameTime) || (!sameSender && sameDay)
-
-    return when {
-        smallPadding -> 2.dp
-        mediumPadding -> MaterialTheme.spacing.smallMedium
-        else -> MaterialTheme.spacing.medium
+    return if (sameSender && sameTime) {
+        2.dp
+    } else {
+        MaterialTheme.spacing.smallMedium
     }
 }
 

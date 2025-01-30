@@ -6,8 +6,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.upsaclay.authentication.domain.entity.RegistrationState
-import com.upsaclay.authentication.domain.entity.exception.AuthenticationException
 import com.upsaclay.authentication.domain.entity.exception.AuthErrorCode
+import com.upsaclay.authentication.domain.entity.exception.AuthenticationException
 import com.upsaclay.authentication.domain.usecase.RegisterUseCase
 import com.upsaclay.authentication.domain.usecase.VerifyEmailFormatUseCase
 import com.upsaclay.common.domain.entity.User
@@ -89,7 +89,7 @@ class RegistrationViewModel(
 
         viewModelScope.launch {
             try {
-                if(isUserExistUseCase(email.trim())) {
+                if (isUserExistUseCase(email.trim())) {
                     _registrationState.value = RegistrationState.USER_ALREADY_EXIST
                     return@launch
                 }
@@ -107,8 +107,8 @@ class RegistrationViewModel(
                 createUserUseCase(user)
                 _registrationState.value = RegistrationState.REGISTERED
             } catch (e: Exception) {
-                if(e is AuthenticationException) {
-                    _registrationState.value = when(e.code) {
+                if (e is AuthenticationException) {
+                    _registrationState.value = when (e.code) {
                         AuthErrorCode.EMAIL_ALREADY_EXIST -> RegistrationState.USER_ALREADY_EXIST
                         else -> RegistrationState.ERROR
                     }
@@ -120,7 +120,7 @@ class RegistrationViewModel(
     }
 
     fun verifyNamesInputs(): Boolean {
-        return if(firstName.isBlank() || lastName.isBlank()) {
+        return if (firstName.isBlank() || lastName.isBlank()) {
             _registrationState.value = RegistrationState.INPUTS_EMPTY_ERROR
             false
         } else {

@@ -9,42 +9,57 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 
+@OptIn(ExperimentalCoroutinesApi::class)
 internal class ConversationRepositoryImpl(
     private val conversationLocalDataSource: ConversationLocalDataSource,
     private val conversationRemoteDataSource: ConversationRemoteDataSource
-): ConversationRepository {
+) : ConversationRepository {
     override fun getConversationsFromRemote(currentUserId: String): Flow<Conversation> =
         conversationRemoteDataSource.listenConversations(currentUserId).mapNotNull {
             ConversationMapper.toConversation(it, currentUserId)
         }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     override fun getConversationFromLocal(): Flow<Pair<Conversation, User>> =
         conversationLocalDataSource.getConversations()
             .flatMapConcat { conversations ->
                 flow {
-                    conversations.forEach { emit(ConversationMapper.toConversationWithInterlocutor(it)) }
+                    conversations.forEach {
+                        emit(ConversationMapper.toConversationWithInterlocutor(it))
+                    }
                 }
             }
 
-    override suspend fun createConversation(conversation: Conversation, interlocutor: User, currentUser: User) {
-        conversationLocalDataSource.insertConversation(ConversationMapper.toLocal(conversation, interlocutor))
-        conversationRemoteDataSource.createConversation(ConversationMapper.toRemote(conversation, currentUser.id))
+    override suspend fun createConversation(
+        conversation: Conversation,
+        interlocutor: User,
+        currentUser: User
+    ) {
+        conversationLocalDataSource.insertConversation(
+            ConversationMapper.toLocal(conversation, interlocutor)
+        )
+        conversationRemoteDataSource.createConversation(
+            ConversationMapper.toRemote(conversation, currentUser.id)
+        )
     }
 
     override suspend fun upsertLocalConversation(conversation: Conversation, interlocutor: User) {
-        conversationLocalDataSource.upsertConversation(ConversationMapper.toLocal(conversation, interlocutor))
+        conversationLocalDataSource.upsertConversation(
+            ConversationMapper.toLocal(conversation, interlocutor)
+        )
     }
 
     override suspend fun updateLocalConversation(conversation: Conversation, interlocutor: User) {
-        conversationLocalDataSource.updateConversation(ConversationMapper.toLocal(conversation, interlocutor))
+        conversationLocalDataSource.updateConversation(
+            ConversationMapper.toLocal(conversation, interlocutor)
+        )
     }
 
     override suspend fun deleteConversation(conversation: Conversation, interlocutor: User) {
-        conversationLocalDataSource.deleteConversation(ConversationMapper.toLocal(conversation, interlocutor))
+        conversationLocalDataSource.deleteConversation(
+            ConversationMapper.toLocal(conversation, interlocutor)
+        )
         conversationRemoteDataSource.deleteConversation(conversation.id)
     }
 

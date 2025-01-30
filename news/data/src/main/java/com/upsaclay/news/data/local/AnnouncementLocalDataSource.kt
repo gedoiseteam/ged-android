@@ -2,7 +2,6 @@ package com.upsaclay.news.data.local
 
 import com.upsaclay.news.data.AnnouncementMapper
 import com.upsaclay.news.domain.entity.Announcement
-import com.upsaclay.news.domain.entity.AnnouncementState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map

@@ -6,8 +6,8 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.upsaclay.common.data.getFlowGsonValue
 import com.upsaclay.common.data.entity.UserDTO
+import com.upsaclay.common.data.getFlowGsonValue
 import com.upsaclay.common.data.setGsonValue
 import kotlinx.coroutines.flow.Flow
 

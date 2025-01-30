@@ -32,10 +32,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.upsaclay.common.domain.entity.Screen
+import com.upsaclay.common.presentation.components.ClickableItem
 import com.upsaclay.common.presentation.components.LoadingDialog
 import com.upsaclay.common.presentation.components.ProfilePicture
 import com.upsaclay.common.presentation.components.SensibleActionDialog
-import com.upsaclay.common.presentation.components.ClickableItem
 import com.upsaclay.common.presentation.components.SmallTopBarBack
 import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
@@ -57,7 +57,7 @@ fun ProfileScreen(
     val profileState by profileViewModel.screenState.collectAsState()
 
     LaunchedEffect(profileState) {
-        when(profileState) {
+        when (profileState) {
             ProfileScreenState.LOADING -> showLoadingDialog = true
 
             else -> {}
@@ -79,7 +79,7 @@ fun ProfileScreen(
         )
     }
 
-    if(showLoadingDialog) {
+    if (showLoadingDialog) {
         LoadingDialog(message = stringResource(R.string.disconnection))
     }
 
@@ -117,7 +117,12 @@ fun ProfileScreen(
 
                 ClickableItem(
                     modifier = Modifier.fillMaxWidth(),
-                    text = { Text(text = stringResource(id = R.string.logout), color = GedoiseColor.Red) },
+                    text = {
+                        Text(
+                            text = stringResource(id = R.string.logout),
+                            color = GedoiseColor.Red
+                        )
+                    },
                     icon = {
                         Icon(
                             painter = painterResource(id = com.upsaclay.common.R.drawable.ic_logout),
@@ -176,7 +181,9 @@ fun ProfileScreenPreview() {
 
     GedoiseTheme {
         Box(
-            modifier = Modifier.fillMaxSize().padding(top = MaterialTheme.spacing.medium)
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = MaterialTheme.spacing.medium)
         ) {
             Column {
                 Row(
