@@ -21,7 +21,7 @@ class ReadAnnouncementViewModel(
     getAnnouncementUseCase: GetAnnouncementUseCase,
     getAnnouncementsUseCase: GetAnnouncementsUseCase,
     private val deleteAnnouncementUseCase: DeleteAnnouncementUseCase,
-): ViewModel() {
+) : ViewModel() {
     private val _announcement = MutableStateFlow(getAnnouncementUseCase(announcementId))
     private val _screenState = MutableStateFlow(AnnouncementScreenState.DEFAULT)
     val announcement: StateFlow<Announcement?> = _announcement

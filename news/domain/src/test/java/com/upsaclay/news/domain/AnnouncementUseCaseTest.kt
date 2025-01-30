@@ -39,9 +39,7 @@ class AnnouncementUseCaseTest {
         coEvery { announcementRepository.updateAnnouncement(any()) } returns Unit
         coEvery { announcementRepository.deleteAnnouncement(any()) } returns Unit
         coEvery { announcementRepository.updateAnnouncement(any()) } returns Unit
-        every { announcementRepository.announcements } returns MutableStateFlow(listOf(
-            announcementFixture
-        ))
+        every { announcementRepository.announcements } returns MutableStateFlow(listOf(announcementFixture))
         every { announcementRepository.getAnnouncement(any()) } returns announcementFixture
     }
 
@@ -82,7 +80,7 @@ class AnnouncementUseCaseTest {
         val result = getAnnouncementsUseCase()
 
         // Then
-       assert(result.first().contains(announcementFixture))
+        assert(result.first().contains(announcementFixture))
     }
 
     @Test

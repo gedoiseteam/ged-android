@@ -17,7 +17,7 @@ class EditAnnouncementViewModel(
     announcementId: String,
     getAnnouncementUseCase: GetAnnouncementUseCase,
     private val updateAnnouncementUseCase: UpdateAnnouncementUseCase
-): ViewModel() {
+) : ViewModel() {
     private val _announcement = MutableStateFlow(getAnnouncementUseCase(announcementId))
     private val _screenState = MutableStateFlow(AnnouncementScreenState.DEFAULT)
     private val _isAnnouncementModified = MutableStateFlow(false)

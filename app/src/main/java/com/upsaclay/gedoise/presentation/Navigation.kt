@@ -58,7 +58,7 @@ fun Navigation(mainViewModel: MainViewModel = koinViewModel()) {
     val startDestination = when (authenticationState) {
         AuthenticationState.IDLE -> Screen.SPLASH.route
         AuthenticationState.AUTHENTICATED -> Screen.NEWS.route
-        else -> Screen.NEWS.route
+        else -> Screen.AUTHENTICATION.route
     }
 
     NavHost(

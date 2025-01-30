@@ -37,7 +37,7 @@ internal class AnnouncementRemoteDataSource(private val announcementApi: Announc
         }
     }
 
-    suspend fun deleteAnnouncement(id: String)  {
+    suspend fun deleteAnnouncement(id: String) {
         withContext(Dispatchers.IO) {
             val response = announcementApi.deleteAnnouncement(id)
             if (!response.isSuccessful) {

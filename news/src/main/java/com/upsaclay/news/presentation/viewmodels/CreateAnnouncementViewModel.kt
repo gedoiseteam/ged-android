@@ -20,7 +20,7 @@ import java.time.LocalDateTime
 class CreateAnnouncementViewModel(
     getCurrentUserUseCase: GetCurrentUserUseCase,
     private val createAnnouncementUseCase: CreateAnnouncementUseCase
-): ViewModel() {
+) : ViewModel() {
     private var currentUser: User? = null
     private val _screenState = MutableStateFlow(AnnouncementScreenState.DEFAULT)
     val screenState: StateFlow<AnnouncementScreenState> = _screenState
@@ -31,7 +31,7 @@ class CreateAnnouncementViewModel(
 
     init {
         viewModelScope.launch {
-            getCurrentUserUseCase().collect { currentUser= it }
+            getCurrentUserUseCase().collect { currentUser = it }
         }
     }
 
@@ -44,7 +44,7 @@ class CreateAnnouncementViewModel(
     }
 
     fun createAnnouncement() {
-        if(currentUser == null) {
+        if (currentUser == null) {
             return
         }
 
