@@ -1,6 +1,6 @@
 package com.upsaclay.message.domain
 
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
 import org.junit.Test
 
 /**

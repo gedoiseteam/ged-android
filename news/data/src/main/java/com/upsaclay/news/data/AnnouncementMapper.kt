@@ -2,9 +2,9 @@ package com.upsaclay.news.data
 
 import com.upsaclay.common.domain.entity.User
 import com.upsaclay.common.domain.usecase.ConvertDateUseCase
-import com.upsaclay.news.data.remote.model.RemoteAnnouncementWithUser
 import com.upsaclay.news.data.local.model.LocalAnnouncement
 import com.upsaclay.news.data.remote.model.RemoteAnnouncement
+import com.upsaclay.news.data.remote.model.RemoteAnnouncementWithUser
 import com.upsaclay.news.domain.entity.Announcement
 import com.upsaclay.news.domain.entity.AnnouncementState
 

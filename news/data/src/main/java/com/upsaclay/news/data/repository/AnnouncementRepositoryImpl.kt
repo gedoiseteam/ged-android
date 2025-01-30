@@ -3,22 +3,16 @@ package com.upsaclay.news.data.repository
 import com.upsaclay.news.data.local.AnnouncementLocalDataSource
 import com.upsaclay.news.data.remote.AnnouncementRemoteDataSource
 import com.upsaclay.news.domain.entity.Announcement
-import com.upsaclay.news.domain.entity.AnnouncementState
 import com.upsaclay.news.domain.repository.AnnouncementRepository
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.plus
-import java.io.IOException
 
 internal class AnnouncementRepositoryImpl(
     private val announcementRemoteDataSource: AnnouncementRemoteDataSource,
     private val announcementLocalDataSource: AnnouncementLocalDataSource,
-    scope: CoroutineScope = (GlobalScope + Dispatchers.IO)
+    scope: CoroutineScope
 ) : AnnouncementRepository {
     private val _announcements = MutableStateFlow<List<Announcement>>(emptyList())
     override val announcements: Flow<List<Announcement>> = _announcements

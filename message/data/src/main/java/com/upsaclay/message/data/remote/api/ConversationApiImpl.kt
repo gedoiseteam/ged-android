@@ -2,19 +2,17 @@ package com.upsaclay.message.data.remote.api
 
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.DocumentChange
-import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.firestore
 import com.upsaclay.common.domain.e
-import com.upsaclay.common.domain.i
 import com.upsaclay.message.data.model.CONVERSATIONS_TABLE_NAME
 import com.upsaclay.message.data.model.ConversationField
 import com.upsaclay.message.data.remote.model.RemoteConversation
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
-import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 internal class ConversationApiImpl : ConversationApi {
     private val conversationsCollection = Firebase.firestore.collection(CONVERSATIONS_TABLE_NAME)

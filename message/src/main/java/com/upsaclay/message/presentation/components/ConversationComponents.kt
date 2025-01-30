@@ -26,15 +26,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.upsaclay.common.domain.entity.ElapsedTime
 import com.upsaclay.common.domain.entity.User
-import com.upsaclay.common.domain.usecase.GetElapsedTimeUseCase
 import com.upsaclay.common.domain.usecase.FormatLocalDateTimeUseCase
+import com.upsaclay.common.domain.usecase.GetElapsedTimeUseCase
 import com.upsaclay.common.presentation.components.ProfilePicture
 import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.message.R
-import com.upsaclay.message.domain.entity.ConversationUI
 import com.upsaclay.message.conversationFixture
+import com.upsaclay.message.domain.entity.ConversationUI
 import com.upsaclay.message.domain.entity.Message
 
 @Composable

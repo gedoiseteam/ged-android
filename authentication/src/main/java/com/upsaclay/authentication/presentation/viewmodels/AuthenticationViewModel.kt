@@ -6,8 +6,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.upsaclay.authentication.domain.entity.AuthenticationState
-import com.upsaclay.authentication.domain.entity.exception.AuthenticationException
 import com.upsaclay.authentication.domain.entity.exception.AuthErrorCode
+import com.upsaclay.authentication.domain.entity.exception.AuthenticationException
 import com.upsaclay.authentication.domain.entity.exception.TooManyRequestException
 import com.upsaclay.authentication.domain.usecase.IsEmailVerifiedUseCase
 import com.upsaclay.authentication.domain.usecase.LoginUseCase

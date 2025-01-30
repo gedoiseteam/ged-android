@@ -323,7 +323,7 @@ private fun AccountScreenPreview() {
                 }
 
                 accountInfos.forEach { accountInfo ->
-                    com.upsaclay.gedoise.presentation.components.AccountInfoItem(
+                    AccountInfoItem(
                         modifier = Modifier.fillMaxWidth(),
                         accountInfo = accountInfo
                     )

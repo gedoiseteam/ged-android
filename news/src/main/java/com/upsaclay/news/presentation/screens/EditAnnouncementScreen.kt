@@ -24,7 +24,6 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.upsaclay.common.presentation.components.LoadingDialog
 import com.upsaclay.common.presentation.components.SmallTopBarEdit
@@ -34,8 +33,7 @@ import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.common.utils.showToast
 import com.upsaclay.news.R
-import com.upsaclay.news.announcementFixture
-import com.upsaclay.news.domain.entity.Announcement
+import com.upsaclay.news.domain.announcementFixture
 import com.upsaclay.news.domain.entity.AnnouncementScreenState
 import com.upsaclay.news.presentation.viewmodels.EditAnnouncementViewModel
 import org.koin.androidx.compose.koinViewModel

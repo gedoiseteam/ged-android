@@ -3,9 +3,9 @@ package com.upsaclay.authentication.data.remote
 import com.upsaclay.common.data.formatHttpError
 import com.upsaclay.common.domain.e
 import com.upsaclay.common.domain.i
-import java.io.IOException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.io.IOException
 
 internal class AuthenticationRemoteDataSource(
     private val authenticationRetrofitApi: AuthenticationRetrofitApi

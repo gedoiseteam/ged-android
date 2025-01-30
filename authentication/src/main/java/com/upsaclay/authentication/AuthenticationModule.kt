@@ -1,9 +1,8 @@
 package com.upsaclay.authentication
 
 import com.upsaclay.authentication.domain.usecase.GenerateHashUseCase
-import com.upsaclay.authentication.domain.usecase.IsUserAuthenticatedUseCase
 import com.upsaclay.authentication.domain.usecase.IsEmailVerifiedUseCase
-import com.upsaclay.common.domain.usecase.CreateUserUseCase
+import com.upsaclay.authentication.domain.usecase.IsUserAuthenticatedUseCase
 import com.upsaclay.authentication.domain.usecase.LoginUseCase
 import com.upsaclay.authentication.domain.usecase.RegisterUseCase
 import com.upsaclay.authentication.domain.usecase.SendVerificationEmailUseCase
@@ -12,6 +11,7 @@ import com.upsaclay.authentication.domain.usecase.VerifyEmailFormatUseCase
 import com.upsaclay.authentication.presentation.viewmodels.AuthenticationViewModel
 import com.upsaclay.authentication.presentation.viewmodels.EmailVerificationViewModel
 import com.upsaclay.authentication.presentation.viewmodels.RegistrationViewModel
+import com.upsaclay.common.domain.usecase.CreateUserUseCase
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.core.module.dsl.singleOf

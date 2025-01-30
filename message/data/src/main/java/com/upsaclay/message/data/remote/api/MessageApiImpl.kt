@@ -10,7 +10,6 @@ import com.upsaclay.message.data.model.MESSAGES_TABLE_NAME
 import com.upsaclay.message.data.model.MessageField.TIMESTAMP
 import com.upsaclay.message.data.remote.model.RemoteMessage
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.DEFAULT_CONCURRENCY
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlin.coroutines.resume

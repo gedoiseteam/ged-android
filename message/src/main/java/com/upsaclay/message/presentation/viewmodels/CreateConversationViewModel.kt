@@ -2,8 +2,6 @@ package com.upsaclay.message.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.gson.GsonBuilder
-import com.upsaclay.common.domain.LocalDateTimeSerializer
 import com.upsaclay.common.domain.entity.User
 import com.upsaclay.common.domain.usecase.GenerateIdUseCase
 import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase

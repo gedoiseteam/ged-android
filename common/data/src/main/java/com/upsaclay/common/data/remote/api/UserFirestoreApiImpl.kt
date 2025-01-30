@@ -2,8 +2,8 @@ package com.upsaclay.common.data.remote.api
 
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
-import com.upsaclay.common.data.remote.UserFieldsRemote
 import com.upsaclay.common.data.remote.FirestoreUser
+import com.upsaclay.common.data.remote.UserFieldsRemote
 import com.upsaclay.common.domain.e
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow

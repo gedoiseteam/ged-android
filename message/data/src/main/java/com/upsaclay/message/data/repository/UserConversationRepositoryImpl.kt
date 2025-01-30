@@ -5,9 +5,7 @@ import com.upsaclay.message.data.mapper.ConversationMapper
 import com.upsaclay.message.domain.entity.ConversationUser
 import com.upsaclay.message.domain.repository.UserConversationRepository
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,13 +14,12 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.plus
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class UserConversationRepositoryImpl(
     private val conversationRepository: ConversationRepository,
     private val userRepository: UserRepository,
-    private val scope: CoroutineScope = (GlobalScope + Dispatchers.IO)
+    private val scope: CoroutineScope
 ): UserConversationRepository  {
     private val _userConversations = MutableStateFlow<Map<String, ConversationUser>>(mapOf())
     override val userConversations: Flow<ConversationUser> = _userConversations

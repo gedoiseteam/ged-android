@@ -35,8 +35,7 @@ class MainViewModel(
                     _isAuthenticatedState.value = if (it) {
                         startDataListeningUseCase()
                         AuthenticationState.AUTHENTICATED
-                    }
-                    else {
+                    } else {
                         AuthenticationState.UNAUTHENTICATED
                     }
                 }

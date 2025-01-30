@@ -3,21 +3,16 @@ package com.upsaclay.message.data.repository
 import com.upsaclay.message.data.local.MessageLocalDataSource
 import com.upsaclay.message.data.remote.MessageRemoteDataSource
 import com.upsaclay.message.domain.entity.Message
-import com.upsaclay.message.domain.entity.MessageState
 import com.upsaclay.message.domain.repository.MessageRepository
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.plus
 
 internal class MessageRepositoryImpl(
     private val messageLocalDataSource: MessageLocalDataSource,
     private val messageRemoteDataSource: MessageRemoteDataSource,
-    private val scope: CoroutineScope = (GlobalScope + Dispatchers.IO)
+    private val scope: CoroutineScope
 ): MessageRepository {
     private val jobs = mutableListOf<Job>()
 

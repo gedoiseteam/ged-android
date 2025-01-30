@@ -12,7 +12,6 @@ import com.upsaclay.news.domain.entity.Announcement
 import com.upsaclay.news.domain.entity.AnnouncementScreenState
 import com.upsaclay.news.domain.entity.AnnouncementState
 import com.upsaclay.news.domain.usecase.CreateAnnouncementUseCase
-import com.upsaclay.news.domain.usecase.UpdateAnnouncementUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch

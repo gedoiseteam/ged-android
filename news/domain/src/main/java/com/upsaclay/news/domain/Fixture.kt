@@ -1,11 +1,11 @@
-package com.upsaclay.news
+package com.upsaclay.news.domain
 
 import com.upsaclay.common.domain.entity.User
 import com.upsaclay.news.domain.entity.Announcement
 import com.upsaclay.news.domain.entity.AnnouncementState
 import java.time.LocalDateTime
 
-internal val announcementFixture = Announcement(
+val announcementFixture = Announcement(
     id = "1",
     title = "Rappel : Visite de cabinet le 23/03.",
     date = LocalDateTime.of(2024, 7, 20, 10, 0),
@@ -33,7 +33,7 @@ internal val announcementFixture = Announcement(
     )
 )
 
-internal val announcementsFixture = listOf(
+val announcementsFixture = listOf(
     announcementFixture,
     announcementFixture,
     announcementFixture,

@@ -1,16 +1,15 @@
 package com.upsaclay.news
 
-import com.upsaclay.news.domain.entity.Announcement
 import com.upsaclay.news.domain.usecase.CreateAnnouncementUseCase
 import com.upsaclay.news.domain.usecase.DeleteAnnouncementUseCase
 import com.upsaclay.news.domain.usecase.GetAnnouncementUseCase
 import com.upsaclay.news.domain.usecase.GetAnnouncementsUseCase
 import com.upsaclay.news.domain.usecase.RefreshAnnouncementsUseCase
 import com.upsaclay.news.domain.usecase.UpdateAnnouncementUseCase
-import com.upsaclay.news.presentation.viewmodels.ReadAnnouncementViewModel
 import com.upsaclay.news.presentation.viewmodels.CreateAnnouncementViewModel
 import com.upsaclay.news.presentation.viewmodels.EditAnnouncementViewModel
 import com.upsaclay.news.presentation.viewmodels.NewsViewModel
+import com.upsaclay.news.presentation.viewmodels.ReadAnnouncementViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.core.module.dsl.singleOf

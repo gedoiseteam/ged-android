@@ -8,13 +8,9 @@ import com.upsaclay.message.data.local.model.LocalConversation
 import com.upsaclay.message.data.remote.model.Conversation
 import com.upsaclay.message.data.remote.model.RemoteConversation
 import com.upsaclay.message.domain.entity.ConversationState
-import com.upsaclay.message.domain.entity.ConversationUser
 import com.upsaclay.message.domain.entity.ConversationUI
+import com.upsaclay.message.domain.entity.ConversationUser
 import com.upsaclay.message.domain.entity.Message
-import java.time.Instant
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.ZoneOffset
 
 internal object ConversationMapper {
     fun toLocal(conversation: Conversation, interlocutor: User) = LocalConversation(
