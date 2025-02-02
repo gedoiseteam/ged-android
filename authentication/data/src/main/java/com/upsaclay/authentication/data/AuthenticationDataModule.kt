@@ -1,15 +1,17 @@
 package com.upsaclay.authentication.data
 
 import com.upsaclay.authentication.data.local.AuthenticationLocalDataSource
-import com.upsaclay.authentication.data.remote.AuthenticationRemoteDataSource
-import com.upsaclay.authentication.data.remote.AuthenticationRetrofitApi
 import com.upsaclay.authentication.data.remote.firebase.FirebaseAuthenticationApi
 import com.upsaclay.authentication.data.remote.firebase.FirebaseAuthenticationApiImpl
 import com.upsaclay.authentication.data.remote.firebase.FirebaseAuthenticationRemoteDataSource
+import com.upsaclay.authentication.data.remote.parissaclay.AuthenticationRetrofitApi
+import com.upsaclay.authentication.data.remote.parissaclay.ParisSaclayAuthenticationRemoteDataSource
 import com.upsaclay.authentication.data.repository.AuthenticationRepositoryImpl
-import com.upsaclay.authentication.data.repository.FirebaseAuthenticationRepositoryImpl
+import com.upsaclay.authentication.data.repository.firebase.FirebaseAuthenticationRepository
+import com.upsaclay.authentication.data.repository.firebase.FirebaseAuthenticationRepositoryImpl
+import com.upsaclay.authentication.data.repository.parissaclay.ParisSaclayAuthenticationRepository
+import com.upsaclay.authentication.data.repository.parissaclay.ParisSaclayAuthenticationRepositoryImpl
 import com.upsaclay.authentication.domain.repository.AuthenticationRepository
-import com.upsaclay.authentication.domain.repository.FirebaseAuthenticationRepository
 import com.upsaclay.common.domain.e
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
@@ -50,17 +52,20 @@ val authenticationDataModule = module {
         )
     }
 
+    singleOf(::FirebaseAuthenticationRepositoryImpl) { bind<FirebaseAuthenticationRepository>() }
+    singleOf(::FirebaseAuthenticationApiImpl) { bind<FirebaseAuthenticationApi>() }
+    singleOf(::FirebaseAuthenticationRemoteDataSource)
+
+    singleOf(::ParisSaclayAuthenticationRepositoryImpl) { bind<ParisSaclayAuthenticationRepository>() }
+    singleOf(::ParisSaclayAuthenticationRemoteDataSource)
+
     single<AuthenticationRepository> {
         AuthenticationRepositoryImpl(
-            authenticationRemoteDataSource = get(),
+            parisSaclayAuthenticationRepository = get(),
+            firebaseAuthenticationRepository = get(),
             authenticationLocalDataSource = get(),
             scope = get(BACKGROUND_SCOPE)
         )
     }
-    singleOf(::AuthenticationRemoteDataSource)
     singleOf(::AuthenticationLocalDataSource)
-
-    singleOf(::FirebaseAuthenticationRepositoryImpl) { bind<FirebaseAuthenticationRepository>() }
-    singleOf(::FirebaseAuthenticationApiImpl) { bind<FirebaseAuthenticationApi>() }
-    singleOf(::FirebaseAuthenticationRemoteDataSource)
 }

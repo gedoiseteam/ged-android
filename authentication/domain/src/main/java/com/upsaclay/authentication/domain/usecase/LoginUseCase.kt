@@ -1,11 +1,11 @@
 package com.upsaclay.authentication.domain.usecase
 
-import com.upsaclay.authentication.domain.repository.FirebaseAuthenticationRepository
+import com.upsaclay.authentication.domain.repository.AuthenticationRepository
 
 class LoginUseCase(
-    private val firebaseAuthenticationRepository: FirebaseAuthenticationRepository
+    private val authenticationRepository: AuthenticationRepository
 ) {
     suspend operator fun invoke(email: String, password: String) {
-        firebaseAuthenticationRepository.loginWithEmailAndPassword(email, password)
+        authenticationRepository.loginWithEmailAndPassword(email, password)
     }
 }

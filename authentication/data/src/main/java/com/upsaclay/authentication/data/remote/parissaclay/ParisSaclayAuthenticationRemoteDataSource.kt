@@ -1,4 +1,4 @@
-package com.upsaclay.authentication.data.remote
+package com.upsaclay.authentication.data.remote.parissaclay
 
 import com.upsaclay.common.data.formatHttpError
 import com.upsaclay.common.domain.e
@@ -7,7 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.IOException
 
-internal class AuthenticationRemoteDataSource(
+internal class ParisSaclayAuthenticationRemoteDataSource(
     private val authenticationRetrofitApi: AuthenticationRetrofitApi
 ) {
     suspend fun loginWithParisSaclay(email: String, password: String, hash: String) {

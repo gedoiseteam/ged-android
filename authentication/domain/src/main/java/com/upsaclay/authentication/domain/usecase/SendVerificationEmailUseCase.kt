@@ -1,11 +1,11 @@
 package com.upsaclay.authentication.domain.usecase
 
-import com.upsaclay.authentication.domain.repository.FirebaseAuthenticationRepository
+import com.upsaclay.authentication.domain.repository.AuthenticationRepository
 
 class SendVerificationEmailUseCase(
-    private val firebaseAuthenticationRepository: FirebaseAuthenticationRepository
+    private val authenticationRepository: AuthenticationRepository
 ) {
     suspend operator fun invoke() {
-        firebaseAuthenticationRepository.sendVerificationEmail()
+        authenticationRepository.sendVerificationEmail()
     }
 }
