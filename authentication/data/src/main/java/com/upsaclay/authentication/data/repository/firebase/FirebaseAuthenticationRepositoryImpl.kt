@@ -1,7 +1,6 @@
-package com.upsaclay.authentication.data.repository
+package com.upsaclay.authentication.data.repository.firebase
 
 import com.upsaclay.authentication.data.remote.firebase.FirebaseAuthenticationRemoteDataSource
-import com.upsaclay.authentication.domain.repository.FirebaseAuthenticationRepository
 
 class FirebaseAuthenticationRepositoryImpl(
     private val firebaseAuthenticationRemoteDataSource: FirebaseAuthenticationRemoteDataSource

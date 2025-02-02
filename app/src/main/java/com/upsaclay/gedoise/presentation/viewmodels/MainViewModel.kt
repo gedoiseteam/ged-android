@@ -8,7 +8,9 @@ import com.upsaclay.common.domain.entity.User
 import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
 import com.upsaclay.gedoise.data.BottomNavigationItem
 import com.upsaclay.gedoise.data.BottomNavigationItemType
-import com.upsaclay.gedoise.domain.usecase.StartDataListeningUseCase
+import com.upsaclay.gedoise.domain.usecase.DeleteLocalDataUseCase
+import com.upsaclay.gedoise.domain.usecase.StartListeningDataUseCase
+import com.upsaclay.gedoise.domain.usecase.StopListeningDataUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -16,26 +18,28 @@ import kotlinx.coroutines.launch
 class MainViewModel(
     isUserAuthenticatedUseCase: IsUserAuthenticatedUseCase,
     getCurrentUserUseCase: GetCurrentUserUseCase,
-    private val startDataListeningUseCase: StartDataListeningUseCase
+    private val startListeningDataUseCase: StartListeningDataUseCase,
+    private val stopListeningDataUseCase: StopListeningDataUseCase,
+    private val deleteLocalDataUseCase: DeleteLocalDataUseCase
 ) : ViewModel() {
-    val bottomNavigationItem: Map<BottomNavigationItemType, BottomNavigationItem> = mapOf(
-        BottomNavigationItemType.HOME to BottomNavigationItem.Home(),
-        BottomNavigationItemType.MESSAGE to BottomNavigationItem.Message(),
-//        BottomNavigationItemType.CALENDAR to BottomNavigationItem.Calendar(),
-//        BottomNavigationItemType.FORUM to BottomNavigationItem.Forum()
-    )
     private val _isAuthenticatedState = MutableStateFlow(AuthenticationState.IDLE)
     val authenticationState: StateFlow<AuthenticationState> = _isAuthenticatedState
     val currentUser: StateFlow<User?> = getCurrentUserUseCase()
+    val bottomNavigationItem: Map<BottomNavigationItemType, BottomNavigationItem> = mapOf(
+        BottomNavigationItemType.HOME to BottomNavigationItem.Home(),
+        BottomNavigationItemType.MESSAGE to BottomNavigationItem.Message()
+    )
 
     init {
         viewModelScope.launch {
             isUserAuthenticatedUseCase().collect { authenticated ->
                 authenticated?.let {
                     _isAuthenticatedState.value = if (it) {
-                        startDataListeningUseCase()
+                        startListeningDataUseCase()
                         AuthenticationState.AUTHENTICATED
                     } else {
+                        stopListeningDataUseCase()
+                        deleteLocalDataUseCase()
                         AuthenticationState.UNAUTHENTICATED
                     }
                 }

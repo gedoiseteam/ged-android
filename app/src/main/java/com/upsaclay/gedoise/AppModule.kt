@@ -3,9 +3,8 @@ package com.upsaclay.gedoise
 import androidx.room.Room
 import com.upsaclay.gedoise.data.GedoiseDatabase
 import com.upsaclay.gedoise.domain.usecase.DeleteLocalDataUseCase
-import com.upsaclay.gedoise.domain.usecase.LogoutUseCase
-import com.upsaclay.gedoise.domain.usecase.StartDataListeningUseCase
-import com.upsaclay.gedoise.domain.usecase.StopDataListeningUseCase
+import com.upsaclay.gedoise.domain.usecase.StartListeningDataUseCase
+import com.upsaclay.gedoise.domain.usecase.StopListeningDataUseCase
 import com.upsaclay.gedoise.presentation.viewmodels.AccountViewModel
 import com.upsaclay.gedoise.presentation.viewmodels.MainViewModel
 import com.upsaclay.gedoise.presentation.viewmodels.ProfileViewModel
@@ -33,8 +32,7 @@ val appModule = module {
     viewModelOf(::ProfileViewModel)
     viewModelOf(::AccountViewModel)
 
-    singleOf(::LogoutUseCase)
     singleOf(::DeleteLocalDataUseCase)
-    singleOf(::StartDataListeningUseCase)
-    singleOf(::StopDataListeningUseCase)
+    singleOf(::StartListeningDataUseCase)
+    singleOf(::StopListeningDataUseCase)
 }

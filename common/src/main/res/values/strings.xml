@@ -32,7 +32,7 @@
     <string name="school_level">Niveau d\'étude</string>
     <string name="first_name">Prénom</string>
     <string name="last_name">Nom</string>
-    <string name="email">Adresse mail</string>
+    <string name="email">Adresse e-mail</string>
 
     <string name="discard_modification_dialog_text">Abandonner les modifications ?</string>
 

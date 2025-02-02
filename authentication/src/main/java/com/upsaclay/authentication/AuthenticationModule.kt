@@ -4,6 +4,7 @@ import com.upsaclay.authentication.domain.usecase.GenerateHashUseCase
 import com.upsaclay.authentication.domain.usecase.IsEmailVerifiedUseCase
 import com.upsaclay.authentication.domain.usecase.IsUserAuthenticatedUseCase
 import com.upsaclay.authentication.domain.usecase.LoginUseCase
+import com.upsaclay.authentication.domain.usecase.LogoutUseCase
 import com.upsaclay.authentication.domain.usecase.RegisterUseCase
 import com.upsaclay.authentication.domain.usecase.SendVerificationEmailUseCase
 import com.upsaclay.authentication.domain.usecase.SetUserAuthenticatedUseCase
@@ -34,6 +35,7 @@ val authenticationModule = module {
     singleOf(::IsUserAuthenticatedUseCase)
     singleOf(::IsEmailVerifiedUseCase)
     singleOf(::LoginUseCase)
+    singleOf(::LogoutUseCase)
     singleOf(::RegisterUseCase)
     singleOf(::SendVerificationEmailUseCase)
     singleOf(::SetUserAuthenticatedUseCase)

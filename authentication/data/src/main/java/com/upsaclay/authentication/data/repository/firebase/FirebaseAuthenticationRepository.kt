@@ -1,4 +1,4 @@
-package com.upsaclay.authentication.domain.repository
+package com.upsaclay.authentication.data.repository.firebase
 
 interface FirebaseAuthenticationRepository {
     suspend fun loginWithEmailAndPassword(email: String, password: String)

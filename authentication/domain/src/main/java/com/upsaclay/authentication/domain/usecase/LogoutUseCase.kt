@@ -2,9 +2,10 @@ package com.upsaclay.authentication.domain.usecase
 
 import com.upsaclay.authentication.domain.repository.AuthenticationRepository
 
-class RegisterUseCase(
+class LogoutUseCase(
     private val authenticationRepository: AuthenticationRepository
 ) {
-    suspend operator fun invoke(email: String, password: String): String =
-        authenticationRepository.registerWithEmailAndPassword(email, password)
+    suspend operator fun invoke() {
+        authenticationRepository.logout()
+    }
 }
