@@ -39,6 +39,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -48,7 +49,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.upsaclay.authentication.R
-import com.upsaclay.authentication.domain.entity.AuthenticationState
+import com.upsaclay.authentication.domain.entity.AuthenticationScreenState
 import com.upsaclay.authentication.presentation.viewmodels.EmailVerificationViewModel
 import com.upsaclay.common.presentation.components.ErrorText
 import com.upsaclay.common.presentation.components.ErrorTextWithIcon
@@ -70,7 +71,7 @@ fun EmailVerificationScreen(
 ) {
     val screenState by emailVerificationViewModel.screenState.collectAsState()
     var errorMessage by remember { mutableStateOf("") }
-    val isLoading = screenState == AuthenticationState.LOADING
+    val isLoading = screenState == AuthenticationScreenState.LOADING
     var isForwardEmailButtonEnable by remember { mutableStateOf(true) }
     var isForwardButtonClicked by remember { mutableStateOf(false) }
     val infiniteTransition = rememberInfiniteTransition(label = "")
@@ -96,9 +97,9 @@ fun EmailVerificationScreen(
     }
 
     errorMessage = when (screenState) {
-        AuthenticationState.EMAIL_NOT_VERIFIED -> stringResource(id = R.string.email_not_verified)
+        AuthenticationScreenState.EMAIL_NOT_VERIFIED -> stringResource(id = R.string.email_not_verified)
 
-        AuthenticationState.UNKNOWN_ERROR -> stringResource(id = com.upsaclay.common.R.string.unknown_error)
+        AuthenticationScreenState.UNKNOWN_ERROR -> stringResource(id = com.upsaclay.common.R.string.unknown_error)
 
         else -> ""
     }
@@ -146,7 +147,10 @@ fun EmailVerificationScreen(
 
                 Spacer(Modifier.height(MaterialTheme.spacing.medium))
 
-                Text(text = annotatedString, style = MaterialTheme.typography.bodyLarge)
+                Text(
+                    text = annotatedString,
+                    style = MaterialTheme.typography.bodyLarge
+                )
 
                 if (errorMessage.isNotEmpty()) {
                     Spacer(Modifier.height(MaterialTheme.spacing.medium))
@@ -167,11 +171,13 @@ fun EmailVerificationScreen(
                 Spacer(Modifier.height(MaterialTheme.spacing.medium))
 
                 OutlinedButton(
+                    modifier = Modifier
+                        .testTag(stringResource(id = R.string.email_verification_screen_forward_email_button_tag)),
                     onClick = {
                         isForwardButtonClicked = true
                         emailVerificationViewModel.sendVerificationEmail()
                     },
-                    enabled = !isForwardEmailButtonEnable
+                    enabled = isForwardEmailButtonEnable && !isLoading
                 ) {
                     Text(text = stringResource(id = R.string.forward_verification_email))
                 }
@@ -203,7 +209,9 @@ fun EmailVerificationScreen(
             }
 
             PrimaryButton(
-                modifier = Modifier.align(Alignment.BottomEnd),
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .testTag(stringResource(id = R.string.email_verification_screen_finish_button_tag)),
                 isEnable = !isLoading,
                 text = stringResource(id = com.upsaclay.common.R.string.next),
                 onClick = { emailVerificationViewModel.verifyIsEmailVerified() }
@@ -221,7 +229,7 @@ fun EmailVerificationScreen(
 @Preview(showBackground = true)
 @Composable
 private fun EmailVerificationScreenPreview() {
-    var isLoading by remember { mutableStateOf(true) }
+    var isLoading by remember { mutableStateOf(false) }
     val email = "patrick.dupont@email.com"
     val isError = false
     val infiniteTransition = rememberInfiniteTransition(label = "")
@@ -284,7 +292,10 @@ private fun EmailVerificationScreenPreview() {
                         ErrorTextWithIcon(text = stringResource(id = R.string.email_not_verified))
                     }
 
-                    OutlinedButton(onClick = { }) {
+                    OutlinedButton(
+                        onClick = { },
+                        enabled = !isLoading
+                    ) {
                         Text(text = stringResource(id = R.string.forward_verification_email))
                     }
                 }

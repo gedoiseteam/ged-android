@@ -22,7 +22,7 @@ class MainViewModel(
     private val stopListeningDataUseCase: StopListeningDataUseCase,
     private val deleteLocalDataUseCase: DeleteLocalDataUseCase
 ) : ViewModel() {
-    private val _isAuthenticatedState = MutableStateFlow(AuthenticationState.IDLE)
+    private val _isAuthenticatedState = MutableStateFlow(AuthenticationState.NOTHING)
     val authenticationState: StateFlow<AuthenticationState> = _isAuthenticatedState
     val currentUser: StateFlow<User?> = getCurrentUserUseCase()
     val bottomNavigationItem: Map<BottomNavigationItemType, BottomNavigationItem> = mapOf(

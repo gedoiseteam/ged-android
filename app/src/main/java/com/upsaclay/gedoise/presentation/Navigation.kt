@@ -56,7 +56,7 @@ fun Navigation(mainViewModel: MainViewModel = koinViewModel()) {
     val registrationViewModel: RegistrationViewModel = koinViewModel()
 
     val startDestination = when (authenticationState) {
-        AuthenticationState.IDLE -> Screen.SPLASH.route
+        AuthenticationState.NOTHING -> Screen.SPLASH.route
         AuthenticationState.AUTHENTICATED -> Screen.NEWS.route
         else -> Screen.AUTHENTICATION.route
     }

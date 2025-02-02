@@ -23,13 +23,14 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.upsaclay.authentication.R
-import com.upsaclay.authentication.domain.entity.RegistrationState
+import com.upsaclay.authentication.domain.entity.RegistrationScreenState
 import com.upsaclay.authentication.presentation.components.RegistrationTopBar
 import com.upsaclay.authentication.presentation.viewmodels.RegistrationViewModel
 import com.upsaclay.common.domain.entity.Screen
@@ -47,14 +48,14 @@ fun FirstRegistrationScreen(
     registrationViewModel: RegistrationViewModel = koinViewModel()
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
-    val registrationState = registrationViewModel.registrationState.collectAsState()
-    val isError = registrationState.value == RegistrationState.INPUTS_EMPTY_ERROR
-    val isLoading = registrationState.value == RegistrationState.LOADING
+    val registrationState = registrationViewModel.screenState.collectAsState()
+    val emptyFields = registrationState.value == RegistrationScreenState.EMPTY_FIELDS_ERROR
+    val isLoading = registrationState.value == RegistrationScreenState.LOADING
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
 
     LaunchedEffect(Unit) {
-        registrationViewModel.resetRegistrationState()
+        registrationViewModel.resetScreenState()
         registrationViewModel.resetFirstName()
         registrationViewModel.resetLastName()
         registrationViewModel.resetEmail()
@@ -86,7 +87,7 @@ fun FirstRegistrationScreen(
                     .fillMaxWidth()
                     .focusRequester(focusRequester),
                 value = registrationViewModel.lastName,
-                isError = isError,
+                isError = emptyFields,
                 enabled = !isLoading,
                 placeholder = { Text(text = stringResource(id = com.upsaclay.common.R.string.last_name)) },
                 keyboardOptions = KeyboardOptions(KeyboardCapitalization.Sentences),
@@ -98,14 +99,14 @@ fun FirstRegistrationScreen(
                     .fillMaxWidth()
                     .focusRequester(focusRequester),
                 value = registrationViewModel.firstName,
-                isError = isError,
+                isError = emptyFields,
                 enabled = !isLoading,
                 keyboardOptions = KeyboardOptions(KeyboardCapitalization.Sentences),
                 placeholder = { Text(text = stringResource(id = com.upsaclay.common.R.string.first_name)) },
                 onValueChange = { registrationViewModel.updateFirstName(it) },
             )
 
-            if (isError) {
+            if (emptyFields) {
                 ErrorTextWithIcon(
                     modifier = Modifier.align(Alignment.Start),
                     text = stringResource(id = com.upsaclay.common.R.string.empty_fields_error)
@@ -114,7 +115,9 @@ fun FirstRegistrationScreen(
         }
 
         PrimaryButton(
-            modifier = Modifier.align(Alignment.BottomEnd),
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .testTag(stringResource(R.string.registration_screen_next_button_tag)),
             text = stringResource(id = com.upsaclay.common.R.string.next),
             isEnable = !isLoading,
             onClick = {
@@ -137,25 +140,13 @@ fun FirstRegistrationScreen(
 @Preview
 @Composable
 private fun FirstRegistrationScreenPreview() {
-    val firstName = ""
-    val lastName = ""
-    val isError = true
-    var isLoading by remember { mutableStateOf(false) }
+    var firstName by remember { mutableStateOf("") }
+    var lastName by remember { mutableStateOf("") }
+    val isError = false
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
 
     GedoiseTheme {
-        if (isLoading) {
-            OverlayLinearLoadingScreen()
-        }
-
-        LaunchedEffect(isLoading) {
-            if (isLoading) {
-                delay(1000)
-                isLoading = false
-            }
-        }
-
         RegistrationTopBar(
             navController = rememberNavController()
         ) {
@@ -181,8 +172,7 @@ private fun FirstRegistrationScreenPreview() {
                     placeholder = { Text(text = stringResource(id = com.upsaclay.common.R.string.last_name)) },
                     value = lastName,
                     isError = isError,
-                    enabled = !isLoading,
-                    onValueChange = { },
+                    onValueChange = { lastName = it }
                 )
 
                 OutlinedTextField(
@@ -191,9 +181,8 @@ private fun FirstRegistrationScreenPreview() {
                         .focusRequester(focusRequester),
                     value = firstName,
                     isError = isError,
-                    enabled = !isLoading,
                     placeholder = { Text(text = stringResource(id = com.upsaclay.common.R.string.first_name)) },
-                    onValueChange = { },
+                    onValueChange = { firstName = it }
                 )
 
                 if (isError) {
@@ -203,9 +192,8 @@ private fun FirstRegistrationScreenPreview() {
 
             PrimaryButton(
                 modifier = Modifier.align(Alignment.BottomEnd),
-                isEnable = !isLoading,
                 text = stringResource(id = com.upsaclay.common.R.string.next),
-                onClick = { isLoading = true }
+                onClick = { }
             )
         }
     }
