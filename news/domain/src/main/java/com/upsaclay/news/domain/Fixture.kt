@@ -1,6 +1,7 @@
 package com.upsaclay.news.domain
 
 import com.upsaclay.common.domain.entity.User
+import com.upsaclay.common.domain.userFixture
 import com.upsaclay.news.domain.entity.Announcement
 import com.upsaclay.news.domain.entity.AnnouncementState
 import java.time.LocalDateTime
@@ -22,15 +23,7 @@ val announcementFixture = Announcement(
             "vous avez des questions ou si vous avez besoin de plus amples informations" +
             " avant la date prévue",
     state = AnnouncementState.DEFAULT,
-    author = User(
-        id = "1",
-        firstName = "Patrick",
-        lastName = "Dupont",
-        email = "patrick.dupont@example.com",
-        schoolLevel = "GED 1",
-        isMember = false,
-        profilePictureUrl = "https://i-mom.unimedias.fr/2020/09/16/dragon-ball-songoku.jpg?auto=format,compress&cs=tinysrgb&w=1200"
-    )
+    author = userFixture
 )
 
 val announcementsFixture = listOf(

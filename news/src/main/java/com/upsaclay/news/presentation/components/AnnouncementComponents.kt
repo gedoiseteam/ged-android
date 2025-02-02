@@ -33,7 +33,7 @@ import com.upsaclay.news.domain.entity.Announcement
 import com.upsaclay.news.domain.entity.AnnouncementState
 
 @Composable
-internal fun HeaderAnnouncement(
+internal fun AnnouncementHeader(
     modifier: Modifier = Modifier,
     announcement: Announcement
 ) {
@@ -99,6 +99,7 @@ internal fun HeaderAnnouncement(
 
 @Composable
 internal fun AnnouncementItem(
+    modifier: Modifier = Modifier,
     announcement: Announcement,
     onClick: () -> Unit
 ) {
@@ -134,7 +135,7 @@ internal fun AnnouncementItem(
     }
 
     Row(
-        modifier = Modifier
+        modifier = modifier
             .clickable(onClick = onClick)
             .fillMaxWidth()
             .padding(MaterialTheme.spacing.smallMedium),
@@ -211,7 +212,7 @@ internal fun AnnouncementItem(
 @Composable
 private fun AnnouncementItemPreview() {
     GedoiseTheme {
-        HeaderAnnouncement(announcement = announcementFixture)
+        AnnouncementHeader(announcement = announcementFixture)
     }
 }
 
@@ -219,25 +220,9 @@ private fun AnnouncementItemPreview() {
 @Composable
 private fun AnnouncementItemWithTitlePreview() {
     GedoiseTheme {
-        Column {
-            AnnouncementItem(
-                announcement = announcementFixture,
-                onClick = { }
-            )
-
-            Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
-
-            AnnouncementItem(
-                announcement = announcementFixture.copy(state = AnnouncementState.LOADING),
-                onClick = { }
-            )
-
-            Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
-
-            AnnouncementItem(
-                announcement = announcementFixture.copy(state = AnnouncementState.ERROR),
-                onClick = { }
-            )
-        }
+        AnnouncementItem(
+            announcement = announcementFixture,
+            onClick = { }
+        )
     }
 }

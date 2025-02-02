@@ -3,7 +3,7 @@ package com.upsaclay.authentication
 import com.upsaclay.common.domain.repository.UserRepository
 import com.upsaclay.common.domain.usecase.CreateUserUseCase
 import com.upsaclay.common.domain.usecase.UpdateUserProfilePictureUseCase
-import com.upsaclay.common.utils.userFixture
+import com.upsaclay.common.domain.userFixture
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk

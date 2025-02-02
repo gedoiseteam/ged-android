@@ -27,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -45,15 +46,14 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun NewsScreen(
-    newsViewModel: NewsViewModel = koinViewModel(),
-    navController: NavController
+    navController: NavController,
+    newsViewModel: NewsViewModel = koinViewModel()
 ) {
-    val announcements = newsViewModel.announcements.collectAsState(emptyList()).value
+    val announcements = newsViewModel.announcementsPreview.collectAsState(emptyList()).value
     val user by newsViewModel.currentUser.collectAsState()
     val isRefreshing = newsViewModel.isRefreshing
 
     LaunchedEffect(Unit) {
-        newsViewModel.resetAnnouncementState()
         newsViewModel.refreshAnnouncements()
     }
 
@@ -82,7 +82,9 @@ fun NewsScreen(
                     .fillMaxSize()
             ) {
                 ExtendedFloatingActionButton(
-                    modifier = Modifier.align(Alignment.BottomEnd),
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .testTag(stringResource(id = R.string.news_screen_create_announcement_button_tag)),
                     text = { Text(text = stringResource(id = R.string.new_announcement)) },
                     containerColor = MaterialTheme.colorScheme.secondaryContainer,
                     icon = {
@@ -110,7 +112,9 @@ private fun RecentAnnouncementSection(
         Text(
             text = stringResource(id = R.string.recent_announcements),
             style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(horizontal = MaterialTheme.spacing.medium)
+            modifier = Modifier
+                .padding(horizontal = MaterialTheme.spacing.medium)
+                .testTag(stringResource(id = R.string.news_screen_empty_announcement_text_tag))
         )
 
         Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
@@ -134,6 +138,7 @@ private fun RecentAnnouncementSection(
             } else {
                 items(sortedAnnouncements) { announcement ->
                     AnnouncementItem(
+                        modifier = Modifier.testTag(stringResource(R.string.news_screen_recent_announcements_tag)),
                         announcement = announcement,
                         onClick = { onClickAnnouncement(announcement) }
                     )

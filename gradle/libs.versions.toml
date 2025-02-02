@@ -15,6 +15,7 @@ foundationCompose = "1.6.8"
 composeBom = "2024.06.00"
 lifecycleViewmodelCompose = "2.8.4"
 navigationCompose = "2.7.7"
+navigationTesting = "2.5.3"
 koin = "3.6.0-wasm-alpha2"
 mockk = "1.13.11"
 okhttpBom = "4.12.0"
@@ -79,6 +80,7 @@ firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "fir
 firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics" }
 firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
 firebase-auth = { module = "com.google.firebase:firebase-auth" }
+androidx-navigation-testing = { group = "androidx.navigation", name = "navigation-testing" ,version.ref = "navigationTesting" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

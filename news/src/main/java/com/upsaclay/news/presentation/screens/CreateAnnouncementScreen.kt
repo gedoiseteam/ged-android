@@ -76,6 +76,7 @@ fun CreateAnnouncementScreen(
     Scaffold(
         topBar = {
             SmallTopBarEdit(
+                modifier = Modifier.fillMaxWidth(),
                 confirmText = stringResource(id = com.upsaclay.common.R.string.publish),
                 onCancelClick = {
                     focusManager.clearFocus()
