@@ -1,6 +1,6 @@
 package com.upsaclay.authentication.domain.entity
 
-enum class RegistrationState {
+enum class RegistrationScreenState {
     OK,
     ERROR,
     LOADING,
@@ -8,8 +8,7 @@ enum class RegistrationState {
     NOT_REGISTERED,
     UNRECOGNIZED_ACCOUNT,
     USER_ALREADY_EXIST,
-    USER_NOT_EXIST,
-    INPUTS_EMPTY_ERROR,
+    EMPTY_FIELDS_ERROR,
     EMAIL_FORMAT_ERROR,
     PASSWORD_LENGTH_ERROR
 }

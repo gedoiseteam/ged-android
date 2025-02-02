@@ -35,4 +35,15 @@
     <string name="email_already_associated">Cette adresse e-mail est déjà associée à un compte. Veuillez vous connecter ou réinitialisez votre mot de passe.</string>
     <string name="authenticated_user_not_found">La création de vore compte a été comprise. Veuillez contacter le support à l\'adresse suivante : application.gedoise@gmail.com</string>
     <string name="too_many_request_error">Vous avez effectué trop de tentatives de connexion. Veuillez réessayer dans quelques minutes.</string>
+
+    <string name="authentication_screen_login_button_tag">Authentication Screen Login Button Tag</string>
+    <string name="authentication_screen_registration_button_tag">Authentication Screen Registration Button Tag</string>
+    <string name="authentication_screen_verify_email_dialog_tag">Authentication Screen Verify Email Dialog Tag</string>
+
+    <string name="registration_screen_next_button_tag">Registration Screen Next Button Tag</string>
+    <string name="registration_screen_email_input_tag">Registration Screen Email Input Tag</string>
+    <string name="registration_screen_password_input_tag">Registration Screen Password Input Tag</string>
+
+    <string name="email_verification_screen_finish_button_tag">Email Verification Screen Finish Button Tag</string>
+    <string name="email_verification_screen_forward_email_button_tag">Email Verification Screen Forward Email Button Tag</string>
 </resources>

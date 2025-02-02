@@ -27,6 +27,7 @@ import com.upsaclay.common.presentation.theme.spacing
 
 @Composable
 fun SimpleDialog(
+    modifier: Modifier = Modifier,
     title: String? = null,
     text: String? = null,
     confirmText: String = stringResource(id = R.string.accept),
@@ -36,6 +37,7 @@ fun SimpleDialog(
     onDismiss: () -> Unit
 ) {
     AlertDialog(
+        modifier = modifier,
         title = { title?.let { Text(text = title) } },
         text = { text?.let { Text(text = text) } },
         onDismissRequest = onDismiss,

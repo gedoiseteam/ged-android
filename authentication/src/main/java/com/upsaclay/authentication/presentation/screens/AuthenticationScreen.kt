@@ -39,6 +39,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -49,7 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.NavController
 import com.upsaclay.authentication.R
-import com.upsaclay.authentication.domain.entity.AuthenticationState
+import com.upsaclay.authentication.domain.entity.AuthenticationScreenState
 import com.upsaclay.authentication.presentation.components.LoginButton
 import com.upsaclay.authentication.presentation.components.OutlinedEmailInput
 import com.upsaclay.authentication.presentation.components.OutlinedPasswordInput
@@ -77,45 +78,45 @@ fun AuthenticationScreen(
     var showVerifyEmailDialog by remember { mutableStateOf(false) }
     var isKeyboardVisible by remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
-    val authenticationState by authenticationViewModel.authenticationState.collectAsState()
+    val screenState by authenticationViewModel.screenState.collectAsState()
 
-    inputsError = authenticationState == AuthenticationState.AUTHENTICATION_ERROR ||
-            authenticationState == AuthenticationState.INPUTS_EMPTY_ERROR
+    inputsError = screenState == AuthenticationScreenState.AUTHENTICATION_ERROR ||
+            screenState == AuthenticationScreenState.EMPTY_FIELDS_ERROR
 
-    errorMessage = when (authenticationState) {
-        AuthenticationState.AUTHENTICATION_ERROR ->
+    errorMessage = when (screenState) {
+        AuthenticationScreenState.AUTHENTICATION_ERROR ->
             stringResource(id = R.string.error_connection)
 
-        AuthenticationState.INPUTS_EMPTY_ERROR ->
+        AuthenticationScreenState.EMPTY_FIELDS_ERROR ->
             stringResource(id = com.upsaclay.common.R.string.empty_fields_error)
 
-        AuthenticationState.AUTHENTICATED_USER_NOT_FOUND ->
+        AuthenticationScreenState.AUTHENTICATED_USER_NOT_FOUND ->
             stringResource(id = R.string.authenticated_user_not_found)
 
-        AuthenticationState.TOO_MANY_REQUESTS_ERROR ->
+        AuthenticationScreenState.TOO_MANY_REQUESTS_ERROR ->
             stringResource(id = R.string.too_many_request_error)
 
-        AuthenticationState.EMAIL_FORMAT_ERROR ->
+        AuthenticationScreenState.EMAIL_FORMAT_ERROR ->
             stringResource(id = R.string.error_incorrect_email_format)
 
         else -> ""
     }
 
     LaunchedEffect(Unit) {
-        authenticationViewModel.resetAuthenticationState()
+        authenticationViewModel.resetScreenState()
     }
 
-    LaunchedEffect(authenticationState) {
-        when (authenticationState) {
-            AuthenticationState.NETWORK_ERROR -> {
+    LaunchedEffect(screenState) {
+        when (screenState) {
+            AuthenticationScreenState.NETWORK_ERROR -> {
                 showToast(context = context, stringRes = com.upsaclay.common.R.string.network_error)
             }
 
-            AuthenticationState.EMAIL_NOT_VERIFIED -> {
+            AuthenticationScreenState.EMAIL_NOT_VERIFIED -> {
                 showVerifyEmailDialog = true
             }
 
-            AuthenticationState.UNKNOWN_ERROR -> {
+            AuthenticationScreenState.UNKNOWN_ERROR -> {
                 showToast(context = context, stringRes = com.upsaclay.common.R.string.unknown_error)
             }
 
@@ -148,11 +149,12 @@ fun AuthenticationScreen(
 
     if (showVerifyEmailDialog) {
         SimpleDialog(
+            modifier = Modifier.testTag(stringResource(id = R.string.authentication_screen_verify_email_dialog_tag)),
             text = stringResource(id = R.string.email_not_verified_dialog_message),
             confirmText = stringResource(id = com.upsaclay.common.R.string.keep_going),
             onDismiss = {
                 showVerifyEmailDialog = false
-                authenticationViewModel.resetAuthenticationState()
+                authenticationViewModel.resetScreenState()
             },
             onConfirm = {
                 navController.navigate(Screen.EMAIL_VERIFICATION.route + "?email=${authenticationViewModel.email}") {
@@ -161,7 +163,7 @@ fun AuthenticationScreen(
             },
             onCancel = {
                 showVerifyEmailDialog = false
-                authenticationViewModel.resetAuthenticationState()
+                authenticationViewModel.resetScreenState()
             }
         )
     }
@@ -196,10 +198,11 @@ fun AuthenticationScreen(
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))
 
             LoginButton(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(stringResource(id = R.string.authentication_screen_login_button_tag)),
                 text = stringResource(id = R.string.login),
-                isLoading = authenticationState == AuthenticationState.LOADING ||
-                        authenticationState == AuthenticationState.AUTHENTICATED,
+                isLoading = screenState == AuthenticationScreenState.LOADING,
                 onClick = {
                     keyboardController?.hide()
                     if (authenticationViewModel.verifyInputs()) {
@@ -269,7 +272,9 @@ private fun RegistrationText(
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.primary
             ),
-            modifier = Modifier.clickable { onRegistrationClick() }
+            modifier = Modifier
+                .clickable { onRegistrationClick() }
+                .testTag(stringResource(id = R.string.authentication_screen_registration_button_tag))
         )
     }
 }

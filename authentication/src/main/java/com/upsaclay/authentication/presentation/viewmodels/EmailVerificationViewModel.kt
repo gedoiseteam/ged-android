@@ -2,7 +2,7 @@ package com.upsaclay.authentication.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.upsaclay.authentication.domain.entity.AuthenticationState
+import com.upsaclay.authentication.domain.entity.AuthenticationScreenState
 import com.upsaclay.authentication.domain.entity.exception.TooManyRequestException
 import com.upsaclay.authentication.domain.usecase.IsEmailVerifiedUseCase
 import com.upsaclay.authentication.domain.usecase.SendVerificationEmailUseCase
@@ -17,8 +17,8 @@ class EmailVerificationViewModel(
     private val isEmailVerifiedUseCase: IsEmailVerifiedUseCase,
     private val setUserAuthenticatedUseCase: SetUserAuthenticatedUseCase
 ) : ViewModel() {
-    private val _screenState = MutableStateFlow(AuthenticationState.IDLE)
-    val screenState: StateFlow<AuthenticationState> = _screenState
+    private val _screenState = MutableStateFlow(AuthenticationScreenState.DEFAULT)
+    val screenState: StateFlow<AuthenticationScreenState> = _screenState
 
     fun sendVerificationEmail() {
         viewModelScope.launch {
@@ -27,27 +27,27 @@ class EmailVerificationViewModel(
             } catch (e: Exception) {
                 when (e) {
                     is TooManyRequestException -> _screenState.value =
-                        AuthenticationState.TOO_MANY_REQUESTS_ERROR
+                        AuthenticationScreenState.TOO_MANY_REQUESTS_ERROR
 
-                    else -> _screenState.value = AuthenticationState.UNKNOWN_ERROR
+                    else -> _screenState.value = AuthenticationScreenState.UNKNOWN_ERROR
                 }
             }
         }
     }
 
     fun verifyIsEmailVerified() {
-        _screenState.value = AuthenticationState.LOADING
+        _screenState.value = AuthenticationScreenState.LOADING
 
         viewModelScope.launch {
             try {
                 if (isEmailVerifiedUseCase()) {
-                    _screenState.value = AuthenticationState.EMAIL_VERIFIED
+                    _screenState.value = AuthenticationScreenState.EMAIL_VERIFIED
                     setUserAuthenticatedUseCase(true)
                 } else {
-                    _screenState.value = AuthenticationState.EMAIL_NOT_VERIFIED
+                    _screenState.value = AuthenticationScreenState.EMAIL_NOT_VERIFIED
                 }
             } catch (e: Exception) {
-                _screenState.value = AuthenticationState.UNKNOWN_ERROR
+                _screenState.value = AuthenticationScreenState.UNKNOWN_ERROR
             }
         }
     }

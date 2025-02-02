@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.upsaclay.authentication.domain.entity.AuthenticationState
+import com.upsaclay.authentication.domain.entity.AuthenticationScreenState
 import com.upsaclay.authentication.domain.entity.exception.AuthErrorCode
 import com.upsaclay.authentication.domain.entity.exception.AuthenticationException
 import com.upsaclay.authentication.domain.entity.exception.TooManyRequestException
@@ -28,8 +28,8 @@ class AuthenticationViewModel(
     private val setCurrentUserUseCase: SetCurrentUserUseCase,
     private val isEmailVerifiedUseCase: IsEmailVerifiedUseCase
 ) : ViewModel() {
-    private val _authenticationState = MutableStateFlow(AuthenticationState.UNAUTHENTICATED)
-    val authenticationState: StateFlow<AuthenticationState> = _authenticationState
+    private val _screenState = MutableStateFlow(AuthenticationScreenState.DEFAULT)
+    val screenState: StateFlow<AuthenticationScreenState> = _screenState
     var email by mutableStateOf("")
         private set
     var password by mutableStateOf("")
@@ -44,7 +44,7 @@ class AuthenticationViewModel(
     }
 
     fun login() {
-        _authenticationState.value = AuthenticationState.LOADING
+        _screenState.value = AuthenticationScreenState.LOADING
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -53,46 +53,46 @@ class AuthenticationViewModel(
                     if (isEmailVerifiedUseCase()) {
                         setCurrentUserUseCase(it)
                         setUserAuthenticatedUseCase(true)
-                        _authenticationState.value = AuthenticationState.AUTHENTICATED
+                        _screenState.value = AuthenticationScreenState.DEFAULT
                     } else {
-                        _authenticationState.value = AuthenticationState.EMAIL_NOT_VERIFIED
+                        _screenState.value = AuthenticationScreenState.EMAIL_NOT_VERIFIED
                     }
                 } ?: run {
-                    _authenticationState.value = AuthenticationState.AUTHENTICATED_USER_NOT_FOUND
+                    _screenState.value = AuthenticationScreenState.AUTHENTICATED_USER_NOT_FOUND
                 }
             } catch (e: Exception) {
-                _authenticationState.value = when (e) {
-                    is NetworkException -> AuthenticationState.NETWORK_ERROR
+                _screenState.value = when (e) {
+                    is NetworkException -> AuthenticationScreenState.NETWORK_ERROR
 
-                    is TooManyRequestException -> AuthenticationState.TOO_MANY_REQUESTS_ERROR
+                    is TooManyRequestException -> AuthenticationScreenState.TOO_MANY_REQUESTS_ERROR
 
                     is AuthenticationException -> {
                         if (e.code == AuthErrorCode.INVALID_CREDENTIALS) {
-                            AuthenticationState.AUTHENTICATION_ERROR
+                            AuthenticationScreenState.AUTHENTICATION_ERROR
                         } else {
-                            AuthenticationState.UNKNOWN_ERROR
+                            AuthenticationScreenState.UNKNOWN_ERROR
                         }
                     }
 
-                    else -> AuthenticationState.UNKNOWN_ERROR
+                    else -> AuthenticationScreenState.UNKNOWN_ERROR
                 }
             }
         }
     }
 
-    fun resetAuthenticationState() {
-        _authenticationState.value = AuthenticationState.UNAUTHENTICATED
+    fun resetScreenState() {
+        _screenState.value = AuthenticationScreenState.DEFAULT
     }
 
     fun verifyInputs(): Boolean {
         return when {
             email.isBlank() || password.isBlank() -> {
-                _authenticationState.value = AuthenticationState.INPUTS_EMPTY_ERROR
+                _screenState.value = AuthenticationScreenState.EMPTY_FIELDS_ERROR
                 return false
             }
 
             !VerifyEmailFormatUseCase(email) -> {
-                _authenticationState.value = AuthenticationState.EMAIL_FORMAT_ERROR
+                _screenState.value = AuthenticationScreenState.EMAIL_FORMAT_ERROR
                 return false
             }
 

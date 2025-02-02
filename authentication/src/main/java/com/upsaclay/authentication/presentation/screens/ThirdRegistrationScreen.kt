@@ -23,12 +23,13 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.upsaclay.authentication.R
-import com.upsaclay.authentication.domain.entity.RegistrationState
+import com.upsaclay.authentication.domain.entity.RegistrationScreenState
 import com.upsaclay.authentication.presentation.components.OutlinedEmailInput
 import com.upsaclay.authentication.presentation.components.OutlinedPasswordInput
 import com.upsaclay.authentication.presentation.components.RegistrationTopBar
@@ -48,45 +49,39 @@ fun ThirdRegistrationScreen(
     registrationViewModel: RegistrationViewModel = koinViewModel()
 ) {
     LaunchedEffect(Unit) {
-        registrationViewModel.resetRegistrationState()
+        registrationViewModel.resetScreenState()
         registrationViewModel.resetSchoolLevel()
     }
 
     val keyboardController = LocalSoftwareKeyboardController.current
-    val registrationState by registrationViewModel.registrationState.collectAsState()
+    val registrationState by registrationViewModel.screenState.collectAsState()
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
-    val isLoading = registrationState == RegistrationState.LOADING
+    val isLoading = registrationState == RegistrationScreenState.LOADING
 
     val inputsError = when (registrationState) {
-        RegistrationState.UNRECOGNIZED_ACCOUNT, RegistrationState.INPUTS_EMPTY_ERROR -> true
+        RegistrationScreenState.UNRECOGNIZED_ACCOUNT, RegistrationScreenState.EMPTY_FIELDS_ERROR -> true
         else -> false
     }
 
     val errorMessage = when (registrationState) {
-        RegistrationState.UNRECOGNIZED_ACCOUNT -> stringResource(id = R.string.unrecognized_account)
-        RegistrationState.INPUTS_EMPTY_ERROR -> stringResource(id = com.upsaclay.common.R.string.empty_fields_error)
-        RegistrationState.EMAIL_FORMAT_ERROR -> stringResource(id = R.string.error_incorrect_email_format)
-        RegistrationState.PASSWORD_LENGTH_ERROR -> stringResource(id = R.string.error_password_length)
-        RegistrationState.USER_ALREADY_EXIST -> stringResource(id = R.string.email_already_associated)
+        RegistrationScreenState.UNRECOGNIZED_ACCOUNT -> stringResource(id = R.string.unrecognized_account)
+        RegistrationScreenState.EMPTY_FIELDS_ERROR -> stringResource(id = com.upsaclay.common.R.string.empty_fields_error)
+        RegistrationScreenState.EMAIL_FORMAT_ERROR -> stringResource(id = R.string.error_incorrect_email_format)
+        RegistrationScreenState.PASSWORD_LENGTH_ERROR -> stringResource(id = R.string.error_password_length)
+        RegistrationScreenState.USER_ALREADY_EXIST -> stringResource(id = R.string.email_already_associated)
         else -> null
     }
 
     LaunchedEffect(registrationState) {
         when (registrationState) {
-            RegistrationState.USER_NOT_EXIST -> {
-                registrationViewModel.register()
+            RegistrationScreenState.REGISTERED -> {
+                registrationViewModel.resetScreenState()
+                navController.navigate(Screen.EMAIL_VERIFICATION.route + "?email=${registrationViewModel.email}")
             }
 
-            RegistrationState.REGISTERED -> {
-                registrationViewModel.resetRegistrationState()
-                navController.navigate(Screen.EMAIL_VERIFICATION.route + "?email=${registrationViewModel.email}") {
-                    popUpTo(navController.graph.id) { inclusive = true }
-                }
-            }
-
-            RegistrationState.ERROR -> showToast(
+            RegistrationScreenState.ERROR -> showToast(
                 context,
                 com.upsaclay.common.R.string.unknown_error
             )
@@ -122,7 +117,8 @@ fun ThirdRegistrationScreen(
             OutlinedEmailInput(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .focusRequester(focusRequester),
+                    .focusRequester(focusRequester)
+                    .testTag(stringResource(R.string.registration_screen_email_input_tag)),
                 text = registrationViewModel.email,
                 isError = inputsError,
                 isEnable = !isLoading,
@@ -134,7 +130,8 @@ fun ThirdRegistrationScreen(
             OutlinedPasswordInput(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .focusRequester(focusRequester),
+                    .focusRequester(focusRequester)
+                    .testTag(stringResource(R.string.registration_screen_password_input_tag)),
                 text = registrationViewModel.password,
                 isError = inputsError,
                 isEnable = !isLoading,
@@ -152,7 +149,9 @@ fun ThirdRegistrationScreen(
         }
 
         PrimaryButton(
-            modifier = Modifier.align(Alignment.BottomEnd),
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .testTag(stringResource(R.string.registration_screen_next_button_tag)),
             isEnable = !isLoading,
             text = stringResource(id = com.upsaclay.common.R.string.next),
             onClick = {
@@ -174,8 +173,8 @@ fun ThirdRegistrationScreen(
 @Preview
 @Composable
 private fun ThirdRegistrationScreenPreview() {
-    val mail = "pierre.dupont@universite-paris-saclay.fr"
-    val password = "password"
+    var mail by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
     val isError = false
     val focusRequester = remember { FocusRequester() }
@@ -212,7 +211,7 @@ private fun ThirdRegistrationScreenPreview() {
                     text = mail,
                     isEnable = !isLoading,
                     isError = isError,
-                    onValueChange = {}
+                    onValueChange = { mail = it }
                 )
 
                 Spacer(Modifier.height(MaterialTheme.spacing.medium))
@@ -224,7 +223,7 @@ private fun ThirdRegistrationScreenPreview() {
                     text = password,
                     isEnable = !isLoading,
                     isError = isError,
-                    onValueChange = {}
+                    onValueChange = { password = it }
                 )
             }
 

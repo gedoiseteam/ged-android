@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.upsaclay.authentication.domain.entity.RegistrationState
+import com.upsaclay.authentication.domain.entity.RegistrationScreenState
 import com.upsaclay.authentication.domain.entity.exception.AuthErrorCode
 import com.upsaclay.authentication.domain.entity.exception.AuthenticationException
 import com.upsaclay.authentication.domain.usecase.RegisterUseCase
@@ -25,8 +25,8 @@ class RegistrationViewModel(
     private val verifyEmailFormatUseCase: VerifyEmailFormatUseCase,
     private val isUserExistUseCase: IsUserExistUseCase,
 ) : ViewModel() {
-    private val _registrationState = MutableStateFlow(RegistrationState.NOT_REGISTERED)
-    val registrationState: StateFlow<RegistrationState> = _registrationState
+    private val _screenState = MutableStateFlow(RegistrationScreenState.NOT_REGISTERED)
+    val screenState: StateFlow<RegistrationScreenState> = _screenState
 
     var firstName by mutableStateOf("")
         private set
@@ -36,7 +36,7 @@ class RegistrationViewModel(
         private set
     var password by mutableStateOf("")
         private set
-    val schoolLevels = persistentListOf("GED 1", "GED 2", "GED 3", "GED 4")
+    val schoolLevels = listOf("GED 1", "GED 2", "GED 3", "GED 4")
     var schoolLevel by mutableStateOf(schoolLevels[0])
         private set
 
@@ -80,17 +80,17 @@ class RegistrationViewModel(
         schoolLevel = schoolLevels[0]
     }
 
-    fun resetRegistrationState() {
-        _registrationState.value = RegistrationState.NOT_REGISTERED
+    fun resetScreenState() {
+        _screenState.value = RegistrationScreenState.NOT_REGISTERED
     }
 
     fun register() {
-        _registrationState.value = RegistrationState.LOADING
+        _screenState.value = RegistrationScreenState.LOADING
 
         viewModelScope.launch {
             try {
                 if (isUserExistUseCase(email.trim())) {
-                    _registrationState.value = RegistrationState.USER_ALREADY_EXIST
+                    _screenState.value = RegistrationScreenState.USER_ALREADY_EXIST
                     return@launch
                 }
 
@@ -105,15 +105,15 @@ class RegistrationViewModel(
                 )
 
                 createUserUseCase(user)
-                _registrationState.value = RegistrationState.REGISTERED
+                _screenState.value = RegistrationScreenState.REGISTERED
             } catch (e: Exception) {
                 if (e is AuthenticationException) {
-                    _registrationState.value = when (e.code) {
-                        AuthErrorCode.EMAIL_ALREADY_EXIST -> RegistrationState.USER_ALREADY_EXIST
-                        else -> RegistrationState.ERROR
+                    _screenState.value = when (e.code) {
+                        AuthErrorCode.EMAIL_ALREADY_EXIST -> RegistrationScreenState.USER_ALREADY_EXIST
+                        else -> RegistrationScreenState.ERROR
                     }
                 } else {
-                    _registrationState.value = RegistrationState.ERROR
+                    _screenState.value = RegistrationScreenState.ERROR
                 }
             }
         }
@@ -121,7 +121,7 @@ class RegistrationViewModel(
 
     fun verifyNamesInputs(): Boolean {
         return if (firstName.isBlank() || lastName.isBlank()) {
-            _registrationState.value = RegistrationState.INPUTS_EMPTY_ERROR
+            _screenState.value = RegistrationScreenState.EMPTY_FIELDS_ERROR
             false
         } else {
             firstName = firstName.uppercaseFirstLetter().trim()
@@ -135,12 +135,12 @@ class RegistrationViewModel(
     private fun verifyPassword(): Boolean {
         return when {
             password.isBlank() -> {
-                _registrationState.value = RegistrationState.INPUTS_EMPTY_ERROR
+                _screenState.value = RegistrationScreenState.EMPTY_FIELDS_ERROR
                 false
             }
 
             password.length <= 8 -> {
-                _registrationState.value = RegistrationState.PASSWORD_LENGTH_ERROR
+                _screenState.value = RegistrationScreenState.PASSWORD_LENGTH_ERROR
                 false
             }
 
@@ -151,12 +151,12 @@ class RegistrationViewModel(
     private fun verifyEmail(): Boolean {
         return when {
             email.isBlank() -> {
-                _registrationState.value = RegistrationState.INPUTS_EMPTY_ERROR
+                _screenState.value = RegistrationScreenState.EMPTY_FIELDS_ERROR
                 false
             }
 
             !verifyEmailFormatUseCase(email.trim()) -> {
-                _registrationState.value = RegistrationState.EMAIL_FORMAT_ERROR
+                _screenState.value = RegistrationScreenState.EMAIL_FORMAT_ERROR
                 true
             }
 
