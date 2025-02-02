@@ -1,9 +1,10 @@
-package com.upsaclay.message
+package com.upsaclay.message.domain
 
 import com.upsaclay.common.domain.userFixture
 import com.upsaclay.common.domain.userFixture2
 import com.upsaclay.message.domain.entity.ConversationState
 import com.upsaclay.message.domain.entity.ConversationUI
+import com.upsaclay.message.domain.entity.ConversationUser
 import com.upsaclay.message.domain.entity.Message
 import com.upsaclay.message.domain.entity.MessageState
 import java.time.LocalDateTime
@@ -39,8 +40,15 @@ val messagesFixture = listOf(
 val conversationFixture = ConversationUI(
     id = "1",
     interlocutor = userFixture2,
-    lastMessage = messageFixture.copy(isRead = true),
-    createdAt = LocalDateTime.now().minusDays(2),
+    lastMessage = messageFixture,
+    createdAt = LocalDateTime.of(2024, 7, 20, 10, 0),
+    state = ConversationState.CREATED
+)
+
+val conversationUserFixture = ConversationUser(
+    id = "1",
+    interlocutor = userFixture2,
+    createdAt = LocalDateTime.of(2024, 7, 20, 10, 0),
     state = ConversationState.CREATED
 )
 
@@ -54,4 +62,16 @@ val conversationsFixture = listOf(
     conversationFixture.copy(lastMessage = messageFixture.copy(date = messageFixture.date.minusDays(2))),
     conversationFixture.copy(lastMessage = messageFixture.copy(isRead = true, date = messageFixture.date.minusWeeks(3))),
     conversationFixture.copy(lastMessage = messageFixture.copy(isRead = true, date = messageFixture.date.minusMonths(1)))
+)
+
+val conversationsUserFixture = listOf(
+    conversationUserFixture,
+    conversationUserFixture.copy(createdAt = LocalDateTime.now().minusMinutes(1)),
+    conversationUserFixture.copy(createdAt = LocalDateTime.now().minusMinutes(20)),
+    conversationUserFixture.copy(createdAt = LocalDateTime.now().minusHours(1)),
+    conversationUserFixture.copy(createdAt = LocalDateTime.now().minusHours(2)),
+    conversationUserFixture.copy(createdAt = LocalDateTime.now().minusDays(1)),
+    conversationUserFixture.copy(createdAt = LocalDateTime.now().minusDays(2)),
+    conversationUserFixture.copy(createdAt = LocalDateTime.now().minusWeeks(3)),
+    conversationUserFixture.copy(createdAt = LocalDateTime.now().minusMonths(1))
 )

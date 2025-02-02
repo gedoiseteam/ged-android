@@ -3,7 +3,7 @@ package com.upsaclay.message
 import com.upsaclay.message.domain.entity.ConversationUI
 import com.upsaclay.message.domain.usecase.CreateConversationUseCase
 import com.upsaclay.message.domain.usecase.DeleteConversationUseCase
-import com.upsaclay.message.domain.usecase.GetConversationUseCase
+import com.upsaclay.message.domain.usecase.GetConversationUserUseCase
 import com.upsaclay.message.domain.usecase.GetConversationsUseCase
 import com.upsaclay.message.domain.usecase.GetMessagesUseCase
 import com.upsaclay.message.domain.usecase.SendMessageUseCase
@@ -34,7 +34,7 @@ val messageModule = module {
     singleOf(::CreateConversationUseCase)
     singleOf(::DeleteConversationUseCase)
     singleOf(::GetConversationsUseCase)
-    singleOf(::GetConversationUseCase)
+    singleOf(::GetConversationUserUseCase)
     singleOf(::GetMessagesUseCase)
     singleOf(::SendMessageUseCase)
 }
