@@ -37,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -54,7 +55,7 @@ import com.upsaclay.news.R
 import com.upsaclay.news.domain.announcementFixture
 import com.upsaclay.news.domain.entity.Announcement
 import com.upsaclay.news.domain.entity.AnnouncementScreenState
-import com.upsaclay.news.presentation.components.HeaderAnnouncement
+import com.upsaclay.news.presentation.components.AnnouncementHeader
 import com.upsaclay.news.presentation.viewmodels.ReadAnnouncementViewModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -110,12 +111,16 @@ fun ReadAnnouncementScreen(
     }
 
     if (showDeleteAnnouncementDialog) {
-        DeleteAnnouncementDialog(
-            onCancel = { showDeleteAnnouncementDialog = false },
+        SensibleActionDialog(
+            modifier = Modifier.testTag(stringResource(id = R.string.read_screen_delete_dialog_tag)),
+            text = stringResource(id = R.string.delete_announcement_dialog_text),
+            onDismiss = { showDeleteAnnouncementDialog = false },
+            confirmText = stringResource(id = com.upsaclay.common.R.string.delete),
             onConfirm = {
                 showDeleteAnnouncementDialog = false
                 readAnnouncementViewModel.deleteAnnouncement()
-            }
+            },
+            onCancel = { showDeleteAnnouncementDialog = false }
         )
     }
 
@@ -146,13 +151,19 @@ fun ReadAnnouncementScreen(
                     )
                 }
             } else {
-                announcement?.let { HeaderAnnouncement(announcement = it) }
+                announcement?.let {
+                    AnnouncementHeader(
+                        modifier = Modifier.testTag(stringResource(id = R.string.read_screen_announcement_header_tag)),
+                        announcement = it
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
 
             announcement?.title?.let {
                 Text(
+                    modifier = Modifier.testTag(stringResource(id = R.string.read_screen_announcement_title_tag)),
                     text = it,
                     style = MaterialTheme.typography.titleMedium,
                     fontSize = MaterialTheme.typography.titleMedium.fontSize * 1.2f
@@ -163,6 +174,7 @@ fun ReadAnnouncementScreen(
 
             announcement?.content?.let {
                 Text(
+                    modifier = Modifier.testTag(stringResource(id = R.string.read_screen_announcement_content_tag)),
                     text = it,
                     style = MaterialTheme.typography.bodyLarge
                 )
@@ -170,11 +182,14 @@ fun ReadAnnouncementScreen(
 
             if (showBottomSheet) {
                 ModalBottomSheet(
+                    modifier = Modifier.testTag(stringResource(id = R.string.read_screen_bottom_sheet_tag)),
                     onDismissRequest = { showBottomSheet = false },
                     sheetState = sheetState
                 ) {
                     ClickableItem(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(stringResource(id = R.string.read_screen_sheet_edit_field_tag)),
                         text = { Text(text = stringResource(id = R.string.edit_announcement)) },
                         icon = {
                             Icon(
@@ -189,7 +204,9 @@ fun ReadAnnouncementScreen(
                     )
 
                     ClickableItem(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(stringResource(id = R.string.read_screen_sheet_delete_field_tag)),
                         text = {
                             Text(
                                 text = stringResource(id = R.string.delete_announcement),
@@ -222,7 +239,7 @@ private fun EditableTopSection(
     onEditClick: () -> Unit
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        HeaderAnnouncement(
+        AnnouncementHeader(
             announcement = announcement,
             modifier = Modifier.weight(1f)
         )
@@ -234,6 +251,7 @@ private fun EditableTopSection(
             modifier = Modifier
                 .size(30.dp)
                 .clip(CircleShape)
+                .testTag(stringResource(id = R.string.read_screen_option_button_tag))
         ) {
             Icon(
                 modifier = Modifier.size(24.dp),
@@ -243,20 +261,6 @@ private fun EditableTopSection(
             )
         }
     }
-}
-
-@Composable
-private fun DeleteAnnouncementDialog(
-    onConfirm: () -> Unit,
-    onCancel: () -> Unit
-) {
-    SensibleActionDialog(
-        text = stringResource(id = R.string.delete_announcement_dialog_text),
-        onDismiss = onCancel,
-        confirmText = stringResource(id = com.upsaclay.common.R.string.delete),
-        onConfirm = onConfirm,
-        onCancel = onCancel
-    )
 }
 
 /*
@@ -277,7 +281,7 @@ private fun ReadOnlyAnnouncementScreenPreview() {
                 .verticalScroll(rememberScrollState())
                 .padding(MaterialTheme.spacing.medium)
         ) {
-            HeaderAnnouncement(announcement = announcement)
+            AnnouncementHeader(announcement = announcement)
 
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
 
@@ -334,16 +338,5 @@ private fun EditableAnnouncementScreenPreview() {
 
             )
         }
-    }
-}
-
-@Preview
-@Composable
-private fun DeleteAnnouncementDialogPreview() {
-    GedoiseTheme {
-        DeleteAnnouncementDialog(
-            onCancel = {},
-            onConfirm = {}
-        )
     }
 }

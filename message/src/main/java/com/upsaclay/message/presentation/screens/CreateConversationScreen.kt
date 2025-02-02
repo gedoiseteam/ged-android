@@ -24,7 +24,7 @@ import com.upsaclay.common.presentation.components.SmallTopBarBack
 import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
-import com.upsaclay.common.utils.usersFixture
+import com.upsaclay.common.domain.usersFixture
 import com.upsaclay.message.R
 import com.upsaclay.message.domain.entity.ConversationScreenState
 import com.upsaclay.message.domain.entity.ConversationState

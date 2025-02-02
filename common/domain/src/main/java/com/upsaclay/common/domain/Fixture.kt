@@ -1,16 +1,18 @@
-package com.upsaclay.common.utils
+package com.upsaclay.common.domain
 
-val userFixture = com.upsaclay.common.domain.entity.User(
+import com.upsaclay.common.domain.entity.User
+
+val userFixture = User(
     "12",
     "Pierre",
     "Dupont",
     "pierre.dupont@universite-paris-saclay.fr",
     "GED 1",
-    false,
+    true,
     "https://i-mom.unimedias.fr/2020/09/16/dragon-ball-songoku.jpg"
 )
 
-val userFixture2 = com.upsaclay.common.domain.entity.User(
+val userFixture2 = User(
     "13",
     "Alain",
     "Robert",

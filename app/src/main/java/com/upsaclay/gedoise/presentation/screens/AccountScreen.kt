@@ -41,7 +41,7 @@ import com.upsaclay.common.presentation.components.SmallTopBarEdit
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.common.utils.showToast
-import com.upsaclay.common.utils.userFixture
+import com.upsaclay.common.domain.userFixture
 import com.upsaclay.gedoise.R
 import com.upsaclay.gedoise.domain.entities.AccountInfo
 import com.upsaclay.gedoise.domain.entities.AccountScreenState

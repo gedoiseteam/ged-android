@@ -1,7 +1,7 @@
 package com.upsaclay.message
 
-import com.upsaclay.common.utils.userFixture
-import com.upsaclay.common.utils.userFixture2
+import com.upsaclay.common.domain.userFixture
+import com.upsaclay.common.domain.userFixture2
 import com.upsaclay.message.domain.entity.ConversationState
 import com.upsaclay.message.domain.entity.ConversationUI
 import com.upsaclay.message.domain.entity.Message

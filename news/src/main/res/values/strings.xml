@@ -20,4 +20,19 @@
     <string name="announcement_creation_error">Une erreur est survenue lors de la création de l\'annonce</string>
     <string name="announcement_update_error">Une erreur est survenue lors de la mise à jour de l\'annonce</string>
     <string name="announcement_delete_error">Une erreur est survenue lors de la suppression de l\'annonce</string>
+
+    <string name="news_screen_empty_announcement_text_tag">NewsScreenEmptyAnnouncementTextTag</string>
+    <string name="news_screen_recent_announcements_tag">NewsScreenRecentAnnouncementTag</string>
+    <string name="news_screen_create_announcement_button_tag">NewsScreenCreateAnnouncementButtonTag</string>
+
+    <string name="read_screen_announcement_header_tag">ReadScreenAnnouncementHeaderTag</string>
+    <string name="read_screen_announcement_title_tag">ReadScreenAnnouncementTitleTag</string>
+    <string name="read_screen_announcement_content_tag">ReadScreenAnnouncementContentTag</string>
+    <string name="read_screen_option_button_tag">ReadScreenOptionButtonTag</string>
+    <string name="read_screen_bottom_sheet_tag">ReadScreenBottomSheetTag</string>
+    <string name="read_screen_sheet_edit_field_tag">ReadScreenSheetEditFieldTag</string>
+    <string name="read_screen_sheet_delete_field_tag">ReadScreenSheetDeleteFieldTag</string>
+    <string name="read_screen_delete_dialog_tag">ReadScreenDeleteDialogTag</string>
+
+    <string name="create_screen_post_button_tag">CreateScreenPostButtonTag</string>
 </resources>

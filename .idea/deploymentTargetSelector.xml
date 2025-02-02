@@ -13,10 +13,19 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="MessageTextFieldPreview">
+      <SelectionState runConfigName="ReadAnnouncementScreenUITest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="MainTopBarPreview">
+      <SelectionState runConfigName="option_button_should_not_be_displayed_when_user_is_member_and_not_author()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="clicking_option_should_display_bottom_sheet()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="clicking_edit_sheet_field_should_navigate_to_edit_screen()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="clicking_delete_sheet_field_should_display_dialog()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

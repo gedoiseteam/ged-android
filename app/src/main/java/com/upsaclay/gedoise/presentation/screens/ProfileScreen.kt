@@ -40,7 +40,7 @@ import com.upsaclay.common.presentation.components.SmallTopBarBack
 import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
-import com.upsaclay.common.utils.userFixture
+import com.upsaclay.common.domain.userFixture
 import com.upsaclay.gedoise.R
 import com.upsaclay.gedoise.domain.entities.ProfileScreenState
 import com.upsaclay.gedoise.presentation.viewmodels.ProfileViewModel

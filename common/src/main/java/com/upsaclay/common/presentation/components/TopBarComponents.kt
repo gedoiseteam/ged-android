@@ -12,6 +12,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -43,6 +44,7 @@ fun SmallTopBarBack(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SmallTopBarEdit(
+    modifier: Modifier = Modifier,
     title: String = "",
     onCancelClick: () -> Unit,
     onSaveClick: () -> Unit,
@@ -50,6 +52,7 @@ fun SmallTopBarEdit(
     confirmText: String = stringResource(id = com.upsaclay.common.R.string.save)
 ) {
     TopAppBar(
+        modifier = modifier,
         title = { Text(text = title, fontWeight = FontWeight.Bold) },
         navigationIcon = {
             IconButton(onClick = onCancelClick) {

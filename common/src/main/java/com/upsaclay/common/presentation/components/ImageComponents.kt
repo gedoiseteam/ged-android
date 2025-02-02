@@ -94,6 +94,7 @@ fun ProfilePicture(
                 .size(100.dp * scale)
                 .clip(CircleShape)
         },
+        onLoading = { ColorPainter(GedoiseColor.ProfilePictureErrorLight) },
         error = ColorPainter(GedoiseColor.ProfilePictureErrorLight)
     )
 }

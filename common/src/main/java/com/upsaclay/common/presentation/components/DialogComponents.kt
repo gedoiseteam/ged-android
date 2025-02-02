@@ -54,6 +54,7 @@ fun SimpleDialog(
 
 @Composable
 fun SensibleActionDialog(
+    modifier: Modifier = Modifier,
     title: String? = null,
     text: String? = null,
     confirmText: String,
@@ -63,6 +64,7 @@ fun SensibleActionDialog(
     onCancel: () -> Unit
 ) {
     AlertDialog(
+        modifier = modifier,
         title = { title?.let { Text(text = title) } },
         text = { text?.let { Text(text = text) } },
         onDismissRequest = onDismiss,
