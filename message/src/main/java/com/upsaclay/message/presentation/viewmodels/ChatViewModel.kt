@@ -63,12 +63,18 @@ class ChatViewModel(
         _messages.value = _messages.value.toMutableMap().apply { put(message.id, message) }
 
         viewModelScope.launch {
-            if (conversation.state == ConversationState.NOT_CREATED) {
-                createConversationUseCase(conversation)
-                conversation = conversation.copy(state = ConversationState.CREATED)
-            }
+            try {
+                if (conversation.state == ConversationState.NOT_CREATED) {
+                    createConversationUseCase(conversation)
+                    conversation = conversation.copy(state = ConversationState.CREATED)
+                }
 
-            sendMessageUseCase(message)
+                sendMessageUseCase(message)
+            } catch (e: Exception) {
+                _messages.value = _messages.value.toMutableMap().apply {
+                    put(message.id, message.copy(state = MessageState.ERROR))
+                }
+            }
         }
 
         textToSend = ""

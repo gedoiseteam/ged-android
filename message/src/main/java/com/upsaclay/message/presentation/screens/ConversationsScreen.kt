@@ -36,7 +36,7 @@ import com.upsaclay.common.domain.entity.Screen
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.message.R
-import com.upsaclay.message.conversationsFixture
+import com.upsaclay.message.domain.conversationsFixture
 import com.upsaclay.message.domain.usecase.ConvertConversationJsonUseCase
 import com.upsaclay.message.presentation.components.ConversationItem
 import com.upsaclay.message.presentation.viewmodels.ConversationViewModel

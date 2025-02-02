@@ -4,7 +4,7 @@ import com.upsaclay.message.domain.entity.ConversationUI
 import com.upsaclay.message.domain.entity.ConversationUser
 import com.upsaclay.message.domain.entity.Message
 
-object ConversationMapper {
+internal object ConversationMapper {
     fun toConversationUser(conversationUI: ConversationUI) = ConversationUser(
         id = conversationUI.id,
         interlocutor = conversationUI.interlocutor,

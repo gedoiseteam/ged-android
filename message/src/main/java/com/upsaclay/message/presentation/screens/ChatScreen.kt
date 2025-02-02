@@ -30,10 +30,10 @@ import com.upsaclay.common.domain.usecase.FormatLocalDateTimeUseCase
 import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
-import com.upsaclay.message.conversationFixture
+import com.upsaclay.message.domain.conversationFixture
 import com.upsaclay.message.domain.entity.ConversationUI
 import com.upsaclay.message.domain.entity.Message
-import com.upsaclay.message.messagesFixture
+import com.upsaclay.message.domain.messagesFixture
 import com.upsaclay.message.presentation.components.ChatTopBar
 import com.upsaclay.message.presentation.components.MessageInput
 import com.upsaclay.message.presentation.components.ReceiveMessageItem

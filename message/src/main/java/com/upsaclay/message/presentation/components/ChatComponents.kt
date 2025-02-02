@@ -33,7 +33,7 @@ import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.message.domain.entity.Message
 import com.upsaclay.message.domain.entity.MessageState
-import com.upsaclay.message.messageFixture
+import com.upsaclay.message.domain.messageFixture
 import java.time.LocalDateTime
 
 @Composable
