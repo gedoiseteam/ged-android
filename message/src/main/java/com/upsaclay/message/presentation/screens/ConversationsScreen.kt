@@ -25,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -36,7 +37,7 @@ import com.upsaclay.common.domain.entity.Screen
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.message.R
-import com.upsaclay.message.domain.conversationsFixture
+import com.upsaclay.message.domain.conversationsUIFixture
 import com.upsaclay.message.domain.usecase.ConvertConversationJsonUseCase
 import com.upsaclay.message.presentation.components.ConversationItem
 import com.upsaclay.message.presentation.viewmodels.ConversationViewModel
@@ -81,12 +82,13 @@ fun ConversationScreen(
             LazyColumn {
                 items(conversations) { conversation ->
                     ConversationItem(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(stringResource(id = R.string.conversation_screen_conversation_item_tag)),
                         conversation = conversation,
                         onClick = {
                             navController.navigate(
-                                Screen.CHAT.route +
-                                        "?conversation=${ConvertConversationJsonUseCase.to(conversation)}"
+                                Screen.CHAT.route + "?conversation=${ConvertConversationJsonUseCase.to(conversation)}"
                             )
                         }
                     )
@@ -94,8 +96,10 @@ fun ConversationScreen(
             }
         }
 
-        ConversationFAB(
-            modifier = Modifier.align(Alignment.BottomEnd),
+        CreateConversationFAB(
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .testTag(stringResource(id = R.string.conversation_screen_create_conversation_button_tag)),
             onClick = { navController.navigate(Screen.CREATE_CONVERSATION.route) },
         )
     }
@@ -103,7 +107,7 @@ fun ConversationScreen(
 
 
 @Composable
-private fun ConversationFAB(
+private fun CreateConversationFAB(
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
@@ -131,7 +135,7 @@ private fun ConversationFAB(
 @Preview(showBackground = true)
 @Composable
 private fun ConversationsScreenPreview() {
-    val conversations = conversationsFixture.sortedByDescending {
+    val conversations = conversationsUIFixture.sortedByDescending {
         it.lastMessage?.date ?: it.createdAt
     }
 
@@ -177,7 +181,7 @@ private fun ConversationsScreenPreview() {
                 }
             }
 
-            ConversationFAB(
+            CreateConversationFAB(
                 modifier = Modifier.align(Alignment.BottomEnd),
                 onClick = { }
             )

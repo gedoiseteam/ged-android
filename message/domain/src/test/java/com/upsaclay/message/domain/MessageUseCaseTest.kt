@@ -6,34 +6,39 @@ import com.upsaclay.message.domain.repository.UserConversationRepository
 import com.upsaclay.message.domain.usecase.CreateConversationUseCase
 import com.upsaclay.message.domain.usecase.DeleteConversationUseCase
 import com.upsaclay.message.domain.usecase.GetConversationUserUseCase
-import com.upsaclay.message.domain.usecase.GetConversationsUseCase
+import com.upsaclay.message.domain.usecase.GetConversationsUIUseCase
 import com.upsaclay.message.domain.usecase.SendMessageUseCase
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class MessageUseCaseTest {
     private val messageRepository: MessageRepository = mockk()
     private val userConversationRepository: UserConversationRepository = mockk()
 
     private lateinit var createConversationUseCase: CreateConversationUseCase
     private lateinit var deleteConversationUseCase: DeleteConversationUseCase
-    private lateinit var getConversationsUseCase: GetConversationsUseCase
+    private lateinit var getConversationsUIUseCase: GetConversationsUIUseCase
     private lateinit var getConversationUserUseCase: GetConversationUserUseCase
     private lateinit var sendMessageUseCase: SendMessageUseCase
+
+    private val testScope = TestScope(UnconfinedTestDispatcher())
 
     @Before
     fun setUp() {
         createConversationUseCase = CreateConversationUseCase(userConversationRepository)
         deleteConversationUseCase = DeleteConversationUseCase(userConversationRepository)
-        getConversationsUseCase = GetConversationsUseCase(userConversationRepository, messageRepository)
         getConversationUserUseCase = GetConversationUserUseCase(userConversationRepository)
         sendMessageUseCase = SendMessageUseCase(messageRepository)
 
@@ -53,21 +58,23 @@ class MessageUseCaseTest {
         coEvery { messageRepository.updateMessage(any()) } returns Unit
         coEvery { messageRepository.upsertMessage(any()) } returns Unit
         coEvery { messageRepository.deleteLocalMessages() } returns Unit
+
+        getConversationsUIUseCase = GetConversationsUIUseCase(userConversationRepository, messageRepository, testScope)
     }
 
     @Test
-    fun `getConversationsUseCase should return conversations`() = runTest {
+    fun `getConversationsUIUseCase should return conversationsUI`() = runTest {
         // When
-        val result = getConversationsUseCase().first()
+        val result = getConversationsUIUseCase.conversationsUI.first()
 
         // Then
-        assertEquals(conversationFixture, result)
+        assertEquals(listOf(conversationUIFixture), result)
     }
 
     @Test
     fun `getConversationUserUseCase should return conversation with user`() = runTest {
         // When
-        val result = getConversationUserUseCase(conversationFixture.id)
+        val result = getConversationUserUseCase(conversationUIFixture.id)
 
         // Then
         assertEquals(conversationUserFixture, result)
@@ -76,7 +83,7 @@ class MessageUseCaseTest {
     @Test
     fun `createConversationUseCase should create conversation`() = runTest {
         // When
-        createConversationUseCase(conversationFixture)
+        createConversationUseCase(conversationUIFixture)
 
         // Then
         coVerify { userConversationRepository.createConversation(conversationUserFixture) }
@@ -85,7 +92,7 @@ class MessageUseCaseTest {
     @Test
     fun `deleteConversationUseCase should delete conversation`() = runTest {
         // When
-        deleteConversationUseCase(conversationFixture)
+        deleteConversationUseCase(conversationUIFixture)
 
         // Then
         coVerify { userConversationRepository.deleteConversation(conversationUserFixture) }

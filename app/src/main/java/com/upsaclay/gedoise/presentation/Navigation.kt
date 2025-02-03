@@ -144,7 +144,7 @@ fun Navigation(mainViewModel: MainViewModel = koinViewModel()) {
             } ?: navController.popBackStack()
         }
 
-        composable(Screen.CONVERSATIONS.route) {
+        composable(Screen.CONVERSATION.route) {
             MainNavigationBars(
                 navController = navController,
                 topBar = {
@@ -174,7 +174,7 @@ fun Navigation(mainViewModel: MainViewModel = koinViewModel()) {
                     navController = navController
                 )
             } ?: run {
-                navController.navigate(Screen.CONVERSATIONS.route)
+                navController.navigate(Screen.CONVERSATION.route)
                 showToast(
                     context = LocalContext.current,
                     stringRes = com.upsaclay.common.R.string.occurred_error

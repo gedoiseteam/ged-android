@@ -13,9 +13,6 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="components_are_disabled_when_loading() (1)">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
       <SelectionState runConfigName="forward_email_button_should_be_disabled_after_click()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>

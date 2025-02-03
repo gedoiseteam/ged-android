@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
@@ -59,7 +60,9 @@ fun MessageInput(
         verticalAlignment = Alignment.CenterVertically
     ) {
         BasicTextField(
-            modifier = modifier.weight(1f),
+            modifier = modifier
+                .weight(1f)
+                .testTag(stringResource(R.string.chat_screen_message_input_tag)),
             value = value,
             onValueChange = onValueChange,
             keyboardOptions = KeyboardOptions(
@@ -95,6 +98,8 @@ fun MessageInput(
 
         if (value.isNotBlank()) {
             Button(
+                modifier = Modifier
+                    .testTag(stringResource(R.string.chat_screen_send_button_tag)),
                 onClick = onSendClick,
                 contentPadding = PaddingValues()
             ) {

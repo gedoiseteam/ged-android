@@ -12,4 +12,16 @@
     <string name="message_placeholder">Envoyer un message</string>
     <string name="send_message_icon_description">Bouton d\'envoi de message</string>
     <string name="tap_to_chat">Appuyer pour discuter</string>
+
+    <string name="conversation_screen_conversation_item_tag">Conversation Screen Conversation Item Tag</string>
+    <string name="conversation_screen_empty_conversation_item_tag">Conversation Screen Empty Conversation Item Tag</string>
+    <string name="conversation_screen_read_conversation_item_tag">Conversation Screen Read Conversation Item Tag</string>
+    <string name="conversation_screen_unread_conversation_item_tag">Conversation Screen Unread Conversation Item Tag</string>
+    <string name="conversation_screen_create_conversation_button_tag">Conversation Screen Create Conversation Button Tag</string>
+
+    <string name="chat_screen_send_message_item_tag">Chat Screen Send Message Item Tag</string>
+    <string name="chat_screen_receive_message_item_tag">Chat Screen Receive Message Item Tag</string>
+    <string name="chat_screen_message_text_tag">Chat Screen Receive Message Text Tag</string>
+    <string name="chat_screen_message_input_tag">Chat Screen Message Input Tag</string>
+    <string name="chat_screen_send_button_tag">Chat Screen Send Button Tag</string>
 </resources>
