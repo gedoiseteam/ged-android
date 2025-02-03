@@ -31,7 +31,7 @@ internal class MessageRepositoryImpl(
     }
 
     override fun getLastMessage(conversationId: String): Flow<Message?> =
-        messageRemoteDataSource.listenLastMessage(conversationId)
+        messageLocalDataSource.getLastMessage(conversationId)
 
     override suspend fun createMessage(message: Message) {
         messageLocalDataSource.insertMessage(message)

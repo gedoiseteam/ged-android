@@ -1,38 +1,12 @@
 package com.upsaclay.message.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.upsaclay.message.domain.entity.ConversationScreenState
 import com.upsaclay.message.domain.entity.ConversationUI
-import com.upsaclay.message.domain.usecase.GetConversationsUseCase
+import com.upsaclay.message.domain.usecase.GetConversationsUIUseCase
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 
 class ConversationViewModel(
-    private val getConversationsUseCase: GetConversationsUseCase
+    getConversationsUIUseCase: GetConversationsUIUseCase
 ) : ViewModel() {
-    private val _screenState = MutableStateFlow(ConversationScreenState.DEFAULT)
-    val screenState: Flow<ConversationScreenState> = _screenState
-    private val _conversations = MutableStateFlow<Map<String, ConversationUI>>(mapOf())
-    val conversations: Flow<List<ConversationUI>> = _conversations.map { conversationMap ->
-        conversationMap.values.toList().sortedByDescending {
-            it.lastMessage?.date ?: it.createdAt
-        }
-    }
-
-    init {
-        fetchConversations()
-    }
-
-    private fun fetchConversations() {
-        viewModelScope.launch {
-            _screenState.value = ConversationScreenState.LOADING
-            getConversationsUseCase().collect { conversationUI ->
-                _conversations.value += (conversationUI.id to conversationUI)
-                _screenState.value = ConversationScreenState.DEFAULT
-            }
-        }
-    }
+    val conversations: Flow<List<ConversationUI>> = getConversationsUIUseCase.conversationsUI
 }

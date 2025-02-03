@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -33,7 +34,7 @@ import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.message.R
-import com.upsaclay.message.domain.conversationFixture
+import com.upsaclay.message.domain.conversationUIFixture
 import com.upsaclay.message.domain.entity.ConversationUI
 import com.upsaclay.message.domain.entity.Message
 
@@ -94,14 +95,18 @@ fun ConversationItem(
             conversation.lastMessage?.let {
                 if (it.isRead || it.senderId != conversation.interlocutor.id) {
                     ReadConversationItem(
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier
+                            .weight(1f)
+                            .testTag(stringResource(id = R.string.conversation_screen_read_conversation_item_tag)),
                         interlocutor = conversation.interlocutor,
                         lastMessage = it,
                         elapsedTime = elapsedTimeValue
                     )
                 } else {
                     UnreadConversationItem(
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier
+                            .weight(1f)
+                            .testTag(stringResource(id = R.string.conversation_screen_unread_conversation_item_tag)),
                         interlocutor = conversation.interlocutor,
                         lastMessage = it,
                         elapsedTime = elapsedTimeValue
@@ -109,7 +114,9 @@ fun ConversationItem(
                 }
             } ?: run {
                 EmptyConversationItem(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .testTag(stringResource(id = R.string.conversation_screen_empty_conversation_item_tag)),
                     interlocutor = conversation.interlocutor
                 )
             }
@@ -246,7 +253,7 @@ private fun ReadConversationItemPreview() {
     GedoiseTheme {
         ConversationItem(
             modifier = Modifier.fillMaxWidth(),
-            conversation = conversationFixture,
+            conversation = conversationUIFixture,
             onClick = { }
         )
     }
@@ -258,8 +265,8 @@ private fun UnreadConversationItemPreview() {
     GedoiseTheme {
         ConversationItem(
             modifier = Modifier.fillMaxWidth(),
-            conversation = conversationFixture.copy(
-                lastMessage = conversationFixture.lastMessage!!.copy(isRead = false)
+            conversation = conversationUIFixture.copy(
+                lastMessage = conversationUIFixture.lastMessage!!.copy(isRead = false)
             ),
             onClick = { }
         )
@@ -272,7 +279,7 @@ private fun EmptyConversationPreview() {
     GedoiseTheme {
         ConversationItem(
             modifier = Modifier.fillMaxWidth(),
-            conversation = conversationFixture.copy(lastMessage = null),
+            conversation = conversationUIFixture.copy(lastMessage = null),
             onClick = { }
         )
     }

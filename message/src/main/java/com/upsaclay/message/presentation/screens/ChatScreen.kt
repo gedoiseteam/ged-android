@@ -19,6 +19,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -30,7 +32,8 @@ import com.upsaclay.common.domain.usecase.FormatLocalDateTimeUseCase
 import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
-import com.upsaclay.message.domain.conversationFixture
+import com.upsaclay.message.R
+import com.upsaclay.message.domain.conversationUIFixture
 import com.upsaclay.message.domain.entity.ConversationUI
 import com.upsaclay.message.domain.entity.Message
 import com.upsaclay.message.domain.messagesFixture
@@ -128,15 +131,16 @@ private fun MessageSection(
                 }
 
                 val displayProfilePicture =
-                    !sameTime || (
-                            message.senderId != nextSenderId &&
-                                    message.senderId == interlocutor.id
-                            )
+                    !sameTime || (message.senderId != nextSenderId && message.senderId == interlocutor.id)
 
                 if (message.senderId != interlocutor.id) {
-                    SentMessageItem(message = message)
+                    SentMessageItem(
+                        modifier = Modifier.testTag(stringResource(R.string.chat_screen_send_message_item_tag)),
+                        message = message
+                    )
                 } else {
                     ReceiveMessageItem(
+                        modifier = Modifier.testTag(stringResource(R.string.chat_screen_receive_message_item_tag)),
                         message = message,
                         displayProfilePicture = displayProfilePicture,
                         profilePictureUrl = interlocutor.profilePictureUrl
@@ -189,7 +193,7 @@ private fun ChatScreenPreview() {
             topBar = {
                 ChatTopBar(
                     navController = rememberNavController(),
-                    interlocutor = conversationFixture.interlocutor
+                    interlocutor = conversationUIFixture.interlocutor
                 )
             }
         ) { innerPadding ->
@@ -205,7 +209,7 @@ private fun ChatScreenPreview() {
                     MessageSection(
                         modifier = Modifier.weight(1f),
                         messages = messagesFixture,
-                        interlocutor = conversationFixture.interlocutor
+                        interlocutor = conversationUIFixture.interlocutor
                     )
 
                     Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
