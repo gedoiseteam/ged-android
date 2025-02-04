@@ -46,5 +46,4 @@ jobs:
         with:
           api-level: 29
           target: google_apis
-          arch: x86_64
           script: ./gradlew connectedDebugAndroidTest
