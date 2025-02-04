@@ -49,7 +49,7 @@ fun NewsScreen(
     navController: NavController,
     newsViewModel: NewsViewModel = koinViewModel()
 ) {
-    val announcements = newsViewModel.announcementsPreview.collectAsState(emptyList()).value
+    val announcements = newsViewModel.announcements.collectAsState(emptyList()).value
     val user by newsViewModel.currentUser.collectAsState()
     val isRefreshing = newsViewModel.isRefreshing
 

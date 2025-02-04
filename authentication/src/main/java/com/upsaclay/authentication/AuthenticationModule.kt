@@ -8,7 +8,7 @@ import com.upsaclay.authentication.domain.usecase.LogoutUseCase
 import com.upsaclay.authentication.domain.usecase.RegisterUseCase
 import com.upsaclay.authentication.domain.usecase.SendVerificationEmailUseCase
 import com.upsaclay.authentication.domain.usecase.SetUserAuthenticatedUseCase
-import com.upsaclay.authentication.domain.usecase.VerifyEmailFormatUseCase
+import com.upsaclay.common.domain.usecase.VerifyEmailFormatUseCase
 import com.upsaclay.authentication.presentation.viewmodels.AuthenticationViewModel
 import com.upsaclay.authentication.presentation.viewmodels.EmailVerificationViewModel
 import com.upsaclay.authentication.presentation.viewmodels.RegistrationViewModel
@@ -39,5 +39,4 @@ val authenticationModule = module {
     singleOf(::RegisterUseCase)
     singleOf(::SendVerificationEmailUseCase)
     singleOf(::SetUserAuthenticatedUseCase)
-    singleOf(::VerifyEmailFormatUseCase)
 }

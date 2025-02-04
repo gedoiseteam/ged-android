@@ -71,7 +71,6 @@ fun AuthenticationScreen(
 ) {
     val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
-    val view = LocalView.current
     val scrollState = rememberScrollState()
     var inputsError by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
@@ -121,23 +120,6 @@ fun AuthenticationScreen(
             }
 
             else -> {}
-        }
-    }
-
-    DisposableEffect(context) {
-        val listener = ViewTreeObserver.OnGlobalLayoutListener {
-            val insets = view.rootWindowInsets
-            val keyboardHeight = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                insets?.getInsets(WindowInsetsCompat.Type.ime())?.bottom ?: 0
-            } else {
-                insets?.systemWindowInsetBottom ?: 0
-            }
-            isKeyboardVisible = keyboardHeight > 0
-        }
-
-        view.viewTreeObserver.addOnGlobalLayoutListener(listener)
-        onDispose {
-            view.viewTreeObserver.removeOnGlobalLayoutListener(listener)
         }
     }
 

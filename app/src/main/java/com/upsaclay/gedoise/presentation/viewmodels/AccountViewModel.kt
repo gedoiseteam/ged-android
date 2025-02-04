@@ -9,15 +9,15 @@ import androidx.lifecycle.viewModelScope
 import com.upsaclay.common.domain.entity.User
 import com.upsaclay.common.domain.usecase.DeleteProfilePictureUseCase
 import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
-import com.upsaclay.common.domain.usecase.UpdateUserProfilePictureUseCase
+import com.upsaclay.common.domain.usecase.UpdateProfilePictureUseCase
 import com.upsaclay.gedoise.domain.entities.AccountScreenState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class AccountViewModel(
-    private val updateUserProfilePictureUseCase: UpdateUserProfilePictureUseCase,
-    private val deleteUserProfilePictureUseCase: DeleteProfilePictureUseCase,
+    private val updateProfilePictureUseCase: UpdateProfilePictureUseCase,
+    private val deleteProfilePictureUseCase: DeleteProfilePictureUseCase,
     getCurrentUserUseCase: GetCurrentUserUseCase
 ): ViewModel() {
     private val _accountScreenState = MutableStateFlow(AccountScreenState.READ)
@@ -44,7 +44,7 @@ class AccountViewModel(
         profilePictureUri?.let { uri ->
             viewModelScope.launch {
                 try {
-                    updateUserProfilePictureUseCase(uri)
+                    updateProfilePictureUseCase(uri)
                     _accountScreenState.value = AccountScreenState.PROFILE_PICTURE_UPDATED
                 } catch (e: Exception) {
                     _accountScreenState.value = AccountScreenState.PROFILE_PICTURE_UPDATE_ERROR
@@ -60,7 +60,7 @@ class AccountViewModel(
         viewModelScope.launch {
             val (id, url) = currentUser.value?.id to currentUser.value?.profilePictureUrl
             try {
-                deleteUserProfilePictureUseCase(id!!, url!!)
+                deleteProfilePictureUseCase(id!!, url!!)
                 _accountScreenState.value = AccountScreenState.PROFILE_PICTURE_UPDATED
             } catch (e: Exception) {
                 _accountScreenState.value = AccountScreenState.PROFILE_PICTURE_UPDATE_ERROR

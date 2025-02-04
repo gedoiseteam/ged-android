@@ -48,6 +48,7 @@ class SecondRegistrationScreenUITest {
         every { registrationViewModel.resetScreenState() } returns Unit
         every { registrationViewModel.verifyNamesInputs() } returns true
         every { registrationViewModel.register() } returns Unit
+        every { registrationViewModel.updateSchoolLevel(any()) } returns Unit
     }
 
     @Test
@@ -77,22 +78,5 @@ class SecondRegistrationScreenUITest {
 
         // Then
         Assert.assertEquals(Screen.THIRD_REGISTRATION.route, navController.currentDestination?.route)
-    }
-
-    @Test
-    fun empty_fields_show_error_message() {
-        // Given
-        every { registrationViewModel.screenState } returns MutableStateFlow(RegistrationScreenState.EMPTY_FIELDS_ERROR)
-
-        // When
-        rule.setContent {
-            SecondRegistrationScreen(
-                navController = navController,
-                registrationViewModel = registrationViewModel
-            )
-        }
-
-        // Then
-        rule.onNodeWithText(rule.activity.getString(com.upsaclay.common.R.string.empty_fields_error)).assertExists()
     }
 }

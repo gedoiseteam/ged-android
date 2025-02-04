@@ -70,7 +70,7 @@ fun ThirdRegistrationScreen(
         RegistrationScreenState.EMPTY_FIELDS_ERROR -> stringResource(id = com.upsaclay.common.R.string.empty_fields_error)
         RegistrationScreenState.EMAIL_FORMAT_ERROR -> stringResource(id = R.string.error_incorrect_email_format)
         RegistrationScreenState.PASSWORD_LENGTH_ERROR -> stringResource(id = R.string.error_password_length)
-        RegistrationScreenState.USER_ALREADY_EXIST -> stringResource(id = R.string.email_already_associated)
+        RegistrationScreenState.USER_ALREADY_EXISTS -> stringResource(id = R.string.email_already_associated)
         else -> null
     }
 

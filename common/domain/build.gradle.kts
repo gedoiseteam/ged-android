@@ -36,6 +36,8 @@ dependencies {
     implementation(libs.jakewharton.timber)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.gson)
+    implementation(libs.koin)
+    implementation(libs.koin.core)
 
     testImplementation(libs.junit)
     testImplementation(libs.mockk)

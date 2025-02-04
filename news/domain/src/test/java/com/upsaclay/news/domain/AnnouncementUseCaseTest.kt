@@ -29,11 +29,11 @@ class AnnouncementUseCaseTest {
 
     @Before
     fun setUp() {
-        createAnnouncementUseCase = CreateAnnouncementUseCase(announcementRepository)
-        deleteAnnouncementUseCase = DeleteAnnouncementUseCase(announcementRepository)
-        getAnnouncementsUseCase = GetAnnouncementsUseCase(announcementRepository)
-        getAnnouncementUseCase = GetAnnouncementUseCase(announcementRepository)
-        updateAnnouncementUseCase = UpdateAnnouncementUseCase(announcementRepository)
+        createAnnouncementUseCase = CreateAnnouncementUseCase(announcementRepository = announcementRepository)
+        deleteAnnouncementUseCase = DeleteAnnouncementUseCase(announcementRepository = announcementRepository)
+        getAnnouncementsUseCase = GetAnnouncementsUseCase(announcementRepository = announcementRepository)
+        getAnnouncementUseCase = GetAnnouncementUseCase(announcementRepository = announcementRepository)
+        updateAnnouncementUseCase = UpdateAnnouncementUseCase(announcementRepository = announcementRepository)
 
         coEvery { announcementRepository.createAnnouncement(any()) } returns Unit
         coEvery { announcementRepository.updateAnnouncement(any()) } returns Unit
@@ -44,7 +44,7 @@ class AnnouncementUseCaseTest {
     }
 
     @Test
-    fun `createAnnouncementUseCase should create announcement`() = runTest {
+    fun create_announcement_use_case_should_create_announcement() = runTest {
         // When
         createAnnouncementUseCase(announcementFixture)
 
@@ -54,7 +54,7 @@ class AnnouncementUseCaseTest {
     }
 
     @Test
-    fun `createAnnouncementUseCase should update announcement state to error when error`() = runTest {
+    fun create_announcement_use_case_should_update_announcement_state_to_error_when_error() = runTest {
         // Given
         coEvery { announcementRepository.createAnnouncement(any()) } throws Exception()
 
@@ -66,7 +66,7 @@ class AnnouncementUseCaseTest {
     }
 
     @Test
-    fun `deleteAnnouncementUseCase should delete announcement`() = runTest {
+    fun delete_announcement_use_case_should_delete_announcement() = runTest {
         // When
         deleteAnnouncementUseCase(announcementFixture)
 
@@ -75,7 +75,7 @@ class AnnouncementUseCaseTest {
     }
 
     @Test
-    fun `getAnnouncementsUseCase should return announcements`() = runTest {
+    fun get_announcements_use_case_should_return_announcements() = runTest {
         // When
         val result = getAnnouncementsUseCase()
 
@@ -84,7 +84,7 @@ class AnnouncementUseCaseTest {
     }
 
     @Test
-    fun `getAnnouncementUseCase should return announcement`() = runTest {
+    fun get_announcement_use_case_should_return_announcement() = runTest {
         // When
         val result = getAnnouncementUseCase(announcementFixture.id)
 
@@ -93,7 +93,7 @@ class AnnouncementUseCaseTest {
     }
 
     @Test
-    fun `updateAnnouncement should update announcement`() = runTest {
+    fun update_announcement_should_update_announcement() = runTest {
         // When
         updateAnnouncementUseCase(announcementFixture)
 

@@ -8,5 +8,5 @@ import kotlinx.coroutines.flow.Flow
 class ConversationViewModel(
     getConversationsUIUseCase: GetConversationsUIUseCase
 ) : ViewModel() {
-    val conversations: Flow<List<ConversationUI>> = getConversationsUIUseCase.conversationsUI
+    val conversations: Flow<List<ConversationUI>> = getConversationsUIUseCase()
 }

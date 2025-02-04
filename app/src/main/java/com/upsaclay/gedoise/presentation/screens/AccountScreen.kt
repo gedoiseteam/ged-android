@@ -48,8 +48,6 @@ import com.upsaclay.gedoise.domain.entities.AccountScreenState
 import com.upsaclay.gedoise.presentation.components.AccountInfoItem
 import com.upsaclay.gedoise.presentation.components.AccountModelBottomSheet
 import com.upsaclay.gedoise.presentation.viewmodels.AccountViewModel
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -121,7 +119,7 @@ fun AccountScreen(
         LoadingDialog()
     }
 
-    val accountInfos: ImmutableList<AccountInfo> = persistentListOf(
+    val accountInfos: List<AccountInfo> = listOf(
         AccountInfo(
             stringResource(id = com.upsaclay.common.R.string.last_name),
             user?.lastName ?: ""
@@ -259,7 +257,7 @@ private fun AccountScreenPreview() {
     val hasPictureChanged = false
     val isEdited = false
 
-    val accountInfos: ImmutableList<AccountInfo> = persistentListOf(
+    val accountInfos: List<AccountInfo> = listOf(
         AccountInfo(
             stringResource(id = com.upsaclay.common.R.string.last_name),
             userFixture.lastName

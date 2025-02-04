@@ -59,20 +59,24 @@ class MessageUseCaseTest {
         coEvery { messageRepository.upsertMessage(any()) } returns Unit
         coEvery { messageRepository.deleteLocalMessages() } returns Unit
 
-        getConversationsUIUseCase = GetConversationsUIUseCase(userConversationRepository, messageRepository, testScope)
+        getConversationsUIUseCase = GetConversationsUIUseCase(
+            userConversationRepository = userConversationRepository,
+            messageRepository = messageRepository,
+            scope = testScope
+        )
     }
 
     @Test
-    fun `getConversationsUIUseCase should return conversationsUI`() = runTest {
+    fun getConversationsUIUseCase_should_return_conversationsUI() = runTest {
         // When
-        val result = getConversationsUIUseCase.conversationsUI.first()
+        val result = getConversationsUIUseCase().first()
 
         // Then
         assertEquals(listOf(conversationUIFixture), result)
     }
 
     @Test
-    fun `getConversationUserUseCase should return conversation with user`() = runTest {
+    fun getConversationUserUseCase_should_return_conversation_with_user() = runTest {
         // When
         val result = getConversationUserUseCase(conversationUIFixture.id)
 
@@ -81,7 +85,7 @@ class MessageUseCaseTest {
     }
 
     @Test
-    fun `createConversationUseCase should create conversation`() = runTest {
+    fun createConversationUseCase_should_create_conversation() = runTest {
         // When
         createConversationUseCase(conversationUIFixture)
 
@@ -90,7 +94,7 @@ class MessageUseCaseTest {
     }
 
     @Test
-    fun `deleteConversationUseCase should delete conversation`() = runTest {
+    fun deleteConversationUseCase_should_delete_conversation() = runTest {
         // When
         deleteConversationUseCase(conversationUIFixture)
 
@@ -99,7 +103,7 @@ class MessageUseCaseTest {
     }
 
     @Test
-    fun `sendMessageUseCase should create message`() = runTest {
+    fun sendMessageUseCase_should_create_message() = runTest {
         // When
         sendMessageUseCase(messageFixture)
 
@@ -109,7 +113,7 @@ class MessageUseCaseTest {
     }
 
     @Test
-    fun `sendMessageUseCase should update message state to error when exception is throwing`() = runTest {
+    fun sendMessageUseCase_should_update_message_state_to_error_when_exception_is_throwing() = runTest {
         // Given
         coEvery { messageRepository.createMessage(messageFixture) } throws Exception()
 

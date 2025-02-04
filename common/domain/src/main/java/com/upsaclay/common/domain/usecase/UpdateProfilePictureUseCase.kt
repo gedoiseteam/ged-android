@@ -8,7 +8,7 @@ import com.upsaclay.common.domain.repository.UserRepository
 import kotlinx.coroutines.flow.first
 import java.io.IOException
 
-class UpdateUserProfilePictureUseCase(
+class UpdateProfilePictureUseCase(
     private val fileRepository: FileRepository,
     private val imageRepository: ImageRepository,
     private val userRepository: UserRepository

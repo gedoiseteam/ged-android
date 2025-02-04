@@ -7,7 +7,6 @@ import androidx.compose.ui.test.isNotEnabled
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performClick
 import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -15,8 +14,6 @@ import androidx.navigation.testing.TestNavHostController
 import com.upsaclay.authentication.domain.entity.AuthenticationScreenState
 import com.upsaclay.authentication.domain.entity.RegistrationScreenState
 import com.upsaclay.authentication.presentation.screens.EmailVerificationScreen
-import com.upsaclay.authentication.presentation.screens.FirstRegistrationScreen
-import com.upsaclay.authentication.presentation.screens.SecondRegistrationScreen
 import com.upsaclay.authentication.presentation.screens.ThirdRegistrationScreen
 import com.upsaclay.authentication.presentation.viewmodels.EmailVerificationViewModel
 import com.upsaclay.authentication.presentation.viewmodels.RegistrationViewModel
@@ -163,7 +160,7 @@ class ThirdRegistrationScreenUITest {
     @Test
     fun email_already_exist_show_error_message() {
         // Given
-        every { registrationViewModel.screenState } returns MutableStateFlow(RegistrationScreenState.USER_ALREADY_EXIST)
+        every { registrationViewModel.screenState } returns MutableStateFlow(RegistrationScreenState.USER_ALREADY_EXISTS)
 
         // When
         rule.setContent {
