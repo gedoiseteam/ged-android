@@ -33,17 +33,19 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
+
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v3
         with:
-          distribution: 'zulu'
-          java-version: '17'
+          java-version: 17
+          distribution: 'adopt'
           cache: 'gradle'
 
-      - name: Instrumented Tests
+      - name: Run connected tests
         uses: ReactiveCircus/android-emulator-runner@v2
         with:
           api-level: 29
           target: google_apis
-          script: ./gradlew connectedDebugAndroidTest
+          arch: x86_64
+          script: ./gradlew connectedCheck
