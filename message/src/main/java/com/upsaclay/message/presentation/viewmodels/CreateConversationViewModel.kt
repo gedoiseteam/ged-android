@@ -12,6 +12,7 @@ import com.upsaclay.message.domain.entity.ConversationUI
 import com.upsaclay.message.domain.usecase.ConvertConversationJsonUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
@@ -20,7 +21,7 @@ class CreateConversationViewModel(
     getCurrentUserUseCase: GetCurrentUserUseCase
 ) : ViewModel() {
     private val _screenState = MutableStateFlow(ConversationScreenState.DEFAULT)
-    val screenState: Flow<ConversationScreenState> = _screenState
+    val screenState: StateFlow<ConversationScreenState> = _screenState
     private val _users = MutableStateFlow<List<User>>(emptyList())
     val users: Flow<List<User>> = _users
     private val currentUser: User? = getCurrentUserUseCase().value

@@ -20,7 +20,7 @@ class NewsViewModel(
     getCurrentUserUseCase: GetCurrentUserUseCase,
     private val refreshAnnouncementsUseCase: RefreshAnnouncementsUseCase
 ) : ViewModel() {
-    val announcementsPreview: Flow<List<Announcement>> = getAnnouncementUseCase()
+    val announcements: Flow<List<Announcement>> = getAnnouncementUseCase()
         .map { announcements ->
             announcements
                 .sortedBy { it.date }

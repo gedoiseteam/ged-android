@@ -20,7 +20,6 @@ koin = "3.6.0-wasm-alpha2"
 mockk = "1.13.11"
 okhttpBom = "4.12.0"
 retrofit = "2.11.0"
-kotlinxCollectionsImmutable = "0.3.7"
 dataStore = "1.1.1"
 timberVersion = "5.0.1"
 room = "2.6.1"
@@ -71,7 +70,6 @@ koin-test-junit4 = { group = "io.insert-koin", name= "koin-test-junit4", version
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 mockk-android = { group = "io.mockk", name = "mockk-android", version.ref = "mockk" }
 kotlin-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinTest" }
-kotlinx-collections-immutable = { group = "org.jetbrains.kotlinx", name = "kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutable" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx" }

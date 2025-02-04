@@ -14,18 +14,23 @@ import kotlinx.coroutines.flow.map
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class GetConversationsUIUseCase(
-    userConversationRepository: UserConversationRepository,
+    private val userConversationRepository: UserConversationRepository,
     private val messageRepository: MessageRepository,
-    scope: CoroutineScope
+    private val scope: CoroutineScope
 ) {
     private val _conversationsUI = MutableStateFlow<Map<String, ConversationUI>>(mapOf())
-    val conversationsUI: Flow<List<ConversationUI>> = _conversationsUI.map { conversationMap ->
+
+    init {
+        listenConversationsUI()
+    }
+
+    operator fun invoke(): Flow<List<ConversationUI>> = _conversationsUI.map { conversationMap ->
         conversationMap.values.toList().sortedByDescending {
             it.lastMessage?.date ?: it.createdAt
         }
     }
 
-    init {
+    private fun listenConversationsUI() {
         userConversationRepository.userConversations.flatMapConcat { conversationUser ->
             messageRepository.getLastMessage(conversationUser.id).map { message ->
                 ConversationMapper.toConversationUI(conversationUser, message)

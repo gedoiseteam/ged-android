@@ -44,7 +44,7 @@ class NewsScreenUITest {
 
     @Before
     fun setUp() {
-        every { newsViewModel.announcementsPreview } returns flowOf(announcementsFixture)
+        every { newsViewModel.announcements } returns flowOf(announcementsFixture)
         every { newsViewModel.currentUser } returns MutableStateFlow(userFixture)
         every { newsViewModel.isRefreshing } returns false
         every { readAnnouncementViewModel.announcement } returns MutableStateFlow(announcementFixture)
@@ -60,7 +60,7 @@ class NewsScreenUITest {
     @Test
     fun empty_announcements_show_empty_announcement_text() {
         // Given
-        every { newsViewModel.announcementsPreview } returns flowOf(emptyList())
+        every { newsViewModel.announcements } returns flowOf(emptyList())
 
         // When
         rule.setContent {
@@ -118,7 +118,7 @@ class NewsScreenUITest {
         // Given
         val content = announcementFixture.content.take(100)
         val announcement = announcementFixture.copy(title = null, content = content)
-        every { newsViewModel.announcementsPreview } returns flowOf(listOf(announcement))
+        every { newsViewModel.announcements } returns flowOf(listOf(announcement))
 
         // When
         rule.setContent {
@@ -140,7 +140,7 @@ class NewsScreenUITest {
     @Test
     fun clicking_announcement_navigate_to_read_announcement_screen() {
         // Given
-        every { newsViewModel.announcementsPreview } returns flowOf(listOf(announcementFixture))
+        every { newsViewModel.announcements } returns flowOf(listOf(announcementFixture))
         val route = Screen.READ_ANNOUNCEMENT.route + "?announcementId={announcementId}"
 
         // When
@@ -228,7 +228,7 @@ class NewsScreenUITest {
     @Test
     fun create_announcement_button_should_not_be_displayed_when_user_is_member() {
         // Given
-        every { newsViewModel.currentUser } returns MutableStateFlow(userFixture)
+        every { newsViewModel.currentUser } returns MutableStateFlow(userFixture.copy(isMember = false))
 
         // When
         rule.setContent {

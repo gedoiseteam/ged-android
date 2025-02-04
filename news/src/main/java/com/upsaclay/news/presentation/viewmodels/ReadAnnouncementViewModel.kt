@@ -48,7 +48,7 @@ class ReadAnnouncementViewModel(
             try {
                 deleteAnnouncementUseCase(_announcement.value!!)
                 _screenState.value = AnnouncementScreenState.DELETED
-            } catch (e: IOException) {
+            } catch (e: Exception) {
                 _screenState.value = AnnouncementScreenState.DELETE_ERROR
             }
         }

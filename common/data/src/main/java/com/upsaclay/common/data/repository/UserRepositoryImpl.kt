@@ -17,7 +17,7 @@ import kotlinx.coroutines.plus
 internal class UserRepositoryImpl(
     private val userRemoteDataSource: UserRemoteDataSource,
     private val userLocalDataSource: UserLocalDataSource,
-    scope: CoroutineScope = (GlobalScope + Dispatchers.IO)
+    scope: CoroutineScope
 ) : UserRepository {
     private val _currentUser = MutableStateFlow<User?>(null)
     override val currentUser: StateFlow<User?> = _currentUser

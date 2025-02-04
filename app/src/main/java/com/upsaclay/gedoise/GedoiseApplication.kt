@@ -3,7 +3,7 @@ package com.upsaclay.gedoise
 import android.app.Application
 import com.upsaclay.authentication.authenticationModule
 import com.upsaclay.authentication.data.authenticationDataModule
-import com.upsaclay.common.commonModule
+import com.upsaclay.common.domain.commonModule
 import com.upsaclay.common.data.commonDataModule
 import com.upsaclay.message.data.messageDataModule
 import com.upsaclay.message.messageModule

@@ -9,12 +9,11 @@ import com.upsaclay.authentication.domain.entity.RegistrationScreenState
 import com.upsaclay.authentication.domain.entity.exception.AuthErrorCode
 import com.upsaclay.authentication.domain.entity.exception.AuthenticationException
 import com.upsaclay.authentication.domain.usecase.RegisterUseCase
-import com.upsaclay.authentication.domain.usecase.VerifyEmailFormatUseCase
+import com.upsaclay.common.domain.usecase.VerifyEmailFormatUseCase
 import com.upsaclay.common.domain.entity.User
 import com.upsaclay.common.domain.extensions.uppercaseFirstLetter
 import com.upsaclay.common.domain.usecase.CreateUserUseCase
 import com.upsaclay.common.domain.usecase.IsUserExistUseCase
-import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -22,7 +21,6 @@ import kotlinx.coroutines.launch
 class RegistrationViewModel(
     private val createUserUseCase: CreateUserUseCase,
     private val registerUseCase: RegisterUseCase,
-    private val verifyEmailFormatUseCase: VerifyEmailFormatUseCase,
     private val isUserExistUseCase: IsUserExistUseCase,
 ) : ViewModel() {
     private val _screenState = MutableStateFlow(RegistrationScreenState.NOT_REGISTERED)
@@ -90,7 +88,7 @@ class RegistrationViewModel(
         viewModelScope.launch {
             try {
                 if (isUserExistUseCase(email.trim())) {
-                    _screenState.value = RegistrationScreenState.USER_ALREADY_EXIST
+                    _screenState.value = RegistrationScreenState.USER_ALREADY_EXISTS
                     return@launch
                 }
 
@@ -109,7 +107,7 @@ class RegistrationViewModel(
             } catch (e: Exception) {
                 if (e is AuthenticationException) {
                     _screenState.value = when (e.code) {
-                        AuthErrorCode.EMAIL_ALREADY_EXIST -> RegistrationScreenState.USER_ALREADY_EXIST
+                        AuthErrorCode.EMAIL_ALREADY_AFFILIATED -> RegistrationScreenState.USER_ALREADY_EXISTS
                         else -> RegistrationScreenState.ERROR
                     }
                 } else {
@@ -124,8 +122,8 @@ class RegistrationViewModel(
             _screenState.value = RegistrationScreenState.EMPTY_FIELDS_ERROR
             false
         } else {
-            firstName = firstName.uppercaseFirstLetter().trim()
-            lastName = lastName.uppercaseFirstLetter().trim()
+            firstName = firstName.trim().uppercaseFirstLetter()
+            lastName = lastName.trim().uppercaseFirstLetter()
             true
         }
     }
@@ -155,9 +153,9 @@ class RegistrationViewModel(
                 false
             }
 
-            !verifyEmailFormatUseCase(email.trim()) -> {
+            !VerifyEmailFormatUseCase(email.trim()) -> {
                 _screenState.value = RegistrationScreenState.EMAIL_FORMAT_ERROR
-                true
+                false
             }
 
             else -> true

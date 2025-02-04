@@ -16,7 +16,6 @@ import com.upsaclay.common.domain.entity.exception.NetworkException
 import com.upsaclay.common.domain.usecase.GetUserUseCase
 import com.upsaclay.common.domain.usecase.SetCurrentUserUseCase
 import com.upsaclay.common.domain.usecase.VerifyEmailFormatUseCase
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -46,7 +45,7 @@ class AuthenticationViewModel(
     fun login() {
         _screenState.value = AuthenticationScreenState.LOADING
 
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             try {
                 loginUseCase(email, password)
                 getUserUseCase.withEmail(email)?.let {

@@ -9,7 +9,7 @@ import com.upsaclay.authentication.domain.usecase.LogoutUseCase
 import com.upsaclay.authentication.domain.usecase.RegisterUseCase
 import com.upsaclay.authentication.domain.usecase.SendVerificationEmailUseCase
 import com.upsaclay.authentication.domain.usecase.SetUserAuthenticatedUseCase
-import com.upsaclay.authentication.domain.usecase.VerifyEmailFormatUseCase
+import com.upsaclay.common.domain.usecase.VerifyEmailFormatUseCase
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -44,7 +44,7 @@ class AuthenticationUseCaseTest {
         registerUseCase = RegisterUseCase(authenticationRepository)
         sendVerificationEmailUseCase = SendVerificationEmailUseCase(authenticationRepository)
         setUserAuthenticatedUseCase = SetUserAuthenticatedUseCase(authenticationRepository)
-        verifyEmailFormatUseCase = VerifyEmailFormatUseCase()
+        verifyEmailFormatUseCase = VerifyEmailFormatUseCase
 
         every { authenticationRepository.isAuthenticated } returns flowOf(false)
         every { authenticationRepository.isUserEmailVerified() } returns false

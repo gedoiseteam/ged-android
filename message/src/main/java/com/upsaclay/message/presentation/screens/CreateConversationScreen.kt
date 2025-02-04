@@ -38,7 +38,7 @@ fun CreateConversationScreen(
     createConversationViewModel: CreateConversationViewModel = koinViewModel()
 ) {
     val users by createConversationViewModel.users.collectAsState(emptyList())
-    val screenState by createConversationViewModel.screenState.collectAsState(ConversationState.DEFAULT)
+    val screenState by createConversationViewModel.screenState.collectAsState()
 
     Scaffold(
         topBar = {

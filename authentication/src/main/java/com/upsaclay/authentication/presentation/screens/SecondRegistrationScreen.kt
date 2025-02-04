@@ -30,7 +30,6 @@ import com.upsaclay.common.presentation.components.PrimaryButton
 import com.upsaclay.common.presentation.components.SimpleDropDownMenu
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
-import kotlinx.collections.immutable.persistentListOf
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -102,7 +101,7 @@ fun SecondRegistrationScreen(
 @Preview
 @Composable
 private fun SecondRegistrationScreenPreview() {
-    val items = persistentListOf("GED 1", "GED 2", "GED 3")
+    val items = listOf("GED 1", "GED 2", "GED 3")
     var selectedItem by remember { mutableStateOf(items[0]) }
     var expanded by remember { mutableStateOf(false) }
 
