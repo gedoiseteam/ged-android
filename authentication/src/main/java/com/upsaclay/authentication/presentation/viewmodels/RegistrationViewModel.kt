@@ -82,6 +82,15 @@ class RegistrationViewModel(
         _screenState.value = RegistrationScreenState.NOT_REGISTERED
     }
 
+    fun resetAllValues() {
+        resetFirstName()
+        resetLastName()
+        resetEmail()
+        resetPassword()
+        resetSchoolLevel()
+        resetScreenState()
+    }
+
     fun register() {
         _screenState.value = RegistrationScreenState.LOADING
 

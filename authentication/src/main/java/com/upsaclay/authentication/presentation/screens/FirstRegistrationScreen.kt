@@ -47,21 +47,10 @@ fun FirstRegistrationScreen(
     navController: NavController,
     registrationViewModel: RegistrationViewModel = koinViewModel()
 ) {
-    val keyboardController = LocalSoftwareKeyboardController.current
     val registrationState = registrationViewModel.screenState.collectAsState()
     val emptyFields = registrationState.value == RegistrationScreenState.EMPTY_FIELDS_ERROR
     val isLoading = registrationState.value == RegistrationScreenState.LOADING
-    val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
-
-    LaunchedEffect(Unit) {
-        registrationViewModel.resetScreenState()
-        registrationViewModel.resetFirstName()
-        registrationViewModel.resetLastName()
-        registrationViewModel.resetEmail()
-        registrationViewModel.resetPassword()
-        registrationViewModel.resetSchoolLevel()
-    }
 
     RegistrationTopBar(
         navController = navController
@@ -70,9 +59,8 @@ fun FirstRegistrationScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .pointerInput(Unit) {
-                    detectTapGestures(onPress = {
+                    detectTapGestures(onTap = {
                         focusManager.clearFocus()
-                        keyboardController?.hide()
                     })
                 },
             verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium)
@@ -83,9 +71,7 @@ fun FirstRegistrationScreen(
             )
 
             OutlinedTextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .focusRequester(focusRequester),
+                modifier = Modifier.fillMaxWidth(),
                 value = registrationViewModel.lastName,
                 isError = emptyFields,
                 enabled = !isLoading,
@@ -95,9 +81,7 @@ fun FirstRegistrationScreen(
             )
 
             OutlinedTextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .focusRequester(focusRequester),
+                modifier = Modifier.fillMaxWidth(),
                 value = registrationViewModel.firstName,
                 isError = emptyFields,
                 enabled = !isLoading,
@@ -122,8 +106,8 @@ fun FirstRegistrationScreen(
             isEnable = !isLoading,
             onClick = {
                 focusManager.clearFocus()
-                keyboardController?.hide()
                 if (registrationViewModel.verifyNamesInputs()) {
+                    registrationViewModel.resetScreenState()
                     navController.navigate(Screen.SECOND_REGISTRATION.route)
                 }
             }
@@ -143,7 +127,6 @@ private fun FirstRegistrationScreenPreview() {
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
     val isError = false
-    val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
 
     GedoiseTheme {
@@ -166,9 +149,7 @@ private fun FirstRegistrationScreenPreview() {
                 )
 
                 OutlinedTextField(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .focusRequester(focusRequester),
+                    modifier = Modifier.fillMaxWidth(),
                     placeholder = { Text(text = stringResource(id = com.upsaclay.common.R.string.last_name)) },
                     value = lastName,
                     isError = isError,
@@ -176,9 +157,7 @@ private fun FirstRegistrationScreenPreview() {
                 )
 
                 OutlinedTextField(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .focusRequester(focusRequester),
+                    modifier = Modifier.fillMaxWidth(),
                     value = firstName,
                     isError = isError,
                     placeholder = { Text(text = stringResource(id = com.upsaclay.common.R.string.first_name)) },

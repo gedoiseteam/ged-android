@@ -70,6 +70,7 @@ fun Navigation(mainViewModel: MainViewModel = koinViewModel()) {
         }
 
         composable(Screen.AUTHENTICATION.route) {
+            registrationViewModel.resetAllValues()
             AuthenticationScreen(navController = navController)
         }
 

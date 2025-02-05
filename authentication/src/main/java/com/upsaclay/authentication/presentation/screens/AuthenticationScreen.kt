@@ -1,7 +1,5 @@
 package com.upsaclay.authentication.presentation.screens
 
-import android.os.Build
-import android.view.ViewTreeObserver
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,7 +19,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -30,15 +27,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -47,7 +41,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.NavController
 import com.upsaclay.authentication.R
 import com.upsaclay.authentication.domain.entity.AuthenticationScreenState
@@ -75,9 +68,8 @@ fun AuthenticationScreen(
     var inputsError by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
     var showVerifyEmailDialog by remember { mutableStateOf(false) }
-    var isKeyboardVisible by remember { mutableStateOf(false) }
-    val focusRequester = remember { FocusRequester() }
     val screenState by authenticationViewModel.screenState.collectAsState()
+    val focusManager = LocalFocusManager.current
 
     inputsError = screenState == AuthenticationScreenState.AUTHENTICATION_ERROR ||
             screenState == AuthenticationScreenState.EMPTY_FIELDS_ERROR
@@ -123,12 +115,6 @@ fun AuthenticationScreen(
         }
     }
 
-    LaunchedEffect(isKeyboardVisible) {
-        if (isKeyboardVisible) {
-            scrollState.animateScrollTo(scrollState.maxValue)
-        }
-    }
-
     if (showVerifyEmailDialog) {
         SimpleDialog(
             modifier = Modifier.testTag(stringResource(id = R.string.authentication_screen_verify_email_dialog_tag)),
@@ -160,6 +146,11 @@ fun AuthenticationScreen(
             .background(MaterialTheme.colorScheme.background)
             .verticalScroll(scrollState)
             .padding(MaterialTheme.spacing.medium)
+            .pointerInput(Unit) {
+                detectTapGestures(onTap = {
+                    focusManager.clearFocus()
+                })
+            }
     ) {
         TitleSection()
 
@@ -174,7 +165,6 @@ fun AuthenticationScreen(
                 keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
                 errorMessage = errorMessage,
                 isError = inputsError,
-                focusRequester = focusRequester
             )
 
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))
@@ -269,14 +259,11 @@ private fun InputsSection(
     onPasswordChange: (String) -> Unit,
     keyboardActions: KeyboardActions,
     errorMessage: String,
-    isError: Boolean,
-    focusRequester: FocusRequester
+    isError: Boolean
 ) {
     Column {
         OutlinedEmailInput(
-            modifier = Modifier
-                .fillMaxWidth()
-                .focusRequester(focusRequester),
+            modifier = Modifier.fillMaxWidth(),
             text = email,
             onValueChange = onEmailChange,
             keyboardActions = keyboardActions,
@@ -286,9 +273,7 @@ private fun InputsSection(
         Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
 
         OutlinedPasswordInput(
-            modifier = Modifier
-                .fillMaxWidth()
-                .focusRequester(focusRequester),
+            modifier = Modifier.fillMaxWidth(),
             text = password,
             onValueChange = onPasswordChange,
             keyboardActions = keyboardActions,
@@ -315,7 +300,6 @@ private fun AuthenticationScreenPreview() {
     var isLoading by remember { mutableStateOf(false) }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
 
     GedoiseTheme {
@@ -345,8 +329,7 @@ private fun AuthenticationScreenPreview() {
                     onPasswordChange = { password = it },
                     keyboardActions = KeyboardActions(onDone = { }),
                     errorMessage = "",
-                    isError = false,
-                    focusRequester = focusRequester
+                    isError = false
                 )
 
                 Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))

@@ -48,14 +48,7 @@ fun ThirdRegistrationScreen(
     navController: NavController,
     registrationViewModel: RegistrationViewModel = koinViewModel()
 ) {
-    LaunchedEffect(Unit) {
-        registrationViewModel.resetScreenState()
-        registrationViewModel.resetSchoolLevel()
-    }
-
-    val keyboardController = LocalSoftwareKeyboardController.current
     val registrationState by registrationViewModel.screenState.collectAsState()
-    val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
     val isLoading = registrationState == RegistrationScreenState.LOADING
@@ -103,7 +96,6 @@ fun ThirdRegistrationScreen(
                 .pointerInput(Unit) {
                     detectTapGestures(onPress = {
                         focusManager.clearFocus()
-                        keyboardController?.hide()
                     })
                 }
         ) {
@@ -117,7 +109,6 @@ fun ThirdRegistrationScreen(
             OutlinedEmailInput(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .focusRequester(focusRequester)
                     .testTag(stringResource(R.string.registration_screen_email_input_tag)),
                 text = registrationViewModel.email,
                 isError = inputsError,
@@ -130,7 +121,6 @@ fun ThirdRegistrationScreen(
             OutlinedPasswordInput(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .focusRequester(focusRequester)
                     .testTag(stringResource(R.string.registration_screen_password_input_tag)),
                 text = registrationViewModel.password,
                 isError = inputsError,
@@ -155,8 +145,8 @@ fun ThirdRegistrationScreen(
             isEnable = !isLoading,
             text = stringResource(id = com.upsaclay.common.R.string.next),
             onClick = {
-                keyboardController?.hide()
                 if (registrationViewModel.validateCredentialInputs()) {
+                    registrationViewModel.resetScreenState()
                     registrationViewModel.register()
                 }
             }
