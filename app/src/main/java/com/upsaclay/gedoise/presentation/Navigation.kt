@@ -33,6 +33,7 @@ import com.upsaclay.gedoise.R
 import com.upsaclay.gedoise.data.BottomNavigationItem
 import com.upsaclay.gedoise.presentation.components.HomeTopBar
 import com.upsaclay.gedoise.presentation.components.MainBottomBar
+import com.upsaclay.gedoise.presentation.components.MainTopBar
 import com.upsaclay.gedoise.presentation.components.SplashScreen
 import com.upsaclay.gedoise.presentation.screens.AccountScreen
 import com.upsaclay.gedoise.presentation.screens.ProfileScreen
@@ -147,16 +148,7 @@ fun Navigation(mainViewModel: MainViewModel = koinViewModel()) {
         composable(Screen.CONVERSATION.route) {
             MainNavigationBars(
                 navController = navController,
-                topBar = {
-                    TopAppBar(
-                        title = {
-                            Text(
-                                text = stringResource(R.string.messages),
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                    )
-                },
+                topBar = { MainTopBar(title = stringResource(R.string.messages)) },
                 bottomNavigationItems = mainViewModel.bottomNavigationItem.values.toList(),
             ) {
                 ConversationScreen(navController = navController)

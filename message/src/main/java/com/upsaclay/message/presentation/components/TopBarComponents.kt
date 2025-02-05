@@ -31,7 +31,7 @@ import com.upsaclay.common.domain.userFixture
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatTopBar(navController: NavController, interlocutor: User) {
-    val color = TopAppBarDefaults.topAppBarColors()
+    val color = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
 
     Row(
         modifier = Modifier

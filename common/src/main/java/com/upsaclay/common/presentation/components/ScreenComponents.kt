@@ -35,15 +35,9 @@ fun OverlayCircularLoadingScreen(scale: Float = 2.5f) {
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun OverlayLinearLoadingScreen() {
-    val backgroundColor = if (isSystemInDarkTheme()) {
-        GedoiseColor.DarkBackground
-    } else {
-        GedoiseColor.LittleTransparentWhite
-    }
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(backgroundColor)
             .zIndex(1000f)
             .pointerInteropFilter { true }
     ) {
