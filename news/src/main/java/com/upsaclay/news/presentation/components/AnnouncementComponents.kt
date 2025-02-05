@@ -193,7 +193,7 @@ internal fun AnnouncementItem(
                     modifier = Modifier.scale(0.8f),
                     painter = painterResource(id = com.upsaclay.common.R.drawable.ic_info_outline),
                     contentDescription = null,
-                    tint = GedoiseColor.Red
+                    tint = MaterialTheme.colorScheme.error
                 )
             }
 

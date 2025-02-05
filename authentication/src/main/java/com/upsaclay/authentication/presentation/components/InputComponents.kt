@@ -91,7 +91,6 @@ fun OutlinedPasswordInput(
                 painter = icon,
                 contentDescription = contentDescription,
                 modifier = Modifier.clickable { passwordVisible = !passwordVisible },
-                tint = GedoiseColor.BlackIconColor
             )
         },
         visualTransformation = if (passwordVisible) {

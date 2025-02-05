@@ -120,14 +120,14 @@ fun ProfileScreen(
                     text = {
                         Text(
                             text = stringResource(id = R.string.logout),
-                            color = GedoiseColor.Red
+                            color = MaterialTheme.colorScheme.error
                         )
                     },
                     icon = {
                         Icon(
                             painter = painterResource(id = com.upsaclay.common.R.drawable.ic_logout),
                             contentDescription = stringResource(id = R.string.logout_icon_description),
-                            tint = GedoiseColor.Red
+                            tint = MaterialTheme.colorScheme.error
                         )
                     },
                     onClick = { showLogoutDialog = true }
@@ -233,14 +233,14 @@ fun ProfileScreenPreview() {
                     text = {
                         Text(
                             text = stringResource(id = R.string.logout),
-                            color = GedoiseColor.Red
+                            color = MaterialTheme.colorScheme.error
                         )
                     },
                     icon = {
                         Icon(
                             painter = painterResource(id = com.upsaclay.common.R.drawable.ic_logout),
                             contentDescription = stringResource(id = R.string.logout_icon_description),
-                            tint = GedoiseColor.Red
+                            tint = MaterialTheme.colorScheme.error
                         )
                     },
                     onClick = { }

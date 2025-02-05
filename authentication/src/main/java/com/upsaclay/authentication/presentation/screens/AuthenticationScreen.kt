@@ -42,6 +42,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.authentication.R
 import com.upsaclay.authentication.domain.entity.AuthenticationScreenState
 import com.upsaclay.authentication.presentation.components.LoginButton
@@ -51,8 +52,6 @@ import com.upsaclay.authentication.presentation.viewmodels.AuthenticationViewMod
 import com.upsaclay.common.domain.entity.Screen
 import com.upsaclay.common.presentation.components.ErrorTextWithIcon
 import com.upsaclay.common.presentation.components.SimpleDialog
-import com.upsaclay.common.presentation.theme.GedoiseColor.Primary
-import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.common.utils.showToast
 import org.koin.androidx.compose.koinViewModel
@@ -208,13 +207,15 @@ private fun TitleSection() {
                 .width(screenWidth * 0.35f)
                 .height(screenHeight * 0.2f)
         )
+
         Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))
 
         Text(
             text = stringResource(id = com.upsaclay.common.R.string.app_name),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.SemiBold,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onSurface
         )
 
         Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
@@ -223,7 +224,7 @@ private fun TitleSection() {
             text = stringResource(id = R.string.presentation_text),
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
-            color = Primary
+            color = MaterialTheme.colorScheme.primary
         )
     }
 }
@@ -234,7 +235,10 @@ private fun RegistrationText(
     onRegistrationClick: () -> Unit
 ) {
     Row(modifier = modifier) {
-        Text(text = stringResource(id = R.string.not_register_yet))
+        Text(
+            text = stringResource(id = R.string.not_register_yet),
+            color = MaterialTheme.colorScheme.onSurface
+        )
 
         Spacer(modifier = Modifier.width(MaterialTheme.spacing.extraSmall))
 
