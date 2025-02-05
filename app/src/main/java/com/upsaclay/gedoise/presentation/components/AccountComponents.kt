@@ -57,14 +57,14 @@ internal fun AccountModelBottomSheet(
                 text = {
                     Text(
                         text = stringResource(id = R.string.delete_profile_picture),
-                        color = GedoiseColor.Red
+                        color = MaterialTheme.colorScheme.error
                     )
                 },
                 icon = {
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = null,
-                        tint = GedoiseColor.Red
+                        tint = MaterialTheme.colorScheme.error
                     )
                 },
                 onClick = onDeleteProfilePictureClick

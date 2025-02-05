@@ -71,7 +71,7 @@ fun SentMessageItem(
                 modifier = Modifier.scale(0.8f),
                 imageVector = Icons.Outlined.Info,
                 contentDescription = "",
-                tint = GedoiseColor.Red
+                tint = MaterialTheme.colorScheme.error
             )
 
             else -> {}
