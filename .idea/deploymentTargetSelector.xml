@@ -13,7 +13,13 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="Tests in 'com.upsaclay.authentication'">
+      <SelectionState runConfigName="ProfileScreenUITest">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="navigate_to_account_screen_when_account_info_button_is_clicked()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="delete_profile_picture_dialog_should_be_display_when_delete_profile_picture_button_is_clicked()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>
