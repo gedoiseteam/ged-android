@@ -20,8 +20,8 @@ class AccountViewModel(
     private val deleteProfilePictureUseCase: DeleteProfilePictureUseCase,
     getCurrentUserUseCase: GetCurrentUserUseCase
 ): ViewModel() {
-    private val _accountScreenState = MutableStateFlow(AccountScreenState.READ)
-    val accountScreenState: StateFlow<AccountScreenState> = _accountScreenState
+    private val _screenState = MutableStateFlow(AccountScreenState.READ)
+    val screenState: StateFlow<AccountScreenState> = _screenState
     val currentUser: StateFlow<User?> = getCurrentUserUseCase()
     var profilePictureUri by mutableStateOf<Uri?>(null)
         private set
@@ -31,7 +31,7 @@ class AccountViewModel(
     }
 
     fun updateAccountScreenState(screenState: AccountScreenState) {
-        _accountScreenState.value = screenState
+        _screenState.value = screenState
     }
 
     fun resetProfilePictureUri() {
@@ -39,15 +39,15 @@ class AccountViewModel(
     }
 
     fun updateUserProfilePicture() {
-        _accountScreenState.value = AccountScreenState.LOADING
+        _screenState.value = AccountScreenState.LOADING
 
         profilePictureUri?.let { uri ->
             viewModelScope.launch {
                 try {
                     updateProfilePictureUseCase(uri)
-                    _accountScreenState.value = AccountScreenState.PROFILE_PICTURE_UPDATED
+                    _screenState.value = AccountScreenState.PROFILE_PICTURE_UPDATED
                 } catch (e: Exception) {
-                    _accountScreenState.value = AccountScreenState.PROFILE_PICTURE_UPDATE_ERROR
+                    _screenState.value = AccountScreenState.PROFILE_PICTURE_UPDATE_ERROR
                 }
                 resetProfilePictureUri()
             }
@@ -55,15 +55,15 @@ class AccountViewModel(
     }
 
     fun deleteUserProfilePicture() {
-        _accountScreenState.value = AccountScreenState.LOADING
+        _screenState.value = AccountScreenState.LOADING
 
         viewModelScope.launch {
             val (id, url) = currentUser.value?.id to currentUser.value?.profilePictureUrl
             try {
                 deleteProfilePictureUseCase(id!!, url!!)
-                _accountScreenState.value = AccountScreenState.PROFILE_PICTURE_UPDATED
+                _screenState.value = AccountScreenState.PROFILE_PICTURE_UPDATED
             } catch (e: Exception) {
-                _accountScreenState.value = AccountScreenState.PROFILE_PICTURE_UPDATE_ERROR
+                _screenState.value = AccountScreenState.PROFILE_PICTURE_UPDATE_ERROR
             }
             resetProfilePictureUri()
         }

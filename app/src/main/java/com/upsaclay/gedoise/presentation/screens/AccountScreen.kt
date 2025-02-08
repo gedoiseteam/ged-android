@@ -27,6 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -47,6 +48,7 @@ import com.upsaclay.gedoise.domain.entities.AccountInfo
 import com.upsaclay.gedoise.domain.entities.AccountScreenState
 import com.upsaclay.gedoise.presentation.components.AccountInfoItem
 import com.upsaclay.gedoise.presentation.components.AccountModelBottomSheet
+import com.upsaclay.gedoise.presentation.components.AccountTopBar
 import com.upsaclay.gedoise.presentation.viewmodels.AccountViewModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -60,11 +62,11 @@ fun AccountScreen(
     val context = LocalContext.current
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
-    val accountScreenState by accountViewModel.accountScreenState.collectAsState()
+    val screenState by accountViewModel.screenState.collectAsState()
+    val user by accountViewModel.currentUser.collectAsState()
     var showBottomSheet by remember { mutableStateOf(false) }
     var showDeleteProfilePictureDialog by remember { mutableStateOf(false) }
     var showLoadingDialog by remember { mutableStateOf(false) }
-    val user by accountViewModel.currentUser.collectAsState()
 
     val hideBottomSheet: () -> Unit = {
         scope.launch { sheetState.hide() }.invokeOnCompletion {
@@ -84,7 +86,7 @@ fun AccountScreen(
         }
     )
 
-    when (accountScreenState) {
+    when (screenState) {
         AccountScreenState.PROFILE_PICTURE_UPDATED -> {
             showLoadingDialog = false
             showToast(context, R.string.profile_picture_updated)
@@ -104,6 +106,8 @@ fun AccountScreen(
 
     if (showDeleteProfilePictureDialog) {
         SensibleActionDialog(
+            modifier = Modifier
+                .testTag(stringResource(id = R.string.account_screen_delete_profile_picture_dialog_tag)),
             text = stringResource(id = R.string.delete_profile_picture_dialog_text),
             confirmText = stringResource(id = com.upsaclay.common.R.string.delete),
             onConfirm = {
@@ -140,8 +144,8 @@ fun AccountScreen(
 
     Scaffold(
         topBar = {
-            com.upsaclay.gedoise.presentation.components.AccountTopBar(
-                isEdited = accountScreenState == AccountScreenState.EDIT,
+            AccountTopBar(
+                isEdited = screenState == AccountScreenState.EDIT,
                 onSaveClick = { accountViewModel.updateUserProfilePicture() },
                 onCancelClick = {
                     accountViewModel.resetProfilePictureUri()
@@ -166,11 +170,12 @@ fun AccountScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 ProfilePictureSection(
-                    isEdited = accountScreenState == AccountScreenState.EDIT,
+                    modifier = Modifier.testTag(stringResource(id = R.string.account_screen_profile_picture_tag)),
+                    isEdited = screenState == AccountScreenState.EDIT,
                     profilePictureUri = accountViewModel.profilePictureUri,
                     profilePictureUrl = user?.profilePictureUrl,
                     onClick = {
-                        if (accountScreenState == AccountScreenState.EDIT) {
+                        if (screenState == AccountScreenState.EDIT) {
                             singlePhotoPickerLauncher.launch(
                                 PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                             )
@@ -211,6 +216,7 @@ fun AccountScreen(
 
 @Composable
 private fun ProfilePictureSection(
+    modifier: Modifier = Modifier,
     isEdited: Boolean,
     profilePictureUri: Uri?,
     profilePictureUrl: String?,
@@ -221,6 +227,7 @@ private fun ProfilePictureSection(
     profilePictureUri?.let { uri ->
         if (isEdited) {
             ProfilePictureWithIcon(
+                modifier = modifier,
                 uri = uri,
                 iconVector = Icons.Default.Edit,
                 scale = scaleImage,
@@ -228,6 +235,7 @@ private fun ProfilePictureSection(
             )
         } else {
             ProfilePicture(
+                modifier = modifier,
                 uri = uri,
                 scale = scaleImage,
                 onClick = onClick
@@ -235,6 +243,7 @@ private fun ProfilePictureSection(
         }
     } ?: run {
         ProfilePictureWithIcon(
+            modifier = modifier,
             url = profilePictureUrl,
             iconVector = Icons.Default.Edit,
             scale = scaleImage,
