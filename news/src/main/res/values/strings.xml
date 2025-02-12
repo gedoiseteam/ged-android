@@ -3,7 +3,7 @@
     <string name="announcement_author_picture_description">Photo de l\'auteur de l\'annonce</string>
     <string name="recent_announcements">Annonces récentes</string>
     <string name="news_ged">Actualités GED</string>
-    <string name="no_announcements">Aucune annonces</string>
+    <string name="no_announcement">Aucune annonce</string>
     <string name="announcement">Annonce</string>
     <string name="announcement_item_more_vert_description">Afficher les options d\'édition de l\'annonce</string>
     <string name="new_announcement">Nouvelle annonce</string>

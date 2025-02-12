@@ -1,5 +1,6 @@
 package com.upsaclay.message.presentation.screens
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -61,7 +62,7 @@ fun ConversationScreen(
                 Text(
                     text = stringResource(id = R.string.no_conversation),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Gray,
+                    color = MaterialTheme.colorScheme.outline,
                     textAlign = TextAlign.Center
                 )
 
