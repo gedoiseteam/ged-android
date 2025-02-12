@@ -33,6 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.upsaclay.common.domain.entity.Screen
+import com.upsaclay.common.domain.userFixture
 import com.upsaclay.common.presentation.components.ClickableItem
 import com.upsaclay.common.presentation.components.LoadingDialog
 import com.upsaclay.common.presentation.components.ProfilePicture
@@ -41,7 +42,6 @@ import com.upsaclay.common.presentation.components.SmallTopBarBack
 import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
-import com.upsaclay.common.domain.userFixture
 import com.upsaclay.gedoise.R
 import com.upsaclay.gedoise.domain.entities.ProfileScreenState
 import com.upsaclay.gedoise.presentation.viewmodels.ProfileViewModel
@@ -58,10 +58,8 @@ fun ProfileScreen(
     val profileState by profileViewModel.screenState.collectAsState()
 
     LaunchedEffect(profileState) {
-        when (profileState) {
-            ProfileScreenState.LOADING -> showLoadingDialog = true
-
-            else -> {}
+        if(profileState == ProfileScreenState.LOADING) {
+            showLoadingDialog = true
         }
     }
 
@@ -104,6 +102,8 @@ fun ProfileScreen(
                     userFullName = user?.fullName ?: "Unknown"
                 )
 
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+
                 ClickableItem(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -145,32 +145,28 @@ fun ProfileScreen(
 
 @Composable
 private fun TopSection(profilePictureUrl: String?, userFullName: String) {
-    Column {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    start = MaterialTheme.spacing.medium,
-                    end = MaterialTheme.spacing.medium,
-                    bottom = MaterialTheme.spacing.medium
-                ),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            ProfilePicture(
-                url = profilePictureUrl,
-                scale = 0.7f
-            )
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(
+                start = MaterialTheme.spacing.medium,
+                end = MaterialTheme.spacing.medium,
+                bottom = MaterialTheme.spacing.medium
+            ),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        ProfilePicture(
+            url = profilePictureUrl,
+            scale = 0.7f
+        )
 
-            Spacer(modifier = Modifier.width(MaterialTheme.spacing.medium))
+        Spacer(modifier = Modifier.width(MaterialTheme.spacing.medium))
 
-            Text(
-                text = userFullName,
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Medium
-            )
-        }
-
-        HorizontalDivider(color = GedoiseColor.LightGray)
+        Text(
+            text = userFullName,
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Medium
+        )
     }
 }
 
@@ -186,6 +182,10 @@ fun ProfileScreenPreview() {
     val isLoading = true
 
     GedoiseTheme {
+        if (isLoading) {
+            LoadingDialog(message = stringResource(R.string.disconnection))
+        }
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -206,8 +206,7 @@ fun ProfileScreenPreview() {
                         painter = painterResource(id = com.upsaclay.common.R.drawable.default_profile_picture),
                         contentDescription = "",
                         contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .size(70.dp)
+                        modifier = Modifier.size(70.dp)
                     )
 
                     Spacer(modifier = Modifier.width(MaterialTheme.spacing.medium))

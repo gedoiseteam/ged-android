@@ -191,7 +191,7 @@ internal fun AnnouncementItem(
             AnnouncementState.ERROR -> {
                 Icon(
                     modifier = Modifier.scale(0.8f),
-                    painter = painterResource(id = com.upsaclay.common.R.drawable.ic_info_outline),
+                    painter = painterResource(id = com.upsaclay.common.R.drawable.ic_outline_info),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.error
                 )

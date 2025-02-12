@@ -1,5 +1,6 @@
 package com.upsaclay.authentication.presentation.components
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Button
@@ -42,7 +43,7 @@ private fun LoadingLargeButton(modifier: Modifier = Modifier) {
         onClick = { },
         enabled = false,
         colors = ButtonColors(
-            contentColor = Color.White,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
             containerColor = MaterialTheme.colorScheme.primary,
             disabledContainerColor = MaterialTheme.colorScheme.primary,
             disabledContentColor = MaterialTheme.colorScheme.primary
@@ -50,7 +51,7 @@ private fun LoadingLargeButton(modifier: Modifier = Modifier) {
         modifier = modifier.height(45.dp)
     ) {
         CircularProgressBar(
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onPrimary,
             scale = 0.6f
         )
     }
@@ -62,7 +63,7 @@ private fun LoadingLargeButton(modifier: Modifier = Modifier) {
  =====================================================================
  */
 
-@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
 @Composable
 private fun LoginButtonPreview() {
     var isLoading by remember { mutableStateOf(false) }
