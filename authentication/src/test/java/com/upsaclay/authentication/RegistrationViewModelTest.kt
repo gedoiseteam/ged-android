@@ -7,11 +7,9 @@ import com.upsaclay.authentication.domain.usecase.RegisterUseCase
 import com.upsaclay.authentication.presentation.viewmodels.RegistrationViewModel
 import com.upsaclay.common.domain.usecase.CreateUserUseCase
 import com.upsaclay.common.domain.usecase.IsUserExistUseCase
-import com.upsaclay.common.domain.usecase.VerifyEmailFormatUseCase
 import com.upsaclay.common.domain.userFixture
 import io.mockk.coEvery
 import io.mockk.coVerify
-import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -245,7 +243,7 @@ class RegistrationViewModelTest {
         registrationViewModel.register()
 
         // Then
-        assertEquals(RegistrationScreenState.ERROR, registrationViewModel.screenState.value)
+        assertEquals(RegistrationScreenState.UNKNOWN_ERROR, registrationViewModel.screenState.value)
     }
 
     @Test

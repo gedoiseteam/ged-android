@@ -12,6 +12,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarColors
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -21,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.upsaclay.authentication.R
+import com.upsaclay.authentication.presentation.viewmodels.MAX_REGISTRATION_STEP
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
 
@@ -28,7 +31,7 @@ import com.upsaclay.common.presentation.theme.spacing
 @Composable
 internal fun RegistrationTopBar(
     navController: NavController,
-    withBackButton: Boolean = true,
+    currentStep: Int,
     content: @Composable BoxScope.() -> Unit
 ) {
     Scaffold(
@@ -42,20 +45,24 @@ internal fun RegistrationTopBar(
                     )
                 },
                 navigationIcon = {
-                    if (withBackButton) {
-                        IconButton(onClick = { navController.popBackStack() }) {
-                            Icon(
-                                painter = painterResource(id = com.upsaclay.common.R.drawable.ic_partial_arrow_left),
-                                contentDescription = stringResource(
-                                    id = com.upsaclay.common.R.string.arrow_back_icon_description
-                                )
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            painter = painterResource(id = com.upsaclay.common.R.drawable.ic_partial_arrow_left),
+                            contentDescription = stringResource(
+                                id = com.upsaclay.common.R.string.arrow_back_icon_description
                             )
-                        }
+                        )
                     }
                 },
                 actions = {
-
-                }
+                    Text(
+                        modifier = Modifier.padding(end = MaterialTheme.spacing.medium),
+                        text = stringResource(id = R.string.step, currentStep, MAX_REGISTRATION_STEP)
+                    )
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                   containerColor = MaterialTheme.colorScheme.background
+                )
             )
         }
     ) {
@@ -86,7 +93,9 @@ internal fun RegistrationTopBarPreview() {
     GedoiseTheme {
         RegistrationTopBar(
             navController = rememberNavController(),
-            withBackButton = true
-        ) {}
+            currentStep = 1
+        ) {
+
+        }
     }
 }

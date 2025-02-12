@@ -9,5 +9,5 @@ interface FirebaseAuthenticationRepository {
 
     suspend fun sendVerificationEmail()
 
-    fun isUserEmailVerified(): Boolean
+    suspend fun isUserEmailVerified(): Boolean
 }

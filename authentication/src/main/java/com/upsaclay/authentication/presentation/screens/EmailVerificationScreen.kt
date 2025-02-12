@@ -1,12 +1,5 @@
 package com.upsaclay.authentication.presentation.screens
 
-import androidx.compose.animation.core.EaseInOut
-import androidx.compose.animation.core.InfiniteRepeatableSpec
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,10 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -35,10 +25,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -46,7 +32,6 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.upsaclay.authentication.R
 import com.upsaclay.authentication.domain.entity.AuthenticationScreenState
@@ -74,16 +59,7 @@ fun EmailVerificationScreen(
     val isLoading = screenState == AuthenticationScreenState.LOADING
     var isForwardEmailButtonEnable by remember { mutableStateOf(true) }
     var isForwardButtonClicked by remember { mutableStateOf(false) }
-    val infiniteTransition = rememberInfiniteTransition(label = "")
-    val animatedValue = infiniteTransition.animateFloat(
-        initialValue = 0.9f,
-        targetValue = 1f,
-        animationSpec = InfiniteRepeatableSpec(
-            animation = tween(1300, easing = EaseInOut),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = ""
-    )
+
     val annotatedString = buildAnnotatedString {
         append(stringResource(id = R.string.email_verification_explanation_begining) + " ")
         withStyle(
@@ -109,9 +85,11 @@ fun EmailVerificationScreen(
     }
 
     LaunchedEffect(isForwardButtonClicked) {
-        isForwardEmailButtonEnable = false
-        delay(60000)
-        isForwardEmailButtonEnable = true
+        if (isForwardButtonClicked) {
+            isForwardEmailButtonEnable = false
+            delay(60000)
+            isForwardEmailButtonEnable = true
+        }
     }
 
     Scaffold(
@@ -183,31 +161,6 @@ fun EmailVerificationScreen(
                 }
             }
 
-            Box(
-                modifier = Modifier
-                    .clip(CircleShape)
-                    .scale(animatedValue.value)
-                    .align(Alignment.Center)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primary)
-                        .padding(MaterialTheme.spacing.medium)
-                        .align(Alignment.Center)
-                        .size(100.dp)
-                )
-
-                Image(
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .size(90.dp),
-                    imageVector = Icons.Filled.Email,
-                    contentDescription = "",
-                    colorFilter = ColorFilter.tint(color = Color.White)
-                )
-            }
-
             PrimaryButton(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
@@ -232,16 +185,6 @@ private fun EmailVerificationScreenPreview() {
     var isLoading by remember { mutableStateOf(false) }
     val email = "patrick.dupont@email.com"
     val isError = false
-    val infiniteTransition = rememberInfiniteTransition(label = "")
-    val animatedValue = infiniteTransition.animateFloat(
-        initialValue = 0.9f,
-        targetValue = 1f,
-        animationSpec = InfiniteRepeatableSpec(
-            animation = tween(1300, easing = EaseInOut),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = ""
-    )
 
     val annotatedString = buildAnnotatedString {
         append(stringResource(id = R.string.email_verification_explanation_begining) + " ")
@@ -298,31 +241,6 @@ private fun EmailVerificationScreenPreview() {
                     ) {
                         Text(text = stringResource(id = R.string.forward_verification_email))
                     }
-                }
-
-                Box(
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .scale(animatedValue.value)
-                        .align(Alignment.Center)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.primary)
-                            .padding(MaterialTheme.spacing.medium)
-                            .align(Alignment.Center)
-                            .size(110.dp)
-                    )
-
-                    Image(
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .size(100.dp),
-                        imageVector = Icons.Filled.Email,
-                        contentDescription = "",
-                        colorFilter = ColorFilter.tint(color = Color.White)
-                    )
                 }
 
                 PrimaryButton(

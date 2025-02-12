@@ -64,32 +64,33 @@ fun AuthenticationScreen(
     val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
     val scrollState = rememberScrollState()
-    var inputsError by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf("") }
     var showVerifyEmailDialog by remember { mutableStateOf(false) }
     val screenState by authenticationViewModel.screenState.collectAsState()
     val focusManager = LocalFocusManager.current
 
-    inputsError = screenState == AuthenticationScreenState.AUTHENTICATION_ERROR ||
-            screenState == AuthenticationScreenState.EMPTY_FIELDS_ERROR
-
-    errorMessage = when (screenState) {
+    val (errorMessage, inputsError) = when (screenState) {
         AuthenticationScreenState.AUTHENTICATION_ERROR ->
-            stringResource(id = R.string.error_connection)
+            stringResource(id = R.string.error_connection) to true
 
         AuthenticationScreenState.EMPTY_FIELDS_ERROR ->
-            stringResource(id = com.upsaclay.common.R.string.empty_fields_error)
+            stringResource(id = com.upsaclay.common.R.string.empty_fields_error) to true
 
         AuthenticationScreenState.AUTHENTICATED_USER_NOT_FOUND ->
-            stringResource(id = R.string.authenticated_user_not_found)
+            stringResource(id = R.string.authenticated_user_not_found) to true
 
         AuthenticationScreenState.TOO_MANY_REQUESTS_ERROR ->
-            stringResource(id = R.string.too_many_request_error)
+            stringResource(id = R.string.too_many_request_error) to false
 
         AuthenticationScreenState.EMAIL_FORMAT_ERROR ->
-            stringResource(id = R.string.error_incorrect_email_format)
+            stringResource(id = R.string.error_incorrect_email_format) to true
 
-        else -> ""
+        AuthenticationScreenState.SERVER_COMMUNICATION_ERROR ->
+            stringResource(id = com.upsaclay.common.R.string.server_communication_error) to false
+
+        AuthenticationScreenState.UNKNOWN_ERROR ->
+            stringResource(id = com.upsaclay.common.R.string.unknown_error) to false
+
+        else -> "" to false
     }
 
     LaunchedEffect(Unit) {
@@ -98,17 +99,7 @@ fun AuthenticationScreen(
 
     LaunchedEffect(screenState) {
         when (screenState) {
-            AuthenticationScreenState.NETWORK_ERROR -> {
-                showToast(context = context, stringRes = com.upsaclay.common.R.string.network_error)
-            }
-
-            AuthenticationScreenState.EMAIL_NOT_VERIFIED -> {
-                showVerifyEmailDialog = true
-            }
-
-            AuthenticationScreenState.UNKNOWN_ERROR -> {
-                showToast(context = context, stringRes = com.upsaclay.common.R.string.unknown_error)
-            }
+            AuthenticationScreenState.EMAIL_NOT_VERIFIED -> showVerifyEmailDialog = true
 
             else -> {}
         }

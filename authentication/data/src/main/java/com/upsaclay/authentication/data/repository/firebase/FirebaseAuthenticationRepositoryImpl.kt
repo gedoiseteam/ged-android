@@ -20,5 +20,5 @@ class FirebaseAuthenticationRepositoryImpl(
         firebaseAuthenticationRemoteDataSource.sendVerificationEmail()
     }
 
-    override fun isUserEmailVerified(): Boolean = firebaseAuthenticationRemoteDataSource.isUserEmailVerified()
+    override suspend fun isUserEmailVerified(): Boolean = firebaseAuthenticationRemoteDataSource.isUserEmailVerified()
 }

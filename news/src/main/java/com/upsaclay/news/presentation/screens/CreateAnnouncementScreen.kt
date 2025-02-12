@@ -154,7 +154,8 @@ private fun CreateAnnouncementScreenPreview() {
                 SmallTopBarEdit(
                     onCancelClick = { },
                     onSaveClick = { },
-                    confirmText = stringResource(id = com.upsaclay.common.R.string.publish)
+                    confirmText = stringResource(id = com.upsaclay.common.R.string.publish),
+                    isButtonEnable = content.isNotBlank()
                 )
             }
         ) { contentPadding ->

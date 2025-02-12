@@ -47,7 +47,7 @@ internal class AuthenticationRepositoryImpl(
         firebaseAuthenticationRepository.sendVerificationEmail()
     }
 
-    override fun isUserEmailVerified(): Boolean = firebaseAuthenticationRepository.isUserEmailVerified()
+    override suspend fun isUserEmailVerified(): Boolean = firebaseAuthenticationRepository.isUserEmailVerified()
 
     override suspend fun setAuthenticated(isAuthenticated: Boolean) {
         authenticationLocalDataSource.setAuthenticationState(isAuthenticated)

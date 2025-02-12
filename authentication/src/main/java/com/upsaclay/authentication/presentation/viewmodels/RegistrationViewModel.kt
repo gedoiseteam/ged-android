@@ -11,18 +11,25 @@ import com.upsaclay.authentication.domain.entity.exception.AuthenticationExcepti
 import com.upsaclay.authentication.domain.usecase.RegisterUseCase
 import com.upsaclay.common.domain.usecase.VerifyEmailFormatUseCase
 import com.upsaclay.common.domain.entity.User
+import com.upsaclay.common.domain.entity.ServerCommunicationException
 import com.upsaclay.common.domain.extensions.uppercaseFirstLetter
 import com.upsaclay.common.domain.usecase.CreateUserUseCase
+import com.upsaclay.common.domain.usecase.GenerateIdUseCase
 import com.upsaclay.common.domain.usecase.IsUserExistUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.io.IOException
+
+const val MAX_REGISTRATION_STEP = 3
+private const val MIN_PASSWORD_LENGTH = 8
 
 class RegistrationViewModel(
     private val createUserUseCase: CreateUserUseCase,
     private val registerUseCase: RegisterUseCase,
     private val isUserExistUseCase: IsUserExistUseCase,
 ) : ViewModel() {
+    private val userId = GenerateIdUseCase()
     private val _screenState = MutableStateFlow(RegistrationScreenState.NOT_REGISTERED)
     val screenState: StateFlow<RegistrationScreenState> = _screenState
 
@@ -101,8 +108,6 @@ class RegistrationViewModel(
                     return@launch
                 }
 
-                val userId = registerUseCase(email.trim(), password)
-
                 val user = User(
                     id = userId,
                     firstName = firstName,
@@ -112,15 +117,17 @@ class RegistrationViewModel(
                 )
 
                 createUserUseCase(user)
+                registerUseCase(email.trim(), password)
                 _screenState.value = RegistrationScreenState.REGISTERED
             } catch (e: Exception) {
-                if (e is AuthenticationException) {
-                    _screenState.value = when (e.code) {
-                        AuthErrorCode.EMAIL_ALREADY_AFFILIATED -> RegistrationScreenState.USER_ALREADY_EXISTS
-                        else -> RegistrationScreenState.ERROR
-                    }
-                } else {
-                    _screenState.value = RegistrationScreenState.ERROR
+                _screenState.value = when(e) {
+                    is AuthenticationException -> RegistrationScreenState.USER_ALREADY_EXISTS
+
+                    is ServerCommunicationException -> RegistrationScreenState.SERVER_COMMUNICATION_ERROR
+
+                    is IOException -> RegistrationScreenState.USER_CREATION_ERROR
+
+                    else -> RegistrationScreenState.UNKNOWN_ERROR
                 }
             }
         }
@@ -137,7 +144,7 @@ class RegistrationViewModel(
         }
     }
 
-    fun validateCredentialInputs() = verifyPassword() && verifyEmail()
+    fun validateCredentialInputs() = verifyEmail() && verifyPassword()
 
     private fun verifyPassword(): Boolean {
         return when {
@@ -146,7 +153,7 @@ class RegistrationViewModel(
                 false
             }
 
-            password.length <= 8 -> {
+            password.length < MIN_PASSWORD_LENGTH -> {
                 _screenState.value = RegistrationScreenState.PASSWORD_LENGTH_ERROR
                 false
             }

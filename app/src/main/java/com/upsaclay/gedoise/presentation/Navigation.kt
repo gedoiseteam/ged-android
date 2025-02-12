@@ -48,7 +48,6 @@ import com.upsaclay.news.presentation.screens.NewsScreen
 import com.upsaclay.news.presentation.screens.ReadAnnouncementScreen
 import org.koin.androidx.compose.koinViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Navigation(mainViewModel: MainViewModel = koinViewModel()) {
     val navController = rememberNavController()

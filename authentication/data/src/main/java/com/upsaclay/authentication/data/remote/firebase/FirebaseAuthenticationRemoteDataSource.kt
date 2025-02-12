@@ -5,9 +5,13 @@ import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.FirebaseAuthException
 import com.upsaclay.authentication.domain.entity.exception.AuthErrorCode
 import com.upsaclay.authentication.domain.entity.exception.AuthenticationException
+import com.upsaclay.authentication.domain.entity.exception.UserAlreadyExistsException
 import com.upsaclay.common.domain.e
+import com.upsaclay.common.domain.entity.ServerCommunicationException
+import com.upsaclay.common.domain.entity.TooManyRequestException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.io.IOException
 
 class FirebaseAuthenticationRemoteDataSource(
     private val firebaseAuthenticationApi: FirebaseAuthenticationApi
@@ -18,17 +22,17 @@ class FirebaseAuthenticationRemoteDataSource(
                 firebaseAuthenticationApi.signInWithEmailAndPassword(email, password)
             } catch (e: FirebaseAuthException) {
                 e("Error to sign in with email and password with Firebase: ${e.message}", e)
-                throw AuthenticationException(
-                    message = e.message,
-                    cause = e,
-                    code = AuthErrorCode.fromCode(e.errorCode)
-                )
+                when (AuthErrorCode.fromCode(e.errorCode)) {
+                    AuthErrorCode.EMAIL_ALREADY_AFFILIATED -> throw UserAlreadyExistsException()
+                    AuthErrorCode.INVALID_CREDENTIALS -> throw AuthenticationException()
+                    else -> throw IOException()
+                }
             } catch (e: FirebaseNetworkException) {
-                e("Error network connection ${e.message}", e)
-                throw e
+                e("Error to sign in with email and password with Firebase because of network connection ${e.message}", e)
+                throw ServerCommunicationException()
             } catch (e: FirebaseTooManyRequestsException) {
                 e("Error to sign in with email and password with Firebase: ${e.message}", e)
-                throw e
+                throw TooManyRequestException()
             }
         }
     }
@@ -39,13 +43,17 @@ class FirebaseAuthenticationRemoteDataSource(
                 firebaseAuthenticationApi.signUpWithEmailAndPassword(email, password)
             } catch (e: FirebaseAuthException) {
                 e("Error to sign up with email and password with Firebase: ${e.message}", e)
-                throw e
+                when (AuthErrorCode.fromCode(e.errorCode)) {
+                    AuthErrorCode.EMAIL_ALREADY_AFFILIATED -> throw UserAlreadyExistsException()
+                    AuthErrorCode.INVALID_CREDENTIALS -> throw AuthenticationException()
+                    else -> throw IOException()
+                }
             } catch (e: FirebaseNetworkException) {
-                e("Error network connection ${e.message}", e)
-                throw e
+                e("Error to sign up with email and password with Firebase because of network connection ${e.message}", e)
+                throw ServerCommunicationException()
             } catch (e: FirebaseTooManyRequestsException) {
                 e("Error to sign up with email and password with Firebase: ${e.message}", e)
-                throw e
+                throw TooManyRequestException()
             }
         }
 
@@ -55,13 +63,13 @@ class FirebaseAuthenticationRemoteDataSource(
                 firebaseAuthenticationApi.signOut()
             } catch (e: FirebaseAuthException) {
                 e("Error to logout with Firebase: ${e.message}", e)
-                throw e
+                throw AuthenticationException()
             } catch (e: FirebaseNetworkException) {
                 e("Error network connection ${e.message}", e)
-                throw e
+                throw ServerCommunicationException()
             } catch (e: FirebaseTooManyRequestsException) {
                 e("Error to logout with Firebase: ${e.message}", e)
-                throw e
+                throw TooManyRequestException()
             }
         }
     }
@@ -70,18 +78,15 @@ class FirebaseAuthenticationRemoteDataSource(
         withContext(Dispatchers.IO) {
             try {
                 firebaseAuthenticationApi.sendVerificationEmail()
-            } catch (e: FirebaseAuthException) {
-                e("Error to send verification email with Firebase: ${e.message}", e)
-                throw e
             } catch (e: FirebaseNetworkException) {
                 e("Error network connection ${e.message}", e)
-                throw e
+                throw ServerCommunicationException()
             } catch (e: FirebaseTooManyRequestsException) {
                 e("Error to send verification email with Firebase: ${e.message}", e)
-                throw e
+                throw TooManyRequestException()
             }
         }
     }
 
-    fun isUserEmailVerified(): Boolean = firebaseAuthenticationApi.isUserEmailVerified()
+    suspend fun isUserEmailVerified(): Boolean = firebaseAuthenticationApi.isUserEmailVerified()
 }

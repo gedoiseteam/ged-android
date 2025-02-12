@@ -8,10 +8,9 @@ import com.upsaclay.authentication.domain.usecase.IsEmailVerifiedUseCase
 import com.upsaclay.authentication.domain.usecase.LoginUseCase
 import com.upsaclay.authentication.domain.usecase.SetUserAuthenticatedUseCase
 import com.upsaclay.authentication.presentation.viewmodels.AuthenticationViewModel
-import com.upsaclay.common.domain.entity.exception.NetworkException
+import com.upsaclay.common.domain.entity.NetworkException
 import com.upsaclay.common.domain.usecase.GetUserUseCase
 import com.upsaclay.common.domain.usecase.SetCurrentUserUseCase
-import com.upsaclay.common.domain.usecase.VerifyEmailFormatUseCase
 import com.upsaclay.common.domain.userFixture
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -126,7 +125,7 @@ class AuthenticationViewModelTest {
         authenticationViewModel.login()
 
         // Then
-        assertEquals(AuthenticationScreenState.NETWORK_ERROR, authenticationViewModel.screenState.value)
+        assertEquals(AuthenticationScreenState.SERVER_COMMUNICATION_ERROR, authenticationViewModel.screenState.value)
     }
 
     @Test

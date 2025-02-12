@@ -177,74 +177,101 @@ private fun TopSection(profilePictureUrl: String?, userFullName: String) {
 @Preview(showBackground = true)
 @Composable
 fun ProfileScreenPreview() {
-    val isLoading = true
+    var showLogoutDialog by remember { mutableStateOf(false) }
+    var showLoadingDialog by remember { mutableStateOf(false) }
 
     GedoiseTheme {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(top = MaterialTheme.spacing.medium)
-        ) {
-            Column {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(
-                            start = MaterialTheme.spacing.medium,
-                            end = MaterialTheme.spacing.medium,
-                            bottom = MaterialTheme.spacing.medium
-                        ),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Image(
-                        painter = painterResource(id = com.upsaclay.common.R.drawable.default_profile_picture),
-                        contentDescription = "",
-                        contentScale = ContentScale.Crop,
+
+        if (showLogoutDialog) {
+            SensibleActionDialog(
+                title = stringResource(id = R.string.logout),
+                text = stringResource(id = R.string.logout_dialog_message),
+                cancelText = stringResource(id = com.upsaclay.common.R.string.cancel),
+                confirmText = stringResource(id = R.string.logout),
+                onConfirm = { showLogoutDialog = false },
+                onDismiss = { showLogoutDialog = false },
+                onCancel = { showLogoutDialog = false }
+            )
+        }
+
+        if (showLoadingDialog) {
+            LoadingDialog(message = stringResource(R.string.disconnection))
+        }
+
+        Scaffold(
+            topBar = {
+                SmallTopBarBack(
+                    onBackClick = { },
+                    title = stringResource(id = R.string.profile)
+                )
+            }
+        ) { contentPadding ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = contentPadding.calculateTopPadding())
+            ) {
+                Column {
+                    Row(
                         modifier = Modifier
-                            .size(70.dp)
+                            .fillMaxWidth()
+                            .padding(
+                                start = MaterialTheme.spacing.medium,
+                                end = MaterialTheme.spacing.medium,
+                                bottom = MaterialTheme.spacing.medium
+                            ),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Image(
+                            painter = painterResource(id = com.upsaclay.common.R.drawable.default_profile_picture),
+                            contentDescription = "",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .size(70.dp)
+                        )
+
+                        Spacer(modifier = Modifier.width(MaterialTheme.spacing.medium))
+
+                        Text(
+                            text = userFixture.firstName + " " + userFixture.lastName,
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+
+                    HorizontalDivider(color = GedoiseColor.LightGray)
+
+                    ClickableItem(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = { Text(text = stringResource(id = R.string.account_informations)) },
+                        icon = {
+                            Icon(
+                                modifier = Modifier.size(28.dp),
+                                painter = painterResource(id = com.upsaclay.common.R.drawable.ic_person),
+                                contentDescription = stringResource(id = R.string.account_icon_description)
+                            )
+                        },
+                        onClick = { }
                     )
 
-                    Spacer(modifier = Modifier.width(MaterialTheme.spacing.medium))
-
-                    Text(
-                        text = userFixture.firstName + " " + userFixture.lastName,
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Medium
+                    ClickableItem(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = {
+                            Text(
+                                text = stringResource(id = R.string.logout),
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        },
+                        icon = {
+                            Icon(
+                                painter = painterResource(id = com.upsaclay.common.R.drawable.ic_logout),
+                                contentDescription = stringResource(id = R.string.logout_icon_description),
+                                tint = MaterialTheme.colorScheme.error
+                            )
+                        },
+                        onClick = { showLogoutDialog = true }
                     )
                 }
-
-                HorizontalDivider(color = GedoiseColor.LightGray)
-
-                ClickableItem(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = { Text(text = stringResource(id = R.string.account_informations)) },
-                    icon = {
-                        Icon(
-                            modifier = Modifier.size(28.dp),
-                            painter = painterResource(id = com.upsaclay.common.R.drawable.ic_person),
-                            contentDescription = stringResource(id = R.string.account_icon_description)
-                        )
-                    },
-                    onClick = { }
-                )
-
-                ClickableItem(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = {
-                        Text(
-                            text = stringResource(id = R.string.logout),
-                            color = MaterialTheme.colorScheme.error
-                        )
-                    },
-                    icon = {
-                        Icon(
-                            painter = painterResource(id = com.upsaclay.common.R.drawable.ic_logout),
-                            contentDescription = stringResource(id = R.string.logout_icon_description),
-                            tint = MaterialTheme.colorScheme.error
-                        )
-                    },
-                    onClick = { }
-                )
             }
         }
     }

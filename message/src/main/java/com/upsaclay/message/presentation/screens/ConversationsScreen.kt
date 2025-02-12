@@ -119,7 +119,7 @@ private fun CreateConversationFAB(
         containerColor = MaterialTheme.colorScheme.secondaryContainer
     ) {
         Icon(
-            painter = painterResource(id = com.upsaclay.common.R.drawable.ic_add),
+            painter = painterResource(id = R.drawable.ic_message_add),
             contentDescription = stringResource(id = R.string.ic_fab_button_add_description)
         )
     }

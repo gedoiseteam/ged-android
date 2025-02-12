@@ -6,19 +6,19 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.upsaclay.authentication.domain.entity.AuthenticationScreenState
-import com.upsaclay.authentication.domain.entity.exception.AuthErrorCode
 import com.upsaclay.authentication.domain.entity.exception.AuthenticationException
-import com.upsaclay.authentication.domain.entity.exception.TooManyRequestException
 import com.upsaclay.authentication.domain.usecase.IsEmailVerifiedUseCase
 import com.upsaclay.authentication.domain.usecase.LoginUseCase
 import com.upsaclay.authentication.domain.usecase.SetUserAuthenticatedUseCase
-import com.upsaclay.common.domain.entity.exception.NetworkException
+import com.upsaclay.common.domain.entity.ServerCommunicationException
+import com.upsaclay.common.domain.entity.TooManyRequestException
 import com.upsaclay.common.domain.usecase.GetUserUseCase
 import com.upsaclay.common.domain.usecase.SetCurrentUserUseCase
 import com.upsaclay.common.domain.usecase.VerifyEmailFormatUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.io.IOException
 
 class AuthenticationViewModel(
     private val loginUseCase: LoginUseCase,
@@ -61,17 +61,13 @@ class AuthenticationViewModel(
                 }
             } catch (e: Exception) {
                 _screenState.value = when (e) {
-                    is NetworkException -> AuthenticationScreenState.NETWORK_ERROR
+                    is IOException -> AuthenticationScreenState.SERVER_COMMUNICATION_ERROR
 
                     is TooManyRequestException -> AuthenticationScreenState.TOO_MANY_REQUESTS_ERROR
 
-                    is AuthenticationException -> {
-                        if (e.code == AuthErrorCode.INVALID_CREDENTIALS) {
-                            AuthenticationScreenState.AUTHENTICATION_ERROR
-                        } else {
-                            AuthenticationScreenState.UNKNOWN_ERROR
-                        }
-                    }
+                    is AuthenticationException -> AuthenticationScreenState.AUTHENTICATION_ERROR
+
+                    is ServerCommunicationException -> AuthenticationScreenState.SERVER_COMMUNICATION_ERROR
 
                     else -> AuthenticationScreenState.UNKNOWN_ERROR
                 }
