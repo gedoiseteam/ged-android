@@ -1,5 +1,6 @@
 package com.upsaclay.gedoise.presentation.components
 
+import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,7 +12,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemColors
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -42,7 +46,6 @@ fun HomeTopBar(navController: NavController, profilePictureUrl: String?) {
         title = {
             Text(
                 text = stringResource(id = R.string.app_name),
-                textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.titleLarge,
             )
@@ -182,7 +185,7 @@ private fun MainTopBarPreview() {
     }
 }
 
-@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun MainBottomBarPreview() {
     val messageWithNotification = BottomNavigationItem.Message()

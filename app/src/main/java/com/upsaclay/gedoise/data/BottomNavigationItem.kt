@@ -19,8 +19,8 @@ sealed class BottomNavigationItem(
         override val label: Int = R.string.home,
         override var badges: Int = 0,
         override var hasNews: Boolean = false,
-        override val filledIcon: Int = com.upsaclay.common.R.drawable.ic_filled_home,
-        override val outlinedIcon: Int = com.upsaclay.common.R.drawable.ic_outlined_home,
+        override val filledIcon: Int = com.upsaclay.common.R.drawable.ic_fill_home,
+        override val outlinedIcon: Int = com.upsaclay.common.R.drawable.ic_outline_home,
         override val iconDescription: Int = R.string.home_icon_description
     ) : BottomNavigationItem(screen, label, badges, hasNews, filledIcon, outlinedIcon, iconDescription)
 
@@ -29,8 +29,8 @@ sealed class BottomNavigationItem(
         override val label: Int = R.string.messages,
         override var badges: Int = 0,
         override var hasNews: Boolean = false,
-        override val filledIcon: Int = com.upsaclay.common.R.drawable.ic_filled_message,
-        override val outlinedIcon: Int = com.upsaclay.common.R.drawable.ic_outlined_message,
+        override val filledIcon: Int = com.upsaclay.common.R.drawable.ic_fill_message,
+        override val outlinedIcon: Int = com.upsaclay.common.R.drawable.ic_outline_message,
         override val iconDescription: Int = R.string.message_icon_description
     ) : BottomNavigationItem(screen, label, badges, hasNews, filledIcon, outlinedIcon, iconDescription)
 
@@ -39,8 +39,8 @@ sealed class BottomNavigationItem(
         override val label: Int = R.string.calendar,
         override var badges: Int = 0,
         override var hasNews: Boolean = false,
-        override val filledIcon: Int = com.upsaclay.common.R.drawable.ic_filled_calendar,
-        override val outlinedIcon: Int = com.upsaclay.common.R.drawable.ic_outlined_calendar,
+        override val filledIcon: Int = com.upsaclay.common.R.drawable.ic_fill_calendar,
+        override val outlinedIcon: Int = com.upsaclay.common.R.drawable.ic_outline_calendar,
         override val iconDescription: Int = R.string.calendar_icon_description
     ) : BottomNavigationItem(screen, label, badges, hasNews, filledIcon, outlinedIcon, iconDescription)
 
@@ -49,8 +49,8 @@ sealed class BottomNavigationItem(
         override val label: Int = R.string.forum,
         override var badges: Int = 0,
         override var hasNews: Boolean = false,
-        override val filledIcon: Int = com.upsaclay.common.R.drawable.ic_filled_forum,
-        override val outlinedIcon: Int = com.upsaclay.common.R.drawable.ic_outlined_forum,
+        override val filledIcon: Int = com.upsaclay.common.R.drawable.ic_fill_forum,
+        override val outlinedIcon: Int = com.upsaclay.common.R.drawable.ic_outline_forum,
         override val iconDescription: Int = R.string.forum_icon_description
     ) : BottomNavigationItem(screen, label, badges, hasNews, filledIcon, outlinedIcon, iconDescription)
 }

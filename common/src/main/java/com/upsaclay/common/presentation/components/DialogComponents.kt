@@ -1,5 +1,6 @@
 package com.upsaclay.common.presentation.components
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -112,6 +113,7 @@ fun LoadingDialog(message: String = stringResource(id = R.string.loading)) {
             Text(
                 text = message,
                 style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface,
                 textAlign = TextAlign.Center
             )
         }
@@ -124,7 +126,7 @@ fun LoadingDialog(message: String = stringResource(id = R.string.loading)) {
  =====================================================================
  */
 
-@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun SimpleDialogPreview() {
     GedoiseTheme {
@@ -140,7 +142,7 @@ private fun SimpleDialogPreview() {
     }
 }
 
-@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun SensibleActionDialogPreview() {
     GedoiseTheme {
@@ -156,9 +158,9 @@ private fun SensibleActionDialogPreview() {
     }
 }
 
-@Preview(showBackground = true, widthDp = 300, heightDp = 300)
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun InformationDialogPreview() {
+private fun LoadingDialogPreview() {
     GedoiseTheme {
         LoadingDialog(
             message = "Waiting..."

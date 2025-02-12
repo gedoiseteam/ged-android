@@ -50,7 +50,7 @@ class AccountViewModelTest {
         // Then
         assertEquals(null, accountViewModel.profilePictureUri)
         assertEquals(userFixture, accountViewModel.currentUser.value)
-        assertEquals(AccountScreenState.READ, accountViewModel.accountScreenState.value)
+        assertEquals(AccountScreenState.READ, accountViewModel.screenState.value)
     }
 
     @Test
@@ -74,7 +74,7 @@ class AccountViewModelTest {
         accountViewModel.updateAccountScreenState(screenState)
 
         // Then
-        assertEquals(screenState, accountViewModel.accountScreenState.value)
+        assertEquals(screenState, accountViewModel.screenState.value)
     }
 
     @Test
@@ -96,7 +96,7 @@ class AccountViewModelTest {
         accountViewModel.updateUserProfilePicture()
 
         // Then
-        assertEquals(AccountScreenState.PROFILE_PICTURE_UPDATED, accountViewModel.accountScreenState.value)
+        assertEquals(AccountScreenState.PROFILE_PICTURE_UPDATED, accountViewModel.screenState.value)
         coVerify { updateProfilePictureUseCase(any()) }
     }
 
@@ -124,7 +124,7 @@ class AccountViewModelTest {
         accountViewModel.updateUserProfilePicture()
 
         // Then
-        assertEquals(AccountScreenState.PROFILE_PICTURE_UPDATE_ERROR, accountViewModel.accountScreenState.value)
+        assertEquals(AccountScreenState.PROFILE_PICTURE_UPDATE_ERROR, accountViewModel.screenState.value)
     }
 
     @Test
@@ -133,7 +133,7 @@ class AccountViewModelTest {
         accountViewModel.deleteUserProfilePicture()
 
         // Then
-        assertEquals(AccountScreenState.PROFILE_PICTURE_UPDATED, accountViewModel.accountScreenState.value)
+        assertEquals(AccountScreenState.PROFILE_PICTURE_UPDATED, accountViewModel.screenState.value)
         coVerify { deleteProfilePictureUseCase(userFixture.id, userFixture.profilePictureUrl!!) }
     }
 
@@ -155,6 +155,6 @@ class AccountViewModelTest {
         accountViewModel.deleteUserProfilePicture()
 
         // Then
-        assertEquals(AccountScreenState.PROFILE_PICTURE_UPDATE_ERROR, accountViewModel.accountScreenState.value)
+        assertEquals(AccountScreenState.PROFILE_PICTURE_UPDATE_ERROR, accountViewModel.screenState.value)
     }
 }

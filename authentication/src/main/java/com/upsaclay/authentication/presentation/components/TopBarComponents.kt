@@ -1,5 +1,6 @@
 package com.upsaclay.authentication.presentation.components
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
@@ -87,7 +88,7 @@ internal fun RegistrationTopBar(
  =====================================================================
  */
 
-@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 internal fun RegistrationTopBarPreview() {
     GedoiseTheme {

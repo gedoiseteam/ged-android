@@ -1,5 +1,6 @@
 package com.upsaclay.common.presentation.components
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -14,6 +15,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -52,7 +54,7 @@ fun SmallTopBarEdit(
     title: String = "",
     onCancelClick: () -> Unit,
     onSaveClick: () -> Unit,
-    isButtonEnable: Boolean = true,
+    isButtonEnable: Boolean = false,
     confirmText: String = stringResource(id = com.upsaclay.common.R.string.save)
 ) {
     TopAppBar(
@@ -77,7 +79,10 @@ fun SmallTopBarEdit(
             ) {
                 Text(text = confirmText)
             }
-        }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.background
+        )
     )
 }
 
@@ -98,7 +103,7 @@ private fun SmallTopBarBackPreview() {
     }
 }
 
-@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun SmallTopBarEditPreview() {
     GedoiseTheme {

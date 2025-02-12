@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -28,6 +29,7 @@ import com.upsaclay.gedoise.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun AccountModelBottomSheet(
+    modifier: Modifier = Modifier,
     onDismissRequest: () -> Unit,
     onNewProfilePictureClick: () -> Unit,
     showDeleteProfilePicture: Boolean = false,
@@ -36,6 +38,7 @@ internal fun AccountModelBottomSheet(
     val sheetState = rememberModalBottomSheetState()
 
     ModalBottomSheet(
+        modifier = modifier,
         onDismissRequest = onDismissRequest,
         sheetState = sheetState
     ) {
@@ -53,7 +56,9 @@ internal fun AccountModelBottomSheet(
 
         if (showDeleteProfilePicture) {
             ClickableItem(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(stringResource(id = R.string.account_screen_delete_profile_picture_button_tag)),
                 text = {
                     Text(
                         text = stringResource(id = R.string.delete_profile_picture),

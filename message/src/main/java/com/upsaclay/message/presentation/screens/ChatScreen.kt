@@ -1,5 +1,6 @@
 package com.upsaclay.message.presentation.screens
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -183,7 +184,7 @@ private fun messagePadding(
  =====================================================================
  */
 
-@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun ChatScreenPreview() {
     var text by remember { mutableStateOf("") }

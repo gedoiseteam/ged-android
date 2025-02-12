@@ -1,5 +1,6 @@
 package com.upsaclay.authentication.presentation.screens
 
+import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -289,7 +290,7 @@ private fun InputsSection(
  =====================================================================
  */
 
-@Preview(widthDp = 360, heightDp = 740, showBackground = true)
+@Preview(widthDp = 360, heightDp = 740, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun AuthenticationScreenPreview() {
     var isLoading by remember { mutableStateOf(false) }

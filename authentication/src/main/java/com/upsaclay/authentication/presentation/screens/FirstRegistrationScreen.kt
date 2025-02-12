@@ -1,5 +1,6 @@
 package com.upsaclay.authentication.presentation.screens
 
+import android.content.res.Configuration
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -118,7 +119,7 @@ fun FirstRegistrationScreen(
  =====================================================================
  */
 
-@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun FirstRegistrationScreenPreview() {
     var firstName by remember { mutableStateOf("") }

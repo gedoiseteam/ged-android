@@ -1,5 +1,6 @@
 package com.upsaclay.message.presentation.components
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -30,7 +31,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.upsaclay.common.domain.usecase.FormatLocalDateTimeUseCase
 import com.upsaclay.common.presentation.components.ProfilePicture
-import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.message.R
@@ -62,7 +62,7 @@ fun SentMessageItem(
         when (message.state) {
             MessageState.LOADING -> Icon(
                 modifier = Modifier.scale(0.7f),
-                painter = painterResource(com.upsaclay.common.R.drawable.ic_outlined_send),
+                painter = painterResource(com.upsaclay.common.R.drawable.ic_outline_send),
                 contentDescription = "",
                 tint = Color.Gray
             )
@@ -101,7 +101,7 @@ fun ReceiveMessageItem(
         MessageText(
             text = message.content,
             date = message.date,
-            backgroundColor = GedoiseColor.LightGray,
+            backgroundColor = MaterialTheme.colorScheme.surface,
             textColor = MaterialTheme.colorScheme.onBackground,
             dateTimeTextColor = Color(0xFF8E8E93)
         )
@@ -163,7 +163,7 @@ private val longtext = "Bonjour, j'espère que vous allez bien. " +
         "Par exemple, en ce qui concerne la gestion des priorités, il serait peut-être utile de revoir nos méthodes " +
         "afin d'être sûrs que nous concentrons nos efforts sur les éléments les plus importants."
 
-@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun SentMessageItemPreview() {
     GedoiseTheme {
