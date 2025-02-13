@@ -44,8 +44,6 @@ fun CreateAnnouncementScreen(
     createAnnouncementViewModel: CreateAnnouncementViewModel = koinViewModel()
 ) {
     val context = LocalContext.current
-    val focusManager = LocalFocusManager.current
-    val keyboardController = LocalSoftwareKeyboardController.current
     var showLoadingDialog by remember { mutableStateOf(false) }
     val state by createAnnouncementViewModel.screenState.collectAsState()
     val title = createAnnouncementViewModel.title
@@ -60,8 +58,6 @@ fun CreateAnnouncementScreen(
 
             AnnouncementScreenState.CREATED -> {
                 showLoadingDialog = false
-                focusManager.clearFocus()
-                keyboardController?.hide()
                 navController.popBackStack()
             }
 
@@ -80,14 +76,8 @@ fun CreateAnnouncementScreen(
             SmallTopBarEdit(
                 modifier = Modifier.fillMaxWidth(),
                 confirmText = stringResource(id = com.upsaclay.common.R.string.publish),
-                onCancelClick = {
-                    focusManager.clearFocus()
-                    keyboardController?.hide()
-                    navController.popBackStack()
-                },
-                onSaveClick = {
-                    createAnnouncementViewModel.createAnnouncement()
-                },
+                onCancelClick = { navController.popBackStack() },
+                onSaveClick = { createAnnouncementViewModel.createAnnouncement() },
                 isButtonEnable = content.isNotBlank()
             )
         }

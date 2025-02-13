@@ -28,6 +28,7 @@ import com.upsaclay.common.presentation.components.ProfilePicture
 import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
+import com.upsaclay.news.R
 import com.upsaclay.news.domain.announcementFixture
 import com.upsaclay.news.domain.entity.Announcement
 import com.upsaclay.news.domain.entity.AnnouncementState
@@ -41,7 +42,7 @@ internal fun AnnouncementHeader(
 
     val elapsedTimeValue: String = when (elapsedTime) {
         is ElapsedTime.Now -> stringResource(
-            com.upsaclay.common.R.string.second_ago_short,
+            com.upsaclay.common.R.string.now,
             elapsedTime.value
         )
 

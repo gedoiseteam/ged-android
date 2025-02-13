@@ -225,7 +225,7 @@ class RegistrationViewModelTest {
     @Test
     fun register_should_update_screen_state_to_USER_ALREADY_EXISTS_when_email_is_already_affiliated() = runTest {
         // Given
-        coEvery { registerUseCase(any(), any()) } throws AuthenticationException(code = AuthErrorCode.EMAIL_ALREADY_AFFILIATED)
+        coEvery { registerUseCase(any(), any()) } throws AuthenticationException()
 
         // When
         registrationViewModel.register()

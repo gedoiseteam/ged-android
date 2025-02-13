@@ -75,6 +75,14 @@ class AuthenticationViewModel(
         }
     }
 
+    fun resetEmail() {
+        email = ""
+    }
+
+    fun resetPassword() {
+        password = ""
+    }
+
     fun resetScreenState() {
         _screenState.value = AuthenticationScreenState.DEFAULT
     }

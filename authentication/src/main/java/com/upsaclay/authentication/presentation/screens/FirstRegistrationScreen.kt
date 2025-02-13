@@ -29,7 +29,6 @@ import androidx.navigation.compose.rememberNavController
 import com.upsaclay.authentication.R
 import com.upsaclay.authentication.domain.entity.RegistrationScreenState
 import com.upsaclay.authentication.presentation.components.RegistrationTopBar
-import com.upsaclay.authentication.presentation.viewmodels.MAX_REGISTRATION_STEP
 import com.upsaclay.authentication.presentation.viewmodels.RegistrationViewModel
 import com.upsaclay.common.domain.entity.Screen
 import com.upsaclay.common.presentation.components.ErrorTextWithIcon
@@ -58,9 +57,7 @@ fun FirstRegistrationScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .pointerInput(Unit) {
-                    detectTapGestures(onTap = {
-                        focusManager.clearFocus()
-                    })
+                    detectTapGestures(onTap = { focusManager.clearFocus() })
                 },
             verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium)
         ) {

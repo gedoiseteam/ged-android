@@ -1,15 +1,14 @@
 package com.upsaclay.authentication
 
 import com.upsaclay.authentication.domain.entity.AuthenticationScreenState
-import com.upsaclay.authentication.domain.entity.exception.TooManyRequestException
 import com.upsaclay.authentication.domain.usecase.IsEmailVerifiedUseCase
 import com.upsaclay.authentication.domain.usecase.SendVerificationEmailUseCase
 import com.upsaclay.authentication.domain.usecase.SetUserAuthenticatedUseCase
 import com.upsaclay.authentication.presentation.viewmodels.EmailVerificationViewModel
+import com.upsaclay.common.domain.entity.TooManyRequestException
 import com.upsaclay.common.domain.userFixture
 import io.mockk.coEvery
 import io.mockk.coVerify
-import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -40,7 +39,7 @@ class EmailVerificationViewModelTest {
             setUserAuthenticatedUseCase = setUserAuthenticatedUseCase
         )
 
-        every { isEmailVerifiedUseCase() } returns true
+        coEvery { isEmailVerifiedUseCase() } returns true
         coEvery { sendVerificationEmailUseCase() } returns Unit
         coEvery { setUserAuthenticatedUseCase(any()) } returns Unit
     }

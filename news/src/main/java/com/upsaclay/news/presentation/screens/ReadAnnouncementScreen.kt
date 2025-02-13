@@ -67,8 +67,9 @@ fun ReadAnnouncementScreen(
     announcementId: String,
     modifier: Modifier = Modifier,
     navController: NavController,
-    readAnnouncementViewModel: ReadAnnouncementViewModel =
-        koinViewModel(parameters = { parametersOf(announcementId) })
+    readAnnouncementViewModel: ReadAnnouncementViewModel = koinViewModel(
+        parameters = { parametersOf(announcementId) }
+    )
 ) {
     val context = LocalContext.current
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -76,7 +77,6 @@ fun ReadAnnouncementScreen(
     var showLoadingDialog by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
-
     val user by readAnnouncementViewModel.currentUser.collectAsState()
     val screenState by readAnnouncementViewModel.screenState.collectAsState()
     val announcement by readAnnouncementViewModel.announcement.collectAsState()
@@ -113,6 +113,7 @@ fun ReadAnnouncementScreen(
     if (showDeleteAnnouncementDialog) {
         SensibleActionDialog(
             modifier = Modifier.testTag(stringResource(id = R.string.read_screen_delete_dialog_tag)),
+            title = stringResource(id = R.string.delete_announcement_dialog_title),
             text = stringResource(id = R.string.delete_announcement_dialog_text),
             onDismiss = { showDeleteAnnouncementDialog = false },
             confirmText = stringResource(id = com.upsaclay.common.R.string.delete),
@@ -184,7 +185,7 @@ fun ReadAnnouncementScreen(
                 ModalBottomSheet(
                     modifier = Modifier.testTag(stringResource(id = R.string.read_screen_bottom_sheet_tag)),
                     onDismissRequest = { showBottomSheet = false },
-                    sheetState = sheetState
+                    sheetState = sheetState,
                 ) {
                     ClickableItem(
                         modifier = Modifier
@@ -226,7 +227,7 @@ fun ReadAnnouncementScreen(
                         }
                     )
 
-                    Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
+                    Spacer(modifier = Modifier.height(MaterialTheme.spacing.extraLarge))
                 }
             }
         }

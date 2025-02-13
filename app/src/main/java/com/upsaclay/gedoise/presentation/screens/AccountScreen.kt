@@ -1,5 +1,6 @@
 package com.upsaclay.gedoise.presentation.screens
 
+import android.content.res.Configuration
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -258,7 +259,7 @@ private fun ProfilePictureSection(
  =====================================================================
  */
 
-@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun AccountScreenPreview() {
     val scaleImage = 1.8f

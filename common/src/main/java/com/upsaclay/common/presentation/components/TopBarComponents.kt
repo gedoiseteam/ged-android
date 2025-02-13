@@ -2,10 +2,12 @@ package com.upsaclay.common.presentation.components
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -19,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
 
@@ -70,11 +73,13 @@ fun SmallTopBarEdit(
         },
         actions = {
             Button(
+                modifier = Modifier.padding(end = MaterialTheme.spacing.small),
                 enabled = isButtonEnable,
                 contentPadding = PaddingValues(
                     vertical = MaterialTheme.spacing.default,
                     horizontal = MaterialTheme.spacing.smallMedium
                 ),
+                colors = ButtonDefaults.buttonColors(contentColor = GedoiseColor.White),
                 onClick = onSaveClick
             ) {
                 Text(text = confirmText)

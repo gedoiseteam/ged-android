@@ -53,7 +53,7 @@ fun ThirdRegistrationScreen(
     val focusManager = LocalFocusManager.current
     val isLoading = registrationState == RegistrationScreenState.LOADING
 
-    var (errorMessage, inputsError) = when (registrationState) {
+    val (errorMessage, inputsError) = when (registrationState) {
         RegistrationScreenState.UNRECOGNIZED_ACCOUNT -> stringResource(id = R.string.unrecognized_account) to true
         RegistrationScreenState.EMPTY_FIELDS_ERROR -> stringResource(id = com.upsaclay.common.R.string.empty_fields_error) to true
         RegistrationScreenState.EMAIL_FORMAT_ERROR -> stringResource(id = R.string.error_incorrect_email_format) to true

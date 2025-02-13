@@ -1,6 +1,8 @@
 package com.upsaclay.gedoise.presentation.screens
 
+import android.content.res.Configuration
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,6 +18,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -24,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -56,10 +60,17 @@ fun ProfileScreen(
     var showLogoutDialog by remember { mutableStateOf(false) }
     var showLoadingDialog by remember { mutableStateOf(false) }
     val profileState by profileViewModel.screenState.collectAsState()
+    val dividerColor = if (isSystemInDarkTheme()) GedoiseColor.DarkGray else Color.Gray
 
     LaunchedEffect(profileState) {
         if(profileState == ProfileScreenState.LOADING) {
             showLoadingDialog = true
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            showLogoutDialog = false
         }
     }
 
@@ -102,7 +113,7 @@ fun ProfileScreen(
                     userFullName = user?.fullName ?: "Unknown"
                 )
 
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                HorizontalDivider(color = dividerColor)
 
                 ClickableItem(
                     modifier = Modifier
@@ -176,11 +187,12 @@ private fun TopSection(profilePictureUrl: String?, userFullName: String) {
  =====================================================================
  */
 
-@Preview(showBackground = true)
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun ProfileScreenPreview() {
     var showLogoutDialog by remember { mutableStateOf(false) }
     var showLoadingDialog by remember { mutableStateOf(false) }
+    val dividerColor = if (isSystemInDarkTheme()) GedoiseColor.DarkGray else Color.LightGray
 
     GedoiseTheme {
 
@@ -241,7 +253,7 @@ fun ProfileScreenPreview() {
                         )
                     }
 
-                    HorizontalDivider(color = GedoiseColor.LightGray)
+                    HorizontalDivider(color = dividerColor)
 
                     ClickableItem(
                         modifier = Modifier.fillMaxWidth(),

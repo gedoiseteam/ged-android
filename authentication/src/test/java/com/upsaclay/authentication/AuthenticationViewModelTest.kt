@@ -1,20 +1,18 @@
 package com.upsaclay.authentication
 
 import com.upsaclay.authentication.domain.entity.AuthenticationScreenState
-import com.upsaclay.authentication.domain.entity.exception.AuthErrorCode
 import com.upsaclay.authentication.domain.entity.exception.AuthenticationException
-import com.upsaclay.authentication.domain.entity.exception.TooManyRequestException
 import com.upsaclay.authentication.domain.usecase.IsEmailVerifiedUseCase
 import com.upsaclay.authentication.domain.usecase.LoginUseCase
 import com.upsaclay.authentication.domain.usecase.SetUserAuthenticatedUseCase
 import com.upsaclay.authentication.presentation.viewmodels.AuthenticationViewModel
-import com.upsaclay.common.domain.entity.NetworkException
+import com.upsaclay.common.domain.entity.ServerCommunicationException
+import com.upsaclay.common.domain.entity.TooManyRequestException
 import com.upsaclay.common.domain.usecase.GetUserUseCase
 import com.upsaclay.common.domain.usecase.SetCurrentUserUseCase
 import com.upsaclay.common.domain.userFixture
 import io.mockk.coEvery
 import io.mockk.coVerify
-import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -51,7 +49,7 @@ class AuthenticationViewModelTest {
             isEmailVerifiedUseCase = isEmailVerifiedUseCase
         )
 
-        every { isEmailVerifiedUseCase() } returns true
+        coEvery { isEmailVerifiedUseCase() } returns true
         coEvery { loginUseCase(any(), any()) } returns Unit
         coEvery { setUserAuthenticatedUseCase(any()) } returns Unit
         coEvery { getUserUseCase.withEmail(any()) } returns userFixture
@@ -95,7 +93,7 @@ class AuthenticationViewModelTest {
     @Test
     fun login_sets_screen_state_to_EMAIL_NOT_VERIFIED_when_email_is_not_verified() = runTest {
         // Given
-        every { isEmailVerifiedUseCase() } returns false
+        coEvery { isEmailVerifiedUseCase() } returns false
 
         // When
         authenticationViewModel.login()
@@ -117,9 +115,9 @@ class AuthenticationViewModelTest {
     }
 
     @Test
-    fun login_sets_screen_state_to_NETWORK_ERROR_when_a_network_exception_is_thrown() = runTest {
+    fun login_sets_screen_state_to_SERVER_COMMUNICATION_ERROR_when_a_server_communication_exception_is_thrown() = runTest {
         // Given
-        coEvery { loginUseCase(any(), any()) } throws NetworkException()
+        coEvery { loginUseCase(any(), any()) } throws ServerCommunicationException()
 
         // When
         authenticationViewModel.login()
@@ -143,7 +141,7 @@ class AuthenticationViewModelTest {
     @Test
     fun login_sets_screen_state_to_AUTHENTICATION_ERROR_when_an_authentication_exception_is_thrown_with_invalid_credentials_code() = runTest {
         // Given
-        coEvery { loginUseCase(any(), any()) } throws AuthenticationException(code = AuthErrorCode.INVALID_CREDENTIALS)
+        coEvery { loginUseCase(any(), any()) } throws AuthenticationException()
 
         // When
         authenticationViewModel.login()

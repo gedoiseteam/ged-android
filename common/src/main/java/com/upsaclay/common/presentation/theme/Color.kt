@@ -16,8 +16,10 @@ internal val onSurfaceVariantLight = Color(0xFF4F4F4F)
 internal val onSurfaceLight = white
 internal val backgroundLight = Color(0xFFFFFFFF)
 internal val onBackgroundLight = black
+internal val outlineLight = Color(0xFF74777E)
+internal val outlineVariantLight = Color(0xFFC4C8D0)
 
-internal val primaryDark = Color(0xFF8598CB)
+internal val primaryDark = Color(0xFF67708A)
 internal val onPrimaryDark = Color(0xFF0E1B34)
 internal val errorDark = Color(0xFFFF5D4E)
 internal val surfaceDark = Color(0xFF1B1C1F)
@@ -27,6 +29,8 @@ internal val onSecondaryContainerDark = white
 internal val secondaryContainerDark = Color(0xFF444958)
 internal val backgroundDark = Color(0xFF1B1C1F)
 internal val onBackgroundDark = white
+internal val outlineDark = Color(0xFF8F9299)
+internal val outlineVariantDark = Color(0xFFC4C8D0)
 
 object GedoiseColor {
     val LittleTransparentWhite = Color(0x66FFFFFF)
@@ -36,4 +40,10 @@ object GedoiseColor {
     val PreviewText = Color(0xFF6F7181)
     val ProfilePictureErrorLight = Color(0xFFEBEDEE)
     val OnlineColor = Color(0xFF4ACB1B)
+    val InputBackgroundLight = Color(0xFFEEEEEE)
+    val InputBackgroundDark = Color(0xFF323232)
+    val InputForegroundLight =  Color(0xFF646464)
+    val InputForegroundDark =  Color(0xFF929298)
+    val Black = black
+    val White = white
 }

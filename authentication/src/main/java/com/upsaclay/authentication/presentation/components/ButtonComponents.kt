@@ -1,6 +1,7 @@
 package com.upsaclay.authentication.presentation.components
 
 import android.content.res.Configuration
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Button
@@ -17,6 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.upsaclay.common.presentation.components.CircularProgressBar
 import com.upsaclay.common.presentation.components.PrimaryButton
+import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 
 @Composable
@@ -43,7 +45,7 @@ private fun LoadingLargeButton(modifier: Modifier = Modifier) {
         onClick = { },
         enabled = false,
         colors = ButtonColors(
-            contentColor = MaterialTheme.colorScheme.onPrimary,
+            contentColor = GedoiseColor.White,
             containerColor = MaterialTheme.colorScheme.primary,
             disabledContainerColor = MaterialTheme.colorScheme.primary,
             disabledContentColor = MaterialTheme.colorScheme.primary
@@ -51,7 +53,7 @@ private fun LoadingLargeButton(modifier: Modifier = Modifier) {
         modifier = modifier.height(45.dp)
     ) {
         CircularProgressBar(
-            color = MaterialTheme.colorScheme.onPrimary,
+            color = GedoiseColor.White,
             scale = 0.6f
         )
     }
@@ -63,7 +65,7 @@ private fun LoadingLargeButton(modifier: Modifier = Modifier) {
  =====================================================================
  */
 
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun LoginButtonPreview() {
     var isLoading by remember { mutableStateOf(false) }

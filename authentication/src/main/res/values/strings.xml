@@ -19,7 +19,7 @@
     <string name="email_verification_explanation_begining">Un lien a été à l\'adresse suivante : </string>
     <string name="email_verification_explanation_end">. Veuillez cliquer dessus pour finaliser l\'inscription.</string>
     <string name="email_not_verified">Veuillez valider votre adresse e-mail avant de continuer.</string>
-    <string name="email_not_verified_dialog_message">Veuillez valider votre adresse e-mail avant de continuer.</string>
+    <string name="email_not_verified_dialog_title">Adresse e-mail non vérifié</string>
     <string name="enter_email_password">Saisissez votre adresse e-mail et votre mot de passe</string>
     <string name="enter_school_credentials">Saisissez vos identifiants universitaire</string>
     <string name="select_level_school">Sélectionnez votre niveau d\'étude</string>

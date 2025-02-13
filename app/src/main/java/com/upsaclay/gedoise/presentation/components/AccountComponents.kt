@@ -1,5 +1,7 @@
 package com.upsaclay.gedoise.presentation.components
 
+import android.content.res.Configuration
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,16 +17,20 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import com.upsaclay.common.presentation.components.ClickableItem
 import com.upsaclay.common.presentation.components.SmallTopBarBack
 import com.upsaclay.common.presentation.components.SmallTopBarEdit
 import com.upsaclay.common.presentation.theme.GedoiseColor
+import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.gedoise.R
+import com.upsaclay.gedoise.domain.entities.AccountInfo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -82,14 +88,15 @@ internal fun AccountModelBottomSheet(
 @Composable
 internal fun AccountInfoItem(
     modifier: Modifier = Modifier,
-    accountInfo: com.upsaclay.gedoise.domain.entities.AccountInfo
+    accountInfo: AccountInfo
 ) {
+    val labelColor = if (isSystemInDarkTheme()) Color.Gray else GedoiseColor.PreviewText
     Column(
         modifier = modifier.padding(vertical = MaterialTheme.spacing.smallMedium)
     ) {
         Text(
             text = accountInfo.label,
-            color = GedoiseColor.DarkGray,
+            color = labelColor,
             fontWeight = FontWeight.SemiBold,
             style = MaterialTheme.typography.labelLarge
         )
@@ -117,6 +124,25 @@ internal fun AccountTopBar(
         SmallTopBarBack(
             title = stringResource(id = R.string.account_informations),
             onBackClick = onBackClick
+        )
+    }
+}
+
+/*
+ =====================================================================
+                                Preview
+ =====================================================================
+ */
+
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun AccountItemPreview() {
+    GedoiseTheme {
+        AccountInfoItem(
+            accountInfo = AccountInfo(
+                label = "Label",
+                value = "Value"
+            )
         )
     }
 }

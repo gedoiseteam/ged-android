@@ -62,7 +62,6 @@ fun AuthenticationScreen(
     navController: NavController,
     authenticationViewModel: AuthenticationViewModel = koinViewModel()
 ) {
-    val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
     val scrollState = rememberScrollState()
     var showVerifyEmailDialog by remember { mutableStateOf(false) }
@@ -70,26 +69,40 @@ fun AuthenticationScreen(
     val focusManager = LocalFocusManager.current
 
     val (errorMessage, inputsError) = when (screenState) {
-        AuthenticationScreenState.AUTHENTICATION_ERROR ->
+        AuthenticationScreenState.AUTHENTICATION_ERROR -> {
+            authenticationViewModel.resetPassword()
             stringResource(id = R.string.error_connection) to true
+        }
 
-        AuthenticationScreenState.EMPTY_FIELDS_ERROR ->
+        AuthenticationScreenState.EMPTY_FIELDS_ERROR -> {
+            authenticationViewModel.resetPassword()
             stringResource(id = com.upsaclay.common.R.string.empty_fields_error) to true
+        }
 
-        AuthenticationScreenState.AUTHENTICATED_USER_NOT_FOUND ->
+        AuthenticationScreenState.AUTHENTICATED_USER_NOT_FOUND -> {
+            authenticationViewModel.resetPassword()
             stringResource(id = R.string.authenticated_user_not_found) to true
+        }
 
-        AuthenticationScreenState.TOO_MANY_REQUESTS_ERROR ->
+        AuthenticationScreenState.TOO_MANY_REQUESTS_ERROR -> {
+            authenticationViewModel.resetPassword()
             stringResource(id = R.string.too_many_request_error) to false
+        }
 
-        AuthenticationScreenState.EMAIL_FORMAT_ERROR ->
+        AuthenticationScreenState.EMAIL_FORMAT_ERROR -> {
+            authenticationViewModel.resetPassword()
             stringResource(id = R.string.error_incorrect_email_format) to true
+        }
 
-        AuthenticationScreenState.SERVER_COMMUNICATION_ERROR ->
+        AuthenticationScreenState.SERVER_COMMUNICATION_ERROR -> {
+            authenticationViewModel.resetPassword()
             stringResource(id = com.upsaclay.common.R.string.server_communication_error) to false
+        }
 
-        AuthenticationScreenState.UNKNOWN_ERROR ->
+        AuthenticationScreenState.UNKNOWN_ERROR -> {
+            authenticationViewModel.resetPassword()
             stringResource(id = com.upsaclay.common.R.string.unknown_error) to false
+        }
 
         else -> "" to false
     }
@@ -109,18 +122,24 @@ fun AuthenticationScreen(
     if (showVerifyEmailDialog) {
         SimpleDialog(
             modifier = Modifier.testTag(stringResource(id = R.string.authentication_screen_verify_email_dialog_tag)),
-            text = stringResource(id = R.string.email_not_verified_dialog_message),
+            title = stringResource(id = R.string.email_not_verified_dialog_title),
+            text = stringResource(id = R.string.email_not_verified),
             confirmText = stringResource(id = com.upsaclay.common.R.string.keep_going),
             onDismiss = {
+                authenticationViewModel.resetPassword()
                 showVerifyEmailDialog = false
                 authenticationViewModel.resetScreenState()
             },
             onConfirm = {
+                authenticationViewModel.resetEmail()
+                authenticationViewModel.resetPassword()
+                authenticationViewModel.resetScreenState()
                 navController.navigate(Screen.EMAIL_VERIFICATION.route + "?email=${authenticationViewModel.email}") {
                     popUpTo(navController.graph.id) { inclusive = true }
                 }
             },
             onCancel = {
+                authenticationViewModel.resetPassword()
                 showVerifyEmailDialog = false
                 authenticationViewModel.resetScreenState()
             }
@@ -178,7 +197,12 @@ fun AuthenticationScreen(
 
             RegistrationText(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
-                onRegistrationClick = { navController.navigate(Screen.FIRST_REGISTRATION.route) }
+                onRegistrationClick = {
+                    authenticationViewModel.resetEmail()
+                    authenticationViewModel.resetPassword()
+                    authenticationViewModel.resetScreenState()
+                    navController.navigate(Screen.FIRST_REGISTRATION.route)
+                }
             )
         }
     }

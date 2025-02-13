@@ -72,12 +72,8 @@ fun SecondRegistrationScreen(
                     expanded = false
                 },
                 expanded = expanded,
-                onExpandedChange = { isExpanded ->
-                    expanded = isExpanded
-                },
-                onDismissRequest = {
-                    expanded = false
-                },
+                onExpandedChange = { expanded = it },
+                onDismissRequest = { expanded = false },
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -131,12 +127,8 @@ private fun SecondRegistrationScreenPreview() {
                         expanded = false
                     },
                     expanded = expanded,
-                    onExpandedChange = { isExpanded ->
-                        expanded = isExpanded
-                    },
-                    onDismissRequest = {
-                        expanded = false
-                    },
+                    onExpandedChange = { expanded = it },
+                    onDismissRequest = { expanded = false },
                     modifier = Modifier.fillMaxWidth()
                 )
             }
