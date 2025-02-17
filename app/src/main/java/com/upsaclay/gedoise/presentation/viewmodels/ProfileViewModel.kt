@@ -16,15 +16,11 @@ class ProfileViewModel(
     getCurrentUserUseCase: GetCurrentUserUseCase,
     private val logoutUseCase: LogoutUseCase
 ) : ViewModel() {
-    private val _screenState = MutableStateFlow(ProfileScreenState.DEFAULT)
-    val screenState: StateFlow<ProfileScreenState> = _screenState
     val currentUser: StateFlow<User?> = getCurrentUserUseCase()
 
     fun logout() {
-        _screenState.value = ProfileScreenState.LOADING
         viewModelScope.launch {
             logoutUseCase()
-            _screenState.value = ProfileScreenState.LOGGED_OUT
         }
     }
 }

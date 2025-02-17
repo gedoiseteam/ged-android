@@ -32,7 +32,6 @@ class ProfileScreenUITest {
 
     @Before
     fun setUp() {
-        every { profileViewModel.screenState } returns MutableStateFlow(ProfileScreenState.DEFAULT)
         every { profileViewModel.currentUser } returns MutableStateFlow(userFixture)
         every { profileViewModel.logout() } returns Unit
     }

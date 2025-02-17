@@ -17,7 +17,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -52,13 +51,13 @@ fun SmallTopBarBack(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SmallTopBarEdit(
+fun SmallTopBarAction(
     modifier: Modifier = Modifier,
     title: String = "",
     onCancelClick: () -> Unit,
-    onSaveClick: () -> Unit,
-    isButtonEnable: Boolean = false,
-    confirmText: String = stringResource(id = com.upsaclay.common.R.string.save)
+    onActionClick: () -> Unit,
+    isButtonEnable: Boolean = true,
+    buttonText: String
 ) {
     TopAppBar(
         modifier = modifier,
@@ -80,9 +79,9 @@ fun SmallTopBarEdit(
                     horizontal = MaterialTheme.spacing.smallMedium
                 ),
                 colors = ButtonDefaults.buttonColors(contentColor = GedoiseColor.White),
-                onClick = onSaveClick
+                onClick = onActionClick
             ) {
-                Text(text = confirmText)
+                Text(text = buttonText)
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
@@ -110,12 +109,13 @@ private fun SmallTopBarBackPreview() {
 
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun SmallTopBarEditPreview() {
+private fun SmallTopBarActionPreview() {
     GedoiseTheme {
-        SmallTopBarEdit(
+        SmallTopBarAction(
             title = "Title",
             onCancelClick = { },
-            onSaveClick = { }
+            onActionClick = { },
+            buttonText = "Enregister"
         )
     }
 }

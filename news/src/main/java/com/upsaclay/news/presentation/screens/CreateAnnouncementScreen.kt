@@ -19,15 +19,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
+import com.upsaclay.common.presentation.components.LinearProgressBar
 import com.upsaclay.common.presentation.components.LoadingDialog
-import com.upsaclay.common.presentation.components.SmallTopBarEdit
+import com.upsaclay.common.presentation.components.SmallTopBarAction
 import com.upsaclay.common.presentation.components.TransparentFocusedTextField
 import com.upsaclay.common.presentation.components.TransparentTextField
 import com.upsaclay.common.presentation.theme.GedoiseTheme
@@ -43,41 +41,19 @@ fun CreateAnnouncementScreen(
     navController: NavController,
     createAnnouncementViewModel: CreateAnnouncementViewModel = koinViewModel()
 ) {
-    val context = LocalContext.current
-    var showLoadingDialog by remember { mutableStateOf(false) }
-    val state by createAnnouncementViewModel.screenState.collectAsState()
     val title = createAnnouncementViewModel.title
     val content = createAnnouncementViewModel.content
 
-    LaunchedEffect(state) {
-        when (state) {
-            AnnouncementScreenState.CREATION_ERROR -> {
-                showLoadingDialog = false
-                showToast(context, R.string.announcement_creation_error)
-            }
-
-            AnnouncementScreenState.CREATED -> {
-                showLoadingDialog = false
-                navController.popBackStack()
-            }
-
-            AnnouncementScreenState.LOADING -> showLoadingDialog = true
-
-            else -> {}
-        }
-    }
-
-    if (showLoadingDialog) {
-        LoadingDialog()
-    }
-
     Scaffold(
         topBar = {
-            SmallTopBarEdit(
+            SmallTopBarAction(
                 modifier = Modifier.fillMaxWidth(),
-                confirmText = stringResource(id = com.upsaclay.common.R.string.publish),
+                buttonText = stringResource(id = com.upsaclay.common.R.string.publish),
                 onCancelClick = { navController.popBackStack() },
-                onSaveClick = { createAnnouncementViewModel.createAnnouncement() },
+                onActionClick = {
+                    createAnnouncementViewModel.createAnnouncement()
+                    navController.popBackStack()
+                },
                 isButtonEnable = content.isNotBlank()
             )
         }
@@ -143,10 +119,10 @@ private fun CreateAnnouncementScreenPreview() {
     GedoiseTheme {
         Scaffold(
             topBar = {
-                SmallTopBarEdit(
+                SmallTopBarAction(
                     onCancelClick = { },
-                    onSaveClick = { },
-                    confirmText = stringResource(id = com.upsaclay.common.R.string.publish),
+                    onActionClick = { },
+                    buttonText = stringResource(id = com.upsaclay.common.R.string.publish),
                     isButtonEnable = content.isNotBlank()
                 )
             }

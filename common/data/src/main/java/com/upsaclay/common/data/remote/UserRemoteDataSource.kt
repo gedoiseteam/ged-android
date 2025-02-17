@@ -9,6 +9,7 @@ import com.upsaclay.common.domain.entity.ServerCommunicationException
 import com.upsaclay.common.domain.entity.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -23,9 +24,9 @@ internal class UserRemoteDataSource(
     }
 
     suspend fun getUserFlow(userId: String): Flow<User> = withContext(Dispatchers.IO) {
-        userFirestoreApi.getUserFlow(userId).mapNotNull {
-            it?.let { UserMapper.toDomain(it) }
-        }
+        userFirestoreApi.getUserFlow(userId)
+            .catch { e("Error while getting user with firestore : $it", it) }
+            .mapNotNull { it?.let { UserMapper.toDomain(it) } }
     }
 
     suspend fun getUserFirestoreWithEmail(userEmail: String): User? = withContext(Dispatchers.IO) {

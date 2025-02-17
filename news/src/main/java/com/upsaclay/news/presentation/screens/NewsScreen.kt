@@ -43,6 +43,7 @@ import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.news.R
 import com.upsaclay.news.domain.announcementsFixture
 import com.upsaclay.news.domain.entity.Announcement
+import com.upsaclay.news.newsModule
 import com.upsaclay.news.presentation.components.AnnouncementItem
 import com.upsaclay.news.presentation.viewmodels.NewsViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -215,7 +216,7 @@ private fun RecentAnnouncementSectionPreview() {
         Column {
             RecentAnnouncementSection(
                 announcements = announcementsFixture,
-                onClickAnnouncement = {}
+                onClickAnnouncement = { }
             )
         }
     }

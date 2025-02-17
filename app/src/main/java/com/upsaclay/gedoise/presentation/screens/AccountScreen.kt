@@ -39,7 +39,7 @@ import com.upsaclay.common.presentation.components.ProfilePicture
 import com.upsaclay.common.presentation.components.ProfilePictureWithIcon
 import com.upsaclay.common.presentation.components.SensibleActionDialog
 import com.upsaclay.common.presentation.components.SmallTopBarBack
-import com.upsaclay.common.presentation.components.SmallTopBarEdit
+import com.upsaclay.common.presentation.components.SmallTopBarAction
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.common.utils.showToast
@@ -290,10 +290,11 @@ private fun AccountScreenPreview() {
         Scaffold(
             topBar = {
                 if (isEdited) {
-                    SmallTopBarEdit(
+                    SmallTopBarAction(
                         title = stringResource(id = R.string.account_informations),
                         onCancelClick = { },
-                        onSaveClick = { }
+                        onActionClick = { },
+                        buttonText = stringResource(id = com.upsaclay.common.R.string.save)
                     )
                 } else {
                     SmallTopBarBack(

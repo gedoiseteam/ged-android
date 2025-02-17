@@ -58,20 +58,10 @@ fun ProfileScreen(
 ) {
     val user by profileViewModel.currentUser.collectAsState()
     var showLogoutDialog by remember { mutableStateOf(false) }
-    var showLoadingDialog by remember { mutableStateOf(false) }
-    val profileState by profileViewModel.screenState.collectAsState()
-    val dividerColor = if (isSystemInDarkTheme()) GedoiseColor.DarkGray else Color.Gray
-
-    LaunchedEffect(profileState) {
-        if(profileState == ProfileScreenState.LOADING) {
-            showLoadingDialog = true
-        }
-    }
+    val dividerColor = if (isSystemInDarkTheme()) GedoiseColor.DarkGray else Color.LightGray
 
     DisposableEffect(Unit) {
-        onDispose {
-            showLogoutDialog = false
-        }
+        onDispose { showLogoutDialog = false }
     }
 
     if (showLogoutDialog) {
@@ -88,10 +78,6 @@ fun ProfileScreen(
             onDismiss = { showLogoutDialog = false },
             onCancel = { showLogoutDialog = false }
         )
-    }
-
-    if (showLoadingDialog) {
-        LoadingDialog(message = stringResource(R.string.disconnection))
     }
 
     Scaffold(
@@ -187,7 +173,7 @@ private fun TopSection(profilePictureUrl: String?, userFullName: String) {
  =====================================================================
  */
 
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
 @Composable
 fun ProfileScreenPreview() {
     var showLogoutDialog by remember { mutableStateOf(false) }

@@ -26,7 +26,6 @@ class CreateAnnouncementScreenUITest {
 
     @Before
     fun setUp() {
-        every { createAnnouncementViewModel.screenState } returns MutableStateFlow(AnnouncementScreenState.DEFAULT)
         every { createAnnouncementViewModel.title } returns ""
         every { createAnnouncementViewModel.content } returns ""
         every { createAnnouncementViewModel.createAnnouncement() } returns Unit

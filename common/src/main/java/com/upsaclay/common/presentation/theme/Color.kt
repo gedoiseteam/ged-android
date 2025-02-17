@@ -35,7 +35,6 @@ internal val outlineVariantDark = Color(0xFFC4C8D0)
 object GedoiseColor {
     val LittleTransparentWhite = Color(0x66FFFFFF)
     val PrimaryVariant = Color(0xFFDBE0E9)
-    val LightGray = Color(0xFFEFEFEF)
     val DarkGray = Color(0xFF3C3C3C)
     val PreviewText = Color(0xFF6F7181)
     val ProfilePictureErrorLight = Color(0xFFEBEDEE)

@@ -8,6 +8,7 @@
     <string name="announcement_item_more_vert_description">Afficher les options d\'édition de l\'annonce</string>
     <string name="new_announcement">Nouvelle annonce</string>
     <string name="edit_announcement">Editer l\'annonce</string>
+    <string name="resend_announcement">Renvoyer l\'annonce</string>
     <string name="delete_announcement">Supprimer l\'annonce</string>
     <string name="delete_announcement_dialog_title">Supprimer annonce</string>
     <string name="delete_announcement_dialog_text">Êtes-vous sûr de vouloir supprimer cette annonce ?</string>
@@ -32,6 +33,7 @@
     <string name="read_screen_option_button_tag">Read Screen Option Button Tag</string>
     <string name="read_screen_bottom_sheet_tag">Read Screen Bottom Sheet Tag</string>
     <string name="read_screen_sheet_edit_field_tag">Read Screen Sheet Edit Field Tag</string>
+    <string name="read_screen_sheet_resent_field_tag">Read Screen Sheet Resent Field Tag</string>
     <string name="read_screen_sheet_delete_field_tag">Read Screen Sheet Delete Field Tag</string>
     <string name="read_screen_delete_dialog_tag">Read Screen Delete Dialog Tag</string>
 

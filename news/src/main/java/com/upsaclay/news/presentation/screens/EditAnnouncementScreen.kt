@@ -25,8 +25,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
+import com.upsaclay.common.presentation.components.LinearProgressBar
 import com.upsaclay.common.presentation.components.LoadingDialog
-import com.upsaclay.common.presentation.components.SmallTopBarEdit
+import com.upsaclay.common.presentation.components.SmallTopBarAction
 import com.upsaclay.common.presentation.components.TransparentFocusedTextField
 import com.upsaclay.common.presentation.components.TransparentTextField
 import com.upsaclay.common.presentation.theme.GedoiseTheme
@@ -51,7 +52,7 @@ fun EditAnnouncementScreen(
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
-    var showLoadingDialog by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
     val state by editAnnouncementViewModel.screenState.collectAsState()
     val isAnnouncementModified by editAnnouncementViewModel.isAnnouncementModified.collectAsState()
     val announcement by editAnnouncementViewModel.announcement.collectAsState()
@@ -59,44 +60,43 @@ fun EditAnnouncementScreen(
     LaunchedEffect(state) {
         when (state) {
             AnnouncementScreenState.UPDATE_ERROR -> {
-                showLoadingDialog = false
+                isLoading = false
                 showToast(context, R.string.announcement_update_error)
             }
 
             AnnouncementScreenState.UPDATED -> {
-                showLoadingDialog = false
+                isLoading = false
                 focusManager.clearFocus()
                 navController.popBackStack()
             }
 
             AnnouncementScreenState.LOADING -> {
                 keyboardController?.hide()
-                showLoadingDialog = true
+                isLoading = true
             }
 
             else -> {}
         }
     }
 
-    if (showLoadingDialog) {
-        LoadingDialog()
+    if (isLoading) {
+        LinearProgressBar(modifier = Modifier.fillMaxWidth())
     }
 
     Scaffold(
         topBar = {
-            SmallTopBarEdit(
+            SmallTopBarAction(
                 onCancelClick = {
                     focusManager.clearFocus()
                     keyboardController?.hide()
                     navController.popBackStack()
                 },
-                onSaveClick = {
+                onActionClick = {
                     announcement?.let {
                         editAnnouncementViewModel.updateAnnouncement(
                             it.copy(
                                 title = editAnnouncementViewModel.title,
-                                content = editAnnouncementViewModel.content,
-                                date = LocalDateTime.now()
+                                content = editAnnouncementViewModel.content
                             )
                         )
                     } ?: run {
@@ -104,7 +104,8 @@ fun EditAnnouncementScreen(
                         navController.popBackStack()
                     }
                 },
-                isButtonEnable = editAnnouncementViewModel.content.isNotBlank() && isAnnouncementModified
+                isButtonEnable = editAnnouncementViewModel.content.isNotBlank() && isAnnouncementModified,
+                buttonText = stringResource(id = com.upsaclay.common.R.string.save)
             )
         }
     ) { contentPadding ->
@@ -169,9 +170,10 @@ private fun EditAnnouncementScreenPreview() {
     GedoiseTheme {
         Scaffold(
             topBar = {
-                SmallTopBarEdit(
+                SmallTopBarAction(
                     onCancelClick = { },
-                    onSaveClick = { }
+                    onActionClick = { },
+                    buttonText = stringResource(id = com.upsaclay.common.R.string.save)
                 )
             }
         ) { contentPadding ->

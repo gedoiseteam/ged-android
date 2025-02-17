@@ -13,9 +13,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -44,10 +46,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.upsaclay.common.domain.entity.Screen
 import com.upsaclay.common.presentation.components.ClickableItem
-import com.upsaclay.common.presentation.components.LoadingDialog
+import com.upsaclay.common.presentation.components.LinearProgressBar
 import com.upsaclay.common.presentation.components.SensibleActionDialog
 import com.upsaclay.common.presentation.components.SmallTopBarBack
-import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.common.utils.showToast
@@ -55,6 +56,7 @@ import com.upsaclay.news.R
 import com.upsaclay.news.domain.announcementFixture
 import com.upsaclay.news.domain.entity.Announcement
 import com.upsaclay.news.domain.entity.AnnouncementScreenState
+import com.upsaclay.news.domain.entity.AnnouncementState
 import com.upsaclay.news.presentation.components.AnnouncementHeader
 import com.upsaclay.news.presentation.viewmodels.ReadAnnouncementViewModel
 import kotlinx.coroutines.launch
@@ -74,13 +76,13 @@ fun ReadAnnouncementScreen(
     val context = LocalContext.current
     var showBottomSheet by remember { mutableStateOf(false) }
     var showDeleteAnnouncementDialog by remember { mutableStateOf(false) }
-    var showLoadingDialog by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
     val user by readAnnouncementViewModel.currentUser.collectAsState()
     val screenState by readAnnouncementViewModel.screenState.collectAsState()
     val announcement by readAnnouncementViewModel.announcement.collectAsState()
-    val hideBottomSheet: () -> Unit = {
+    val hideBottomSheet = {
         scope.launch { sheetState.hide() }.invokeOnCompletion {
             if (!sheetState.isVisible) {
                 showBottomSheet = false
@@ -88,23 +90,23 @@ fun ReadAnnouncementScreen(
         }
     }
 
-    if (showLoadingDialog) {
-        LoadingDialog(message = stringResource(id = com.upsaclay.common.R.string.deletion))
+    if (isLoading) {
+        LinearProgressBar(modifier = Modifier.fillMaxWidth())
     }
 
     LaunchedEffect(screenState) {
         when (screenState) {
             AnnouncementScreenState.DELETE_ERROR -> {
-                showLoadingDialog = false
+                isLoading = false
                 showToast(context, R.string.announcement_delete_error)
             }
 
             AnnouncementScreenState.DELETED -> {
-                showLoadingDialog = false
+                isLoading = false
                 navController.popBackStack()
             }
 
-            AnnouncementScreenState.LOADING -> showLoadingDialog = true
+            AnnouncementScreenState.LOADING -> isLoading = true
 
             else -> {}
         }
@@ -187,22 +189,41 @@ fun ReadAnnouncementScreen(
                     onDismissRequest = { showBottomSheet = false },
                     sheetState = sheetState,
                 ) {
-                    ClickableItem(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .testTag(stringResource(id = R.string.read_screen_sheet_edit_field_tag)),
-                        text = { Text(text = stringResource(id = R.string.edit_announcement)) },
-                        icon = {
-                            Icon(
-                                imageVector = Icons.Default.Edit,
-                                contentDescription = null
-                            )
-                        },
-                        onClick = {
-                            navController.navigate(Screen.EDIT_ANNOUNCEMENT.route + "?announcementId=$announcementId")
-                            hideBottomSheet()
-                        }
-                    )
+                    if(announcement?.state == AnnouncementState.DEFAULT) {
+                        ClickableItem(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .testTag(stringResource(id = R.string.read_screen_sheet_edit_field_tag)),
+                            text = { Text(text = stringResource(id = R.string.edit_announcement)) },
+                            icon = {
+                                Icon(
+                                    imageVector = Icons.Default.Edit,
+                                    contentDescription = null
+                                )
+                            },
+                            onClick = {
+                                navController.navigate(Screen.EDIT_ANNOUNCEMENT.route + "?announcementId=$announcementId")
+                                hideBottomSheet()
+                            }
+                        )
+                    } else {
+                        ClickableItem(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .testTag(stringResource(id = R.string.read_screen_sheet_resent_field_tag)),
+                            text = { Text(text = stringResource(id = R.string.resend_announcement)) },
+                            icon = {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.Send,
+                                    contentDescription = null
+                                )
+                            },
+                            onClick = {
+                                announcement?.let { readAnnouncementViewModel.recreateAnnouncement(it) }
+                                hideBottomSheet()
+                            }
+                        )
+                    }
 
                     ClickableItem(
                         modifier = Modifier

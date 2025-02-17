@@ -48,9 +48,10 @@ class AuthenticationViewModel(
         viewModelScope.launch {
             try {
                 loginUseCase(email, password)
+                
                 getUserUseCase.withEmail(email)?.let {
+                    setCurrentUserUseCase(it)
                     if (isEmailVerifiedUseCase()) {
-                        setCurrentUserUseCase(it)
                         setUserAuthenticatedUseCase(true)
                         _screenState.value = AuthenticationScreenState.DEFAULT
                     } else {

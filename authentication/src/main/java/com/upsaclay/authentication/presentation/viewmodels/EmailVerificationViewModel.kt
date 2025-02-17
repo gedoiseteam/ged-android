@@ -16,7 +16,7 @@ class EmailVerificationViewModel(
     val email: String,
     private val sendVerificationEmailUseCase: SendVerificationEmailUseCase,
     private val isEmailVerifiedUseCase: IsEmailVerifiedUseCase,
-    private val setUserAuthenticatedUseCase: SetUserAuthenticatedUseCase
+    private val setUserAuthenticatedUseCase: SetUserAuthenticatedUseCase,
 ) : ViewModel() {
     private val _screenState = MutableStateFlow(AuthenticationScreenState.DEFAULT)
     val screenState: StateFlow<AuthenticationScreenState> = _screenState

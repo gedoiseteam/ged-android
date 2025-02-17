@@ -240,7 +240,7 @@ private fun TitleSection() {
             text = stringResource(id = R.string.presentation_text),
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.primary
+            color = MaterialTheme.colorScheme.onBackground
         )
     }
 }
@@ -314,7 +314,7 @@ private fun InputsSection(
  =====================================================================
  */
 
-@Preview(widthDp = 360, heightDp = 740, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(showBackground = true, widthDp = 360, heightDp = 740, uiMode = Configuration.UI_MODE_NIGHT_NO)
 @Composable
 private fun AuthenticationScreenPreview() {
     var isLoading by remember { mutableStateOf(false) }

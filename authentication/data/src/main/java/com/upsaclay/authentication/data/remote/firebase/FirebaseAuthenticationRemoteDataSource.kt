@@ -63,13 +63,10 @@ class FirebaseAuthenticationRemoteDataSource(
                 firebaseAuthenticationApi.signOut()
             } catch (e: FirebaseAuthException) {
                 e("Error to logout with Firebase: ${e.message}", e)
-                throw AuthenticationException()
             } catch (e: FirebaseNetworkException) {
                 e("Error network connection ${e.message}", e)
-                throw ServerCommunicationException()
             } catch (e: FirebaseTooManyRequestsException) {
                 e("Error to logout with Firebase: ${e.message}", e)
-                throw TooManyRequestException()
             }
         }
     }

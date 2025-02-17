@@ -21,19 +21,7 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
-private val BACKGROUND_SCOPE = named("BackgroundScope")
-
 val messageModule = module {
-    single<CoroutineScope>(BACKGROUND_SCOPE) {
-        CoroutineScope(
-            SupervisorJob() +
-                    Dispatchers.IO +
-                    CoroutineExceptionHandler { coroutineContext, throwable ->
-                        e("Uncaught error in backgroundScope", throwable)
-                    }
-        )
-    }
-
     viewModelOf(::ConversationViewModel)
     viewModelOf(::CreateConversationViewModel)
     viewModel { (conversation: ConversationUI) ->
@@ -45,17 +33,4 @@ val messageModule = module {
             createConversationUseCase = get()
         )
     }
-
-    single {
-        GetConversationsUIUseCase(
-            userConversationRepository = get(),
-            messageRepository = get(),
-            scope = get(BACKGROUND_SCOPE)
-        )
-    }
-    singleOf(::CreateConversationUseCase)
-    singleOf(::DeleteConversationUseCase)
-    singleOf(::GetConversationUserUseCase)
-    singleOf(::GetMessagesUseCase)
-    singleOf(::SendMessageUseCase)
 }

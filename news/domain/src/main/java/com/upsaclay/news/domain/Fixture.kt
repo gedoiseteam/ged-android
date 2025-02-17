@@ -22,8 +22,8 @@ val announcementFixture = Announcement(
             "sans heurts et de manière efficace. N'hésitez pas à nous contacter si " +
             "vous avez des questions ou si vous avez besoin de plus amples informations" +
             " avant la date prévue",
-    state = AnnouncementState.DEFAULT,
-    author = userFixture
+    author = userFixture,
+    state = AnnouncementState.DEFAULT
 )
 
 val announcementsFixture = listOf(
