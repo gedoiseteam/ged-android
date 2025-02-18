@@ -1,7 +1,6 @@
 package com.upsaclay.news.domain.repository
 
 import com.upsaclay.news.domain.entity.Announcement
-import com.upsaclay.news.domain.entity.AnnouncementState
 import kotlinx.coroutines.flow.Flow
 
 interface AnnouncementRepository {
@@ -17,7 +16,7 @@ interface AnnouncementRepository {
 
     suspend fun updateAnnouncement(announcement: Announcement)
 
-    suspend fun updateAnnouncementState(announcemen: Announcement)
+    suspend fun updateAnnouncementState(announcement: Announcement)
 
     suspend fun deleteAnnouncement(announcement: Announcement)
 

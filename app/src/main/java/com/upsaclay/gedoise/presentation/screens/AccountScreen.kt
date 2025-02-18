@@ -17,6 +17,8 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -34,16 +36,19 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.upsaclay.common.domain.entity.SnackbarType
+import com.upsaclay.common.domain.userFixture
+import com.upsaclay.common.presentation.components.ErrorSnackBar
+import com.upsaclay.common.presentation.components.InfoSnackbar
 import com.upsaclay.common.presentation.components.LoadingDialog
 import com.upsaclay.common.presentation.components.ProfilePicture
 import com.upsaclay.common.presentation.components.ProfilePictureWithIcon
 import com.upsaclay.common.presentation.components.SensibleActionDialog
-import com.upsaclay.common.presentation.components.SmallTopBarBack
 import com.upsaclay.common.presentation.components.SmallTopBarAction
+import com.upsaclay.common.presentation.components.SmallTopBarBack
+import com.upsaclay.common.presentation.components.SuccessSnackBar
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
-import com.upsaclay.common.utils.showToast
-import com.upsaclay.common.domain.userFixture
 import com.upsaclay.gedoise.R
 import com.upsaclay.gedoise.domain.entities.AccountInfo
 import com.upsaclay.gedoise.domain.entities.AccountScreenState
@@ -65,9 +70,13 @@ fun AccountScreen(
     val scope = rememberCoroutineScope()
     val screenState by accountViewModel.screenState.collectAsState()
     val user by accountViewModel.currentUser.collectAsState()
+
     var showBottomSheet by remember { mutableStateOf(false) }
     var showDeleteProfilePictureDialog by remember { mutableStateOf(false) }
     var showLoadingDialog by remember { mutableStateOf(false) }
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    var snackBarType by remember { mutableStateOf(SnackbarType.INFO) }
 
     val hideBottomSheet: () -> Unit = {
         scope.launch { sheetState.hide() }.invokeOnCompletion {
@@ -77,12 +86,23 @@ fun AccountScreen(
         }
     }
 
+    val showSnackBar = { type: SnackbarType, message: String ->
+        snackBarType = type
+        scope.launch {
+            snackbarHostState.showSnackbar(message = message)
+        }
+    }
+
+    val resetScreenState = {
+        accountViewModel.resetScreenState()
+    }
+
     val singlePhotoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
         onResult = { uri ->
             uri?.let {
                 accountViewModel.updateProfilePictureUri(it)
-                accountViewModel.updateAccountScreenState(AccountScreenState.EDIT)
+                accountViewModel.updateScreenState(AccountScreenState.EDIT)
             }
         }
     )
@@ -90,14 +110,14 @@ fun AccountScreen(
     when (screenState) {
         AccountScreenState.PROFILE_PICTURE_UPDATED -> {
             showLoadingDialog = false
-            showToast(context, R.string.profile_picture_updated)
-            accountViewModel.updateAccountScreenState(AccountScreenState.READ)
+            showSnackBar(SnackbarType.SUCCESS, context.getString(R.string.profile_picture_updated))
+            resetScreenState()
         }
 
         AccountScreenState.PROFILE_PICTURE_UPDATE_ERROR -> {
             showLoadingDialog = false
-            showToast(context, R.string.error_updating_profile_picture)
-            accountViewModel.updateAccountScreenState(AccountScreenState.READ)
+            showSnackBar(SnackbarType.ERROR, context.getString(R.string.error_updating_profile_picture))
+            resetScreenState()
         }
 
         AccountScreenState.LOADING -> showLoadingDialog = true
@@ -150,10 +170,29 @@ fun AccountScreen(
                 onSaveClick = { accountViewModel.updateUserProfilePicture() },
                 onCancelClick = {
                     accountViewModel.resetProfilePictureUri()
-                    accountViewModel.updateAccountScreenState(AccountScreenState.READ)
+                    resetScreenState()
                 },
                 onBackClick = { navController.popBackStack() }
             )
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) {
+                when (snackBarType) {
+                    SnackbarType.SUCCESS ->
+                        SuccessSnackBar(
+                            modifier = Modifier.testTag(stringResource(id = R.string.account_screen_success_snackbar_tag)),
+                            message = it.visuals.message
+                        )
+
+                    SnackbarType.ERROR ->
+                        ErrorSnackBar(
+                            modifier = Modifier.testTag(stringResource(id = R.string.account_screen_error_snackbar_tag)),
+                            message = it.visuals.message
+                        )
+
+                    else -> {}
+                }
+            }
         }
     ) {
         Box(

@@ -19,7 +19,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -47,7 +46,6 @@ import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.gedoise.R
-import com.upsaclay.gedoise.domain.entities.ProfileScreenState
 import com.upsaclay.gedoise.presentation.viewmodels.ProfileViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -173,7 +171,7 @@ private fun TopSection(profilePictureUrl: String?, userFullName: String) {
  =====================================================================
  */
 
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun ProfileScreenPreview() {
     var showLogoutDialog by remember { mutableStateOf(false) }

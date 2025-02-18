@@ -1,7 +1,6 @@
 package com.upsaclay.authentication
 
 import com.upsaclay.authentication.domain.entity.RegistrationScreenState
-import com.upsaclay.authentication.domain.entity.exception.AuthErrorCode
 import com.upsaclay.authentication.domain.entity.exception.AuthenticationException
 import com.upsaclay.authentication.domain.usecase.RegisterUseCase
 import com.upsaclay.authentication.presentation.viewmodels.RegistrationViewModel

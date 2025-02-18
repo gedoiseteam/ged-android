@@ -4,8 +4,8 @@ import android.app.Application
 import com.upsaclay.authentication.authenticationModule
 import com.upsaclay.authentication.data.authenticationDataModule
 import com.upsaclay.authentication.domain.authenticationDomainModule
-import com.upsaclay.common.domain.commonDomainModule
 import com.upsaclay.common.data.commonDataModule
+import com.upsaclay.common.domain.commonDomainModule
 import com.upsaclay.message.data.messageDataModule
 import com.upsaclay.message.domain.messageDomainModule
 import com.upsaclay.message.messageModule

@@ -1,6 +1,5 @@
 package com.upsaclay.message.domain
 
-import com.upsaclay.message.domain.entity.MessageState
 import com.upsaclay.message.domain.repository.MessageRepository
 import com.upsaclay.message.domain.repository.UserConversationRepository
 import com.upsaclay.message.domain.usecase.CreateConversationUseCase

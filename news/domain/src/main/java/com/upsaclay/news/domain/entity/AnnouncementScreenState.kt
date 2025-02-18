@@ -8,5 +8,6 @@ enum class AnnouncementScreenState {
     UPDATED,
     CREATION_ERROR,
     UPDATE_ERROR,
-    DELETE_ERROR
+    CONNECTION_ERROR,
+    ERROR
 }

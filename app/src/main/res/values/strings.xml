@@ -34,10 +34,13 @@
     <string name="delete_profile_picture_dialog_text">Voulez-vous supprimer la photo de profil ?</string>
     <string name="logout_dialog_message">Êtes-vous sûr de vouloir vous déconnecter ?</string>
 
-    <string name="profile_screen_logout_dialog_tag">Profile Screen Logout Dialog Tag</string>
-    <string name="profile_screen_logout_button_tag">Profile Screen Logout Button Tag</string>
-    <string name="profile_screen_account_info_button_tag">Profile Screen Account Info Button Tag</string>
-    <string name="account_screen_delete_profile_picture_button_tag">Account Screen Delete Profile Picture Button Tag</string>
-    <string name="account_screen_delete_profile_picture_dialog_tag">Account Screen Delete Profile Picture Button Tag</string>
-    <string name="account_screen_profile_picture_tag">Account Screen Profile Picture Tag</string>
+    <string name="profile_screen_logout_dialog_tag">Profile screen logout dialog tag</string>
+    <string name="profile_screen_logout_button_tag">Profile screen Logout Button tag</string>
+    <string name="profile_screen_account_info_button_tag">Profile screen account info button tag</string>
+
+    <string name="account_screen_delete_profile_picture_button_tag">Account screen delete profile picture button tag</string>
+    <string name="account_screen_delete_profile_picture_dialog_tag">Account screen delete profile picture button tag</string>
+    <string name="account_screen_profile_picture_tag">Account screen profile picture tag</string>
+    <string name="account_screen_error_snackbar_tag">Account screen error snackbar tag</string>
+    <string name="account_screen_success_snackbar_tag">Account screen success snackbar tag</string>
 </resources>

@@ -1,24 +1,11 @@
 package com.upsaclay.message
 
-import com.upsaclay.common.domain.e
 import com.upsaclay.message.domain.entity.ConversationUI
-import com.upsaclay.message.domain.usecase.CreateConversationUseCase
-import com.upsaclay.message.domain.usecase.DeleteConversationUseCase
-import com.upsaclay.message.domain.usecase.GetConversationUserUseCase
-import com.upsaclay.message.domain.usecase.GetConversationsUIUseCase
-import com.upsaclay.message.domain.usecase.GetMessagesUseCase
-import com.upsaclay.message.domain.usecase.SendMessageUseCase
 import com.upsaclay.message.presentation.viewmodels.ChatViewModel
 import com.upsaclay.message.presentation.viewmodels.ConversationViewModel
 import com.upsaclay.message.presentation.viewmodels.CreateConversationViewModel
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.androidx.viewmodel.dsl.viewModelOf
-import org.koin.core.module.dsl.singleOf
-import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
 val messageModule = module {

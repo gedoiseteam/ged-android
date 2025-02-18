@@ -1,11 +1,9 @@
 package com.upsaclay.message.data.remote
 
-import com.upsaclay.common.domain.e
 import com.upsaclay.message.data.remote.api.ConversationApi
 import com.upsaclay.message.data.remote.model.RemoteConversation
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.withContext
 
 internal class ConversationRemoteDataSource(private val conversationApi: ConversationApi) {

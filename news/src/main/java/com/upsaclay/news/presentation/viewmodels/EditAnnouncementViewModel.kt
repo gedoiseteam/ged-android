@@ -12,6 +12,7 @@ import com.upsaclay.news.domain.usecase.UpdateAnnouncementUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.net.ConnectException
 
 class EditAnnouncementViewModel(
     announcementId: String,
@@ -48,10 +49,16 @@ class EditAnnouncementViewModel(
                 updateAnnouncementUseCase(announcement)
                 this@EditAnnouncementViewModel._announcement.value = announcement
                 _screenState.value = AnnouncementScreenState.UPDATED
+            } catch (e: ConnectException) {
+                _screenState.value = AnnouncementScreenState.CONNECTION_ERROR
             } catch (e: Exception) {
-                _screenState.value = AnnouncementScreenState.UPDATE_ERROR
+                _screenState.value = AnnouncementScreenState.ERROR
             }
         }
+    }
+
+    fun resetScreenState() {
+        _screenState.value = AnnouncementScreenState.DEFAULT
     }
 
     private fun verifyIsAnnouncementModified() {
