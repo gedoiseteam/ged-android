@@ -1,6 +1,5 @@
 package com.upsaclay.gedoise
 
-import com.upsaclay.authentication.domain.entity.AuthenticationScreenState
 import com.upsaclay.authentication.domain.entity.AuthenticationState
 import com.upsaclay.authentication.domain.usecase.IsUserAuthenticatedUseCase
 import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
@@ -62,7 +61,7 @@ class MainViewModelTest {
         )
 
         // Then
-        assertEquals(AuthenticationState.NOTHING, mainViewModel.authenticationState.value)
+        assertEquals(AuthenticationState.WAITING, mainViewModel.authenticationState.value)
         assertEquals(userFixture, mainViewModel.currentUser.value)
         assertEquals(
             mapOf(

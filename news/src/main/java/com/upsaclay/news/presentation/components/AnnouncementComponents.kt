@@ -229,7 +229,7 @@ private fun AnnouncementHeaderPreview() {
 private fun AnnouncementItemPreview() {
     GedoiseTheme {
         AnnouncementItem(
-            announcement = announcementFixture.copy(state = AnnouncementState.ERROR),
+            announcement = announcementFixture,
             onClick = { }
         )
     }
