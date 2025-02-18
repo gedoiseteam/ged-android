@@ -30,9 +30,10 @@ class AccountScreenUITest {
         every { accountViewModel.currentUser } returns MutableStateFlow(userFixture)
         every { accountViewModel.profilePictureUri } returns Uri.EMPTY
         every { accountViewModel.updateProfilePictureUri(any()) } returns Unit
-        every { accountViewModel.updateAccountScreenState(any()) } returns Unit
+        every { accountViewModel.updateScreenState(any()) } returns Unit
         every { accountViewModel.resetProfilePictureUri() } returns Unit
         every { accountViewModel.deleteUserProfilePicture() } returns Unit
+        every { accountViewModel.resetScreenState() } returns Unit
     }
 
     @Test
@@ -50,5 +51,39 @@ class AccountScreenUITest {
 
         // Then
         rule.onNodeWithTag(rule.activity.getString(R.string.account_screen_delete_profile_picture_dialog_tag)).assertExists()
+    }
+
+    @Test
+    fun error_snackbar_should_be_displayed_when_update_profile_picture_fails() {
+        // Given
+        every { accountViewModel.screenState } returns MutableStateFlow(AccountScreenState.PROFILE_PICTURE_UPDATE_ERROR)
+
+        // When
+        rule.setContent {
+            AccountScreen(
+                navController = navController,
+                accountViewModel = accountViewModel
+            )
+        }
+
+        // Then
+        rule.onNodeWithTag(rule.activity.getString(R.string.account_screen_error_snackbar_tag)).assertExists()
+    }
+
+    @Test
+    fun success_snackbar_should_be_displayed_when_update_profile_picture_succeeds() {
+        // Given
+        every { accountViewModel.screenState } returns MutableStateFlow(AccountScreenState.PROFILE_PICTURE_UPDATED)
+
+        // When
+        rule.setContent {
+            AccountScreen(
+                navController = navController,
+                accountViewModel = accountViewModel
+            )
+        }
+
+        // Then
+        rule.onNodeWithTag(rule.activity.getString(R.string.account_screen_success_snackbar_tag)).assertExists()
     }
 }

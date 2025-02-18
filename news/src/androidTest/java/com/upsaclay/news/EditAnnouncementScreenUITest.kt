@@ -5,6 +5,7 @@ import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.isEnabled
 import androidx.compose.ui.test.isNotEnabled
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.navigation.testing.TestNavHostController
 import com.upsaclay.news.domain.announcementFixture
@@ -32,6 +33,7 @@ class EditAnnouncementScreenUITest {
         every { editAnnouncementViewModel.isAnnouncementModified } returns MutableStateFlow(false)
         every { editAnnouncementViewModel.title } returns ""
         every { editAnnouncementViewModel.content } returns "content"
+        every { editAnnouncementViewModel.resetScreenState() } returns Unit
     }
 
     @Test
@@ -90,5 +92,23 @@ class EditAnnouncementScreenUITest {
         // Then
         rule.onNodeWithText(rule.activity.getString(com.upsaclay.common.R.string.save))
             .assert(isEnabled())
+    }
+
+    @Test
+    fun error_snackbar_should_be_displayed_when_update_fails() {
+        // Given
+        every { editAnnouncementViewModel.screenState } returns MutableStateFlow(AnnouncementScreenState.ERROR)
+
+        // When
+        rule.setContent {
+            EditAnnouncementScreen(
+                announcementId = announcementFixture.id,
+                navController = navController,
+                editAnnouncementViewModel = editAnnouncementViewModel
+            )
+        }
+
+        // Then
+        rule.onNodeWithTag(rule.activity.getString(R.string.edit_screen_error_snackbar_tag)).assertExists()
     }
 }

@@ -15,6 +15,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.Before
 import org.junit.Test
+import java.net.ConnectException
 import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -104,7 +105,21 @@ class EditAnnouncementViewModelTest {
     }
 
     @Test
-    fun update_announcement_should_update_screen_state_to_UPDATE_ERROR_when_failure() = runTest {
+    fun update_announcement_should_update_screen_state_to_CONNECTION_ERROR_when_connect_exception_is_thrown() = runTest {
+        // Given
+        editAnnouncementViewModel.updateTitle(title)
+        editAnnouncementViewModel.updateContent(content)
+        coEvery { updateAnnouncementUseCase(announcementFixture) } throws ConnectException()
+
+        // When
+        editAnnouncementViewModel.updateAnnouncement(announcementFixture)
+
+        // Then
+        assertEquals(AnnouncementScreenState.CONNECTION_ERROR, editAnnouncementViewModel.screenState.value)
+    }
+
+    @Test
+    fun update_announcement_should_update_screen_state_to_ERROR_when_unknown_exception_is_thrown() = runTest {
         // Given
         editAnnouncementViewModel.updateTitle(title)
         editAnnouncementViewModel.updateContent(content)
@@ -114,6 +129,6 @@ class EditAnnouncementViewModelTest {
         editAnnouncementViewModel.updateAnnouncement(announcementFixture)
 
         // Then
-        assertEquals(AnnouncementScreenState.UPDATE_ERROR, editAnnouncementViewModel.screenState.value)
+        assertEquals(AnnouncementScreenState.ERROR, editAnnouncementViewModel.screenState.value)
     }
 }

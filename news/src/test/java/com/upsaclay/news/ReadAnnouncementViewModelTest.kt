@@ -21,6 +21,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.setMain
 import org.junit.Before
 import org.junit.Test
+import java.net.ConnectException
 import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -101,7 +102,19 @@ class ReadAnnouncementViewModelTest {
     }
 
     @Test
-    fun deleteAnnouncement_should_update_screen_state_to_DELETE_ERROR_when_exception_is_thrown() {
+    fun deleteAnnouncement_should_update_screen_state_to_CONNECTION_ERROR_when_connect_exception_is_thrown() {
+        // Given
+        coEvery { deleteAnnouncementUseCase(announcementFixture) } throws ConnectException()
+
+        // When
+        readAnnouncementViewModel.deleteAnnouncement()
+
+        // Then
+        assertEquals(AnnouncementScreenState.CONNECTION_ERROR, readAnnouncementViewModel.screenState.value)
+    }
+
+    @Test
+    fun deleteAnnouncement_should_update_screen_state_to_ERROR_when_unknown_exception_is_thrown() {
         // Given
         coEvery { deleteAnnouncementUseCase(announcementFixture) } throws Exception()
 
@@ -109,6 +122,6 @@ class ReadAnnouncementViewModelTest {
         readAnnouncementViewModel.deleteAnnouncement()
 
         // Then
-        assertEquals(AnnouncementScreenState.DELETE_ERROR, readAnnouncementViewModel.screenState.value)
+        assertEquals(AnnouncementScreenState.ERROR, readAnnouncementViewModel.screenState.value)
     }
 }

@@ -31,7 +31,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
@@ -43,7 +42,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.authentication.R
 import com.upsaclay.authentication.domain.entity.AuthenticationScreenState
 import com.upsaclay.authentication.presentation.components.LoginButton
@@ -53,8 +51,8 @@ import com.upsaclay.authentication.presentation.viewmodels.AuthenticationViewMod
 import com.upsaclay.common.domain.entity.Screen
 import com.upsaclay.common.presentation.components.ErrorTextWithIcon
 import com.upsaclay.common.presentation.components.SimpleDialog
+import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
-import com.upsaclay.common.utils.showToast
 import org.koin.androidx.compose.koinViewModel
 
 @Composable

@@ -1,12 +1,10 @@
 package com.upsaclay.message.data.remote
 
-import com.upsaclay.common.domain.e
 import com.upsaclay.message.data.mapper.MessageMapper
 import com.upsaclay.message.data.remote.api.MessageApi
 import com.upsaclay.message.domain.entity.Message
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 

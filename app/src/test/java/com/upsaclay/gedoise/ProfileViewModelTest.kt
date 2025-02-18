@@ -3,7 +3,6 @@ package com.upsaclay.gedoise
 import com.upsaclay.authentication.domain.usecase.LogoutUseCase
 import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
 import com.upsaclay.common.domain.userFixture
-import com.upsaclay.gedoise.domain.entities.ProfileScreenState
 import com.upsaclay.gedoise.presentation.viewmodels.ProfileViewModel
 import io.mockk.coEvery
 import io.mockk.coVerify

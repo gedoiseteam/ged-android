@@ -20,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -39,7 +38,6 @@ import com.upsaclay.common.presentation.components.PrimaryButton
 import com.upsaclay.common.presentation.components.TopLinearLoadingScreen
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
-import com.upsaclay.common.utils.showToast
 import org.koin.androidx.compose.koinViewModel
 
 private const val CURRENT_STEP = 3

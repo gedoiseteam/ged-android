@@ -2,7 +2,6 @@ package com.upsaclay.news
 
 import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
 import com.upsaclay.common.domain.userFixture
-import com.upsaclay.news.domain.entity.AnnouncementScreenState
 import com.upsaclay.news.domain.usecase.CreateAnnouncementUseCase
 import com.upsaclay.news.presentation.viewmodels.CreateAnnouncementViewModel
 import io.mockk.coEvery

@@ -66,12 +66,12 @@ class AccountViewModelTest {
     }
 
     @Test
-    fun updateAccountScreenState_should_update_accountScreenState() {
+    fun updateAccountScreenState_should_update_ScreenState() {
         // Given
         val screenState = AccountScreenState.LOADING
 
         // When
-        accountViewModel.updateAccountScreenState(screenState)
+        accountViewModel.updateScreenState(screenState)
 
         // Then
         assertEquals(screenState, accountViewModel.screenState.value)

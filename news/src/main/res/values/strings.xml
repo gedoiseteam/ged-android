@@ -27,15 +27,19 @@
     <string name="news_screen_recent_announcements_tag">News Screen Recent Announcement Tag</string>
     <string name="news_screen_create_announcement_button_tag">News Screen Create Announcement Button Tag</string>
 
-    <string name="read_screen_announcement_header_tag">Read Screen Announcement Header Tag</string>
-    <string name="read_screen_announcement_title_tag">Read Screen Announcement Title Tag</string>
-    <string name="read_screen_announcement_content_tag">Read Screen Announcement Content Tag</string>
-    <string name="read_screen_option_button_tag">Read Screen Option Button Tag</string>
-    <string name="read_screen_bottom_sheet_tag">Read Screen Bottom Sheet Tag</string>
-    <string name="read_screen_sheet_edit_field_tag">Read Screen Sheet Edit Field Tag</string>
-    <string name="read_screen_sheet_resent_field_tag">Read Screen Sheet Resent Field Tag</string>
-    <string name="read_screen_sheet_delete_field_tag">Read Screen Sheet Delete Field Tag</string>
-    <string name="read_screen_delete_dialog_tag">Read Screen Delete Dialog Tag</string>
+    <string name="read_screen_announcement_header_tag">Read screen announcement header tag</string>
+    <string name="read_screen_announcement_title_tag">Read screen announcement title tag</string>
+    <string name="read_screen_announcement_content_tag">Read screen announcement content tag</string>
+    <string name="read_screen_option_button_tag">Read screen option button tag</string>
+    <string name="read_screen_bottom_sheet_tag">Read screen bottom sheet tag</string>
+    <string name="read_screen_sheet_edit_field_tag">Read screen sheet edit field tag</string>
+    <string name="read_screen_sheet_resent_field_tag">Read screen sheet resent field tag</string>
+    <string name="read_screen_sheet_delete_field_tag">Read screen sheet delete field tag</string>
+    <string name="read_screen_delete_dialog_tag">Read screen delete dialog tag</string>
+    <string name="read_screen_delete_dialog_title_tag">Read screen delete dialog title tag</string>
+    <string name="read_screen_error_snackbar_tag">Read screen error snackbar tag</string>
 
-    <string name="create_screen_post_button_tag">Create Screen Post Button Tag</string>
+    <string name="create_screen_post_button_tag">Create screen post button tag</string>
+
+    <string name="edit_screen_error_snackbar_tag">Edit screen error snackbar tag</string>
 </resources>

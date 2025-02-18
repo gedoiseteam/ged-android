@@ -30,10 +30,6 @@ class AccountViewModel(
         profilePictureUri = uri
     }
 
-    fun updateAccountScreenState(screenState: AccountScreenState) {
-        _screenState.value = screenState
-    }
-
     fun resetProfilePictureUri() {
         profilePictureUri = null
     }
@@ -67,5 +63,13 @@ class AccountViewModel(
             }
             resetProfilePictureUri()
         }
+    }
+
+    fun updateScreenState(screenState: AccountScreenState) {
+        _screenState.value = screenState
+    }
+
+    fun resetScreenState() {
+        _screenState.value = AccountScreenState.READ
     }
 }

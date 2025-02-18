@@ -2,14 +2,11 @@ package com.upsaclay.common.data.remote
 
 import com.upsaclay.common.data.remote.api.ImageApi
 import com.upsaclay.common.domain.e
-import com.upsaclay.common.domain.entity.ServerResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
-import okhttp3.ResponseBody.Companion.toResponseBody
-import retrofit2.Response
 import java.io.File
 import java.io.IOException
 

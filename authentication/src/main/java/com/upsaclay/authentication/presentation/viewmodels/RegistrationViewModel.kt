@@ -6,16 +6,15 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.upsaclay.authentication.domain.entity.RegistrationScreenState
-import com.upsaclay.authentication.domain.entity.exception.AuthErrorCode
 import com.upsaclay.authentication.domain.entity.exception.AuthenticationException
 import com.upsaclay.authentication.domain.usecase.RegisterUseCase
-import com.upsaclay.common.domain.usecase.VerifyEmailFormatUseCase
-import com.upsaclay.common.domain.entity.User
 import com.upsaclay.common.domain.entity.ServerCommunicationException
+import com.upsaclay.common.domain.entity.User
 import com.upsaclay.common.domain.extensions.uppercaseFirstLetter
 import com.upsaclay.common.domain.usecase.CreateUserUseCase
 import com.upsaclay.common.domain.usecase.GenerateIdUseCase
 import com.upsaclay.common.domain.usecase.IsUserExistUseCase
+import com.upsaclay.common.domain.usecase.VerifyEmailFormatUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -100,10 +99,11 @@ class RegistrationViewModel(
 
     fun register() {
         _screenState.value = RegistrationScreenState.LOADING
+        this.email = email.trim()
 
         viewModelScope.launch {
             try {
-                if (isUserExistUseCase(email.trim())) {
+                if (isUserExistUseCase(email)) {
                     _screenState.value = RegistrationScreenState.USER_ALREADY_EXISTS
                     return@launch
                 }
@@ -112,12 +112,12 @@ class RegistrationViewModel(
                     id = userId,
                     firstName = firstName,
                     lastName = lastName,
-                    email = email.trim(),
+                    email = email,
                     schoolLevel = schoolLevel
                 )
 
                 createUserUseCase(user)
-                registerUseCase(email.trim(), password)
+                registerUseCase(email, password)
                 _screenState.value = RegistrationScreenState.REGISTERED
             } catch (e: Exception) {
                 _screenState.value = when(e) {

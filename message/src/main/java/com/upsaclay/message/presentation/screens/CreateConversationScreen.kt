@@ -19,15 +19,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import com.upsaclay.common.domain.entity.Screen
 import com.upsaclay.common.domain.entity.User
+import com.upsaclay.common.domain.usersFixture
 import com.upsaclay.common.presentation.components.CircularProgressBar
 import com.upsaclay.common.presentation.components.SmallTopBarBack
 import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
-import com.upsaclay.common.domain.usersFixture
 import com.upsaclay.message.R
 import com.upsaclay.message.domain.entity.ConversationScreenState
-import com.upsaclay.message.domain.entity.ConversationState
 import com.upsaclay.message.presentation.components.UserItem
 import com.upsaclay.message.presentation.viewmodels.CreateConversationViewModel
 import org.koin.androidx.compose.koinViewModel

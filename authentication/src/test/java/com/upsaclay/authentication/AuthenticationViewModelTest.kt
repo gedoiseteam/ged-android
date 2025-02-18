@@ -21,6 +21,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.Before
 import org.junit.Test
+import java.io.IOException
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 
@@ -151,15 +152,15 @@ class AuthenticationViewModelTest {
     }
 
     @Test
-    fun login_sets_screen_state_to_UNKNOWN_ERROR_when_an_authentication_exception_is_thrown_with_an_unknown_code() = runTest {
+    fun login_sets_screen_state_to_USERVER_COMMUNICATION_ERROR_when_an_io_exception_is_thrown() = runTest {
         // Given
-        coEvery { loginUseCase(any(), any()) } throws AuthenticationException()
+        coEvery { loginUseCase(any(), any()) } throws IOException()
 
         // When
         authenticationViewModel.login()
 
         // Then
-        assertEquals(AuthenticationScreenState.UNKNOWN_ERROR, authenticationViewModel.screenState.value)
+        assertEquals(AuthenticationScreenState.SERVER_COMMUNICATION_ERROR, authenticationViewModel.screenState.value)
     }
 
     @Test
@@ -172,6 +173,31 @@ class AuthenticationViewModelTest {
 
         // Then
         assertEquals(AuthenticationScreenState.UNKNOWN_ERROR, authenticationViewModel.screenState.value)
+    }
+
+
+    @Test
+    fun login_sets_screen_state_to_TOO_MANY_REQUESTS_ERROR_when_an_too_many_request_exception_is_thrown() = runTest {
+        // Given
+        coEvery { loginUseCase(any(), any()) } throws TooManyRequestException()
+
+        // When
+        authenticationViewModel.login()
+
+        // Then
+        assertEquals(AuthenticationScreenState.TOO_MANY_REQUESTS_ERROR, authenticationViewModel.screenState.value)
+    }
+
+    @Test
+    fun login_sets_screen_state_to_AUTHENTICATION_ERRORERROR_when_an_authentication_exception_is_thrown() = runTest {
+        // Given
+        coEvery { loginUseCase(any(), any()) } throws AuthenticationException()
+
+        // When
+        authenticationViewModel.login()
+
+        // Then
+        assertEquals(AuthenticationScreenState.AUTHENTICATION_ERROR, authenticationViewModel.screenState.value)
     }
 
     @Test
