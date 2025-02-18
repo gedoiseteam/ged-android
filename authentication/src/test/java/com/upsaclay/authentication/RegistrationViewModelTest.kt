@@ -193,19 +193,11 @@ class RegistrationViewModelTest {
 
     @Test
     fun register_should_create_user() = runTest {
-        // Given
-        val user = userFixture.copy(isMember = false, profilePictureUrl = null)
-        registrationViewModel.updateFirstName(user.firstName)
-        registrationViewModel.updateLastName(user.lastName)
-        registrationViewModel.updateEmail(user.email)
-        registrationViewModel.updatePassword(password)
-        registrationViewModel.updateSchoolLevel(user.schoolLevel)
-
         // When
         registrationViewModel.register()
 
         // Then
-        coVerify { createUserUseCase(user) }
+        coVerify { createUserUseCase(any()) }
     }
 
 

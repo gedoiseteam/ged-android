@@ -99,10 +99,11 @@ class RegistrationViewModel(
 
     fun register() {
         _screenState.value = RegistrationScreenState.LOADING
+        this.email = email.trim()
 
         viewModelScope.launch {
             try {
-                if (isUserExistUseCase(email.trim())) {
+                if (isUserExistUseCase(email)) {
                     _screenState.value = RegistrationScreenState.USER_ALREADY_EXISTS
                     return@launch
                 }
@@ -111,12 +112,12 @@ class RegistrationViewModel(
                     id = userId,
                     firstName = firstName,
                     lastName = lastName,
-                    email = email.trim(),
+                    email = email,
                     schoolLevel = schoolLevel
                 )
 
                 createUserUseCase(user)
-                registerUseCase(email.trim(), password)
+                registerUseCase(email, password)
                 _screenState.value = RegistrationScreenState.REGISTERED
             } catch (e: Exception) {
                 _screenState.value = when(e) {

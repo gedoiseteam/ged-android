@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.io.IOException
+import java.net.ConnectException
 
 class AuthenticationViewModel(
     private val loginUseCase: LoginUseCase,
@@ -62,13 +63,11 @@ class AuthenticationViewModel(
                 }
             } catch (e: Exception) {
                 _screenState.value = when (e) {
-                    is IOException -> AuthenticationScreenState.SERVER_COMMUNICATION_ERROR
-
                     is TooManyRequestException -> AuthenticationScreenState.TOO_MANY_REQUESTS_ERROR
 
                     is AuthenticationException -> AuthenticationScreenState.AUTHENTICATION_ERROR
 
-                    is ServerCommunicationException -> AuthenticationScreenState.SERVER_COMMUNICATION_ERROR
+                    is ServerCommunicationException, is IOException -> AuthenticationScreenState.SERVER_COMMUNICATION_ERROR
 
                     else -> AuthenticationScreenState.UNKNOWN_ERROR
                 }
