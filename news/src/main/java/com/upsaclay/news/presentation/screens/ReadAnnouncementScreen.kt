@@ -49,6 +49,7 @@ import com.upsaclay.common.domain.entity.Screen
 import com.upsaclay.common.domain.entity.SnackbarType
 import com.upsaclay.common.presentation.components.ClickableItem
 import com.upsaclay.common.presentation.components.ErrorSnackBar
+import com.upsaclay.common.presentation.components.InfoSnackbar
 import com.upsaclay.common.presentation.components.LinearProgressBar
 import com.upsaclay.common.presentation.components.SensibleActionDialog
 import com.upsaclay.common.presentation.components.SmallTopBarBack
@@ -161,7 +162,7 @@ fun ReadAnnouncementScreen(
         topBar = {
             SmallTopBarBack(
                 onBackClick = { navController.popBackStack() },
-                title = stringResource(id = com.upsaclay.news.R.string.announcement)
+                title = stringResource(id = R.string.announcement)
             )
         },
         snackbarHost = {
@@ -170,11 +171,22 @@ fun ReadAnnouncementScreen(
                 modifier = Modifier
                     .testTag(stringResource(id = R.string.read_screen_delete_dialog_title_tag))
             ) {
-                if (snackBarType == SnackbarType.ERROR) {
-                    ErrorSnackBar(
-                        modifier = Modifier.testTag(stringResource(id = R.string.read_screen_error_snackbar_tag)),
-                        message = it.visuals.message
-                    )
+                when (snackBarType) {
+                    SnackbarType.INFO -> {
+                        InfoSnackbar(
+                            modifier = Modifier.testTag(stringResource(id = R.string.read_screen_info_snackbar_tag)),
+                            message = it.visuals.message
+                        )
+                    }
+
+                    SnackbarType.ERROR -> {
+                        ErrorSnackBar(
+                            modifier = Modifier.testTag(stringResource(id = R.string.read_screen_error_snackbar_tag)),
+                            message = it.visuals.message
+                        )
+                    }
+
+                    else -> { }
                 }
             }
         }
@@ -233,7 +245,7 @@ fun ReadAnnouncementScreen(
                     onDismissRequest = { showBottomSheet = false },
                     sheetState = sheetState,
                 ) {
-                    if(announcement?.state == AnnouncementState.DEFAULT) {
+                    if(announcement?.state == AnnouncementState.PUBLISHED) {
                         ClickableItem(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -263,7 +275,10 @@ fun ReadAnnouncementScreen(
                                 )
                             },
                             onClick = {
-                                announcement?.let { readAnnouncementViewModel.recreateAnnouncement(it) }
+                                announcement?.let {
+                                    readAnnouncementViewModel.recreateAnnouncement(it)
+                                    showSnackBar(SnackbarType.INFO, context.getString(R.string.announcement_sent))
+                                } ?: showSnackBar(SnackbarType.ERROR, context.getString(com.upsaclay.common.R.string.occurred_error))
                                 hideBottomSheet()
                             }
                         )

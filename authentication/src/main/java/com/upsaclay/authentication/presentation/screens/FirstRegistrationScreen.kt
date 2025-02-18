@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -48,6 +49,7 @@ fun FirstRegistrationScreen(
     val emptyFields = registrationState.value == RegistrationScreenState.EMPTY_FIELDS_ERROR
     val isLoading = registrationState.value == RegistrationScreenState.LOADING
     val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     RegistrationTopBar(
         navController = navController,
@@ -103,6 +105,8 @@ fun FirstRegistrationScreen(
             onClick = {
                 if (registrationViewModel.verifyNamesInputs()) {
                     registrationViewModel.resetScreenState()
+                    focusManager.clearFocus()
+                    keyboardController?.hide()
                     navController.navigate(Screen.SECOND_REGISTRATION.route)
                 }
             }

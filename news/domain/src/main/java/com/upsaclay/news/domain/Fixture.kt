@@ -22,7 +22,7 @@ val announcementFixture = Announcement(
             "vous avez des questions ou si vous avez besoin de plus amples informations" +
             " avant la date prévue",
     author = userFixture,
-    state = AnnouncementState.DEFAULT
+    state = AnnouncementState.PUBLISHED
 )
 
 val announcementsFixture = listOf(

@@ -16,6 +16,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -136,11 +139,14 @@ internal fun AnnouncementItem(
         is ElapsedTime.Later -> FormatLocalDateTimeUseCase.formatDayMonthYear(elapsedTime.value)
     }
 
+    val alpha = if (announcement.state != AnnouncementState.PUBLISHED) 0.5f else 1f
+
     Row(
         modifier = modifier
             .clickable(onClick = onClick)
             .fillMaxWidth()
-            .padding(MaterialTheme.spacing.smallMedium),
+            .padding(MaterialTheme.spacing.smallMedium)
+            .alpha(alpha),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Row(
@@ -186,7 +192,7 @@ internal fun AnnouncementItem(
         }
 
         when (announcement.state) {
-            AnnouncementState.LOADING -> {
+            AnnouncementState.SENDING -> {
                 CircularProgressBar(scale = 0.4f)
             }
 
@@ -214,7 +220,7 @@ internal fun AnnouncementItem(
 private fun AnnouncementHeaderPreview() {
     GedoiseTheme {
         AnnouncementHeader(
-            announcement = announcementFixture.copy(state = AnnouncementState.ERROR)
+            announcement = announcementFixture
         )
     }
 }
@@ -224,7 +230,7 @@ private fun AnnouncementHeaderPreview() {
 private fun AnnouncementItemPreview() {
     GedoiseTheme {
         AnnouncementItem(
-            announcement = announcementFixture.copy(state = AnnouncementState.ERROR),
+            announcement = announcementFixture,
             onClick = { }
         )
     }

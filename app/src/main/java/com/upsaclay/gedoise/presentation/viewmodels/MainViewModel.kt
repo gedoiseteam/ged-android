@@ -11,6 +11,7 @@ import com.upsaclay.gedoise.data.BottomNavigationItemType
 import com.upsaclay.gedoise.domain.usecase.DeleteLocalDataUseCase
 import com.upsaclay.gedoise.domain.usecase.StartListeningDataUseCase
 import com.upsaclay.gedoise.domain.usecase.StopListeningDataUseCase
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -22,7 +23,7 @@ class MainViewModel(
     private val stopListeningDataUseCase: StopListeningDataUseCase,
     private val deleteLocalDataUseCase: DeleteLocalDataUseCase
 ) : ViewModel() {
-    private val _authenticationState = MutableStateFlow(AuthenticationState.NOTHING)
+    private val _authenticationState = MutableStateFlow(AuthenticationState.WAITING)
     val authenticationState: StateFlow<AuthenticationState> = _authenticationState
     val currentUser: StateFlow<User?> = getCurrentUserUseCase()
     val bottomNavigationItem: Map<BottomNavigationItemType, BottomNavigationItem> = mapOf(
@@ -34,13 +35,14 @@ class MainViewModel(
         viewModelScope.launch {
             isUserAuthenticatedUseCase().collect { authenticated ->
                 authenticated?.let {
-                    _authenticationState.value = if (it) {
+                    if (it) {
                         startListeningDataUseCase()
-                        AuthenticationState.AUTHENTICATED
+                        _authenticationState.value = AuthenticationState.AUTHENTICATED
                     } else {
                         stopListeningDataUseCase()
+                        _authenticationState.value = AuthenticationState.UNAUTHENTICATED
+                        delay(2000)
                         deleteLocalDataUseCase()
-                        AuthenticationState.UNAUTHENTICATED
                     }
                 }
             }
