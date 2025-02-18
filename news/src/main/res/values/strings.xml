@@ -9,6 +9,7 @@
     <string name="new_announcement">Nouvelle annonce</string>
     <string name="edit_announcement">Editer l\'annonce</string>
     <string name="resend_announcement">Renvoyer l\'annonce</string>
+    <string name="announcement_sent">Annonce envoyée</string>
     <string name="delete_announcement">Supprimer l\'annonce</string>
     <string name="delete_announcement_dialog_title">Supprimer annonce</string>
     <string name="delete_announcement_dialog_text">Êtes-vous sûr de vouloir supprimer cette annonce ?</string>
@@ -38,6 +39,7 @@
     <string name="read_screen_delete_dialog_tag">Read screen delete dialog tag</string>
     <string name="read_screen_delete_dialog_title_tag">Read screen delete dialog title tag</string>
     <string name="read_screen_error_snackbar_tag">Read screen error snackbar tag</string>
+    <string name="read_screen_info_snackbar_tag">Read screen info snackbar tag</string>
 
     <string name="create_screen_post_button_tag">Create screen post button tag</string>
 
