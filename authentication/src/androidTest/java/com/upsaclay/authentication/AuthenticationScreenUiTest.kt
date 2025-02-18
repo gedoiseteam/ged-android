@@ -18,6 +18,7 @@ import com.upsaclay.authentication.presentation.viewmodels.RegistrationViewModel
 import com.upsaclay.common.domain.entity.Screen
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Assert
 import org.junit.Before
@@ -40,6 +41,8 @@ class AuthenticationScreenUiTest {
         every { authenticationViewModel.login() } returns Unit
         every { authenticationViewModel.resetScreenState() } returns Unit
         every { authenticationViewModel.verifyInputs() } returns true
+        every { authenticationViewModel.resetEmail() } returns Unit
+        every { authenticationViewModel.resetPassword() } returns Unit
     }
 
     @Test
@@ -153,5 +156,22 @@ class AuthenticationScreenUiTest {
 
         // Then
         rule.onNodeWithText(rule.activity.getString(R.string.too_many_request_error)).assertExists()
+    }
+
+    @Test
+    fun password_should_be_erase_when_login_fails() {
+        // Given
+        every { authenticationViewModel.screenState } returns MutableStateFlow(AuthenticationScreenState.AUTHENTICATION_ERROR)
+
+        // When
+        rule.setContent {
+            AuthenticationScreen(
+                navController,
+                authenticationViewModel
+            )
+        }
+
+        // Then
+        verify { authenticationViewModel.resetPassword() }
     }
 }
