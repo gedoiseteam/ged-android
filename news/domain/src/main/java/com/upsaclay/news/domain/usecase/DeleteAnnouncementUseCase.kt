@@ -8,7 +8,7 @@ class DeleteAnnouncementUseCase(
     private val announcementRepository: AnnouncementRepository
 ) {
     suspend operator fun invoke(announcement: Announcement) {
-        if (announcement.state == AnnouncementState.DEFAULT) {
+        if (announcement.state == AnnouncementState.PUBLISHED) {
             announcementRepository.deleteAnnouncement(announcement)
         } else {
             announcementRepository.deleteLocalAnnouncement(announcement)

@@ -49,7 +49,7 @@ class CreateAnnouncementViewModel(
             content = content.trim(),
             date = LocalDateTime.now(),
             author = currentUser!!,
-            state = AnnouncementState.LOADING
+            state = AnnouncementState.SENDING
         )
 
         createAnnouncementUseCase(announcement)
