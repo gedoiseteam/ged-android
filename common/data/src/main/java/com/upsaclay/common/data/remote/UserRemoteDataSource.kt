@@ -5,9 +5,11 @@ import com.upsaclay.common.data.formatHttpError
 import com.upsaclay.common.data.remote.api.UserFirestoreApi
 import com.upsaclay.common.data.remote.api.UserRetrofitApi
 import com.upsaclay.common.domain.e
+import com.upsaclay.common.domain.entity.ServerCommunicationException
 import com.upsaclay.common.domain.entity.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -22,9 +24,9 @@ internal class UserRemoteDataSource(
     }
 
     suspend fun getUserFlow(userId: String): Flow<User> = withContext(Dispatchers.IO) {
-        userFirestoreApi.getUserFlow(userId).mapNotNull {
-            it?.let { UserMapper.toDomain(it) }
-        }
+        userFirestoreApi.getUserFlow(userId)
+            .catch { e("Error while getting user with firestore : $it", it) }
+            .mapNotNull { it?.let { UserMapper.toDomain(it) } }
     }
 
     suspend fun getUserFirestoreWithEmail(userEmail: String): User? = withContext(Dispatchers.IO) {
@@ -37,8 +39,8 @@ internal class UserRemoteDataSource(
 
     suspend fun createUser(user: User) {
         withContext(Dispatchers.IO) {
-            launch { createUserWithOracle(user) }
-            launch { createUserWithFirestore(user) }
+            createUserWithOracle(user)
+            createUserWithFirestore(user)
         }
     }
 
@@ -75,15 +77,28 @@ internal class UserRemoteDataSource(
     }
 
     private suspend fun createUserWithOracle(user: User) {
-        val response = userRetrofitApi.createUser(UserMapper.toDTO(user))
-        if (!response.isSuccessful) {
-            val errorMessage = formatHttpError("Error creating user with Oracle", response)
-            e(errorMessage)
-            throw IOException(errorMessage)
-        }
+        runCatching { userRetrofitApi.createUser(UserMapper.toDTO(user)) }
+            .onSuccess { response ->
+                if (!response.isSuccessful) {
+                    val errorMessage = formatHttpError("Error creating user with Oracle", response)
+                    e(errorMessage)
+                    throw IOException(errorMessage)
+                }
+            }
+            .onFailure {
+                val errorMessage = "Error creating user with Oracle"
+                e(errorMessage, it)
+                throw ServerCommunicationException(errorMessage)
+            }
     }
 
     private suspend fun createUserWithFirestore(user: User) {
-        userFirestoreApi.createUser(UserMapper.toFirestoreUser(user))
+        try {
+            userFirestoreApi.createUser(UserMapper.toFirestoreUser(user))
+        } catch (e: Exception) {
+            val errorMessage = "Error creating user with Firestore"
+            e(errorMessage, e)
+            throw IOException(errorMessage)
+        }
     }
 }

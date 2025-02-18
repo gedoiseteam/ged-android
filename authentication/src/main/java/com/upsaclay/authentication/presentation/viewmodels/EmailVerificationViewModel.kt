@@ -3,10 +3,11 @@ package com.upsaclay.authentication.presentation.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.upsaclay.authentication.domain.entity.AuthenticationScreenState
-import com.upsaclay.authentication.domain.entity.exception.TooManyRequestException
 import com.upsaclay.authentication.domain.usecase.IsEmailVerifiedUseCase
 import com.upsaclay.authentication.domain.usecase.SendVerificationEmailUseCase
 import com.upsaclay.authentication.domain.usecase.SetUserAuthenticatedUseCase
+import com.upsaclay.common.domain.e
+import com.upsaclay.common.domain.entity.TooManyRequestException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -15,7 +16,7 @@ class EmailVerificationViewModel(
     val email: String,
     private val sendVerificationEmailUseCase: SendVerificationEmailUseCase,
     private val isEmailVerifiedUseCase: IsEmailVerifiedUseCase,
-    private val setUserAuthenticatedUseCase: SetUserAuthenticatedUseCase
+    private val setUserAuthenticatedUseCase: SetUserAuthenticatedUseCase,
 ) : ViewModel() {
     private val _screenState = MutableStateFlow(AuthenticationScreenState.DEFAULT)
     val screenState: StateFlow<AuthenticationScreenState> = _screenState
@@ -25,9 +26,9 @@ class EmailVerificationViewModel(
             try {
                 sendVerificationEmailUseCase()
             } catch (e: Exception) {
+                e("Error sending verification email: ${e.message}", e)
                 when (e) {
-                    is TooManyRequestException -> _screenState.value =
-                        AuthenticationScreenState.TOO_MANY_REQUESTS_ERROR
+                    is TooManyRequestException -> _screenState.value = AuthenticationScreenState.TOO_MANY_REQUESTS_ERROR
 
                     else -> _screenState.value = AuthenticationScreenState.UNKNOWN_ERROR
                 }

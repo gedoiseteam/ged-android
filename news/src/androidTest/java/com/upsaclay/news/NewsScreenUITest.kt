@@ -51,7 +51,6 @@ class NewsScreenUITest {
         every { readAnnouncementViewModel.screenState } returns MutableStateFlow(AnnouncementScreenState.DEFAULT)
         every { readAnnouncementViewModel.currentUser } returns MutableStateFlow(userFixture)
         every { readAnnouncementViewModel.deleteAnnouncement() } returns Unit
-        every { createAnnouncementViewModel.screenState } returns MutableStateFlow(AnnouncementScreenState.DEFAULT)
         every { createAnnouncementViewModel.title } returns ""
         every { createAnnouncementViewModel.content } returns ""
         coEvery { newsViewModel.refreshAnnouncements() } returns Unit

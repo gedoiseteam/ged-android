@@ -15,7 +15,7 @@ interface AuthenticationRepository {
 
     suspend fun sendVerificationEmail()
 
-    fun isUserEmailVerified(): Boolean
+    suspend fun isUserEmailVerified(): Boolean
 
     suspend fun setAuthenticated(isAuthenticated: Boolean)
 }

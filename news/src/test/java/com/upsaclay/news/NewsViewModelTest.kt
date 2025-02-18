@@ -24,7 +24,7 @@ import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class NewsViewModelTest {
-    private val getAnnouncementUseCase: GetAnnouncementsUseCase = mockk()
+    private val getAnnouncementsUseCase: GetAnnouncementsUseCase = mockk()
     private val getCurrentUserUseCase: GetCurrentUserUseCase = mockk()
     private val refreshAnnouncementsUseCase: RefreshAnnouncementsUseCase = mockk()
 
@@ -35,12 +35,12 @@ class NewsViewModelTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
 
-        every { getAnnouncementUseCase() } returns flowOf(announcementsFixture)
+        every { getAnnouncementsUseCase() } returns flowOf(announcementsFixture)
         every { getCurrentUserUseCase() } returns MutableStateFlow(userFixture)
         coEvery { refreshAnnouncementsUseCase() } returns Unit
 
         newsViewModel = NewsViewModel(
-            getAnnouncementUseCase = getAnnouncementUseCase,
+            getAnnouncementsUseCase = getAnnouncementsUseCase,
             getCurrentUserUseCase = getCurrentUserUseCase,
             refreshAnnouncementsUseCase = refreshAnnouncementsUseCase
         )

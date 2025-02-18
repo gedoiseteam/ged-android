@@ -11,7 +11,7 @@ import com.upsaclay.common.domain.usecase.UpdateProfilePictureUseCase
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
-val commonModule = module {
+val commonDomainModule = module {
     singleOf(::DeleteProfilePictureUseCase)
     singleOf(::GetUsersUseCase)
     singleOf(::GetCurrentUserUseCase)

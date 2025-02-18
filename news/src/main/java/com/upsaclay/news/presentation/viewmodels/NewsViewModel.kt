@@ -16,11 +16,11 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class NewsViewModel(
-    getAnnouncementUseCase: GetAnnouncementsUseCase,
+    getAnnouncementsUseCase: GetAnnouncementsUseCase,
     getCurrentUserUseCase: GetCurrentUserUseCase,
     private val refreshAnnouncementsUseCase: RefreshAnnouncementsUseCase
 ) : ViewModel() {
-    val announcements: Flow<List<Announcement>> = getAnnouncementUseCase()
+    val announcements: Flow<List<Announcement>> = getAnnouncementsUseCase()
         .map { announcements ->
             announcements
                 .sortedBy { it.date }

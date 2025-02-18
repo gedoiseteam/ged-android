@@ -2,7 +2,6 @@ package com.upsaclay.news
 
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -15,6 +14,7 @@ import com.upsaclay.common.domain.userFixture
 import com.upsaclay.common.domain.userFixture2
 import com.upsaclay.news.domain.announcementFixture
 import com.upsaclay.news.domain.entity.AnnouncementScreenState
+import com.upsaclay.news.domain.entity.AnnouncementState
 import com.upsaclay.news.presentation.screens.EditAnnouncementScreen
 import com.upsaclay.news.presentation.screens.ReadAnnouncementScreen
 import com.upsaclay.news.presentation.viewmodels.ReadAnnouncementViewModel
@@ -38,6 +38,7 @@ class ReadAnnouncementScreenUITest {
         every { readAnnouncementViewModel.announcement } returns MutableStateFlow(announcementFixture)
         every { readAnnouncementViewModel.screenState } returns MutableStateFlow(AnnouncementScreenState.DEFAULT)
         every { readAnnouncementViewModel.currentUser } returns MutableStateFlow(userFixture)
+        every { readAnnouncementViewModel.updateScreenState(any()) } returns Unit
     }
 
     @Test
@@ -156,5 +157,23 @@ class ReadAnnouncementScreenUITest {
 
         // Then
         rule.onNodeWithTag(rule.activity.getString(R.string.read_screen_delete_dialog_tag)).assertExists()
+    }
+
+    @Test
+    fun error_snackbar_should_displayed_when_delete_announcement_fails() {
+        // Given
+        every { readAnnouncementViewModel.screenState } returns MutableStateFlow(AnnouncementScreenState.ERROR)
+
+        // When
+        rule.setContent {
+            ReadAnnouncementScreen(
+                announcementId = announcementFixture.id,
+                navController = navController,
+                readAnnouncementViewModel = readAnnouncementViewModel
+            )
+        }
+
+        // Then
+        rule.onNodeWithTag(rule.activity.getString(R.string.read_screen_error_snackbar_tag)).assertExists()
     }
 }

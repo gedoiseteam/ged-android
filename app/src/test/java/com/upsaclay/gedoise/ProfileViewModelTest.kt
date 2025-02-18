@@ -3,7 +3,6 @@ package com.upsaclay.gedoise
 import com.upsaclay.authentication.domain.usecase.LogoutUseCase
 import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
 import com.upsaclay.common.domain.userFixture
-import com.upsaclay.gedoise.domain.entities.ProfileScreenState
 import com.upsaclay.gedoise.presentation.viewmodels.ProfileViewModel
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -51,7 +50,6 @@ class ProfileViewModelTest {
         )
 
         // Then
-        assertEquals(ProfileScreenState.DEFAULT, profileViewModel.screenState.value)
         assertEquals(null, profileViewModel.currentUser.value)
     }
 
@@ -62,14 +60,5 @@ class ProfileViewModelTest {
 
         // Then
         coVerify { logoutUseCase() }
-    }
-
-    @Test
-    fun logout_should_update_screen_state_to_LOGGED_OUT() {
-        // When
-        profileViewModel.logout()
-
-        // Then
-        assertEquals(ProfileScreenState.LOGGED_OUT, profileViewModel.screenState.value)
     }
 }

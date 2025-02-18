@@ -7,20 +7,21 @@ import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
 import com.upsaclay.news.domain.entity.Announcement
 import com.upsaclay.news.domain.entity.AnnouncementScreenState
 import com.upsaclay.news.domain.usecase.DeleteAnnouncementUseCase
+import com.upsaclay.news.domain.usecase.GetAnnouncementFlowUseCase
 import com.upsaclay.news.domain.usecase.GetAnnouncementUseCase
-import com.upsaclay.news.domain.usecase.GetAnnouncementsUseCase
+import com.upsaclay.news.domain.usecase.RecreateAnnouncementUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
-import java.io.IOException
+import java.net.ConnectException
 
 class ReadAnnouncementViewModel(
     announcementId: String,
     getCurrentUserUseCase: GetCurrentUserUseCase,
     getAnnouncementUseCase: GetAnnouncementUseCase,
-    getAnnouncementsUseCase: GetAnnouncementsUseCase,
+    getAnnouncementFlowUseCase: GetAnnouncementFlowUseCase,
     private val deleteAnnouncementUseCase: DeleteAnnouncementUseCase,
+    private val recreateAnnouncementUseCase: RecreateAnnouncementUseCase
 ) : ViewModel() {
     private val _announcement = MutableStateFlow(getAnnouncementUseCase(announcementId))
     private val _screenState = MutableStateFlow(AnnouncementScreenState.DEFAULT)
@@ -30,9 +31,7 @@ class ReadAnnouncementViewModel(
 
     init {
         viewModelScope.launch {
-            getAnnouncementsUseCase().mapNotNull { announcements ->
-                announcements.firstOrNull { it.id == announcementId }
-            }.collect {
+            getAnnouncementFlowUseCase(announcementId).collect {
                 _announcement.value = it
             }
         }
@@ -43,14 +42,24 @@ class ReadAnnouncementViewModel(
             return
         }
 
-        _screenState.value = AnnouncementScreenState.LOADING
         viewModelScope.launch {
             try {
                 deleteAnnouncementUseCase(_announcement.value!!)
                 _screenState.value = AnnouncementScreenState.DELETED
+            }
+            catch (e: ConnectException) {
+                _screenState.value = AnnouncementScreenState.CONNECTION_ERROR
             } catch (e: Exception) {
-                _screenState.value = AnnouncementScreenState.DELETE_ERROR
+                _screenState.value = AnnouncementScreenState.ERROR
             }
         }
+    }
+
+    fun recreateAnnouncement(announcement: Announcement) {
+        recreateAnnouncementUseCase(announcement)
+    }
+
+    fun updateScreenState(screenState: AnnouncementScreenState) {
+        _screenState.value = screenState
     }
 }

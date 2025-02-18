@@ -1,6 +1,5 @@
 package com.upsaclay.news.domain
 
-import com.upsaclay.common.domain.entity.User
 import com.upsaclay.common.domain.userFixture
 import com.upsaclay.news.domain.entity.Announcement
 import com.upsaclay.news.domain.entity.AnnouncementState
@@ -22,8 +21,8 @@ val announcementFixture = Announcement(
             "sans heurts et de manière efficace. N'hésitez pas à nous contacter si " +
             "vous avez des questions ou si vous avez besoin de plus amples informations" +
             " avant la date prévue",
-    state = AnnouncementState.DEFAULT,
-    author = userFixture
+    author = userFixture,
+    state = AnnouncementState.DEFAULT
 )
 
 val announcementsFixture = listOf(

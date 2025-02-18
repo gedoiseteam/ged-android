@@ -11,7 +11,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.testing.TestNavHostController
 import com.upsaclay.common.domain.entity.Screen
 import com.upsaclay.common.domain.userFixture
-import com.upsaclay.gedoise.domain.entities.ProfileScreenState
 import com.upsaclay.gedoise.presentation.screens.AccountScreen
 import com.upsaclay.gedoise.presentation.screens.ProfileScreen
 import com.upsaclay.gedoise.presentation.viewmodels.ProfileViewModel
@@ -32,7 +31,6 @@ class ProfileScreenUITest {
 
     @Before
     fun setUp() {
-        every { profileViewModel.screenState } returns MutableStateFlow(ProfileScreenState.DEFAULT)
         every { profileViewModel.currentUser } returns MutableStateFlow(userFixture)
         every { profileViewModel.logout() } returns Unit
     }

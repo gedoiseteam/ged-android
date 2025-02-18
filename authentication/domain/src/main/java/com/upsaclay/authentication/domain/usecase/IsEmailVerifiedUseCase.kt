@@ -5,5 +5,5 @@ import com.upsaclay.authentication.domain.repository.AuthenticationRepository
 class IsEmailVerifiedUseCase(
     private val authenticationRepository: AuthenticationRepository
 ) {
-    operator fun invoke(): Boolean = authenticationRepository.isUserEmailVerified()
+    suspend operator fun invoke(): Boolean = authenticationRepository.isUserEmailVerified()
 }

@@ -41,13 +41,25 @@ internal class AnnouncementRepositoryImpl(
         announcementRemoteDataSource.createAnnouncement(announcement)
     }
 
+    override suspend fun createRemoteAnnouncement(announcement: Announcement) {
+        announcementRemoteDataSource.createAnnouncement(announcement)
+    }
+
     override suspend fun updateAnnouncement(announcement: Announcement) {
         announcementRemoteDataSource.updateAnnouncement(announcement)
         announcementLocalDataSource.updateAnnouncement(announcement)
     }
 
+    override suspend fun updateAnnouncementState(announcement: Announcement) {
+        announcementLocalDataSource.updateAnnouncement(announcement)
+    }
+
     override suspend fun deleteAnnouncement(announcement: Announcement) {
-        announcementLocalDataSource.deleteAnnouncement(announcement)
         announcementRemoteDataSource.deleteAnnouncement(announcement.id)
+        announcementLocalDataSource.deleteAnnouncement(announcement)
+    }
+
+    override suspend fun deleteLocalAnnouncement(announcement: Announcement) {
+        announcementLocalDataSource.deleteAnnouncement(announcement)
     }
 }

@@ -1,6 +1,5 @@
 package com.upsaclay.gedoise
 
-import com.upsaclay.authentication.domain.entity.AuthenticationScreenState
 import com.upsaclay.authentication.domain.entity.AuthenticationState
 import com.upsaclay.authentication.domain.usecase.IsUserAuthenticatedUseCase
 import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase

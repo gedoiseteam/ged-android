@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.tooling.preview.Preview
+import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 
 @Composable
@@ -24,7 +25,7 @@ fun PrimaryButton(
         enabled = isEnable,
         onClick = onClick
     ) {
-        Text(text = text)
+        Text(text = text, color = GedoiseColor.White)
     }
 }
 

@@ -15,26 +15,25 @@
     <string name="registration">Inscription</string>
     <string name="partial_arrow_left_icon_description">Icône de retour à l\'écran précédent</string>
     <string name="step">Étape %1$d sur %2$d</string>
-    <string name="enter_first_last_name">Entrez votre nom et prénom</string>
-    <string name="email_verification_text">Un lien de vérification vous a été envoyé à l\'adresse suivante : <b>%s</b>.\nCliquer dessus afin de valider votre adresse e-mail</string>
+    <string name="enter_first_last_name">Saisissez votre nom</string>
     <string name="email_verification_explanation_begining">Un lien a été à l\'adresse suivante : </string>
     <string name="email_verification_explanation_end">. Veuillez cliquer dessus pour finaliser l\'inscription.</string>
     <string name="email_not_verified">Veuillez valider votre adresse e-mail avant de continuer.</string>
-    <string name="email_not_verified_dialog_message">Veuillez valider votre adresse e-mail avant de continuer.</string>
-    <string name="enter_email_password">Entrez votre adresse e-mail et votre mot de passe</string>
-    <string name="enter_school_credentials">Entrez vos identifiants universitaire</string>
+    <string name="email_not_verified_dialog_title">Adresse e-mail non vérifié</string>
+    <string name="enter_email_password">Saisissez votre adresse e-mail et votre mot de passe</string>
+    <string name="enter_school_credentials">Saisissez vos identifiants universitaire</string>
     <string name="select_level_school">Sélectionnez votre niveau d\'étude</string>
     <string name="email_verification_title">Vérification de l\'e-mail</string>
-    <string name="forward_verification_email">Renvoyez l\'e-mail</string>
-    <string name="add_profile_picture">Ajoutez une photo de profil</string>
+    <string name="forward_verification_email">Renvoyer l\'e-mail</string>
 
     <string name="unrecognized_account">Compte universitaire non reconnu</string>
-    <string name="error_update_profile_picture">Une erreur est survenue lors de la mise à jour de la photo de profil. Veuillez réesayez.</string>
-    <string name="error_incorrect_email_format">Veuillez mettre une adresse e-mail valide</string>
+    <string name="error_update_profile_picture">Une erreur est survenue lors de la mise à jour de la photo de profil. Veuillez réesayer.</string>
+    <string name="error_incorrect_email_format">Veuillez entrer une adresse e-mail valide</string>
     <string name="error_password_length">Le mot de passe doit comporter au moins 8 caractères</string>
-    <string name="email_already_associated">Cette adresse e-mail est déjà associée à un compte. Veuillez vous connecter ou réinitialisez votre mot de passe.</string>
+    <string name="email_already_associated">Cette adresse e-mail est déjà associée à un compte. Veuillez vous connecter ou réinitialiser votre mot de passe.</string>
     <string name="authenticated_user_not_found">La création de vore compte a été comprise. Veuillez contacter le support à l\'adresse suivante : application.gedoise@gmail.com</string>
     <string name="too_many_request_error">Vous avez effectué trop de tentatives de connexion. Veuillez réessayer dans quelques minutes.</string>
+    <string name="user_creation_error">Une erreur est survenue lors de la création de votre compte. Veuillez réessayer.</string>
 
     <string name="authentication_screen_login_button_tag">Authentication Screen Login Button Tag</string>
     <string name="authentication_screen_registration_button_tag">Authentication Screen Registration Button Tag</string>

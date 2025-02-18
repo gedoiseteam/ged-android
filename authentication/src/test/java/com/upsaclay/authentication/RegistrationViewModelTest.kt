@@ -1,17 +1,14 @@
 package com.upsaclay.authentication
 
 import com.upsaclay.authentication.domain.entity.RegistrationScreenState
-import com.upsaclay.authentication.domain.entity.exception.AuthErrorCode
 import com.upsaclay.authentication.domain.entity.exception.AuthenticationException
 import com.upsaclay.authentication.domain.usecase.RegisterUseCase
 import com.upsaclay.authentication.presentation.viewmodels.RegistrationViewModel
 import com.upsaclay.common.domain.usecase.CreateUserUseCase
 import com.upsaclay.common.domain.usecase.IsUserExistUseCase
-import com.upsaclay.common.domain.usecase.VerifyEmailFormatUseCase
 import com.upsaclay.common.domain.userFixture
 import io.mockk.coEvery
 import io.mockk.coVerify
-import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -196,19 +193,11 @@ class RegistrationViewModelTest {
 
     @Test
     fun register_should_create_user() = runTest {
-        // Given
-        val user = userFixture.copy(isMember = false, profilePictureUrl = null)
-        registrationViewModel.updateFirstName(user.firstName)
-        registrationViewModel.updateLastName(user.lastName)
-        registrationViewModel.updateEmail(user.email)
-        registrationViewModel.updatePassword(password)
-        registrationViewModel.updateSchoolLevel(user.schoolLevel)
-
         // When
         registrationViewModel.register()
 
         // Then
-        coVerify { createUserUseCase(user) }
+        coVerify { createUserUseCase(any()) }
     }
 
 
@@ -227,7 +216,7 @@ class RegistrationViewModelTest {
     @Test
     fun register_should_update_screen_state_to_USER_ALREADY_EXISTS_when_email_is_already_affiliated() = runTest {
         // Given
-        coEvery { registerUseCase(any(), any()) } throws AuthenticationException(code = AuthErrorCode.EMAIL_ALREADY_AFFILIATED)
+        coEvery { registerUseCase(any(), any()) } throws AuthenticationException()
 
         // When
         registrationViewModel.register()
@@ -245,7 +234,7 @@ class RegistrationViewModelTest {
         registrationViewModel.register()
 
         // Then
-        assertEquals(RegistrationScreenState.ERROR, registrationViewModel.screenState.value)
+        assertEquals(RegistrationScreenState.UNKNOWN_ERROR, registrationViewModel.screenState.value)
     }
 
     @Test

@@ -47,7 +47,7 @@ class AuthenticationUseCaseTest {
         verifyEmailFormatUseCase = VerifyEmailFormatUseCase
 
         every { authenticationRepository.isAuthenticated } returns flowOf(false)
-        every { authenticationRepository.isUserEmailVerified() } returns false
+        coEvery { authenticationRepository.isUserEmailVerified() } returns false
         coEvery { authenticationRepository.loginWithEmailAndPassword(any(), any()) } returns Unit
         coEvery { authenticationRepository.registerWithEmailAndPassword(any(), any()) } returns ""
         coEvery { authenticationRepository.logout() } returns Unit
@@ -65,7 +65,7 @@ class AuthenticationUseCaseTest {
     }
 
     @Test
-    fun `isEmailVerifiedUseCase should return false when email is not verified`() {
+    fun `isEmailVerifiedUseCase should return false when email is not verified`() = runTest {
         // When
         val result = isEmailVerifiedUseCase()
 
@@ -74,9 +74,9 @@ class AuthenticationUseCaseTest {
     }
 
     @Test
-    fun `isEmailVerifiedUseCase should return false when email is verified`() {
+    fun `isEmailVerifiedUseCase should return false when email is verified`() = runTest {
         // Given
-        every { authenticationRepository.isUserEmailVerified() } returns true
+        coEvery { authenticationRepository.isUserEmailVerified() } returns true
 
         // When
         val result = isEmailVerifiedUseCase()

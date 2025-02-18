@@ -1,6 +1,5 @@
 package com.upsaclay.news.domain
 
-import com.upsaclay.news.domain.entity.AnnouncementState
 import com.upsaclay.news.domain.repository.AnnouncementRepository
 import com.upsaclay.news.domain.usecase.CreateAnnouncementUseCase
 import com.upsaclay.news.domain.usecase.DeleteAnnouncementUseCase
@@ -11,13 +10,17 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class AnnouncementUseCaseTest {
     private val announcementRepository: AnnouncementRepository = mockk()
 
@@ -27,9 +30,14 @@ class AnnouncementUseCaseTest {
     private lateinit var getAnnouncementUseCase: GetAnnouncementUseCase
     private lateinit var updateAnnouncementUseCase: UpdateAnnouncementUseCase
 
+    private val testScope = TestScope(UnconfinedTestDispatcher())
+
     @Before
     fun setUp() {
-        createAnnouncementUseCase = CreateAnnouncementUseCase(announcementRepository = announcementRepository)
+        createAnnouncementUseCase = CreateAnnouncementUseCase(
+            announcementRepository = announcementRepository,
+            scope = testScope
+        )
         deleteAnnouncementUseCase = DeleteAnnouncementUseCase(announcementRepository = announcementRepository)
         getAnnouncementsUseCase = GetAnnouncementsUseCase(announcementRepository = announcementRepository)
         getAnnouncementUseCase = GetAnnouncementUseCase(announcementRepository = announcementRepository)
@@ -50,19 +58,6 @@ class AnnouncementUseCaseTest {
 
         // Then
         coVerify { announcementRepository.createAnnouncement(announcementFixture) }
-        coVerify { announcementRepository.updateAnnouncement(announcementFixture.copy(state = AnnouncementState.DEFAULT)) }
-    }
-
-    @Test
-    fun create_announcement_use_case_should_update_announcement_state_to_error_when_error() = runTest {
-        // Given
-        coEvery { announcementRepository.createAnnouncement(any()) } throws Exception()
-
-        // When
-        createAnnouncementUseCase(announcementFixture)
-
-        // Then
-        coVerify { announcementRepository.updateAnnouncement(announcementFixture.copy(state = AnnouncementState.ERROR)) }
     }
 
     @Test

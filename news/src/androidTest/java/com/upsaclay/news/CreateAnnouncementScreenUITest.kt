@@ -7,12 +7,10 @@ import androidx.compose.ui.test.isNotEnabled
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.navigation.testing.TestNavHostController
-import com.upsaclay.news.domain.entity.AnnouncementScreenState
 import com.upsaclay.news.presentation.screens.CreateAnnouncementScreen
 import com.upsaclay.news.presentation.viewmodels.CreateAnnouncementViewModel
 import io.mockk.every
 import io.mockk.mockk
-import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -26,7 +24,6 @@ class CreateAnnouncementScreenUITest {
 
     @Before
     fun setUp() {
-        every { createAnnouncementViewModel.screenState } returns MutableStateFlow(AnnouncementScreenState.DEFAULT)
         every { createAnnouncementViewModel.title } returns ""
         every { createAnnouncementViewModel.content } returns ""
         every { createAnnouncementViewModel.createAnnouncement() } returns Unit

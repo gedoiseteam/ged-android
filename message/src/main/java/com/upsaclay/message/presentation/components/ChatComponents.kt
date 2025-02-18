@@ -2,10 +2,13 @@ package com.upsaclay.message.presentation.components
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,24 +16,42 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import com.upsaclay.common.domain.usecase.FormatLocalDateTimeUseCase
 import com.upsaclay.common.presentation.components.ProfilePicture
+import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.message.R
@@ -86,6 +107,9 @@ fun ReceiveMessageItem(
     message: Message,
     displayProfilePicture: Boolean
 ) {
+    val background = if (isSystemInDarkTheme()) GedoiseColor.InputBackgroundDark else GedoiseColor.InputBackgroundLight
+    val foreground = if (isSystemInDarkTheme()) GedoiseColor.White else GedoiseColor.Black
+
     Row(
         modifier = modifier.fillMaxWidth(0.8f),
         verticalAlignment = Alignment.Bottom
@@ -101,8 +125,8 @@ fun ReceiveMessageItem(
         MessageText(
             text = message.content,
             date = message.date,
-            backgroundColor = MaterialTheme.colorScheme.surface,
-            textColor = MaterialTheme.colorScheme.onBackground,
+            backgroundColor = background,
+            textColor = foreground,
             dateTimeTextColor = Color(0xFF8E8E93)
         )
     }
@@ -143,6 +167,81 @@ private fun MessageText(
             style = MaterialTheme.typography.labelSmall,
             color = dateTimeTextColor
         )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MessageInput(
+    modifier: Modifier = Modifier,
+    value: String,
+    onValueChange: (String) -> Unit,
+    onSendClick: () -> Unit
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val colors: TextFieldColors = TextFieldDefaults.colors()
+    val backgroundColor = if(isSystemInDarkTheme()) GedoiseColor.InputBackgroundDark else GedoiseColor.InputBackgroundLight
+    val placeholderColor = if(isSystemInDarkTheme()) GedoiseColor.InputForegroundDark else GedoiseColor.InputForegroundLight
+    val textColor = if (isSystemInDarkTheme()) GedoiseColor.White else GedoiseColor.Black
+
+    Row(
+        modifier = modifier
+            .clip(ShapeDefaults.ExtraLarge)
+            .background(backgroundColor)
+            .padding(end = MaterialTheme.spacing.small),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        BasicTextField(
+            modifier = modifier
+                .weight(1f)
+                .testTag(stringResource(R.string.chat_screen_message_input_tag)),
+            value = value,
+            onValueChange = onValueChange,
+            keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
+            cursorBrush = SolidColor(colors.cursorColor),
+            textStyle = TextStyle(color = textColor)
+        ) { innerTextField ->
+            TextFieldDefaults.DecorationBox(
+                value = value,
+                innerTextField = innerTextField,
+                placeholder = {
+                    Text(
+                        text = stringResource(id = R.string.message_placeholder),
+                        style = TextStyle(platformStyle = PlatformTextStyle(false)),
+                        color = placeholderColor
+                    )
+                },
+                enabled = true,
+                singleLine = false,
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = backgroundColor,
+                    unfocusedContainerColor = backgroundColor,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
+                ),
+                visualTransformation = VisualTransformation.None,
+                interactionSource = interactionSource,
+                contentPadding = PaddingValues(
+                    horizontal = MaterialTheme.spacing.medium,
+                    vertical = MaterialTheme.spacing.smallMedium
+                )
+            )
+        }
+
+        if (value.isNotBlank()) {
+            Button(
+                modifier = Modifier
+                    .testTag(stringResource(R.string.chat_screen_send_button_tag)),
+                onClick = onSendClick,
+                contentPadding = PaddingValues()
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Default.Send,
+                    contentDescription = stringResource(id = R.string.send_message_icon_description),
+                    tint = GedoiseColor.White
+                )
+            }
+        }
     }
 }
 
@@ -189,6 +288,20 @@ private fun ReceiveMessageItemPreview() {
             message = messageFixture.copy(content = mediumText),
             displayProfilePicture = true,
             profilePictureUrl = ""
+        )
+    }
+}
+
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
+@Composable
+private fun MessageTextFieldPreview() {
+    var text by remember { mutableStateOf("") }
+    GedoiseTheme {
+        MessageInput(
+            modifier = Modifier.fillMaxWidth(),
+            value = text,
+            onValueChange = { text = it },
+            onSendClick = { },
         )
     }
 }

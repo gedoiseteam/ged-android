@@ -12,7 +12,13 @@ interface AnnouncementRepository {
 
     suspend fun createAnnouncement(announcement: Announcement)
 
+    suspend fun createRemoteAnnouncement(announcement: Announcement)
+
     suspend fun updateAnnouncement(announcement: Announcement)
 
+    suspend fun updateAnnouncementState(announcement: Announcement)
+
     suspend fun deleteAnnouncement(announcement: Announcement)
+
+    suspend fun deleteLocalAnnouncement(announcement: Announcement)
 }

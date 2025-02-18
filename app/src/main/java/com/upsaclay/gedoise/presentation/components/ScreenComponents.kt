@@ -54,7 +54,7 @@ fun SplashScreen() {
         Image(
             modifier = Modifier
                 .width(screenWith)
-                .height(200.dp)
+                .height(160.dp)
                 .scale(animatedValue.value),
             painter = painterResource(id = com.upsaclay.common.R.drawable.ged_logo),
             contentDescription = stringResource(id = R.string.app_name)

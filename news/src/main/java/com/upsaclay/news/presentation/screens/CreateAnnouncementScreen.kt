@@ -12,29 +12,22 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
-import com.upsaclay.common.presentation.components.LoadingDialog
-import com.upsaclay.common.presentation.components.SmallTopBarEdit
+import com.upsaclay.common.presentation.components.SmallTopBarAction
 import com.upsaclay.common.presentation.components.TransparentFocusedTextField
 import com.upsaclay.common.presentation.components.TransparentTextField
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
-import com.upsaclay.common.utils.showToast
 import com.upsaclay.news.R
-import com.upsaclay.news.domain.entity.AnnouncementScreenState
 import com.upsaclay.news.presentation.viewmodels.CreateAnnouncementViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -43,50 +36,22 @@ fun CreateAnnouncementScreen(
     navController: NavController,
     createAnnouncementViewModel: CreateAnnouncementViewModel = koinViewModel()
 ) {
-    val context = LocalContext.current
-    val focusManager = LocalFocusManager.current
-    val keyboardController = LocalSoftwareKeyboardController.current
-    var showLoadingDialog by remember { mutableStateOf(false) }
-    val state by createAnnouncementViewModel.screenState.collectAsState()
     val title = createAnnouncementViewModel.title
     val content = createAnnouncementViewModel.content
-
-    LaunchedEffect(state) {
-        when (state) {
-            AnnouncementScreenState.CREATION_ERROR -> {
-                showLoadingDialog = false
-                showToast(context, R.string.announcement_creation_error)
-            }
-
-            AnnouncementScreenState.CREATED -> {
-                showLoadingDialog = false
-                focusManager.clearFocus()
-                keyboardController?.hide()
-                navController.popBackStack()
-            }
-
-            AnnouncementScreenState.LOADING -> showLoadingDialog = true
-
-            else -> {}
-        }
-    }
-
-    if (showLoadingDialog) {
-        LoadingDialog()
-    }
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
 
     Scaffold(
         topBar = {
-            SmallTopBarEdit(
+            SmallTopBarAction(
                 modifier = Modifier.fillMaxWidth(),
-                confirmText = stringResource(id = com.upsaclay.common.R.string.publish),
-                onCancelClick = {
+                buttonText = stringResource(id = com.upsaclay.common.R.string.publish),
+                onCancelClick = { navController.popBackStack() },
+                onActionClick = {
                     focusManager.clearFocus()
                     keyboardController?.hide()
-                    navController.popBackStack()
-                },
-                onSaveClick = {
                     createAnnouncementViewModel.createAnnouncement()
+                    navController.popBackStack()
                 },
                 isButtonEnable = content.isNotBlank()
             )
@@ -153,11 +118,11 @@ private fun CreateAnnouncementScreenPreview() {
     GedoiseTheme {
         Scaffold(
             topBar = {
-                SmallTopBarEdit(
+                SmallTopBarAction(
                     onCancelClick = { },
-                    onSaveClick = { },
-                    confirmText = stringResource(id = com.upsaclay.common.R.string.publish),
-                    isButtonEnable = false
+                    onActionClick = { },
+                    buttonText = stringResource(id = com.upsaclay.common.R.string.publish),
+                    isButtonEnable = content.isNotBlank()
                 )
             }
         ) { contentPadding ->

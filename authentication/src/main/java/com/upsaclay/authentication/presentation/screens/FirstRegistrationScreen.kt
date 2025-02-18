@@ -11,7 +11,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -19,11 +18,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -36,45 +32,32 @@ import com.upsaclay.authentication.presentation.components.RegistrationTopBar
 import com.upsaclay.authentication.presentation.viewmodels.RegistrationViewModel
 import com.upsaclay.common.domain.entity.Screen
 import com.upsaclay.common.presentation.components.ErrorTextWithIcon
-import com.upsaclay.common.presentation.components.OverlayLinearLoadingScreen
 import com.upsaclay.common.presentation.components.PrimaryButton
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
-import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
+
+private const val CURRENT_STEP = 1
 
 @Composable
 fun FirstRegistrationScreen(
     navController: NavController,
     registrationViewModel: RegistrationViewModel = koinViewModel()
 ) {
-    val keyboardController = LocalSoftwareKeyboardController.current
     val registrationState = registrationViewModel.screenState.collectAsState()
     val emptyFields = registrationState.value == RegistrationScreenState.EMPTY_FIELDS_ERROR
     val isLoading = registrationState.value == RegistrationScreenState.LOADING
-    val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
 
-    LaunchedEffect(Unit) {
-        registrationViewModel.resetScreenState()
-        registrationViewModel.resetFirstName()
-        registrationViewModel.resetLastName()
-        registrationViewModel.resetEmail()
-        registrationViewModel.resetPassword()
-        registrationViewModel.resetSchoolLevel()
-    }
-
     RegistrationTopBar(
-        navController = navController
+        navController = navController,
+        currentStep = CURRENT_STEP
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .pointerInput(Unit) {
-                    detectTapGestures(onPress = {
-                        focusManager.clearFocus()
-                        keyboardController?.hide()
-                    })
+                    detectTapGestures(onTap = { focusManager.clearFocus() })
                 },
             verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium)
         ) {
@@ -84,27 +67,23 @@ fun FirstRegistrationScreen(
             )
 
             OutlinedTextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .focusRequester(focusRequester),
-                value = registrationViewModel.lastName,
-                isError = emptyFields,
-                enabled = !isLoading,
-                placeholder = { Text(text = stringResource(id = com.upsaclay.common.R.string.last_name)) },
-                keyboardOptions = KeyboardOptions(KeyboardCapitalization.Sentences),
-                onValueChange = { registrationViewModel.updateLastName(it) },
-            )
-
-            OutlinedTextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .focusRequester(focusRequester),
+                modifier = Modifier.fillMaxWidth(),
                 value = registrationViewModel.firstName,
                 isError = emptyFields,
                 enabled = !isLoading,
                 keyboardOptions = KeyboardOptions(KeyboardCapitalization.Sentences),
                 placeholder = { Text(text = stringResource(id = com.upsaclay.common.R.string.first_name)) },
                 onValueChange = { registrationViewModel.updateFirstName(it) },
+            )
+
+            OutlinedTextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = registrationViewModel.lastName,
+                isError = emptyFields,
+                enabled = !isLoading,
+                placeholder = { Text(text = stringResource(id = com.upsaclay.common.R.string.last_name)) },
+                keyboardOptions = KeyboardOptions(KeyboardCapitalization.Sentences),
+                onValueChange = { registrationViewModel.updateLastName(it) },
             )
 
             if (emptyFields) {
@@ -122,9 +101,8 @@ fun FirstRegistrationScreen(
             text = stringResource(id = com.upsaclay.common.R.string.next),
             isEnable = !isLoading,
             onClick = {
-                focusManager.clearFocus()
-                keyboardController?.hide()
                 if (registrationViewModel.verifyNamesInputs()) {
+                    registrationViewModel.resetScreenState()
                     navController.navigate(Screen.SECOND_REGISTRATION.route)
                 }
             }
@@ -144,12 +122,12 @@ private fun FirstRegistrationScreenPreview() {
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
     val isError = false
-    val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
 
     GedoiseTheme {
         RegistrationTopBar(
-            navController = rememberNavController()
+            navController = rememberNavController(),
+            currentStep = 1
         ) {
             Column(
                 modifier = Modifier
@@ -167,9 +145,7 @@ private fun FirstRegistrationScreenPreview() {
                 )
 
                 OutlinedTextField(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .focusRequester(focusRequester),
+                    modifier = Modifier.fillMaxWidth(),
                     placeholder = { Text(text = stringResource(id = com.upsaclay.common.R.string.last_name)) },
                     value = lastName,
                     isError = isError,
@@ -177,9 +153,7 @@ private fun FirstRegistrationScreenPreview() {
                 )
 
                 OutlinedTextField(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .focusRequester(focusRequester),
+                    modifier = Modifier.fillMaxWidth(),
                     value = firstName,
                     isError = isError,
                     placeholder = { Text(text = stringResource(id = com.upsaclay.common.R.string.first_name)) },

@@ -13,7 +13,7 @@ internal class AuthenticationRepositoryImpl(
     private val parisSaclayAuthenticationRepository: ParisSaclayAuthenticationRepository,
     private val firebaseAuthenticationRepository: FirebaseAuthenticationRepository,
     private val authenticationLocalDataSource: AuthenticationLocalDataSource,
-    scope: CoroutineScope
+    private val scope: CoroutineScope
 ) : AuthenticationRepository {
     private val _isAuthenticated = MutableStateFlow<Boolean?>(null)
     override val isAuthenticated: Flow<Boolean?> = _isAuthenticated
@@ -39,7 +39,7 @@ internal class AuthenticationRepositoryImpl(
     }
 
     override suspend fun logout() {
-        firebaseAuthenticationRepository.logout()
+        scope.launch { firebaseAuthenticationRepository.logout() }
         setAuthenticated(false)
     }
 
@@ -47,7 +47,7 @@ internal class AuthenticationRepositoryImpl(
         firebaseAuthenticationRepository.sendVerificationEmail()
     }
 
-    override fun isUserEmailVerified(): Boolean = firebaseAuthenticationRepository.isUserEmailVerified()
+    override suspend fun isUserEmailVerified(): Boolean = firebaseAuthenticationRepository.isUserEmailVerified()
 
     override suspend fun setAuthenticated(isAuthenticated: Boolean) {
         authenticationLocalDataSource.setAuthenticationState(isAuthenticated)

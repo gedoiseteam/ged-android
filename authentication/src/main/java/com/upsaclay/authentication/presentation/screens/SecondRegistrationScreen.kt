@@ -32,6 +32,8 @@ import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
 import org.koin.androidx.compose.koinViewModel
 
+private const val CURRENT_STEP = 2
+
 @Composable
 fun SecondRegistrationScreen(
     navController: NavController,
@@ -45,7 +47,8 @@ fun SecondRegistrationScreen(
     }
 
     RegistrationTopBar(
-        navController = navController
+        navController = navController,
+        currentStep = CURRENT_STEP
     ) {
         Column(
             modifier = Modifier
@@ -69,12 +72,8 @@ fun SecondRegistrationScreen(
                     expanded = false
                 },
                 expanded = expanded,
-                onExpandedChange = { isExpanded ->
-                    expanded = isExpanded
-                },
-                onDismissRequest = {
-                    expanded = false
-                },
+                onExpandedChange = { expanded = it },
+                onDismissRequest = { expanded = false },
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -107,7 +106,8 @@ private fun SecondRegistrationScreenPreview() {
 
     GedoiseTheme {
         RegistrationTopBar(
-            navController = rememberNavController()
+            navController = rememberNavController(),
+            currentStep = CURRENT_STEP
         ) {
             Column(
                 modifier = Modifier.fillMaxSize(),
@@ -127,12 +127,8 @@ private fun SecondRegistrationScreenPreview() {
                         expanded = false
                     },
                     expanded = expanded,
-                    onExpandedChange = { isExpanded ->
-                        expanded = isExpanded
-                    },
-                    onDismissRequest = {
-                        expanded = false
-                    },
+                    onExpandedChange = { expanded = it },
+                    onDismissRequest = { expanded = false },
                     modifier = Modifier.fillMaxWidth()
                 )
             }

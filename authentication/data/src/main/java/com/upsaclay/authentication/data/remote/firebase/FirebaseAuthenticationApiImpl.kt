@@ -45,10 +45,11 @@ class FirebaseAuthenticationApiImpl : FirebaseAuthenticationApi {
             .addOnFailureListener { e -> continuation.resumeWithException(e) }
     }
 
-    override fun isUserEmailVerified(): Boolean {
-        return firebaseAuth.currentUser?.let {
-            it.reload()
-            it.isEmailVerified
-        } ?: false
+    override suspend fun isUserEmailVerified(): Boolean = suspendCoroutine { continuation ->
+        firebaseAuth.currentUser?.let { currentUser ->
+            currentUser.reload()
+                .addOnSuccessListener { continuation.resume(currentUser.isEmailVerified) }
+                .addOnFailureListener { continuation.resume(false) }
+        } ?: continuation.resume(false)
     }
 }

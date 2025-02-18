@@ -8,14 +8,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,7 +41,7 @@ internal fun AnnouncementHeader(
 
     val elapsedTimeValue: String = when (elapsedTime) {
         is ElapsedTime.Now -> stringResource(
-            com.upsaclay.common.R.string.second_ago_short,
+            com.upsaclay.common.R.string.now,
             elapsedTime.value
         )
 
@@ -80,11 +80,11 @@ internal fun AnnouncementHeader(
         Spacer(modifier = Modifier.width(MaterialTheme.spacing.smallMedium))
 
         Text(
+            modifier = Modifier.weight(fill = false, weight = 1f),
             text = announcement.author.fullName,
             style = MaterialTheme.typography.titleSmall,
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.weight(fill = false, weight = 1f)
+            overflow = TextOverflow.Ellipsis
         )
 
         Spacer(modifier = Modifier.width(MaterialTheme.spacing.smallMedium))
@@ -94,6 +94,8 @@ internal fun AnnouncementHeader(
             style = MaterialTheme.typography.bodySmall,
             color = GedoiseColor.PreviewText
         )
+
+        Spacer(modifier = Modifier.width(MaterialTheme.spacing.smallMedium))
     }
 }
 
@@ -107,7 +109,7 @@ internal fun AnnouncementItem(
 
     val elapsedTimeValue = when (elapsedTime) {
         is ElapsedTime.Now -> stringResource(
-            com.upsaclay.common.R.string.second_ago_short,
+            com.upsaclay.common.R.string.now,
             elapsedTime.value
         )
 
@@ -190,8 +192,7 @@ internal fun AnnouncementItem(
 
             AnnouncementState.ERROR -> {
                 Icon(
-                    modifier = Modifier.scale(0.8f),
-                    painter = painterResource(id = com.upsaclay.common.R.drawable.ic_outline_info),
+                    imageVector = Icons.Outlined.Info,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.error
                 )
@@ -210,18 +211,20 @@ internal fun AnnouncementItem(
 
 @Preview(showBackground = true)
 @Composable
-private fun AnnouncementItemPreview() {
+private fun AnnouncementHeaderPreview() {
     GedoiseTheme {
-        AnnouncementHeader(announcement = announcementFixture)
+        AnnouncementHeader(
+            announcement = announcementFixture.copy(state = AnnouncementState.ERROR)
+        )
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-private fun AnnouncementItemWithTitlePreview() {
+private fun AnnouncementItemPreview() {
     GedoiseTheme {
         AnnouncementItem(
-            announcement = announcementFixture,
+            announcement = announcementFixture.copy(state = AnnouncementState.ERROR),
             onClick = { }
         )
     }

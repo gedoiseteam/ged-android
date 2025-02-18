@@ -2,7 +2,6 @@ package com.upsaclay.news
 
 import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
 import com.upsaclay.common.domain.userFixture
-import com.upsaclay.news.domain.entity.AnnouncementScreenState
 import com.upsaclay.news.domain.usecase.CreateAnnouncementUseCase
 import com.upsaclay.news.presentation.viewmodels.CreateAnnouncementViewModel
 import io.mockk.coEvery
@@ -43,7 +42,6 @@ class CreateAnnouncementViewModelTest {
 
     @Test
     fun default_values_are_correct() {
-        assertEquals(AnnouncementScreenState.DEFAULT, createAnnouncementViewModel.screenState.value)
         assertEquals("", createAnnouncementViewModel.title)
         assertEquals("", createAnnouncementViewModel.content)
     }
@@ -89,30 +87,5 @@ class CreateAnnouncementViewModelTest {
 
         // Then
         coVerify(exactly = 0) { createAnnouncementUseCase(any())}
-    }
-
-    @Test
-    fun createAnnouncement_should_update_screen_state_to_CREATED_when_successful() {
-        // When
-        createAnnouncementViewModel.createAnnouncement()
-
-        // Then
-        assertEquals(AnnouncementScreenState.CREATED, createAnnouncementViewModel.screenState.value)
-    }
-
-    @Test
-    fun createAnnouncement_should_update_screen_state_to_CREATION_ERROR_when_failed() {
-        // Given
-        coEvery { createAnnouncementUseCase(any()) } throws Exception()
-        createAnnouncementViewModel = CreateAnnouncementViewModel(
-            getCurrentUserUseCase = getCurrentUserUseCase,
-            createAnnouncementUseCase = createAnnouncementUseCase
-        )
-
-        // When
-        createAnnouncementViewModel.createAnnouncement()
-
-        // Then
-        assertEquals(AnnouncementScreenState.CREATION_ERROR, createAnnouncementViewModel.screenState.value)
     }
 }

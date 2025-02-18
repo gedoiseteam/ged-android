@@ -5,6 +5,7 @@ import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.firestore
 import com.upsaclay.common.domain.e
+import com.upsaclay.common.domain.i
 import com.upsaclay.message.data.model.CONVERSATIONS_TABLE_NAME
 import com.upsaclay.message.data.model.MESSAGES_TABLE_NAME
 import com.upsaclay.message.data.model.MessageField.TIMESTAMP
@@ -29,12 +30,14 @@ internal class MessageApiImpl : MessageApi {
                     return@addSnapshotListener
                 }
 
-                snapshot?.documentChanges?.forEach { change ->
-                    val message = change.document.toObject(RemoteMessage::class.java)
-                    when (change.type) {
-                        DocumentChange.Type.ADDED -> trySend(message)
-                        DocumentChange.Type.MODIFIED -> trySend(message)
-                        DocumentChange.Type.REMOVED -> return@forEach
+                if (snapshot?.metadata?.isFromCache == false) {
+                    snapshot.documentChanges.forEach { change ->
+                        val message = change.document.toObject(RemoteMessage::class.java)
+                        when (change.type) {
+                            DocumentChange.Type.ADDED -> trySend(message)
+                            DocumentChange.Type.MODIFIED -> trySend(message)
+                            DocumentChange.Type.REMOVED -> return@forEach
+                        }
                     }
                 }
             }
@@ -52,9 +55,9 @@ internal class MessageApiImpl : MessageApi {
                     e("Error getting last message", it)
                     trySend(null)
                 }
-
                 snapshot?.toObjects(RemoteMessage::class.java)?.firstOrNull()?.let { trySend(it) }
             }
+
         awaitClose { listener.remove() }
     }
 
@@ -90,6 +93,9 @@ internal class MessageApiImpl : MessageApi {
                 .addOnFailureListener { e ->
                     e("Error creating remote message", e)
                     continuation.resumeWithException(e)
+                }
+                .addOnCanceledListener {
+                    i("Its cancelled bro ;(")
                 }
         }
     }

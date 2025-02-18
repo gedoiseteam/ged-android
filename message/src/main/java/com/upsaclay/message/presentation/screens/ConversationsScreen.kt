@@ -1,6 +1,5 @@
 package com.upsaclay.message.presentation.screens
 
-import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -120,7 +119,7 @@ private fun CreateConversationFAB(
         containerColor = MaterialTheme.colorScheme.secondaryContainer
     ) {
         Icon(
-            painter = painterResource(id = com.upsaclay.common.R.drawable.ic_add),
+            painter = painterResource(id = R.drawable.ic_message_add),
             contentDescription = stringResource(id = R.string.ic_fab_button_add_description)
         )
     }

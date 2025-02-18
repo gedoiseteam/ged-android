@@ -74,11 +74,10 @@ internal class UserFirestoreApiImpl : UserFirestoreApi {
     override suspend fun createUser(firestoreUser: FirestoreUser) {
         suspendCoroutine { continuation ->
             usersCollection.document(firestoreUser.userId).set(firestoreUser)
-                .addOnSuccessListener {
-                    continuation.resume(Result.success(Unit))
-                }
-                .addOnFailureListener { e ->
-                    continuation.resumeWithException(e)
+                .addOnSuccessListener { continuation.resume(Unit) }
+                .addOnFailureListener {
+                    e("Error creating firestore user", it)
+                    continuation.resumeWithException(it)
                 }
         }
     }
@@ -87,9 +86,7 @@ internal class UserFirestoreApiImpl : UserFirestoreApi {
         suspendCoroutine { continuation ->
             usersCollection.document(userId)
                 .update(UserFieldsRemote.PROFILE_PICTURE_URL, profilePictureUrl)
-                .addOnSuccessListener {
-                    continuation.resume(Unit)
-                }
+                .addOnSuccessListener { continuation.resume(Unit) }
                 .addOnFailureListener { e ->
                     e("Error update firestore user pofile picture", e)
                     continuation.resumeWithException(e)

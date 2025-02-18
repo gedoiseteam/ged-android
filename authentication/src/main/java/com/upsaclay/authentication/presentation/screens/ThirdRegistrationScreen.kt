@@ -20,9 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -40,38 +38,29 @@ import com.upsaclay.common.presentation.components.PrimaryButton
 import com.upsaclay.common.presentation.components.TopLinearLoadingScreen
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
-import com.upsaclay.common.utils.showToast
 import org.koin.androidx.compose.koinViewModel
+
+private const val CURRENT_STEP = 3
 
 @Composable
 fun ThirdRegistrationScreen(
     navController: NavController,
     registrationViewModel: RegistrationViewModel = koinViewModel()
 ) {
-    LaunchedEffect(Unit) {
-        registrationViewModel.resetScreenState()
-        registrationViewModel.resetSchoolLevel()
-    }
-
-    val keyboardController = LocalSoftwareKeyboardController.current
     val registrationState by registrationViewModel.screenState.collectAsState()
-    val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
-    val context = LocalContext.current
     val isLoading = registrationState == RegistrationScreenState.LOADING
 
-    val inputsError = when (registrationState) {
-        RegistrationScreenState.UNRECOGNIZED_ACCOUNT, RegistrationScreenState.EMPTY_FIELDS_ERROR -> true
-        else -> false
-    }
-
-    val errorMessage = when (registrationState) {
-        RegistrationScreenState.UNRECOGNIZED_ACCOUNT -> stringResource(id = R.string.unrecognized_account)
-        RegistrationScreenState.EMPTY_FIELDS_ERROR -> stringResource(id = com.upsaclay.common.R.string.empty_fields_error)
-        RegistrationScreenState.EMAIL_FORMAT_ERROR -> stringResource(id = R.string.error_incorrect_email_format)
-        RegistrationScreenState.PASSWORD_LENGTH_ERROR -> stringResource(id = R.string.error_password_length)
-        RegistrationScreenState.USER_ALREADY_EXISTS -> stringResource(id = R.string.email_already_associated)
-        else -> null
+    val (errorMessage, inputsError) = when (registrationState) {
+        RegistrationScreenState.UNRECOGNIZED_ACCOUNT -> stringResource(id = R.string.unrecognized_account) to true
+        RegistrationScreenState.EMPTY_FIELDS_ERROR -> stringResource(id = com.upsaclay.common.R.string.empty_fields_error) to true
+        RegistrationScreenState.EMAIL_FORMAT_ERROR -> stringResource(id = R.string.error_incorrect_email_format) to true
+        RegistrationScreenState.PASSWORD_LENGTH_ERROR -> stringResource(id = R.string.error_password_length) to true
+        RegistrationScreenState.USER_ALREADY_EXISTS -> stringResource(id = R.string.email_already_associated) to true
+        RegistrationScreenState.USER_CREATION_ERROR -> stringResource(id = R.string.user_creation_error) to false
+        RegistrationScreenState.UNKNOWN_ERROR -> stringResource(id = com.upsaclay.common.R.string.unknown_error) to false
+        RegistrationScreenState.SERVER_COMMUNICATION_ERROR -> stringResource(id = com.upsaclay.common.R.string.server_communication_error) to false
+        else -> null to false
     }
 
     LaunchedEffect(registrationState) {
@@ -80,11 +69,6 @@ fun ThirdRegistrationScreen(
                 registrationViewModel.resetScreenState()
                 navController.navigate(Screen.EMAIL_VERIFICATION.route + "?email=${registrationViewModel.email}")
             }
-
-            RegistrationScreenState.ERROR -> showToast(
-                context,
-                com.upsaclay.common.R.string.unknown_error
-            )
 
             else -> {}
         }
@@ -95,16 +79,14 @@ fun ThirdRegistrationScreen(
     }
 
     RegistrationTopBar(
-        navController = navController
+        navController = navController,
+        currentStep = CURRENT_STEP
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .pointerInput(Unit) {
-                    detectTapGestures(onPress = {
-                        focusManager.clearFocus()
-                        keyboardController?.hide()
-                    })
+                    detectTapGestures(onPress = { focusManager.clearFocus() })
                 }
         ) {
             Text(
@@ -117,7 +99,6 @@ fun ThirdRegistrationScreen(
             OutlinedEmailInput(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .focusRequester(focusRequester)
                     .testTag(stringResource(R.string.registration_screen_email_input_tag)),
                 text = registrationViewModel.email,
                 isError = inputsError,
@@ -130,7 +111,6 @@ fun ThirdRegistrationScreen(
             OutlinedPasswordInput(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .focusRequester(focusRequester)
                     .testTag(stringResource(R.string.registration_screen_password_input_tag)),
                 text = registrationViewModel.password,
                 isError = inputsError,
@@ -155,8 +135,8 @@ fun ThirdRegistrationScreen(
             isEnable = !isLoading,
             text = stringResource(id = com.upsaclay.common.R.string.next),
             onClick = {
-                keyboardController?.hide()
                 if (registrationViewModel.validateCredentialInputs()) {
+                    registrationViewModel.resetScreenState()
                     registrationViewModel.register()
                 }
             }
@@ -186,7 +166,8 @@ private fun ThirdRegistrationScreenPreview() {
         }
 
         RegistrationTopBar(
-            navController = rememberNavController()
+            navController = rememberNavController(),
+            currentStep = CURRENT_STEP
         ) {
             Column(
                 modifier = Modifier

@@ -37,6 +37,7 @@ import com.upsaclay.message.R
 import com.upsaclay.message.domain.conversationUIFixture
 import com.upsaclay.message.domain.entity.ConversationUI
 import com.upsaclay.message.domain.entity.Message
+import com.upsaclay.message.domain.messageFixture2
 
 @Composable
 fun ConversationItem(
@@ -93,20 +94,20 @@ fun ConversationItem(
             horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium)
         ) {
             conversation.lastMessage?.let {
-                if (it.isRead || it.senderId != conversation.interlocutor.id) {
-                    ReadConversationItem(
+                if (!it.isRead && it.senderId == conversation.interlocutor.id) {
+                    UnreadConversationItem(
                         modifier = Modifier
                             .weight(1f)
-                            .testTag(stringResource(id = R.string.conversation_screen_read_conversation_item_tag)),
+                            .testTag(stringResource(id = R.string.conversation_screen_unread_conversation_item_tag)),
                         interlocutor = conversation.interlocutor,
                         lastMessage = it,
                         elapsedTime = elapsedTimeValue
                     )
                 } else {
-                    UnreadConversationItem(
+                    ReadConversationItem(
                         modifier = Modifier
                             .weight(1f)
-                            .testTag(stringResource(id = R.string.conversation_screen_unread_conversation_item_tag)),
+                            .testTag(stringResource(id = R.string.conversation_screen_read_conversation_item_tag)),
                         interlocutor = conversation.interlocutor,
                         lastMessage = it,
                         elapsedTime = elapsedTimeValue
@@ -266,7 +267,7 @@ private fun UnreadConversationItemPreview() {
         ConversationItem(
             modifier = Modifier.fillMaxWidth(),
             conversation = conversationUIFixture.copy(
-                lastMessage = conversationUIFixture.lastMessage!!.copy(isRead = false)
+                lastMessage = messageFixture2
             ),
             onClick = { }
         )

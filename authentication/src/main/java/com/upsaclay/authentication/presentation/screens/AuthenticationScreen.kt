@@ -28,12 +28,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
@@ -45,7 +42,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.authentication.R
 import com.upsaclay.authentication.domain.entity.AuthenticationScreenState
 import com.upsaclay.authentication.presentation.components.LoginButton
@@ -55,8 +51,8 @@ import com.upsaclay.authentication.presentation.viewmodels.AuthenticationViewMod
 import com.upsaclay.common.domain.entity.Screen
 import com.upsaclay.common.presentation.components.ErrorTextWithIcon
 import com.upsaclay.common.presentation.components.SimpleDialog
+import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
-import com.upsaclay.common.utils.showToast
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -64,36 +60,49 @@ fun AuthenticationScreen(
     navController: NavController,
     authenticationViewModel: AuthenticationViewModel = koinViewModel()
 ) {
-    val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
     val scrollState = rememberScrollState()
-    var inputsError by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf("") }
     var showVerifyEmailDialog by remember { mutableStateOf(false) }
-    var isKeyboardVisible by remember { mutableStateOf(false) }
-    val focusRequester = remember { FocusRequester() }
     val screenState by authenticationViewModel.screenState.collectAsState()
+    val focusManager = LocalFocusManager.current
 
-    inputsError = screenState == AuthenticationScreenState.AUTHENTICATION_ERROR ||
-            screenState == AuthenticationScreenState.EMPTY_FIELDS_ERROR
+    val (errorMessage, inputsError) = when (screenState) {
+        AuthenticationScreenState.AUTHENTICATION_ERROR -> {
+            authenticationViewModel.resetPassword()
+            stringResource(id = R.string.error_connection) to true
+        }
 
-    errorMessage = when (screenState) {
-        AuthenticationScreenState.AUTHENTICATION_ERROR ->
-            stringResource(id = R.string.error_connection)
+        AuthenticationScreenState.EMPTY_FIELDS_ERROR -> {
+            authenticationViewModel.resetPassword()
+            stringResource(id = com.upsaclay.common.R.string.empty_fields_error) to true
+        }
 
-        AuthenticationScreenState.EMPTY_FIELDS_ERROR ->
-            stringResource(id = com.upsaclay.common.R.string.empty_fields_error)
+        AuthenticationScreenState.AUTHENTICATED_USER_NOT_FOUND -> {
+            authenticationViewModel.resetPassword()
+            stringResource(id = R.string.authenticated_user_not_found) to true
+        }
 
-        AuthenticationScreenState.AUTHENTICATED_USER_NOT_FOUND ->
-            stringResource(id = R.string.authenticated_user_not_found)
+        AuthenticationScreenState.TOO_MANY_REQUESTS_ERROR -> {
+            authenticationViewModel.resetPassword()
+            stringResource(id = R.string.too_many_request_error) to false
+        }
 
-        AuthenticationScreenState.TOO_MANY_REQUESTS_ERROR ->
-            stringResource(id = R.string.too_many_request_error)
+        AuthenticationScreenState.EMAIL_FORMAT_ERROR -> {
+            authenticationViewModel.resetPassword()
+            stringResource(id = R.string.error_incorrect_email_format) to true
+        }
 
-        AuthenticationScreenState.EMAIL_FORMAT_ERROR ->
-            stringResource(id = R.string.error_incorrect_email_format)
+        AuthenticationScreenState.SERVER_COMMUNICATION_ERROR -> {
+            authenticationViewModel.resetPassword()
+            stringResource(id = com.upsaclay.common.R.string.server_communication_error) to false
+        }
 
-        else -> ""
+        AuthenticationScreenState.UNKNOWN_ERROR -> {
+            authenticationViewModel.resetPassword()
+            stringResource(id = com.upsaclay.common.R.string.unknown_error) to false
+        }
+
+        else -> "" to false
     }
 
     LaunchedEffect(Unit) {
@@ -102,43 +111,33 @@ fun AuthenticationScreen(
 
     LaunchedEffect(screenState) {
         when (screenState) {
-            AuthenticationScreenState.NETWORK_ERROR -> {
-                showToast(context = context, stringRes = com.upsaclay.common.R.string.network_error)
-            }
-
-            AuthenticationScreenState.EMAIL_NOT_VERIFIED -> {
-                showVerifyEmailDialog = true
-            }
-
-            AuthenticationScreenState.UNKNOWN_ERROR -> {
-                showToast(context = context, stringRes = com.upsaclay.common.R.string.unknown_error)
-            }
+            AuthenticationScreenState.EMAIL_NOT_VERIFIED -> showVerifyEmailDialog = true
 
             else -> {}
-        }
-    }
-
-    LaunchedEffect(isKeyboardVisible) {
-        if (isKeyboardVisible) {
-            scrollState.animateScrollTo(scrollState.maxValue)
         }
     }
 
     if (showVerifyEmailDialog) {
         SimpleDialog(
             modifier = Modifier.testTag(stringResource(id = R.string.authentication_screen_verify_email_dialog_tag)),
-            text = stringResource(id = R.string.email_not_verified_dialog_message),
+            title = stringResource(id = R.string.email_not_verified_dialog_title),
+            text = stringResource(id = R.string.email_not_verified),
             confirmText = stringResource(id = com.upsaclay.common.R.string.keep_going),
             onDismiss = {
+                authenticationViewModel.resetPassword()
                 showVerifyEmailDialog = false
                 authenticationViewModel.resetScreenState()
             },
             onConfirm = {
+                authenticationViewModel.resetEmail()
+                authenticationViewModel.resetPassword()
+                authenticationViewModel.resetScreenState()
                 navController.navigate(Screen.EMAIL_VERIFICATION.route + "?email=${authenticationViewModel.email}") {
                     popUpTo(navController.graph.id) { inclusive = true }
                 }
             },
             onCancel = {
+                authenticationViewModel.resetPassword()
                 showVerifyEmailDialog = false
                 authenticationViewModel.resetScreenState()
             }
@@ -155,6 +154,11 @@ fun AuthenticationScreen(
             .background(MaterialTheme.colorScheme.background)
             .verticalScroll(scrollState)
             .padding(MaterialTheme.spacing.medium)
+            .pointerInput(Unit) {
+                detectTapGestures(onTap = {
+                    focusManager.clearFocus()
+                })
+            }
     ) {
         TitleSection()
 
@@ -169,7 +173,6 @@ fun AuthenticationScreen(
                 keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
                 errorMessage = errorMessage,
                 isError = inputsError,
-                focusRequester = focusRequester
             )
 
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))
@@ -192,7 +195,12 @@ fun AuthenticationScreen(
 
             RegistrationText(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
-                onRegistrationClick = { navController.navigate(Screen.FIRST_REGISTRATION.route) }
+                onRegistrationClick = {
+                    authenticationViewModel.resetEmail()
+                    authenticationViewModel.resetPassword()
+                    authenticationViewModel.resetScreenState()
+                    navController.navigate(Screen.FIRST_REGISTRATION.route)
+                }
             )
         }
     }
@@ -230,7 +238,7 @@ private fun TitleSection() {
             text = stringResource(id = R.string.presentation_text),
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.primary
+            color = MaterialTheme.colorScheme.onBackground
         )
     }
 }
@@ -269,14 +277,11 @@ private fun InputsSection(
     onPasswordChange: (String) -> Unit,
     keyboardActions: KeyboardActions,
     errorMessage: String,
-    isError: Boolean,
-    focusRequester: FocusRequester
+    isError: Boolean
 ) {
     Column {
         OutlinedEmailInput(
-            modifier = Modifier
-                .fillMaxWidth()
-                .focusRequester(focusRequester),
+            modifier = Modifier.fillMaxWidth(),
             text = email,
             onValueChange = onEmailChange,
             keyboardActions = keyboardActions,
@@ -286,9 +291,7 @@ private fun InputsSection(
         Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
 
         OutlinedPasswordInput(
-            modifier = Modifier
-                .fillMaxWidth()
-                .focusRequester(focusRequester),
+            modifier = Modifier.fillMaxWidth(),
             text = password,
             onValueChange = onPasswordChange,
             keyboardActions = keyboardActions,
@@ -309,13 +312,12 @@ private fun InputsSection(
  =====================================================================
  */
 
-@Preview(widthDp = 360, heightDp = 740, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(showBackground = true, widthDp = 360, heightDp = 740, uiMode = Configuration.UI_MODE_NIGHT_NO)
 @Composable
 private fun AuthenticationScreenPreview() {
     var isLoading by remember { mutableStateOf(false) }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
 
     GedoiseTheme {
@@ -345,8 +347,7 @@ private fun AuthenticationScreenPreview() {
                     onPasswordChange = { password = it },
                     keyboardActions = KeyboardActions(onDone = { }),
                     errorMessage = "",
-                    isError = false,
-                    focusRequester = focusRequester
+                    isError = false
                 )
 
                 Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))
