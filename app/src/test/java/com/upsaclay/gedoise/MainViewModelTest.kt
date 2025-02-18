@@ -19,6 +19,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.Before
 import org.junit.Test
@@ -142,7 +144,7 @@ class MainViewModelTest {
     }
 
     @Test
-    fun local_data_should_be_deleted_when_user_is_not_authenticated() {
+    fun local_data_should_be_deleted_when_user_is_not_authenticated() = runTest {
         // Given
         every { isUserAuthenticatedUseCase() } returns flowOf(false)
 
@@ -154,6 +156,8 @@ class MainViewModelTest {
             stopListeningDataUseCase = stopListeningDataUseCase,
             deleteLocalDataUseCase = deleteLocalDataUseCase
         )
+
+        advanceUntilIdle()
 
         // Then
         coVerify { deleteLocalDataUseCase() }
