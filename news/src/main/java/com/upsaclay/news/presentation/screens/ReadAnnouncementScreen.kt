@@ -1,6 +1,5 @@
 package com.upsaclay.news.presentation.screens
 
-import android.icu.text.IDNA.Info
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -246,7 +245,7 @@ fun ReadAnnouncementScreen(
                     onDismissRequest = { showBottomSheet = false },
                     sheetState = sheetState,
                 ) {
-                    if(announcement?.state == AnnouncementState.DEFAULT) {
+                    if(announcement?.state == AnnouncementState.PUBLISHED) {
                         ClickableItem(
                             modifier = Modifier
                                 .fillMaxWidth()
