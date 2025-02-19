@@ -9,9 +9,8 @@ import com.upsaclay.common.domain.usecase.GetUsersUseCase
 import com.upsaclay.message.domain.entity.ConversationScreenState
 import com.upsaclay.message.domain.entity.ConversationState
 import com.upsaclay.message.domain.entity.ConversationUI
-import com.upsaclay.message.domain.entity.ConversationUser
 import com.upsaclay.message.domain.usecase.ConvertConversationJsonUseCase
-import com.upsaclay.message.domain.usecase.GetConversationUserUseCase
+import com.upsaclay.message.domain.usecase.ListenConversationsUiUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,7 +19,7 @@ import java.time.LocalDateTime
 
 class CreateConversationViewModel(
     private val getUsersUseCase: GetUsersUseCase,
-    private val getConversationUserUseCase: GetConversationUserUseCase,
+    private val listenConversationsUiUseCase: ListenConversationsUiUseCase,
     getCurrentUserUseCase: GetCurrentUserUseCase
 ) : ViewModel() {
     private val _screenState = MutableStateFlow(ConversationScreenState.DEFAULT)
@@ -34,16 +33,18 @@ class CreateConversationViewModel(
     }
 
     fun generateConversationJson(interlocutor: User): String {
-        val conversation = ConversationUser(
+        val conversation = ConversationUI(
             id = GenerateIdUseCase.invoke(),
             interlocutor = interlocutor,
+            lastMessage = null,
             createdAt = LocalDateTime.now(),
             state = ConversationState.NOT_CREATED
         )
         return ConvertConversationJsonUseCase(conversation)
     }
 
-    fun getConversationUser(interlocutorId: String): ConversationUser? = getConversationUserUseCase(interlocutorId)
+    fun getConversation(interlocutorId: String): ConversationUI? =
+        listenConversationsUiUseCase.currentConversationsUI.firstOrNull { it.interlocutor.id == interlocutorId }
 
     private fun fetchUsers() {
         _screenState.value = ConversationScreenState.LOADING

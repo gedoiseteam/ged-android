@@ -5,7 +5,6 @@ import com.upsaclay.message.domain.repository.MessageRepository
 import com.upsaclay.message.domain.repository.UserConversationRepository
 import com.upsaclay.message.domain.usecase.CreateConversationUseCase
 import com.upsaclay.message.domain.usecase.DeleteConversationUseCase
-import com.upsaclay.message.domain.usecase.GetConversationUserUseCase
 import com.upsaclay.message.domain.usecase.ListenConversationsUiUseCase
 import com.upsaclay.message.domain.usecase.ListenConversationsUseCase
 import com.upsaclay.message.domain.usecase.ListenMessagesUseCase
@@ -33,7 +32,6 @@ class MessageUseCaseTest {
 
     private lateinit var createConversationUseCase: CreateConversationUseCase
     private lateinit var deleteConversationUseCase: DeleteConversationUseCase
-    private lateinit var getConversationUserUseCase: GetConversationUserUseCase
     private lateinit var sendMessageUseCase: SendMessageUseCase
     private lateinit var listenConversationsUiUseCase: ListenConversationsUiUseCase
     private lateinit var listenConversationsUseCase: ListenConversationsUseCase
@@ -45,7 +43,6 @@ class MessageUseCaseTest {
     fun setUp() {
         createConversationUseCase = CreateConversationUseCase(userConversationRepository = userConversationRepository)
         deleteConversationUseCase = DeleteConversationUseCase(userConversationRepository = userConversationRepository)
-        getConversationUserUseCase = GetConversationUserUseCase(userConversationRepository = userConversationRepository)
         sendMessageUseCase = SendMessageUseCase(messageRepository = messageRepository)
         listenConversationsUiUseCase = ListenConversationsUiUseCase(
             userConversationRepository = userConversationRepository,
@@ -63,7 +60,6 @@ class MessageUseCaseTest {
         )
 
         every { userConversationRepository.userConversations } returns MutableStateFlow(conversationUserFixture)
-        every { userConversationRepository.getUserConversation(any()) } returns conversationUserFixture
         every { messageRepository.getMessages(any()) } returns MutableStateFlow(messageFixture)
         every { messageRepository.getLastMessage(any()) } returns MutableStateFlow(messageFixture)
         coEvery { userConversationRepository.userConversations } returns flowOf(conversationUserFixture)
@@ -81,18 +77,9 @@ class MessageUseCaseTest {
     }
 
     @Test
-    fun getConversationUserUseCase_should_return_conversation_with_user() = runTest {
-        // When
-        val result = getConversationUserUseCase(conversationUIFixture.id)
-
-        // Then
-        assertEquals(conversationUserFixture, result)
-    }
-
-    @Test
     fun createConversationUseCase_should_create_conversation() = runTest {
         // When
-        createConversationUseCase(conversationUserFixture)
+        createConversationUseCase(conversationUIFixture)
 
         // Then
         coVerify { userConversationRepository.createConversation(conversationUserFixture) }
@@ -137,7 +124,7 @@ class MessageUseCaseTest {
 
         // When
         listenConversationsUiUseCase.start()
-        val result = listenConversationsUiUseCase.conversationsUI.first()
+        val result = listenConversationsUiUseCase.currentConversationsUI
 
         // Then
         assert(listenConversationsUiUseCase.job != null)

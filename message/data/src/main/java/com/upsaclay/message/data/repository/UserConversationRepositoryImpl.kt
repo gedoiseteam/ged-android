@@ -29,9 +29,6 @@ internal class UserConversationRepositoryImpl(
             flow { conversations.forEach { emit(it.value) } }
         }
 
-    override fun getUserConversation(interlocutorId: String): ConversationUser? =
-        _userConversations.value.values.find { it.interlocutor.id == interlocutorId }
-
     override suspend fun createConversation(conversationUser: ConversationUser) {
         val currentUser = userRepository.currentUser.first() ?: throw Exception()
         conversationRepository.createConversation(

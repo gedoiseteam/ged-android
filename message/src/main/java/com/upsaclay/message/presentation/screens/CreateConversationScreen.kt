@@ -60,7 +60,7 @@ fun CreateConversationScreen(
                         UserItem(
                             user = user,
                             onClick = {
-                                createConversationViewModel.getConversationUser(user.id)?.let {
+                                createConversationViewModel.getConversation(user.id)?.let {
                                     navController.navigate(
                                         Screen.CHAT.route + "?conversation=${ConvertConversationJsonUseCase(it)}"
                                     ) {

@@ -6,8 +6,6 @@ import kotlinx.coroutines.flow.Flow
 interface UserConversationRepository {
     val userConversations: Flow<ConversationUser>
 
-    fun getUserConversation(interlocutorId: String): ConversationUser?
-
     suspend fun createConversation(conversationUser: ConversationUser)
 
     suspend fun updateConversation(conversationUser: ConversationUser)

@@ -24,6 +24,8 @@ class ListenConversationsUiUseCase(
     private val conversationsUIMap = mutableMapOf<String, ConversationUI>()
     private val _conversationsUI = MutableStateFlow<List<ConversationUI>>(emptyList())
     val conversationsUI: Flow<List<ConversationUI>> = _conversationsUI
+    val currentConversationsUI: List<ConversationUI>
+        get() = _conversationsUI.value
     internal var job: Job? = null
 
     fun start() {
