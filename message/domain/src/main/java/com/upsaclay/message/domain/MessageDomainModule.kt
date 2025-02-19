@@ -4,7 +4,6 @@ import com.upsaclay.common.domain.e
 import com.upsaclay.message.domain.usecase.CreateConversationUseCase
 import com.upsaclay.message.domain.usecase.DeleteConversationUseCase
 import com.upsaclay.message.domain.usecase.GetConversationUserUseCase
-import com.upsaclay.message.domain.usecase.GetConversationsUIUseCase
 import com.upsaclay.message.domain.usecase.GetMessagesUseCase
 import com.upsaclay.message.domain.usecase.ListenConversationsUiUseCase
 import com.upsaclay.message.domain.usecase.ListenConversationsUseCase

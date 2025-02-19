@@ -12,7 +12,7 @@ class ListenMessagesUseCase(
     private val messageRepository: MessageRepository,
     private val scope: CoroutineScope
 ) {
-    private var job: Job? = null
+    internal var job: Job? = null
 
     fun start() {
         job?.cancel()

@@ -1,7 +1,7 @@
 package com.upsaclay.message
 
 import com.upsaclay.message.domain.conversationsUIFixture
-import com.upsaclay.message.domain.usecase.GetConversationsUIUseCase
+import com.upsaclay.message.domain.usecase.ListenConversationsUiUseCase
 import com.upsaclay.message.presentation.viewmodels.ConversationViewModel
 import io.mockk.every
 import io.mockk.mockk
@@ -13,15 +13,15 @@ import org.junit.Test
 import kotlin.test.assertEquals
 
 class ConversationViewModelTest {
-    private val getConversationsUIUseCase: GetConversationsUIUseCase = mockk()
+    private val listenConversationsUiUseCase: ListenConversationsUiUseCase = mockk()
 
     private lateinit var conversationViewModel: ConversationViewModel
 
     @Before
     fun setUp() {
-        every { getConversationsUIUseCase() } returns flowOf(conversationsUIFixture)
+        every { listenConversationsUiUseCase.conversationsUI } returns flowOf(conversationsUIFixture)
 
-        conversationViewModel = ConversationViewModel(getConversationsUIUseCase = getConversationsUIUseCase)
+        conversationViewModel = ConversationViewModel(listenConversationsUiUseCase = listenConversationsUiUseCase)
     }
 
     @Test

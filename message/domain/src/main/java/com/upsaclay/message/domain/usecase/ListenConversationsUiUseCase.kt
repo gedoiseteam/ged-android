@@ -21,9 +21,10 @@ class ListenConversationsUiUseCase(
     private val messageRepository: MessageRepository,
     private val scope: CoroutineScope
 ) {
+    private val conversationsUIMap = mutableMapOf<String, ConversationUI>()
     private val _conversationsUI = MutableStateFlow<List<ConversationUI>>(emptyList())
     val conversationsUI: Flow<List<ConversationUI>> = _conversationsUI
-    private var job: Job? = null
+    internal var job: Job? = null
 
     fun start() {
         job?.cancel()
@@ -41,7 +42,7 @@ class ListenConversationsUiUseCase(
                     ConversationMapper.toConversationUI(conversationUser, message)
                 }
             }
-            .scan(mutableMapOf<String, ConversationUI>()) { acc, conversationUI ->
+            .scan(conversationsUIMap) { acc, conversationUI ->
                 acc[conversationUI.id] = conversationUI
                 acc
             }

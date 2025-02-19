@@ -9,7 +9,7 @@ class ListenConversationsUseCase(
     private val userConversationRepository: UserConversationRepository,
     private val scope: CoroutineScope
 ) {
-    private var job: Job? = null
+    internal var job: Job? = null
 
     fun start() {
         job?.cancel()
