@@ -8,7 +8,7 @@ import com.upsaclay.common.domain.entity.User
 import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
 import com.upsaclay.gedoise.data.BottomNavigationItem
 import com.upsaclay.gedoise.data.BottomNavigationItemType
-import com.upsaclay.gedoise.domain.usecase.DeleteLocalDataUseCase
+import com.upsaclay.gedoise.domain.usecase.ClearDataUseCase
 import com.upsaclay.gedoise.domain.usecase.StartListeningDataUseCase
 import com.upsaclay.gedoise.domain.usecase.StopListeningDataUseCase
 import kotlinx.coroutines.delay
@@ -21,7 +21,7 @@ class MainViewModel(
     getCurrentUserUseCase: GetCurrentUserUseCase,
     private val startListeningDataUseCase: StartListeningDataUseCase,
     private val stopListeningDataUseCase: StopListeningDataUseCase,
-    private val deleteLocalDataUseCase: DeleteLocalDataUseCase
+    private val clearDataUseCase: ClearDataUseCase
 ) : ViewModel() {
     private val _authenticationState = MutableStateFlow(AuthenticationState.WAITING)
     val authenticationState: StateFlow<AuthenticationState> = _authenticationState
@@ -42,7 +42,7 @@ class MainViewModel(
                         stopListeningDataUseCase()
                         _authenticationState.value = AuthenticationState.UNAUTHENTICATED
                         delay(2000)
-                        deleteLocalDataUseCase()
+                        clearDataUseCase()
                     }
                 }
             }

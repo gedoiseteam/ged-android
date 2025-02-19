@@ -54,14 +54,14 @@ val conversationUserFixture = ConversationUser(
 
 val conversationsUIFixture = listOf(
     conversationUIFixture,
-    conversationUIFixture.copy(lastMessage = messageFixture.copy(date = messageFixture.date.minusMinutes(1))),
-    conversationUIFixture.copy(lastMessage = messageFixture.copy(date = messageFixture.date.minusMinutes(20))),
-    conversationUIFixture.copy(lastMessage = messageFixture.copy(date = messageFixture.date.minusHours(1))),
-    conversationUIFixture.copy(lastMessage = messageFixture.copy(date = messageFixture.date.minusHours(2))),
-    conversationUIFixture.copy(lastMessage = messageFixture.copy(date = messageFixture.date.minusDays(1))),
-    conversationUIFixture.copy(lastMessage = messageFixture.copy(date = messageFixture.date.minusDays(2))),
-    conversationUIFixture.copy(lastMessage = messageFixture.copy(isRead = true, date = messageFixture.date.minusWeeks(3))),
-    conversationUIFixture.copy(lastMessage = messageFixture.copy(isRead = true, date = messageFixture.date.minusMonths(1)))
+    conversationUIFixture.copy(id = "2", lastMessage = messageFixture.copy(date = messageFixture.date.minusMinutes(1))),
+    conversationUIFixture.copy(id = "3", lastMessage = messageFixture.copy(date = messageFixture.date.minusMinutes(20))),
+    conversationUIFixture.copy(id = "4", lastMessage = messageFixture.copy(date = messageFixture.date.minusHours(1))),
+    conversationUIFixture.copy(id = "5", lastMessage = messageFixture.copy(date = messageFixture.date.minusHours(2))),
+    conversationUIFixture.copy(id = "6", lastMessage = messageFixture.copy(date = messageFixture.date.minusDays(1))),
+    conversationUIFixture.copy(id = "7", lastMessage = messageFixture.copy(date = messageFixture.date.minusDays(2))),
+    conversationUIFixture.copy(id = "8", lastMessage = messageFixture.copy(isRead = true, date = messageFixture.date.minusWeeks(3))),
+    conversationUIFixture.copy(id = "9", lastMessage = messageFixture.copy(isRead = true, date = messageFixture.date.minusMonths(1)))
 )
 
 val conversationsUserFixture = listOf(
