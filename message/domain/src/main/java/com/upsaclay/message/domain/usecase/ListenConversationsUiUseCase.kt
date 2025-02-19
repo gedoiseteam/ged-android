@@ -6,6 +6,7 @@ import com.upsaclay.message.domain.repository.MessageRepository
 import com.upsaclay.message.domain.repository.UserConversationRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flatMapConcat
@@ -15,21 +16,26 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.scan
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class GetConversationsUIUseCase(
+class ListenConversationsUiUseCase(
     private val userConversationRepository: UserConversationRepository,
     private val messageRepository: MessageRepository,
     private val scope: CoroutineScope
 ) {
     private val _conversationsUI = MutableStateFlow<List<ConversationUI>>(emptyList())
+    val conversationsUI: Flow<List<ConversationUI>> = _conversationsUI
+    private var job: Job? = null
 
-    init {
+    fun start() {
+        job?.cancel()
         listenConversationsUI()
     }
 
-    operator fun invoke(): Flow<List<ConversationUI>> = _conversationsUI
+    fun stop() {
+        job?.cancel()
+    }
 
     private fun listenConversationsUI() {
-        userConversationRepository.userConversations
+        job = userConversationRepository.userConversations
             .flatMapConcat { conversationUser ->
                 messageRepository.getLastMessage(conversationUser.id).map { message ->
                     ConversationMapper.toConversationUI(conversationUser, message)

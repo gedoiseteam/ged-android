@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 interface UserConversationRepository {
     val userConversations: Flow<ConversationUser>
 
-    fun getUserConversation(conversationId: String): ConversationUser?
+    fun getUserConversation(interlocutorId: String): ConversationUser?
 
     suspend fun createConversation(conversationUser: ConversationUser)
 
@@ -16,7 +16,7 @@ interface UserConversationRepository {
 
     suspend fun deleteLocalConversations()
 
-    fun stopListenConversations()
+    suspend fun listenLocalConversations()
 
-    fun listenConversations()
+    suspend fun listenRemoteConversations()
 }

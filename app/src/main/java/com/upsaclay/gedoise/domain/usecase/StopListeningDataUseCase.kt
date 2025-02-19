@@ -1,14 +1,17 @@
 package com.upsaclay.gedoise.domain.usecase
 
-import com.upsaclay.message.domain.repository.MessageRepository
-import com.upsaclay.message.domain.repository.UserConversationRepository
+import com.upsaclay.message.domain.usecase.ListenConversationsUiUseCase
+import com.upsaclay.message.domain.usecase.ListenConversationsUseCase
+import com.upsaclay.message.domain.usecase.ListenMessagesUseCase
 
 class StopListeningDataUseCase(
-    private val userConversationRepository: UserConversationRepository,
-    private val messageRepository: MessageRepository
+    private val listenConversationsUseCase: ListenConversationsUseCase,
+    private val listenMessagesUseCase: ListenMessagesUseCase,
+    private val listenConversationsUiUseCase: ListenConversationsUiUseCase
 ) {
     operator fun invoke() {
-        userConversationRepository.stopListenConversations()
-        messageRepository.stopListenMessages()
+        listenConversationsUseCase.stop()
+        listenMessagesUseCase.stop()
+        listenConversationsUiUseCase.stop()
     }
 }

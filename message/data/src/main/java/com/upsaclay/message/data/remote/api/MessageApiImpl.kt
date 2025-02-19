@@ -30,14 +30,14 @@ internal class MessageApiImpl : MessageApi {
                     return@addSnapshotListener
                 }
 
-                if (snapshot?.metadata?.isFromCache == false) {
-                    snapshot.documentChanges.forEach { change ->
-                        val message = change.document.toObject(RemoteMessage::class.java)
-                        when (change.type) {
-                            DocumentChange.Type.ADDED -> trySend(message)
-                            DocumentChange.Type.MODIFIED -> trySend(message)
-                            DocumentChange.Type.REMOVED -> return@forEach
-                        }
+                snapshot?.documentChanges?.forEach { change ->
+                    if (change.document.metadata.hasPendingWrites()) return@forEach
+
+                    val message = change.document.toObject(RemoteMessage::class.java)
+                    when (change.type) {
+                        DocumentChange.Type.ADDED -> trySend(message)
+                        DocumentChange.Type.MODIFIED -> trySend(message)
+                        DocumentChange.Type.REMOVED -> return@forEach
                     }
                 }
             }

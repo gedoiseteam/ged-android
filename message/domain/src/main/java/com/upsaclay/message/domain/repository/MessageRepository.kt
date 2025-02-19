@@ -16,5 +16,5 @@ interface MessageRepository {
 
     suspend fun deleteLocalMessages()
 
-    fun stopListenMessages()
+    suspend fun listenRemoteMessages(conversationId: String)
 }

@@ -158,7 +158,7 @@ fun Navigation(mainViewModel: MainViewModel = koinViewModel()) {
         composable(route = Screen.CHAT.route + "?conversation={conversation}") { backStackEntry ->
             backStackEntry.arguments?.getString("conversation")?.let {
                 ChatScreen(
-                    conversation = ConvertConversationJsonUseCase.from(it),
+                    conversationUser = ConvertConversationJsonUseCase.from(it),
                     navController = navController
                 )
             } ?: run {

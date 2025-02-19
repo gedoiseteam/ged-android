@@ -10,6 +10,7 @@ import com.upsaclay.common.domain.usecase.GenerateIdUseCase
 import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
 import com.upsaclay.message.domain.entity.ConversationState
 import com.upsaclay.message.domain.entity.ConversationUI
+import com.upsaclay.message.domain.entity.ConversationUser
 import com.upsaclay.message.domain.entity.Message
 import com.upsaclay.message.domain.entity.MessageState
 import com.upsaclay.message.domain.usecase.CreateConversationUseCase
@@ -22,7 +23,7 @@ import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
 class ChatViewModel(
-    conversation: ConversationUI,
+    conversationUser: ConversationUser,
     getCurrentUserUseCase: GetCurrentUserUseCase,
     private val getMessagesUseCase: GetMessagesUseCase,
     private val sendMessageUseCase: SendMessageUseCase,
@@ -33,7 +34,7 @@ class ChatViewModel(
     val messages: Flow<List<Message>> = _messages.map { messageMap ->
         messageMap.values.toList().sortedByDescending { it.date }
     }
-    var conversation = conversation
+    var conversationUser = conversationUser
         private set
     var textToSend: String by mutableStateOf("")
         private set
@@ -53,7 +54,7 @@ class ChatViewModel(
 
         val message = Message(
             id = GenerateIdUseCase(),
-            conversationId = conversation.id,
+            conversationId = conversationUser.id,
             senderId = currentUser.id,
             content = textToSend,
             date = LocalDateTime.now(),
@@ -64,9 +65,9 @@ class ChatViewModel(
 
         viewModelScope.launch {
             try {
-                if (conversation.state == ConversationState.NOT_CREATED) {
-                    createConversationUseCase(conversation)
-                    conversation = conversation.copy(state = ConversationState.CREATED)
+                if (conversationUser.state == ConversationState.NOT_CREATED) {
+                    createConversationUseCase(conversationUser)
+                    conversationUser = conversationUser.copy(state = ConversationState.CREATED)
                 }
 
                 sendMessageUseCase(message)
@@ -82,7 +83,7 @@ class ChatViewModel(
 
     private fun fetchMessages() {
         viewModelScope.launch {
-            getMessagesUseCase(conversation.id).collect { message ->
+            getMessagesUseCase(conversationUser.id).collect { message ->
                 _messages.value = _messages.value.toMutableMap().apply { put(message.id, message) }
             }
         }

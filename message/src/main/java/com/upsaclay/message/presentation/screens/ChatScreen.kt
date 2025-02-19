@@ -36,6 +36,7 @@ import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.message.R
 import com.upsaclay.message.domain.conversationUIFixture
 import com.upsaclay.message.domain.entity.ConversationUI
+import com.upsaclay.message.domain.entity.ConversationUser
 import com.upsaclay.message.domain.entity.Message
 import com.upsaclay.message.domain.messagesFixture
 import com.upsaclay.message.presentation.components.ChatTopBar
@@ -48,10 +49,10 @@ import org.koin.core.parameter.parametersOf
 
 @Composable
 fun ChatScreen(
-    conversation: ConversationUI,
+    conversationUser: ConversationUser,
     navController: NavController,
     chatViewModel: ChatViewModel = koinViewModel<ChatViewModel>(
-        parameters = { parametersOf(conversation) }
+        parameters = { parametersOf(conversationUser) }
     )
 ) {
     val messages by chatViewModel.messages.collectAsState(emptyList())
@@ -60,7 +61,7 @@ fun ChatScreen(
         topBar = {
             ChatTopBar(
                 navController = navController,
-                interlocutor = chatViewModel.conversation.interlocutor
+                interlocutor = chatViewModel.conversationUser.interlocutor
             )
         }
     ) { innerPadding ->
@@ -75,7 +76,7 @@ fun ChatScreen(
             MessageSection(
                 modifier = Modifier.weight(1f),
                 messages = messages,
-                interlocutor = chatViewModel.conversation.interlocutor
+                interlocutor = chatViewModel.conversationUser.interlocutor
             )
 
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))

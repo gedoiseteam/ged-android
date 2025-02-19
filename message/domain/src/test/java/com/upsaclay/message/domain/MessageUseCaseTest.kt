@@ -42,7 +42,6 @@ class MessageUseCaseTest {
         sendMessageUseCase = SendMessageUseCase(messageRepository)
 
         every { userConversationRepository.userConversations } returns MutableStateFlow(conversationUserFixture)
-        every { userConversationRepository.getUserConversation(any()) } returns conversationUserFixture
         every { userConversationRepository.stopListenConversations() } returns Unit
         every { userConversationRepository.listenConversations() } returns Unit
         every { messageRepository.getMessages(any()) } returns MutableStateFlow(messageFixture)
