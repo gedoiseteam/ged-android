@@ -88,7 +88,7 @@ fun ConversationScreen(
                         conversation = conversation,
                         onClick = {
                             navController.navigate(
-                                Screen.CHAT.route + "?conversation=${ConvertConversationJsonUseCase.to(conversation)}"
+                                Screen.CHAT.route + "?conversation=${ConvertConversationJsonUseCase(conversation)}"
                             )
                         }
                     )

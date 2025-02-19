@@ -27,6 +27,7 @@ import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.message.R
 import com.upsaclay.message.domain.entity.ConversationScreenState
+import com.upsaclay.message.domain.usecase.ConvertConversationJsonUseCase
 import com.upsaclay.message.presentation.components.UserItem
 import com.upsaclay.message.presentation.viewmodels.CreateConversationViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -59,9 +60,21 @@ fun CreateConversationScreen(
                         UserItem(
                             user = user,
                             onClick = {
-                                val conversationJson = createConversationViewModel.generateConversationJson(user)
-                                navController.navigate(Screen.CHAT.route + "?conversation=$conversationJson") {
-                                    popUpTo(Screen.CREATE_CONVERSATION.route) { inclusive = true }
+                                createConversationViewModel.getConversation(user.id)?.let {
+                                    navController.navigate(
+                                        Screen.CHAT.route + "?conversation=${ConvertConversationJsonUseCase(it)}"
+                                    ) {
+                                        popUpTo(Screen.CREATE_CONVERSATION.route) {
+                                            inclusive = true
+                                        }
+                                    }
+                                } ?: run {
+                                    val conversationJson = createConversationViewModel.generateConversationJson(user)
+                                    navController.navigate(Screen.CHAT.route + "?conversation=$conversationJson") {
+                                        popUpTo(Screen.CREATE_CONVERSATION.route) {
+                                            inclusive = true
+                                        }
+                                    }
                                 }
                             }
                         )
