@@ -12,7 +12,7 @@ class DeleteAnnouncementUseCase(
 ) {
     operator fun invoke(announcement: Announcement) {
         scope.launch {
-            if (announcement.state == AnnouncementState.DEFAULT) {
+            if (announcement.state == AnnouncementState.PUBLISHED) {
                 announcementRepository.deleteAnnouncement(announcement)
             } else {
                 announcementRepository.deleteLocalAnnouncement(announcement)

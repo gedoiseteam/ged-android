@@ -15,7 +15,7 @@ class RecreateAnnouncementUseCase(
             try {
                 announcementRepository.updateAnnouncementState(announcement.copy(state = AnnouncementState.LOADING))
                 announcementRepository.createRemoteAnnouncement(announcement)
-                announcementRepository.updateAnnouncementState(announcement.copy(state = AnnouncementState.DEFAULT))
+                announcementRepository.updateAnnouncementState(announcement.copy(state = AnnouncementState.PUBLISHED))
             } catch (e: Exception) {
                 announcementRepository.updateAnnouncementState(announcement.copy(state = AnnouncementState.ERROR))
             }

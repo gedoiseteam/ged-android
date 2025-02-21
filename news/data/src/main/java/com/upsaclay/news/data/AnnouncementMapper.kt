@@ -55,7 +55,7 @@ internal object AnnouncementMapper {
             isMember = remoteAnnouncement.userIsMember == 1,
             profilePictureUrl = remoteAnnouncement.profilePictureUrl
         ),
-        state = AnnouncementState.DEFAULT
+        state = AnnouncementState.PUBLISHED
     )
 
     fun toRemote(announcement: Announcement) = RemoteAnnouncement(
