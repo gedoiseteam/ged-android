@@ -84,7 +84,7 @@ class ChatViewModel(
 
         textToSend = ""
     }
-    
+
     private fun seeMessage() {
         viewModelScope.launch {
             _messages.collect { messages ->

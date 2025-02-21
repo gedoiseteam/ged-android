@@ -43,6 +43,7 @@ import androidx.navigation.NavController
 import com.upsaclay.common.domain.entity.Screen
 import com.upsaclay.common.presentation.components.ClickableItem
 import com.upsaclay.common.presentation.components.PullToRefreshComponent
+import com.upsaclay.common.presentation.components.SensibleActionDialog
 import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
@@ -65,6 +66,7 @@ fun NewsScreen(
     val user by newsViewModel.currentUser.collectAsState()
     val isRefreshing = newsViewModel.isRefreshing
     var showBottomSheet by remember { mutableStateOf(false) }
+    var showDeleteAnnouncementDialog by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
     var announcementClicked by remember { mutableStateOf<Announcement?>(null) }
@@ -81,14 +83,27 @@ fun NewsScreen(
         newsViewModel.refreshAnnouncements()
     }
 
+    if (showDeleteAnnouncementDialog) {
+        SensibleActionDialog(
+            modifier = Modifier.testTag(stringResource(id = R.string.read_screen_delete_dialog_tag)),
+            title = stringResource(id = R.string.delete_announcement_dialog_title),
+            text = stringResource(id = R.string.delete_announcement_dialog_text),
+            onDismiss = { showDeleteAnnouncementDialog = false },
+            confirmText = stringResource(id = com.upsaclay.common.R.string.delete),
+            onConfirm = {
+                showDeleteAnnouncementDialog = false
+                announcementClicked?.let { newsViewModel.deleteAnnouncement(it) }
+            },
+            onCancel = { showDeleteAnnouncementDialog = false }
+        )
+    }
+
     PullToRefreshComponent(
         onRefresh = { newsViewModel.refreshAnnouncements() },
         isRefreshing = isRefreshing
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState()),
+            modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.smallMedium)
         ) {
             RecentAnnouncementSection(
@@ -97,10 +112,10 @@ fun NewsScreen(
                     navController.navigate(Screen.READ_ANNOUNCEMENT.route + "?announcementId=${it.id}")
                 },
                 onClickNotSentAnnouncement = {
-
+                    announcementClicked = it
+                    showBottomSheet = true
                 }
             )
-            PostSection()
         }
 
         if (user?.isMember == true) {
@@ -138,9 +153,7 @@ fun NewsScreen(
                     .fillMaxWidth(),
                 text = { Text(text = stringResource(id = R.string.resend_announcement)) },
                 onClick = {
-                    announcementClicked?.let {
-                        newsViewModel.recreateAnnouncement(it)
-                    }
+                    announcementClicked?.let { newsViewModel.recreateAnnouncement(it) }
                     hideBottomSheet()
                 }
             )
@@ -148,14 +161,17 @@ fun NewsScreen(
             ClickableItem(
                 modifier = Modifier
                     .fillMaxWidth(),
-                text = { Text(text = stringResource(id = R.string.delete_announcement)) },
+                text = { Text(
+                    text = stringResource(id = R.string.delete_announcement),
+                    color = MaterialTheme.colorScheme.error
+                ) },
                 onClick = {
-                    announcementClicked?.let {
-                        newsViewModel.deleteAnnouncement(it)
-                    }
+                    showDeleteAnnouncementDialog = true
                     hideBottomSheet()
                 }
             )
+
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))
         }
     }
 }
@@ -166,7 +182,6 @@ private fun RecentAnnouncementSection(
     onClickAnnouncement: (Announcement) -> Unit,
     onClickNotSentAnnouncement: (Announcement) -> Unit
 ) {
-    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
     val sortedAnnouncements = announcements.sortedByDescending { it.date }
     val textColor = if (isSystemInDarkTheme()) {
         GedoiseColor.PreviewTextDark
@@ -174,64 +189,45 @@ private fun RecentAnnouncementSection(
         GedoiseColor.PreviewTextLight
     }
 
-    Column(
-        verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small)
-    ) {
-        Text(
-            text = stringResource(id = R.string.recent_announcements),
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier
-                .padding(horizontal = MaterialTheme.spacing.medium)
-                .testTag(stringResource(id = R.string.news_screen_empty_announcement_text_tag))
-        )
+    Text(
+        text = stringResource(id = R.string.recent_announcements),
+        style = MaterialTheme.typography.titleMedium,
+        modifier = Modifier
+            .padding(horizontal = MaterialTheme.spacing.medium)
+            .testTag(stringResource(id = R.string.news_screen_empty_announcement_text_tag))
+    )
 
-        LazyColumn(
-            modifier = Modifier.heightIn(max = screenHeight * 0.46f),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            if (announcements.isEmpty()) {
-                item {
-                    Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
-                    Text(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = stringResource(id = R.string.no_announcement),
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = textColor,
-                        textAlign = TextAlign.Center
-                    )
-                    Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
-                }
-            } else {
-                items(sortedAnnouncements) { announcement ->
-                    AnnouncementItem(
-                        modifier = Modifier.testTag(stringResource(R.string.news_screen_recent_announcements_tag)),
-                        announcement = announcement,
-                        onClick = {
-                            if (announcement.state != AnnouncementState.ERROR) {
-                                onClickNotSentAnnouncement(announcement)
-                            } else {
-                                onClickAnnouncement(announcement)
-                            }
+    LazyColumn(
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        if (announcements.isEmpty()) {
+            item {
+                Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = stringResource(id = R.string.no_announcement),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = textColor,
+                    textAlign = TextAlign.Center
+                )
+                Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
+            }
+        } else {
+            items(sortedAnnouncements) { announcement ->
+                AnnouncementItem(
+                    modifier = Modifier.testTag(stringResource(R.string.news_screen_recent_announcements_tag)),
+                    announcement = announcement,
+                    onClick = {
+                        if (announcement.state != AnnouncementState.PUBLISHED) {
+                            onClickNotSentAnnouncement(announcement)
+                        } else {
+                            onClickAnnouncement(announcement)
                         }
-                    )
-                }
+                    }
+                )
             }
         }
-    }
-}
-
-@Composable
-private fun PostSection() {
-    Column(
-        modifier = Modifier.padding(horizontal = MaterialTheme.spacing.medium)
-    ) {
-        Text(
-            text = stringResource(id = R.string.news_ged),
-            style = MaterialTheme.typography.titleMedium,
-        )
-
-        // TODO : Implémenter la récupération des posts
     }
 }
 
@@ -249,7 +245,6 @@ private fun NewsScreenPreview() {
         PullToRefreshComponent(onRefresh = { }, isRefreshing = true) {
             Column {
                 RecentAnnouncementSectionPreview()
-                PostSection()
             }
 
             if (isMember) {

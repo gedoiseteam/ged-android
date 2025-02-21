@@ -158,6 +158,7 @@ fun ReadAnnouncementScreen(
             onCancel = { showDeleteAnnouncementDialog = false }
         )
     }
+
     Scaffold(
         topBar = {
             SmallTopBarBack(

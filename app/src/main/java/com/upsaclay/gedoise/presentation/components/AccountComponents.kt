@@ -81,7 +81,7 @@ internal fun AccountModelBottomSheet(
                 onClick = onDeleteProfilePictureClick
             )
         }
-        Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
+        Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))
     }
 }
 

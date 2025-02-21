@@ -30,7 +30,11 @@ import com.upsaclay.common.presentation.theme.spacing
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChatTopBar(navController: NavController, interlocutor: User) {
+fun ChatTopBar(
+    navController: NavController,
+    interlocutor: User,
+    onClickBack: () -> Unit
+) {
     val color = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
 
     Row(
@@ -43,7 +47,10 @@ fun ChatTopBar(navController: NavController, interlocutor: User) {
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(onClick = { navController.popBackStack() }) {
+        IconButton(onClick = {
+            onClickBack()
+            navController.popBackStack()
+        }) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = stringResource(id = com.upsaclay.common.R.string.arrow_back_icon_description)
@@ -71,7 +78,8 @@ private fun ChatTopBarPreview() {
         Column {
             ChatTopBar(
                 navController = rememberNavController(),
-                interlocutor = userFixture
+                interlocutor = userFixture,
+                onClickBack = { }
             )
         }
     }

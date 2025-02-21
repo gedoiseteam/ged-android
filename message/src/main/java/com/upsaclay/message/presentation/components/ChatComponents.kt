@@ -83,17 +83,6 @@ fun SentMessageItem(
                 backgroundColor = MaterialTheme.colorScheme.primary,
                 dateTimeTextColor = Color(0xFFD1D3D8)
             )
-
-            when (message.state) {
-                MessageState.LOADING -> Icon(
-                    modifier = Modifier.scale(0.7f),
-                    painter = painterResource(com.upsaclay.common.R.drawable.ic_outline_send),
-                    contentDescription = "",
-                    tint = Color.Gray
-                )
-
-                else -> {}
-            }
         }
 
         if (seen) {
