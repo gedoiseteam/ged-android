@@ -15,16 +15,15 @@ internal class MessageRemoteDataSource(private val messageApi: MessageApi) {
         messageApi.listenMessages(conversationId)
             .map(MessageMapper::toDomain)
 
-    fun listenLastMessage(conversationId: String): Flow<Message?> =
-        messageApi.listenLastMessage(conversationId)
-            .map { it?.let(MessageMapper::toDomain) }
-
-    suspend fun getMessages(conversationId: String, limit: Long): List<Message> =
-        messageApi.getMessages(conversationId, limit).map(MessageMapper::toDomain)
-
     suspend fun createMessage(message: Message) {
         withContext(Dispatchers.IO) {
             messageApi.createMessage(MessageMapper.toRemote(message))
+        }
+    }
+
+    suspend fun updateMessage(message: Message) {
+        withContext(Dispatchers.IO) {
+            messageApi.updateMessage(MessageMapper.toRemote(message))
         }
     }
 }

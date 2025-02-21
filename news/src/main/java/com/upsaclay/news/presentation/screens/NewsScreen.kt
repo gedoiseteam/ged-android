@@ -1,5 +1,6 @@
 package com.upsaclay.news.presentation.screens
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,14 +16,21 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -33,16 +41,21 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.upsaclay.common.domain.entity.Screen
+import com.upsaclay.common.presentation.components.ClickableItem
 import com.upsaclay.common.presentation.components.PullToRefreshComponent
+import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.news.R
 import com.upsaclay.news.domain.announcementsFixture
 import com.upsaclay.news.domain.entity.Announcement
+import com.upsaclay.news.domain.entity.AnnouncementState
 import com.upsaclay.news.presentation.components.AnnouncementItem
 import com.upsaclay.news.presentation.viewmodels.NewsViewModel
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewsScreen(
     navController: NavController,
@@ -51,6 +64,18 @@ fun NewsScreen(
     val announcements by newsViewModel.announcements.collectAsState(emptyList())
     val user by newsViewModel.currentUser.collectAsState()
     val isRefreshing = newsViewModel.isRefreshing
+    var showBottomSheet by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState()
+    val scope = rememberCoroutineScope()
+    var announcementClicked by remember { mutableStateOf<Announcement?>(null) }
+
+    val hideBottomSheet = {
+        scope.launch { sheetState.hide() }.invokeOnCompletion {
+            if (!sheetState.isVisible) {
+                showBottomSheet = false
+            }
+        }
+    }
 
     LaunchedEffect(Unit) {
         newsViewModel.refreshAnnouncements()
@@ -70,6 +95,9 @@ fun NewsScreen(
                 announcements = announcements,
                 onClickAnnouncement = {
                     navController.navigate(Screen.READ_ANNOUNCEMENT.route + "?announcementId=${it.id}")
+                },
+                onClickNotSentAnnouncement = {
+
                 }
             )
             PostSection()
@@ -98,15 +126,53 @@ fun NewsScreen(
             }
         }
     }
+
+    if (showBottomSheet) {
+        ModalBottomSheet(
+            modifier = Modifier.testTag(stringResource(id = R.string.read_screen_bottom_sheet_tag)),
+            onDismissRequest = { showBottomSheet = false },
+            sheetState = sheetState,
+        ) {
+            ClickableItem(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                text = { Text(text = stringResource(id = R.string.resend_announcement)) },
+                onClick = {
+                    announcementClicked?.let {
+                        newsViewModel.recreateAnnouncement(it)
+                    }
+                    hideBottomSheet()
+                }
+            )
+
+            ClickableItem(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                text = { Text(text = stringResource(id = R.string.delete_announcement)) },
+                onClick = {
+                    announcementClicked?.let {
+                        newsViewModel.deleteAnnouncement(it)
+                    }
+                    hideBottomSheet()
+                }
+            )
+        }
+    }
 }
 
 @Composable
 private fun RecentAnnouncementSection(
     announcements: List<Announcement>,
-    onClickAnnouncement: (Announcement) -> Unit
+    onClickAnnouncement: (Announcement) -> Unit,
+    onClickNotSentAnnouncement: (Announcement) -> Unit
 ) {
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
     val sortedAnnouncements = announcements.sortedByDescending { it.date }
+    val textColor = if (isSystemInDarkTheme()) {
+        GedoiseColor.PreviewTextDark
+    } else {
+        GedoiseColor.PreviewTextLight
+    }
 
     Column(
         verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small)
@@ -131,7 +197,7 @@ private fun RecentAnnouncementSection(
                         modifier = Modifier.fillMaxWidth(),
                         text = stringResource(id = R.string.no_announcement),
                         style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.outline,
+                        color = textColor,
                         textAlign = TextAlign.Center
                     )
                     Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
@@ -141,7 +207,13 @@ private fun RecentAnnouncementSection(
                     AnnouncementItem(
                         modifier = Modifier.testTag(stringResource(R.string.news_screen_recent_announcements_tag)),
                         announcement = announcement,
-                        onClick = { onClickAnnouncement(announcement) }
+                        onClick = {
+                            if (announcement.state != AnnouncementState.ERROR) {
+                                onClickNotSentAnnouncement(announcement)
+                            } else {
+                                onClickAnnouncement(announcement)
+                            }
+                        }
                     )
                 }
             }
@@ -211,7 +283,8 @@ private fun RecentAnnouncementSectionPreview() {
         Column {
             RecentAnnouncementSection(
                 announcements = announcementsFixture,
-                onClickAnnouncement = { }
+                onClickAnnouncement = { },
+                onClickNotSentAnnouncement = { }
             )
         }
     }

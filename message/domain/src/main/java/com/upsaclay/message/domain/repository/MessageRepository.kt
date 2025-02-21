@@ -8,6 +8,8 @@ interface MessageRepository {
 
     fun getLastMessage(conversationId: String): Flow<Message?>
 
+    suspend fun getMessages(conversationId: String, limit: Int, offset: Int): List<Message>
+
     suspend fun createMessage(message: Message)
 
     suspend fun updateMessage(message: Message)

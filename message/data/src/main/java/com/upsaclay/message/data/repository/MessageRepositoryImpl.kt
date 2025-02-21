@@ -19,6 +19,9 @@ internal class MessageRepositoryImpl(
     override fun getLastMessage(conversationId: String): Flow<Message?> =
         messageLocalDataSource.getLastMessage(conversationId)
 
+    override suspend fun getMessages(conversationId: String, limit: Int, offset: Int): List<Message> =
+        messageLocalDataSource.getMessages(conversationId, limit, offset)
+
     override suspend fun createMessage(message: Message) {
         messageLocalDataSource.insertMessage(message)
         messageRemoteDataSource.createMessage(message)
@@ -26,6 +29,7 @@ internal class MessageRepositoryImpl(
 
     override suspend fun updateMessage(message: Message) {
         messageLocalDataSource.updateMessage(message)
+        messageRemoteDataSource.updateMessage(message)
     }
 
     override suspend fun upsertMessage(message: Message) {
@@ -38,7 +42,6 @@ internal class MessageRepositoryImpl(
 
     override suspend fun listenRemoteMessages(conversationId: String) {
         messageRemoteDataSource.listenMessages(conversationId)
-            .distinctUntilChanged()
             .collect { messageLocalDataSource.upsertMessage(it) }
     }
 }

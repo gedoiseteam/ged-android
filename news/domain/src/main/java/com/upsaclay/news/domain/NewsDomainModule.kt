@@ -37,7 +37,14 @@ val newsDomainModule = module {
             scope = get(BACKGROUND_SCOPE)
         )
     }
-    singleOf(::DeleteAnnouncementUseCase)
+
+    single {
+        DeleteAnnouncementUseCase(
+            announcementRepository = get(),
+            scope = get(BACKGROUND_SCOPE)
+        )
+    }
+
     singleOf(::GetAnnouncementFlowUseCase)
     singleOf(::GetAnnouncementsUseCase)
     singleOf(::GetAnnouncementUseCase)

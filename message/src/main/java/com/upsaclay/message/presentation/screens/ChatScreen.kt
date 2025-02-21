@@ -9,12 +9,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -103,13 +107,15 @@ private fun MessageSection(
     ) {
         if (messages.isNotEmpty()) {
             itemsIndexed(messages) { index, message ->
-                val firstMessage = index == 0
-                val lastMessage = index == messages.size - 1
-                val previousSenderId = if (!lastMessage) messages[index + 1].senderId else ""
+                val currentUserSender = message.senderId != interlocutor.id
+                val firstMessage = index == messages.size - 1
+                val lastMessage = index == 0
+                val previousSenderId = if (!firstMessage) messages[index + 1].senderId else ""
                 val sameSender = previousSenderId == message.senderId
-                val nextSenderId = if (!firstMessage) messages[index - 1].senderId else ""
+                val nextSenderId = if (!lastMessage) messages[index - 1].senderId else ""
+                val showSeenMessage = lastMessage && currentUserSender && message.seen
 
-                val sameTime = if (!lastMessage) {
+                val sameTime = if (!firstMessage) {
                     message.date
                         .withSecond(0)
                         .withNano(0)
@@ -118,26 +124,23 @@ private fun MessageSection(
                                 .withSecond(0)
                                 .withNano(0)
                         )
-                } else {
-                    false
-                }
+                } else false
 
-                val sameDay = if (!lastMessage) {
+                val sameDay = if (!firstMessage) {
                     message.date
                         .toLocalDate()
                         .isEqual(messages[index + 1].date.toLocalDate())
                 }
-                else {
-                    false
-                }
+                else false
 
                 val displayProfilePicture =
-                    !sameTime || (message.senderId != nextSenderId && message.senderId == interlocutor.id)
+                    !sameTime || (!currentUserSender && message.senderId != nextSenderId )
 
                 if (message.senderId != interlocutor.id) {
                     SentMessageItem(
                         modifier = Modifier.testTag(stringResource(R.string.chat_screen_send_message_item_tag)),
-                        message = message
+                        message = message,
+                        seen = showSeenMessage
                     )
                 } else {
                     ReceiveMessageItem(
@@ -148,14 +151,14 @@ private fun MessageSection(
                     )
                 }
 
-                if (lastMessage || !sameDay) {
+                if (firstMessage || !sameDay) {
                     Text(
                         modifier = Modifier
                             .padding(vertical = MaterialTheme.spacing.mediumLarge)
                             .fillMaxWidth(),
                         text = FormatLocalDateTimeUseCase.formatDayMonthYear(message.date),
                         style = MaterialTheme.typography.bodySmall,
-                        color = GedoiseColor.PreviewText,
+                        color = GedoiseColor.PreviewTextLight,
                         textAlign = TextAlign.Center
                     )
                 } else {

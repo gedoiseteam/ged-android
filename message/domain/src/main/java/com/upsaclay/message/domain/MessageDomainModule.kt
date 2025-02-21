@@ -8,6 +8,7 @@ import com.upsaclay.message.domain.usecase.ListenConversationsUiUseCase
 import com.upsaclay.message.domain.usecase.ListenConversationsUseCase
 import com.upsaclay.message.domain.usecase.ListenMessagesUseCase
 import com.upsaclay.message.domain.usecase.SendMessageUseCase
+import com.upsaclay.message.domain.usecase.UpdateMessageUseCase
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -52,8 +53,19 @@ val messageDomainModule = module {
         )
     }
 
-    singleOf(::CreateConversationUseCase)
+    single {
+        CreateConversationUseCase(
+            userConversationRepository = get(),
+            scope = get(BACKGROUND_SCOPE)
+        )
+    }
     singleOf(::DeleteConversationUseCase)
     singleOf(::GetMessagesUseCase)
-    singleOf(::SendMessageUseCase)
+    single {
+        SendMessageUseCase(
+            messageRepository = get(),
+            scope = get(BACKGROUND_SCOPE)
+        )
+    }
+    singleOf(::UpdateMessageUseCase)
 }

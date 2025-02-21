@@ -92,7 +92,7 @@ internal fun AnnouncementHeader(
         Text(
             text = elapsedTimeValue,
             style = MaterialTheme.typography.bodySmall,
-            color = GedoiseColor.PreviewText
+            color = GedoiseColor.PreviewTextLight
         )
 
         Spacer(modifier = Modifier.width(MaterialTheme.spacing.smallMedium))
@@ -169,7 +169,7 @@ internal fun AnnouncementItem(
                     Text(
                         text = elapsedTimeValue,
                         style = MaterialTheme.typography.bodySmall,
-                        color = GedoiseColor.PreviewText
+                        color = GedoiseColor.PreviewTextLight
                     )
                 }
 
@@ -177,7 +177,7 @@ internal fun AnnouncementItem(
 
                 Text(
                     text = announcement.title ?: announcement.content,
-                    color = GedoiseColor.PreviewText,
+                    color = GedoiseColor.PreviewTextLight,
                     style = MaterialTheme.typography.bodyMedium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis

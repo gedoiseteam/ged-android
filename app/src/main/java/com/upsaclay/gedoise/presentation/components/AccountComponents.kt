@@ -90,7 +90,8 @@ internal fun AccountInfoItem(
     modifier: Modifier = Modifier,
     accountInfo: AccountInfo
 ) {
-    val labelColor = if (isSystemInDarkTheme()) Color.Gray else GedoiseColor.PreviewText
+    val labelColor = if (isSystemInDarkTheme()) GedoiseColor.PreviewTextDark else GedoiseColor.PreviewTextLight
+
     Column(
         modifier = modifier.padding(vertical = MaterialTheme.spacing.smallMedium)
     ) {

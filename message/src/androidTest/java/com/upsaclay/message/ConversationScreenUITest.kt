@@ -16,7 +16,6 @@ import androidx.navigation.testing.TestNavHostController
 import com.upsaclay.common.domain.entity.Screen
 import com.upsaclay.common.domain.userFixture2
 import com.upsaclay.message.domain.conversationUIFixture
-import com.upsaclay.message.domain.conversationUserFixture
 import com.upsaclay.message.domain.conversationsUIFixture
 import com.upsaclay.message.domain.messageFixture
 import com.upsaclay.message.presentation.screens.ChatScreen
@@ -137,7 +136,7 @@ class ConversationScreenUITest {
     @Test
     fun unread_conversations_item_should_be_displayed_when_last_message_is_not_read_and_not_sent_by_interlocutor() {
         // Given
-        val lastMessage = messageFixture.copy(isRead = false, senderId = userFixture2.id)
+        val lastMessage = messageFixture.copy(seen = false, senderId = userFixture2.id)
         every { conversationViewModel.conversations } returns flowOf(listOf(conversationUIFixture.copy(lastMessage = lastMessage)))
 
         // When

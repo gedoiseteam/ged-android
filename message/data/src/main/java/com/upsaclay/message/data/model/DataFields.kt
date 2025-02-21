@@ -20,7 +20,7 @@ internal object MessageField {
     const val SENDER_ID = "sender_id"
     const val CONTENT = "text"
     const val TIMESTAMP = "timestamp"
-    const val IS_READ = "is_read"
+    const val SEEN = "seen"
     const val TYPE = "type"
     const val STATE = "state"
 }

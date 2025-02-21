@@ -13,6 +13,7 @@ class RecreateAnnouncementUseCase(
     operator fun invoke(announcement: Announcement) {
         scope.launch {
             try {
+                announcementRepository.updateAnnouncementState(announcement.copy(state = AnnouncementState.LOADING))
                 announcementRepository.createRemoteAnnouncement(announcement)
                 announcementRepository.updateAnnouncementState(announcement.copy(state = AnnouncementState.DEFAULT))
             } catch (e: Exception) {

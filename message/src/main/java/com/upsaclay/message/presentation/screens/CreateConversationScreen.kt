@@ -86,7 +86,7 @@ fun CreateConversationScreen(
                             modifier = Modifier.fillMaxWidth(),
                             text = stringResource(id = com.upsaclay.common.R.string.no_user_found),
                             textAlign = TextAlign.Center,
-                            color = GedoiseColor.PreviewText
+                            color = GedoiseColor.PreviewTextLight
                         )
                     }
                 }
@@ -130,7 +130,7 @@ private fun CreateConversationScreenPreview() {
                             modifier = Modifier.fillMaxWidth(),
                             text = stringResource(id = com.upsaclay.common.R.string.no_user_found),
                             textAlign = TextAlign.Center,
-                            color = GedoiseColor.PreviewText
+                            color = GedoiseColor.PreviewTextLight
                         )
                     }
                 }

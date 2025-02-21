@@ -1,5 +1,6 @@
 package com.upsaclay.message.presentation.screens
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,6 +35,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import com.upsaclay.common.domain.entity.Screen
+import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.message.R
@@ -49,6 +51,11 @@ fun ConversationScreen(
     conversationViewModel: ConversationViewModel = koinViewModel()
 ) {
     val conversations by conversationViewModel.conversations.collectAsState(emptyList())
+    val textColor = if (isSystemInDarkTheme()) {
+        GedoiseColor.PreviewTextDark
+    } else {
+        GedoiseColor.PreviewTextLight
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         if (conversations.isEmpty()) {
@@ -61,7 +68,7 @@ fun ConversationScreen(
                 Text(
                     text = stringResource(id = R.string.no_conversation),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.outline,
+                    color = textColor,
                     textAlign = TextAlign.Center
                 )
 
