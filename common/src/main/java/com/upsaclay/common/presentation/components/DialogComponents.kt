@@ -35,7 +35,7 @@ fun SimpleDialog(
     cancelText: String = stringResource(id = R.string.cancel),
     onConfirm: () -> Unit,
     onCancel: () -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit = onCancel
 ) {
     AlertDialog(
         modifier = modifier,
@@ -62,9 +62,9 @@ fun SensibleActionDialog(
     text: String? = null,
     confirmText: String,
     cancelText: String = stringResource(id = R.string.cancel),
-    onDismiss: () -> Unit,
     onConfirm: () -> Unit,
-    onCancel: () -> Unit
+    onCancel: () -> Unit,
+    onDismiss: () -> Unit = onCancel
 ) {
     AlertDialog(
         modifier = modifier,
@@ -147,8 +147,8 @@ private fun SimpleDialogPreview() {
 private fun SensibleActionDialogPreview() {
     GedoiseTheme {
         SensibleActionDialog(
-            title = "Delete item",
-            text = "Do you want delete this item ?",
+            title = "Sensible action",
+            text = "Do you want to do this sensible action ?",
             confirmText = "Delete",
             cancelText = "Cancel",
             onConfirm = { },

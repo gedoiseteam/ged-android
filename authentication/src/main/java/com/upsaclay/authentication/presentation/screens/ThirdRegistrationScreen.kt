@@ -21,6 +21,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -49,6 +50,7 @@ fun ThirdRegistrationScreen(
 ) {
     val registrationState by registrationViewModel.screenState.collectAsState()
     val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
     val isLoading = registrationState == RegistrationScreenState.LOADING
 
     val (errorMessage, inputsError) = when (registrationState) {
@@ -80,7 +82,12 @@ fun ThirdRegistrationScreen(
 
     RegistrationTopBar(
         navController = navController,
-        currentStep = CURRENT_STEP
+        currentStep = CURRENT_STEP,
+        onBackClick = {
+            focusManager.clearFocus()
+            keyboardController?.hide()
+            navController.popBackStack()
+        }
     ) {
         Column(
             modifier = Modifier

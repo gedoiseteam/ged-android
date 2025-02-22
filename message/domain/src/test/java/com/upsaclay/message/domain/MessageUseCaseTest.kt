@@ -41,9 +41,20 @@ class MessageUseCaseTest {
 
     @Before
     fun setUp() {
-        createConversationUseCase = CreateConversationUseCase(userConversationRepository = userConversationRepository)
-        deleteConversationUseCase = DeleteConversationUseCase(userConversationRepository = userConversationRepository)
-        sendMessageUseCase = SendMessageUseCase(messageRepository = messageRepository)
+        createConversationUseCase = CreateConversationUseCase(
+            userConversationRepository = userConversationRepository,
+            scope = testScope
+        )
+        deleteConversationUseCase = DeleteConversationUseCase(
+            userConversationRepository = userConversationRepository,
+            messageRepository = messageRepository,
+            listenConversationsUiUseCase = listenConversationsUiUseCase,
+            scope = testScope
+        )
+        sendMessageUseCase = SendMessageUseCase(
+            messageRepository = messageRepository,
+            scope = testScope
+        )
         listenConversationsUiUseCase = ListenConversationsUiUseCase(
             userConversationRepository = userConversationRepository,
             messageRepository = messageRepository,

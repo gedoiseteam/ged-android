@@ -61,6 +61,7 @@ val messageDomainModule = module {
     }
     singleOf(::DeleteConversationUseCase)
     singleOf(::GetMessagesUseCase)
+
     single {
         SendMessageUseCase(
             messageRepository = get(),

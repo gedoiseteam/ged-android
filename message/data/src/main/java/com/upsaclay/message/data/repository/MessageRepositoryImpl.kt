@@ -4,11 +4,7 @@ import com.upsaclay.message.data.local.MessageLocalDataSource
 import com.upsaclay.message.data.remote.MessageRemoteDataSource
 import com.upsaclay.message.domain.entity.Message
 import com.upsaclay.message.domain.repository.MessageRepository
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.launch
 
 internal class MessageRepositoryImpl(
     private val messageLocalDataSource: MessageLocalDataSource,
@@ -34,6 +30,11 @@ internal class MessageRepositoryImpl(
 
     override suspend fun upsertMessage(message: Message) {
         messageLocalDataSource.upsertMessage(message)
+    }
+
+    override suspend fun deleteMessages(conversationId: String) {
+        messageLocalDataSource.deleteMessages(conversationId)
+        messageRemoteDataSource.deleteMessages(conversationId)
     }
 
     override suspend fun deleteLocalMessages() {

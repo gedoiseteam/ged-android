@@ -291,7 +291,7 @@ fun ReadAnnouncementScreen(
                             .testTag(stringResource(id = R.string.read_screen_sheet_delete_field_tag)),
                         text = {
                             Text(
-                                text = stringResource(id = R.string.delete_announcement),
+                                text = stringResource(id = com.upsaclay.common.R.string.delete),
                                 color = MaterialTheme.colorScheme.error
                             )
                         },

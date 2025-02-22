@@ -159,15 +159,14 @@ fun NewsScreen(
             )
 
             ClickableItem(
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 text = { Text(
-                    text = stringResource(id = R.string.delete_announcement),
+                    text = stringResource(id = com.upsaclay.common.R.string.delete),
                     color = MaterialTheme.colorScheme.error
                 ) },
                 onClick = {
-                    showDeleteAnnouncementDialog = true
                     hideBottomSheet()
+                    showDeleteAnnouncementDialog = true
                 }
             )
 

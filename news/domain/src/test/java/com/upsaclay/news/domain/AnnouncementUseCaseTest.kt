@@ -38,7 +38,10 @@ class AnnouncementUseCaseTest {
             announcementRepository = announcementRepository,
             scope = testScope
         )
-        deleteAnnouncementUseCase = DeleteAnnouncementUseCase(announcementRepository = announcementRepository)
+        deleteAnnouncementUseCase = DeleteAnnouncementUseCase(
+            announcementRepository = announcementRepository,
+            scope = testScope
+        )
         getAnnouncementsUseCase = GetAnnouncementsUseCase(announcementRepository = announcementRepository)
         getAnnouncementUseCase = GetAnnouncementUseCase(announcementRepository = announcementRepository)
         updateAnnouncementUseCase = UpdateAnnouncementUseCase(announcementRepository = announcementRepository)

@@ -18,12 +18,11 @@ import com.upsaclay.message.domain.usecase.SendMessageUseCase
 import com.upsaclay.message.domain.usecase.UpdateMessageUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
-private const val MESSAGE_LIMIT = 15
+private const val MESSAGE_LIMIT = 20
 
 class ChatViewModel(
     conversation: ConversationUI,
@@ -43,6 +42,7 @@ class ChatViewModel(
     var textToSend: String by mutableStateOf("")
         private set
     private var messagesOffset = MESSAGE_LIMIT
+    private var allOldMessageLoaded = false
 
     init {
         fetchMessages()
@@ -83,6 +83,20 @@ class ChatViewModel(
         }
 
         textToSend = ""
+    }
+
+    fun loadOldMessages() {
+        if (_messages.value.size < MESSAGE_LIMIT || allOldMessageLoaded) return
+        val currentMessages = _messages.value.values.toList()
+
+        viewModelScope.launch {
+            getMessagesUseCase(conversation.id, messagesOffset, MESSAGE_LIMIT)
+                .apply { messagesOffset += size }
+                .forEach {
+                    _messages.value = _messages.value.toMutableMap().apply { put(it.id, it) }
+                }
+            allOldMessageLoaded = currentMessages.size == _messages.value.size
+        }
     }
 
     private fun seeMessage() {

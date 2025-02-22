@@ -44,6 +44,11 @@ class ListenConversationsUiUseCase(
         _conversationsUI.value = emptyList()
     }
 
+    fun deleteConversation(conversation: ConversationUI) {
+       _conversationsUI.value = _conversationsUI.value.filterNot { it.id == conversation.id }
+        conversationsUIMap.remove(conversation.id)
+    }
+
     private fun listenConversationsUI() {
         job = userConversationRepository.userConversations
             .flatMapConcat { conversationUser ->

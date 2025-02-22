@@ -1,7 +1,9 @@
 package com.upsaclay.message.presentation.components
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -41,11 +43,13 @@ import com.upsaclay.message.domain.entity.Message
 import com.upsaclay.message.domain.entity.MessageState
 import com.upsaclay.message.domain.messageFixture2
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ConversationItem(
     modifier: Modifier = Modifier,
     conversation: ConversationUI,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onLongClick: () -> Unit
 ) {
     val elapsedTimeValue = conversation.lastMessage?.let { lastMessage ->
         when (val elapsedTime = GetElapsedTimeUseCase.fromLocalDateTime(lastMessage.date)) {
@@ -77,7 +81,10 @@ fun ConversationItem(
 
     Row(
         modifier = modifier
-            .clickable(onClick = onClick)
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = onLongClick
+            )
             .padding(
                 horizontal = MaterialTheme.spacing.medium,
                 vertical = MaterialTheme.spacing.smallMedium
@@ -266,7 +273,8 @@ private fun ReadConversationItemPreview() {
         ConversationItem(
             modifier = Modifier.fillMaxWidth(),
             conversation = conversationUIFixture,
-            onClick = { }
+            onClick = { },
+            onLongClick = { }
         )
     }
 }
@@ -280,7 +288,8 @@ private fun UnreadConversationItemPreview() {
             conversation = conversationUIFixture.copy(
                 lastMessage = messageFixture2
             ),
-            onClick = { }
+            onClick = { },
+            onLongClick = { }
         )
     }
 }
@@ -292,7 +301,8 @@ private fun EmptyConversationPreview() {
         ConversationItem(
             modifier = Modifier.fillMaxWidth(),
             conversation = conversationUIFixture.copy(lastMessage = null),
-            onClick = { }
+            onClick = { },
+            onLongClick = { }
         )
     }
 }

@@ -1,5 +1,6 @@
 package com.upsaclay.message.data.repository
 
+import com.upsaclay.common.domain.e
 import com.upsaclay.common.domain.entity.User
 import com.upsaclay.message.data.local.ConversationLocalDataSource
 import com.upsaclay.message.data.mapper.ConversationMapper
@@ -10,6 +11,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.mapNotNull
+import java.io.IOException
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class ConversationRepositoryImpl(
@@ -57,10 +59,13 @@ internal class ConversationRepositoryImpl(
     }
 
     override suspend fun deleteConversation(conversation: Conversation, interlocutor: User) {
-        conversationLocalDataSource.deleteConversation(
-            ConversationMapper.toLocal(conversation, interlocutor)
-        )
-        conversationRemoteDataSource.deleteConversation(conversation.id)
+        try {
+            conversationRemoteDataSource.deleteConversation(conversation.id)
+            conversationLocalDataSource.deleteConversation(ConversationMapper.toLocal(conversation, interlocutor))
+        } catch (e: Exception) {
+            e("Error deleting conversation", e)
+            throw IOException()
+        }
     }
 
     override suspend fun deleteLocalConversations() {

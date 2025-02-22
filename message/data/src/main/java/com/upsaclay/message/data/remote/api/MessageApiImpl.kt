@@ -84,4 +84,22 @@ internal class MessageApiImpl : MessageApi {
             }
         }
     }
+
+    override suspend fun deleteMessages(conversationId: String) {
+        suspendCoroutine { continuation ->
+            conversationsCollection.document(conversationId)
+                .collection(MESSAGES_TABLE_NAME)
+                .get(Source.SERVER)
+                .addOnSuccessListener { snapshot ->
+                    snapshot.documents.forEach { document ->
+                        document.reference.delete()
+                    }
+                    continuation.resume(Unit)
+                }
+                .addOnFailureListener { e ->
+                    e("Error deleting remote messages", e)
+                    continuation.resumeWithException(e)
+                }
+        }
+    }
 }

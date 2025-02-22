@@ -3,6 +3,7 @@ package com.upsaclay.message.presentation.screens
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,11 +17,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -33,10 +34,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.upsaclay.common.domain.entity.User
 import com.upsaclay.common.domain.usecase.FormatLocalDateTimeUseCase
+import com.upsaclay.common.presentation.components.CircularProgressBar
 import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
@@ -44,14 +45,16 @@ import com.upsaclay.message.R
 import com.upsaclay.message.domain.conversationUIFixture
 import com.upsaclay.message.domain.entity.ConversationUI
 import com.upsaclay.message.domain.entity.Message
-import com.upsaclay.message.domain.messagesFixture
+import com.upsaclay.message.domain.entity.MessageState
 import com.upsaclay.message.presentation.components.ChatTopBar
 import com.upsaclay.message.presentation.components.MessageInput
 import com.upsaclay.message.presentation.components.ReceiveMessageItem
 import com.upsaclay.message.presentation.components.SentMessageItem
 import com.upsaclay.message.presentation.viewmodels.ChatViewModel
+import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
+import java.time.LocalDateTime
 
 @Composable
 fun ChatScreen(
@@ -63,6 +66,21 @@ fun ChatScreen(
 ) {
     val messages by chatViewModel.messages.collectAsState(emptyList())
     val keyboardController = LocalSoftwareKeyboardController.current
+    val listState = rememberLazyListState()
+    val topList by remember {
+        derivedStateOf {
+            listState.layoutInfo.visibleItemsInfo
+                .filterNot { it.key == -2 }
+                .lastOrNull()?.index == messages.size - 1 &&
+                    listState.firstVisibleItemIndex != 0
+        }
+    }
+
+    LaunchedEffect(topList) {
+        if (topList) {
+            chatViewModel.loadOldMessages()
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -86,7 +104,8 @@ fun ChatScreen(
             MessageSection(
                 modifier = Modifier.weight(1f),
                 messages = messages,
-                interlocutor = chatViewModel.conversation.interlocutor
+                interlocutor = chatViewModel.conversation.interlocutor,
+                listState = listState
             )
 
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
@@ -105,12 +124,14 @@ fun ChatScreen(
 private fun MessageSection(
     modifier: Modifier = Modifier,
     messages: List<Message>,
-    interlocutor: User
+    interlocutor: User,
+    listState: LazyListState
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Bottom,
-        reverseLayout = true
+        reverseLayout = true,
+        state = listState
     ) {
         if (messages.isNotEmpty()) {
             itemsIndexed(messages) { index, message ->
@@ -198,6 +219,9 @@ private fun messagePadding(
 @Composable
 private fun ChatScreenPreview() {
     var text by remember { mutableStateOf("") }
+    var messages by remember { mutableStateOf(emptyList<Message>()) }
+    var id by remember { mutableIntStateOf(10) }
+    val listState = rememberLazyListState()
 
     GedoiseTheme {
         Scaffold(
@@ -220,8 +244,9 @@ private fun ChatScreenPreview() {
                 ) {
                     MessageSection(
                         modifier = Modifier.weight(1f),
-                        messages = messagesFixture,
-                        interlocutor = conversationUIFixture.interlocutor
+                        messages = messages,
+                        interlocutor = conversationUIFixture.interlocutor,
+                        listState = listState
                     )
 
                     Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
@@ -230,7 +255,22 @@ private fun ChatScreenPreview() {
                         modifier = Modifier.fillMaxWidth(),
                         value = text,
                         onValueChange = { text = it },
-                        onSendClick = { }
+                        onSendClick = {
+                            id++
+                            messages = messages.toMutableList().apply {
+                                add(
+                                    Message(
+                                        id = id.toString(),
+                                        conversationId = "conversationId",
+                                        senderId = "senderId",
+                                        content = text,
+                                        date = LocalDateTime.now(),
+                                        state = MessageState.SENT
+                                    )
+                                )
+                                sortedByDescending { it.date }
+                            }
+                        }
                     )
                 }
             }

@@ -44,16 +44,6 @@ internal object ConversationMapper {
         return Pair<Conversation, User>(conversation, interlocutor)
     }
 
-    fun toConversation(localConversation: LocalConversation): Conversation {
-        val interlocutor = Gson().fromJson(localConversation.interlocutorJson, User::class.java)
-        return Conversation(
-            id = localConversation.conversationId,
-            interlocutorId = interlocutor.id,
-            createdAt = ConvertDateUseCase.toLocalDateTime(localConversation.createdAt),
-            state = ConversationState.valueOf(localConversation.state)
-        )
-    }
-
     fun toConversation(
         remoteConversation: RemoteConversation,
         currentUserId: String
@@ -70,21 +60,6 @@ internal object ConversationMapper {
     fun toConversation(conversationUser: ConversationUser) = Conversation(
         id = conversationUser.id,
         interlocutorId = conversationUser.interlocutor.id,
-        createdAt = conversationUser.createdAt,
-        state = conversationUser.state
-    )
-
-    fun toConversationUser(conversationUI: ConversationUI) = ConversationUser(
-        id = conversationUI.id,
-        interlocutor = conversationUI.interlocutor,
-        createdAt = conversationUI.createdAt,
-        state = conversationUI.state
-    )
-
-    fun toConversationUI(conversationUser: ConversationUser, message: Message?) = ConversationUI(
-        id = conversationUser.id,
-        interlocutor = conversationUser.interlocutor,
-        lastMessage = message,
         createdAt = conversationUser.createdAt,
         state = conversationUser.state
     )

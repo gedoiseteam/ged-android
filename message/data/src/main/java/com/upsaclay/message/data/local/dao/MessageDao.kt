@@ -46,6 +46,9 @@ interface MessageDao {
     @Upsert
     suspend fun upsertMessage(localMessage: LocalMessage)
 
+    @Query("DELETE FROM $MESSAGES_TABLE_NAME WHERE ${MessageField.CONVERSATION_ID} = :conversationId")
+    suspend fun deleteMessages(conversationId: String)
+
     @Query("DELETE FROM $MESSAGES_TABLE_NAME")
-    suspend fun deleteMessages()
+    suspend fun deleteAllMessages()
 }

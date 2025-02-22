@@ -50,6 +50,9 @@ internal class UserConversationRepositoryImpl(
             ConversationMapper.toConversation(conversationUser),
             conversationUser.interlocutor
         )
+        _userConversations.update { currentMap ->
+            currentMap.toMutableMap().apply { remove(conversationUser.id) }
+        }
     }
 
     override suspend fun deleteLocalConversations() {

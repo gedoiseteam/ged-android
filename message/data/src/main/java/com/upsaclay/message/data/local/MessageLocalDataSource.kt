@@ -46,9 +46,15 @@ internal class MessageLocalDataSource(private val messageDao: MessageDao) {
         }
     }
 
+    suspend fun deleteMessages(conversationId: String) {
+        withContext(Dispatchers.IO) {
+            messageDao.deleteMessages(conversationId)
+        }
+    }
+
     suspend fun deleteMessages() {
         withContext(Dispatchers.IO) {
-            messageDao.deleteMessages()
+            messageDao.deleteAllMessages()
         }
     }
 }

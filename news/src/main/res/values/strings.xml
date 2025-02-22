@@ -10,7 +10,6 @@
     <string name="edit_announcement">Editer l\'annonce</string>
     <string name="resend_announcement">Renvoyer l\'annonce</string>
     <string name="announcement_sent">Annonce envoyée</string>
-    <string name="delete_announcement">Supprimer l\'annonce</string>
     <string name="delete_announcement_dialog_title">Supprimer annonce</string>
     <string name="delete_announcement_dialog_text">Êtes-vous sûr de vouloir supprimer cette annonce ?</string>
     <string name="title_field_entry">Titre</string>
