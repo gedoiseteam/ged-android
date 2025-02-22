@@ -20,6 +20,7 @@
         <activity
             android:name=".presentation.MainActivity"
             android:exported="true"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.Gedoise"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
