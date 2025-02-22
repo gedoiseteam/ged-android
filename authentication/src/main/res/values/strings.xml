@@ -30,6 +30,7 @@
     <string name="error_update_profile_picture">Une erreur est survenue lors de la mise à jour de la photo de profil. Veuillez réesayer.</string>
     <string name="error_incorrect_email_format">Veuillez entrer une adresse e-mail valide</string>
     <string name="error_password_length">Le mot de passe doit comporter au moins 8 caractères</string>
+    <string name="server_communication_error">La communication avec le serveur a echoué. Vérifier votre connexion internet.</string>
     <string name="email_already_associated">Cette adresse e-mail est déjà associée à un compte. Veuillez vous connecter ou réinitialiser votre mot de passe.</string>
     <string name="authenticated_user_not_found">La création de vore compte a été comprise. Veuillez contacter le support à l\'adresse suivante : application.gedoise@gmail.com</string>
     <string name="too_many_request_error">Vous avez effectué trop de tentatives de connexion. Veuillez réessayer dans quelques minutes.</string>

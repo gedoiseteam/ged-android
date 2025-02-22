@@ -1,7 +1,6 @@
 package com.upsaclay.message
 
 import com.upsaclay.message.domain.entity.ConversationUI
-import com.upsaclay.message.domain.entity.ConversationUser
 import com.upsaclay.message.presentation.viewmodels.ChatViewModel
 import com.upsaclay.message.presentation.viewmodels.ConversationViewModel
 import com.upsaclay.message.presentation.viewmodels.CreateConversationViewModel

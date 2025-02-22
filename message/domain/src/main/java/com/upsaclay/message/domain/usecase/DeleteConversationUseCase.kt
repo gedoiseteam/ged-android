@@ -4,8 +4,6 @@ import com.upsaclay.message.domain.ConversationMapper
 import com.upsaclay.message.domain.entity.ConversationUI
 import com.upsaclay.message.domain.repository.MessageRepository
 import com.upsaclay.message.domain.repository.UserConversationRepository
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 class DeleteConversationUseCase(
     private val userConversationRepository: UserConversationRepository,

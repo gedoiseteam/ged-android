@@ -67,49 +67,22 @@ fun AuthenticationScreen(
     val screenState by authenticationViewModel.screenState.collectAsState()
 
     val (errorMessage, inputsError) = when (screenState) {
-        AuthenticationScreenState.AUTHENTICATION_ERROR -> {
-            authenticationViewModel.resetPassword()
-            authenticationViewModel.resetScreenState()
-            stringResource(id = R.string.error_connection) to true
-        }
+        AuthenticationScreenState.AUTHENTICATION_ERROR -> stringResource(id = R.string.error_connection) to true
 
-        AuthenticationScreenState.EMPTY_FIELDS_ERROR -> {
-            authenticationViewModel.resetPassword()
-            authenticationViewModel.resetScreenState()
-            stringResource(id = com.upsaclay.common.R.string.empty_fields_error) to true
-        }
+        AuthenticationScreenState.EMPTY_FIELDS_ERROR -> stringResource(id = com.upsaclay.common.R.string.empty_fields_error) to true
 
-        AuthenticationScreenState.AUTHENTICATED_USER_NOT_FOUND -> {
-            authenticationViewModel.resetPassword()
-            authenticationViewModel.resetScreenState()
-            stringResource(id = R.string.authenticated_user_not_found) to true
-        }
+        AuthenticationScreenState.AUTHENTICATED_USER_NOT_FOUND -> stringResource(id = R.string.authenticated_user_not_found) to true
 
-        AuthenticationScreenState.TOO_MANY_REQUESTS_ERROR -> {
-            authenticationViewModel.resetPassword()
-            authenticationViewModel.resetScreenState()
-            stringResource(id = R.string.too_many_request_error) to false
-        }
+        AuthenticationScreenState.TOO_MANY_REQUESTS_ERROR -> stringResource(id = R.string.too_many_request_error) to false
 
-        AuthenticationScreenState.EMAIL_FORMAT_ERROR -> {
-            authenticationViewModel.resetPassword()
-            authenticationViewModel.resetScreenState()
-            stringResource(id = R.string.error_incorrect_email_format) to true
-        }
+        AuthenticationScreenState.EMAIL_FORMAT_ERROR -> stringResource(id = R.string.error_incorrect_email_format) to true
 
-        AuthenticationScreenState.SERVER_COMMUNICATION_ERROR -> {
-            authenticationViewModel.resetPassword()
-            authenticationViewModel.resetScreenState()
-            stringResource(id = com.upsaclay.common.R.string.server_communication_error) to false
-        }
+        AuthenticationScreenState.SERVER_COMMUNICATION_ERROR, AuthenticationScreenState.NETWORK_ERROR ->
+            stringResource(id = R.string.server_communication_error) to false
 
-        AuthenticationScreenState.UNKNOWN_ERROR -> {
-            authenticationViewModel.resetPassword()
-            authenticationViewModel.resetScreenState()
-            stringResource(id = com.upsaclay.common.R.string.unknown_error) to false
-        }
+        AuthenticationScreenState.UNKNOWN_ERROR -> stringResource(id = com.upsaclay.common.R.string.unknown_error) to false
 
-        else ->  to false
+        else -> "" to false
     }
 
     LaunchedEffect(Unit) {

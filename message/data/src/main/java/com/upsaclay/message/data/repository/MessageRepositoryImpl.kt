@@ -12,7 +12,7 @@ internal class MessageRepositoryImpl(
 ): MessageRepository {
     override fun getMessages(conversationId: String): Flow<Message> = messageLocalDataSource.getMessages(conversationId)
 
-    override fun getLastMessage(conversationId: String): Flow<Message?> =
+    override fun getLastMessage(conversationId: String): Flow<Message> =
         messageLocalDataSource.getLastMessage(conversationId)
 
     override suspend fun getMessages(conversationId: String, limit: Int, offset: Int): List<Message> =

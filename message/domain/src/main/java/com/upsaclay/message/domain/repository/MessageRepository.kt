@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 interface MessageRepository {
     fun getMessages(conversationId: String): Flow<Message>
 
-    fun getLastMessage(conversationId: String): Flow<Message?>
+    fun getLastMessage(conversationId: String): Flow<Message>
 
     suspend fun getMessages(conversationId: String, limit: Int, offset: Int): List<Message>
 

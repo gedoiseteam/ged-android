@@ -4,9 +4,7 @@ import com.upsaclay.common.domain.repository.UserRepository
 import com.upsaclay.message.data.mapper.ConversationMapper
 import com.upsaclay.message.domain.entity.ConversationUser
 import com.upsaclay.message.domain.repository.UserConversationRepository
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -16,7 +14,6 @@ import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class UserConversationRepositoryImpl(
@@ -50,9 +47,7 @@ internal class UserConversationRepositoryImpl(
             ConversationMapper.toConversation(conversationUser),
             conversationUser.interlocutor
         )
-        _userConversations.update { currentMap ->
-            currentMap.toMutableMap().apply { remove(conversationUser.id) }
-        }
+        _userConversations.value = _userConversations.value.filter { it.key != conversationUser.id }
     }
 
     override suspend fun deleteLocalConversations() {

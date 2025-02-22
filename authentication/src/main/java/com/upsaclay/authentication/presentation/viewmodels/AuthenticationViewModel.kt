@@ -1,5 +1,6 @@
 package com.upsaclay.authentication.presentation.viewmodels
 
+import android.accounts.NetworkErrorException
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -10,7 +11,6 @@ import com.upsaclay.authentication.domain.entity.exception.AuthenticationExcepti
 import com.upsaclay.authentication.domain.usecase.IsEmailVerifiedUseCase
 import com.upsaclay.authentication.domain.usecase.LoginUseCase
 import com.upsaclay.authentication.domain.usecase.SetUserAuthenticatedUseCase
-import com.upsaclay.common.domain.entity.ServerCommunicationException
 import com.upsaclay.common.domain.entity.TooManyRequestException
 import com.upsaclay.common.domain.usecase.GetUserUseCase
 import com.upsaclay.common.domain.usecase.SetCurrentUserUseCase
@@ -19,7 +19,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.io.IOException
-import java.net.ConnectException
 
 class AuthenticationViewModel(
     private val loginUseCase: LoginUseCase,
@@ -60,16 +59,31 @@ class AuthenticationViewModel(
                     }
                 } ?: run {
                     _screenState.value = AuthenticationScreenState.AUTHENTICATED_USER_NOT_FOUND
+                    resetPassword()
                 }
             } catch (e: Exception) {
                 _screenState.value = when (e) {
                     is TooManyRequestException -> AuthenticationScreenState.TOO_MANY_REQUESTS_ERROR
 
-                    is AuthenticationException -> AuthenticationScreenState.AUTHENTICATION_ERROR
+                    is AuthenticationException -> {
+                        resetPassword()
+                        AuthenticationScreenState.AUTHENTICATION_ERROR
+                    }
 
-                    is ServerCommunicationException, is IOException -> AuthenticationScreenState.SERVER_COMMUNICATION_ERROR
+                    is IOException -> {
+                        resetPassword()
+                        AuthenticationScreenState.SERVER_COMMUNICATION_ERROR
+                    }
 
-                    else -> AuthenticationScreenState.UNKNOWN_ERROR
+                    is NetworkErrorException -> {
+                        resetPassword()
+                        AuthenticationScreenState.NETWORK_ERROR
+                    }
+
+                    else -> {
+                        resetPassword()
+                        AuthenticationScreenState.UNKNOWN_ERROR
+                    }
                 }
             }
         }

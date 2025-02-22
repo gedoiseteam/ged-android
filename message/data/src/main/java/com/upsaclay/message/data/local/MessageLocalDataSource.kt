@@ -18,10 +18,8 @@ internal class MessageLocalDataSource(private val messageDao: MessageDao) {
             flow { messages.forEach { emit(MessageMapper.toDomain(it)) } }
         }
 
-    fun getLastMessage(conversationId: String): Flow<Message?> =
-        messageDao.getLastMessage(conversationId).map {
-            it?.let { MessageMapper.toDomain(it) }
-        }
+    fun getLastMessage(conversationId: String): Flow<Message> =
+        messageDao.getLastMessage(conversationId).map(MessageMapper::toDomain)
 
     suspend fun getMessages(conversationId: String, limit: Int, offset: Int): List<Message> =
         withContext(Dispatchers.IO) {
