@@ -7,7 +7,6 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.navigation.testing.TestNavHostController
 import com.upsaclay.message.domain.conversationUIFixture
-import com.upsaclay.message.domain.conversationUserFixture
 import com.upsaclay.message.domain.messageFixture
 import com.upsaclay.message.domain.messagesFixture
 import com.upsaclay.message.presentation.screens.ChatScreen

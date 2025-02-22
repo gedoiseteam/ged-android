@@ -1,12 +1,9 @@
 package com.upsaclay.gedoise.domain.usecase
 
-import com.google.firebase.Firebase
-import com.google.firebase.firestore.firestore
 import com.upsaclay.common.domain.repository.UserRepository
 import com.upsaclay.message.domain.repository.MessageRepository
 import com.upsaclay.message.domain.repository.UserConversationRepository
 import com.upsaclay.message.domain.usecase.ListenConversationsUiUseCase
-import kotlinx.coroutines.tasks.await
 
 class ClearDataUseCase(
     private val userRepository: UserRepository,

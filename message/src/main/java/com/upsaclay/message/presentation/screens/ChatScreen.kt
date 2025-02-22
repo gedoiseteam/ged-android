@@ -3,7 +3,6 @@ package com.upsaclay.message.presentation.screens
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -37,7 +36,6 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.upsaclay.common.domain.entity.User
 import com.upsaclay.common.domain.usecase.FormatLocalDateTimeUseCase
-import com.upsaclay.common.presentation.components.CircularProgressBar
 import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
@@ -51,7 +49,6 @@ import com.upsaclay.message.presentation.components.MessageInput
 import com.upsaclay.message.presentation.components.ReceiveMessageItem
 import com.upsaclay.message.presentation.components.SentMessageItem
 import com.upsaclay.message.presentation.viewmodels.ChatViewModel
-import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 import java.time.LocalDateTime

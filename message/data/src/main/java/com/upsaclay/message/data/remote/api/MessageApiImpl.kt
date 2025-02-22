@@ -2,24 +2,15 @@ package com.upsaclay.message.data.remote.api
 
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.DocumentChange
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.FirebaseFirestoreSettings
-import com.google.firebase.firestore.ListenSource
-import com.google.firebase.firestore.LocalCacheSettings
-import com.google.firebase.firestore.MetadataChanges
 import com.google.firebase.firestore.Query
-import com.google.firebase.firestore.SnapshotListenOptions
 import com.google.firebase.firestore.Source
 import com.google.firebase.firestore.firestore
-import com.upsaclay.common.domain.d
 import com.upsaclay.common.domain.e
-import com.upsaclay.common.domain.i
 import com.upsaclay.message.data.model.CONVERSATIONS_TABLE_NAME
 import com.upsaclay.message.data.model.MESSAGES_TABLE_NAME
 import com.upsaclay.message.data.model.MessageField
 import com.upsaclay.message.data.model.MessageField.TIMESTAMP
 import com.upsaclay.message.data.remote.model.RemoteMessage
-import com.upsaclay.message.domain.entity.MessageState
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow

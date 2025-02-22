@@ -5,8 +5,6 @@ import com.upsaclay.message.data.remote.api.MessageApi
 import com.upsaclay.message.domain.entity.Message
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 

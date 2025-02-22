@@ -39,7 +39,6 @@ import androidx.navigation.NavController
 import com.upsaclay.common.domain.entity.SnackbarType
 import com.upsaclay.common.domain.userFixture
 import com.upsaclay.common.presentation.components.ErrorSnackBar
-import com.upsaclay.common.presentation.components.InfoSnackbar
 import com.upsaclay.common.presentation.components.LoadingDialog
 import com.upsaclay.common.presentation.components.ProfilePicture
 import com.upsaclay.common.presentation.components.ProfilePictureWithIcon
