@@ -2,6 +2,7 @@ package com.upsaclay.message
 
 import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
 import com.upsaclay.common.domain.userFixture
+import com.upsaclay.common.domain.userFixture2
 import com.upsaclay.message.domain.conversationUIFixture
 import com.upsaclay.message.domain.entity.ConversationState
 import com.upsaclay.message.domain.messageFixture
@@ -14,6 +15,7 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow

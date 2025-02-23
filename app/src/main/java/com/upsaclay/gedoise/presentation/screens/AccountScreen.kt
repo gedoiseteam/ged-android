@@ -134,8 +134,7 @@ fun AccountScreen(
                 showDeleteProfilePictureDialog = false
                 accountViewModel.deleteUserProfilePicture()
             },
-            onCancel = { showDeleteProfilePictureDialog = false },
-            onDismiss = { showDeleteProfilePictureDialog = false }
+            onCancel = { showDeleteProfilePictureDialog = false }
         )
     }
 

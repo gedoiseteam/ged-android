@@ -1,6 +1,5 @@
 package com.upsaclay.message.domain
 
-import com.upsaclay.message.domain.entity.MessageState
 import com.upsaclay.message.domain.repository.MessageRepository
 import com.upsaclay.message.domain.repository.UserConversationRepository
 import com.upsaclay.message.domain.usecase.CreateConversationUseCase
@@ -13,6 +12,7 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
@@ -40,6 +40,11 @@ class MessageUseCaseTest {
 
     @Before
     fun setUp() {
+        listenConversationsUiUseCase = ListenConversationsUiUseCase(
+            userConversationRepository = userConversationRepository,
+            messageRepository = messageRepository,
+            scope = testScope
+        )
         createConversationUseCase = CreateConversationUseCase(
             userConversationRepository = userConversationRepository,
             scope = testScope
@@ -51,11 +56,6 @@ class MessageUseCaseTest {
             scope = testScope
         )
         sendMessageUseCase = SendMessageUseCase(
-            messageRepository = messageRepository,
-            scope = testScope
-        )
-        listenConversationsUiUseCase = ListenConversationsUiUseCase(
-            userConversationRepository = userConversationRepository,
             messageRepository = messageRepository,
             scope = testScope
         )
@@ -101,7 +101,9 @@ class MessageUseCaseTest {
         deleteConversationUseCase(conversationUIFixture)
 
         // Then
+        verify { listenConversationsUiUseCase.clearCache() }
         coVerify { userConversationRepository.deleteConversation(conversationUserFixture) }
+        coVerify { messageRepository.deleteLocalMessages() }
     }
 
     @Test
@@ -111,19 +113,6 @@ class MessageUseCaseTest {
 
         // Then
         coVerify { messageRepository.createMessage(messageFixture) }
-        coVerify { messageRepository.updateMessage(messageFixture.copy(state = MessageState.SENT)) }
-    }
-
-    @Test
-    fun sendMessageUseCase_should_update_message_state_to_error_when_exception_is_throwing() = runTest {
-        // Given
-        coEvery { messageRepository.createMessage(messageFixture) } throws Exception()
-
-        // When
-        sendMessageUseCase(messageFixture)
-
-        // Then
-        coVerify { messageRepository.upsertMessage(messageFixture.copy(state = MessageState.ERROR)) }
     }
 
     @Test

@@ -73,7 +73,6 @@ fun ProfileScreen(
                 profileViewModel.logout()
                 showLogoutDialog = false
             },
-            onDismiss = { showLogoutDialog = false },
             onCancel = { showLogoutDialog = false }
         )
     }
@@ -187,7 +186,6 @@ fun ProfileScreenPreview() {
                 cancelText = stringResource(id = com.upsaclay.common.R.string.cancel),
                 confirmText = stringResource(id = R.string.logout),
                 onConfirm = { showLogoutDialog = false },
-                onDismiss = { showLogoutDialog = false },
                 onCancel = { showLogoutDialog = false }
             )
         }

@@ -59,7 +59,14 @@ val messageDomainModule = module {
             scope = get(BACKGROUND_SCOPE)
         )
     }
-    singleOf(::DeleteConversationUseCase)
+    single {
+        DeleteConversationUseCase(
+            userConversationRepository = get(),
+            messageRepository = get(),
+            listenConversationsUiUseCase = get(),
+            scope = get(BACKGROUND_SCOPE)
+        )
+    }
     singleOf(::GetMessagesUseCase)
 
     single {

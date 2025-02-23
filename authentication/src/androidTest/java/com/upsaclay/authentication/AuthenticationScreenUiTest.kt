@@ -74,6 +74,36 @@ class AuthenticationScreenUiTest {
     }
 
     @Test
+    fun data_should_be_cleared_when_navigate_to_registration() {
+        // When
+        rule.setContent {
+            navController = TestNavHostController(LocalContext.current)
+            navController.navigatorProvider.addNavigator(ComposeNavigator())
+            NavHost(navController, startDestination = Screen.AUTHENTICATION.route) {
+                composable(Screen.AUTHENTICATION.route) {
+                    AuthenticationScreen(
+                        navController,
+                        authenticationViewModel
+                    )
+                }
+
+                composable(Screen.FIRST_REGISTRATION.route) {
+                    FirstRegistrationScreen(
+                        navController,
+                        registrationViewModel
+                    )
+                }
+            }
+        }
+        rule.onNodeWithTag(rule.activity.getString(R.string.authentication_screen_registration_button_tag)).performClick()
+
+        // Then
+        verify { authenticationViewModel.resetEmail() }
+        verify { authenticationViewModel.resetPassword() }
+        verify { authenticationViewModel.resetScreenState() }
+    }
+
+    @Test
     fun display_verify_email_dialog_when_email_is_not_verified() {
         // Given
         every { authenticationViewModel.screenState } returns MutableStateFlow(AuthenticationScreenState.EMAIL_NOT_VERIFIED)
@@ -156,22 +186,5 @@ class AuthenticationScreenUiTest {
 
         // Then
         rule.onNodeWithText(rule.activity.getString(R.string.too_many_request_error)).assertExists()
-    }
-
-    @Test
-    fun password_should_be_erase_when_login_fails() {
-        // Given
-        every { authenticationViewModel.screenState } returns MutableStateFlow(AuthenticationScreenState.AUTHENTICATION_ERROR)
-
-        // When
-        rule.setContent {
-            AuthenticationScreen(
-                navController,
-                authenticationViewModel
-            )
-        }
-
-        // Then
-        verify { authenticationViewModel.resetPassword() }
     }
 }

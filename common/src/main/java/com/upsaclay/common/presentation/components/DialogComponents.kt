@@ -137,7 +137,6 @@ private fun SimpleDialogPreview() {
             cancelText = "Cancel",
             onConfirm = { },
             onCancel = { },
-            onDismiss = { }
         )
     }
 }

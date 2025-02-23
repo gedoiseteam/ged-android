@@ -103,11 +103,6 @@ fun AuthenticationScreen(
             title = stringResource(id = R.string.email_not_verified_dialog_title),
             text = stringResource(id = R.string.email_not_verified),
             confirmText = stringResource(id = com.upsaclay.common.R.string.keep_going),
-            onDismiss = {
-                authenticationViewModel.resetPassword()
-                showVerifyEmailDialog = false
-                authenticationViewModel.resetScreenState()
-            },
             onConfirm = {
                 authenticationViewModel.resetEmail()
                 authenticationViewModel.resetPassword()

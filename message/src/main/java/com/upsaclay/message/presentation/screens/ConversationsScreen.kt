@@ -123,7 +123,6 @@ fun ConversationScreen(
         SensibleActionDialog(
             title = stringResource(id = R.string.delete_conversation_dialog_title),
             text = stringResource(id = R.string.delete_conversation_dialog_message),
-            onDismiss = { showDeleteConversationDialog = false },
             confirmText = stringResource(id = com.upsaclay.common.R.string.delete),
             onConfirm = {
                 showDeleteConversationDialog = false

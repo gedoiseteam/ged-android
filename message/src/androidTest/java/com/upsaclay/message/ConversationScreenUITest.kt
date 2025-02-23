@@ -1,6 +1,7 @@
 package com.upsaclay.message
 
 import androidx.activity.ComponentActivity
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.hasText
@@ -17,6 +18,7 @@ import com.upsaclay.common.domain.entity.Screen
 import com.upsaclay.common.domain.userFixture2
 import com.upsaclay.message.domain.conversationUIFixture
 import com.upsaclay.message.domain.conversationsUIFixture
+import com.upsaclay.message.domain.entity.ConversationScreenState
 import com.upsaclay.message.domain.messageFixture
 import com.upsaclay.message.presentation.screens.ChatScreen
 import com.upsaclay.message.presentation.screens.ConversationScreen
@@ -24,6 +26,7 @@ import com.upsaclay.message.presentation.screens.CreateConversationScreen
 import com.upsaclay.message.presentation.viewmodels.ConversationViewModel
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import org.junit.Assert
 import org.junit.Before
@@ -40,6 +43,7 @@ class ConversationScreenUITest {
     @Before
     fun setUp() {
         every { conversationViewModel.conversations } returns flowOf(conversationsUIFixture)
+        every { conversationViewModel.screenState } returns MutableStateFlow(ConversationScreenState.DEFAULT)
     }
 
     @Test
@@ -48,7 +52,9 @@ class ConversationScreenUITest {
         rule.setContent {
             ConversationScreen(
                 navController = navController,
-                conversationViewModel = conversationViewModel
+                conversationViewModel = conversationViewModel,
+                snackbarHostState = SnackbarHostState(),
+                updateSnackbarType = { }
             )
         }
 
@@ -70,7 +76,9 @@ class ConversationScreenUITest {
         rule.setContent {
             ConversationScreen(
                 navController = navController,
-                conversationViewModel = conversationViewModel
+                conversationViewModel = conversationViewModel,
+                snackbarHostState = SnackbarHostState(),
+                updateSnackbarType = { }
             )
         }
 
@@ -85,7 +93,9 @@ class ConversationScreenUITest {
         rule.setContent {
             ConversationScreen(
                 navController = navController,
-                conversationViewModel = conversationViewModel
+                conversationViewModel = conversationViewModel,
+                snackbarHostState = SnackbarHostState(),
+                updateSnackbarType = { }
             )
         }
 
@@ -102,7 +112,9 @@ class ConversationScreenUITest {
         rule.setContent {
             ConversationScreen(
                 navController = navController,
-                conversationViewModel = conversationViewModel
+                conversationViewModel = conversationViewModel,
+                snackbarHostState = SnackbarHostState(),
+                updateSnackbarType = { }
             )
         }
 
@@ -122,7 +134,9 @@ class ConversationScreenUITest {
         rule.setContent {
             ConversationScreen(
                 navController = navController,
-                conversationViewModel = conversationViewModel
+                conversationViewModel = conversationViewModel,
+                snackbarHostState = SnackbarHostState(),
+                updateSnackbarType = { }
             )
         }
 
@@ -143,7 +157,9 @@ class ConversationScreenUITest {
         rule.setContent {
             ConversationScreen(
                 navController = navController,
-                conversationViewModel = conversationViewModel
+                conversationViewModel = conversationViewModel,
+                snackbarHostState = SnackbarHostState(),
+                updateSnackbarType = { }
             )
         }
 
@@ -164,7 +180,9 @@ class ConversationScreenUITest {
                 composable(Screen.CONVERSATION.route) {
                     ConversationScreen(
                         navController = navController,
-                        conversationViewModel = conversationViewModel
+                        conversationViewModel = conversationViewModel,
+                        snackbarHostState = SnackbarHostState(),
+                        updateSnackbarType = { }
                     )
                 }
 
@@ -196,7 +214,9 @@ class ConversationScreenUITest {
                 composable(Screen.CONVERSATION.route) {
                     ConversationScreen(
                         navController = navController,
-                        conversationViewModel = conversationViewModel
+                        conversationViewModel = conversationViewModel,
+                        snackbarHostState = SnackbarHostState(),
+                        updateSnackbarType = { }
                     )
                 }
 

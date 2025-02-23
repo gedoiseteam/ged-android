@@ -102,11 +102,9 @@ class ChatViewModel(
     private fun seeMessage() {
         viewModelScope.launch {
             _messages.collect { messages ->
-                messages.values.filter {
-                    it.senderId != currentUser?.id && !it.seen
-                }.forEach { message ->
-                    updateMessageUseCase(message.copy(seen = true))
-                }
+                messages.values
+                    .filter { it.senderId != currentUser?.id && !it.seen }
+                    .forEach { updateMessageUseCase(it.copy(seen = true)) }
             }
         }
     }
