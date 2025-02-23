@@ -28,6 +28,7 @@ import kotlin.test.assertFalse
 class MessageUseCaseTest {
     private val messageRepository: MessageRepository = mockk()
     private val userConversationRepository: UserConversationRepository = mockk()
+    private val listenConversationsUiUseCaseMockk: ListenConversationsUiUseCase = mockk()
 
     private lateinit var createConversationUseCase: CreateConversationUseCase
     private lateinit var deleteConversationUseCase: DeleteConversationUseCase
@@ -52,7 +53,7 @@ class MessageUseCaseTest {
         deleteConversationUseCase = DeleteConversationUseCase(
             userConversationRepository = userConversationRepository,
             messageRepository = messageRepository,
-            listenConversationsUiUseCase = listenConversationsUiUseCase,
+            listenConversationsUiUseCase = listenConversationsUiUseCaseMockk,
             scope = testScope
         )
         sendMessageUseCase = SendMessageUseCase(
@@ -69,6 +70,7 @@ class MessageUseCaseTest {
             scope = testScope
         )
 
+        every { listenConversationsUiUseCaseMockk.deleteConversation(any()) } returns Unit
         every { userConversationRepository.userConversations } returns MutableStateFlow(conversationUserFixture)
         every { messageRepository.getMessages(any()) } returns MutableStateFlow(messageFixture)
         every { messageRepository.getLastMessage(any()) } returns MutableStateFlow(messageFixture)
@@ -97,13 +99,16 @@ class MessageUseCaseTest {
 
     @Test
     fun deleteConversationUseCase_should_delete_conversation() = runTest {
+        // Given
+        val conversation = conversationUIFixture
+
         // When
-        deleteConversationUseCase(conversationUIFixture)
+        deleteConversationUseCase(conversation)
 
         // Then
-        verify { listenConversationsUiUseCase.clearCache() }
-        coVerify { userConversationRepository.deleteConversation(conversationUserFixture) }
-        coVerify { messageRepository.deleteLocalMessages() }
+        coVerify { userConversationRepository.deleteConversation(ConversationMapper.toConversationUser(conversation)) }
+        verify { listenConversationsUiUseCaseMockk.deleteConversation(conversation) }
+        coVerify { messageRepository.deleteMessages(conversation.id) }
     }
 
     @Test
