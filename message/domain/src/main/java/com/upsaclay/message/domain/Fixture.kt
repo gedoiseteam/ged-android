@@ -15,7 +15,7 @@ val messageFixture = Message(
     conversationId = "1",
     content = "Salut, bien et toi ? Oui bien sûr.",
     date = LocalDateTime.of(2024, 7, 20, 10, 0),
-    isRead = true,
+    seen = true,
     state = MessageState.SENT,
     type = "text"
 )
@@ -26,7 +26,7 @@ val messageFixture2 = Message(
     conversationId = "1",
     content = "Salut ça va ? Cela fait longtemps que j'attend de te parler. Pourrait-on se voir ?",
     date = LocalDateTime.now(),
-    isRead = false,
+    seen = false,
     state = MessageState.SENT,
     type = "text"
 )
@@ -54,14 +54,14 @@ val conversationUserFixture = ConversationUser(
 
 val conversationsUIFixture = listOf(
     conversationUIFixture,
-    conversationUIFixture.copy(lastMessage = messageFixture.copy(date = messageFixture.date.minusMinutes(1))),
-    conversationUIFixture.copy(lastMessage = messageFixture.copy(date = messageFixture.date.minusMinutes(20))),
-    conversationUIFixture.copy(lastMessage = messageFixture.copy(date = messageFixture.date.minusHours(1))),
-    conversationUIFixture.copy(lastMessage = messageFixture.copy(date = messageFixture.date.minusHours(2))),
-    conversationUIFixture.copy(lastMessage = messageFixture.copy(date = messageFixture.date.minusDays(1))),
-    conversationUIFixture.copy(lastMessage = messageFixture.copy(date = messageFixture.date.minusDays(2))),
-    conversationUIFixture.copy(lastMessage = messageFixture.copy(isRead = true, date = messageFixture.date.minusWeeks(3))),
-    conversationUIFixture.copy(lastMessage = messageFixture.copy(isRead = true, date = messageFixture.date.minusMonths(1)))
+    conversationUIFixture.copy(id = "2", lastMessage = messageFixture.copy(date = messageFixture.date.minusMinutes(1))),
+    conversationUIFixture.copy(id = "3", lastMessage = messageFixture.copy(date = messageFixture.date.minusMinutes(20))),
+    conversationUIFixture.copy(id = "4", lastMessage = messageFixture.copy(date = messageFixture.date.minusHours(1))),
+    conversationUIFixture.copy(id = "5", lastMessage = messageFixture.copy(date = messageFixture.date.minusHours(2))),
+    conversationUIFixture.copy(id = "6", lastMessage = messageFixture.copy(date = messageFixture.date.minusDays(1))),
+    conversationUIFixture.copy(id = "7", lastMessage = messageFixture.copy(date = messageFixture.date.minusDays(2))),
+    conversationUIFixture.copy(id = "8", lastMessage = messageFixture.copy(seen = true, date = messageFixture.date.minusWeeks(3))),
+    conversationUIFixture.copy(id = "9", lastMessage = messageFixture.copy(seen = true, date = messageFixture.date.minusMonths(1)))
 )
 
 val conversationsUserFixture = listOf(

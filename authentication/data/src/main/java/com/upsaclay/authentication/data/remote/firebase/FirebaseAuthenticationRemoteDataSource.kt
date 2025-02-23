@@ -1,5 +1,6 @@
 package com.upsaclay.authentication.data.remote.firebase
 
+import android.accounts.NetworkErrorException
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.FirebaseAuthException
@@ -29,7 +30,7 @@ class FirebaseAuthenticationRemoteDataSource(
                 }
             } catch (e: FirebaseNetworkException) {
                 e("Error to sign in with email and password with Firebase because of network connection ${e.message}", e)
-                throw ServerCommunicationException()
+                throw NetworkErrorException()
             } catch (e: FirebaseTooManyRequestsException) {
                 e("Error to sign in with email and password with Firebase: ${e.message}", e)
                 throw TooManyRequestException()

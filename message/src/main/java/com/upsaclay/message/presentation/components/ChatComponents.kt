@@ -20,7 +20,6 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -38,11 +37,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
@@ -63,39 +60,39 @@ import java.time.LocalDateTime
 @Composable
 fun SentMessageItem(
     modifier: Modifier = Modifier,
-    message: Message
+    message: Message,
+    seen: Boolean = false
 ) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.End,
-        verticalAlignment = Alignment.Bottom
+    Column(
+        horizontalAlignment = Alignment.End
     ) {
-        Spacer(modifier = Modifier.fillMaxWidth(0.2f))
+        Row(
+            modifier = modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.Bottom
+        ) {
+            Spacer(modifier = Modifier.fillMaxWidth(0.2f))
 
-        MessageText(
-            text = message.content,
-            textColor = Color.White,
-            date = message.date,
-            backgroundColor = MaterialTheme.colorScheme.primary,
-            dateTimeTextColor = Color(0xFFD1D3D8)
-        )
-
-        when (message.state) {
-            MessageState.LOADING -> Icon(
-                modifier = Modifier.scale(0.7f),
-                painter = painterResource(com.upsaclay.common.R.drawable.ic_outline_send),
-                contentDescription = "",
-                tint = Color.Gray
+            MessageText(
+                text = message.content,
+                textColor = Color.White,
+                date = message.date,
+                backgroundColor = MaterialTheme.colorScheme.primary,
+                dateTimeTextColor = Color(0xFFD1D3D8)
             )
+        }
 
-            MessageState.ERROR -> Icon(
-                modifier = Modifier.scale(0.8f),
-                imageVector = Icons.Outlined.Info,
-                contentDescription = "",
-                tint = MaterialTheme.colorScheme.error
+        if (seen) {
+            Text(
+                modifier = Modifier
+                    .padding(
+                        top = MaterialTheme.spacing.extraSmall,
+                        end = MaterialTheme.spacing.smallMedium
+                    ),
+                text = stringResource(id = R.string.message_seen),
+                style = MaterialTheme.typography.labelSmall,
+                color = Color.Gray
             )
-
-            else -> {}
         }
     }
 }
@@ -262,12 +259,12 @@ private val longtext = "Bonjour, j'espère que vous allez bien. " +
         "Par exemple, en ce qui concerne la gestion des priorités, il serait peut-être utile de revoir nos méthodes " +
         "afin d'être sûrs que nous concentrons nos efforts sur les éléments les plus importants."
 
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
 @Composable
 private fun SentMessageItemPreview() {
     GedoiseTheme {
         Column(verticalArrangement = Arrangement.SpaceAround) {
-            SentMessageItem(message = messageFixture)
+            SentMessageItem(message = messageFixture, seen = true)
 
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
 

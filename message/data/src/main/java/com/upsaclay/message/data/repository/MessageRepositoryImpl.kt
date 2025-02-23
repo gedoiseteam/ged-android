@@ -4,34 +4,19 @@ import com.upsaclay.message.data.local.MessageLocalDataSource
 import com.upsaclay.message.data.remote.MessageRemoteDataSource
 import com.upsaclay.message.domain.entity.Message
 import com.upsaclay.message.domain.repository.MessageRepository
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
 
 internal class MessageRepositoryImpl(
     private val messageLocalDataSource: MessageLocalDataSource,
-    private val messageRemoteDataSource: MessageRemoteDataSource,
-    private val scope: CoroutineScope
-) : MessageRepository {
-    private val jobs = mutableListOf<Job>()
+    private val messageRemoteDataSource: MessageRemoteDataSource
+): MessageRepository {
+    override fun getMessages(conversationId: String): Flow<Message> = messageLocalDataSource.getMessages(conversationId)
 
-    override fun getMessages(conversationId: String): Flow<Message> {
-        listenRemoteMessage(conversationId)
-        return messageLocalDataSource.getMessages(conversationId)
-    }
-
-    private fun listenRemoteMessage(conversationId: String) {
-        val job = scope.launch {
-            messageRemoteDataSource.listenMessages(conversationId).collect {
-                messageLocalDataSource.upsertMessage(it)
-            }
-        }
-        jobs.add(job)
-    }
-
-    override fun getLastMessage(conversationId: String): Flow<Message?> =
+    override fun getLastMessage(conversationId: String): Flow<Message> =
         messageLocalDataSource.getLastMessage(conversationId)
+
+    override suspend fun getMessages(conversationId: String, limit: Int, offset: Int): List<Message> =
+        messageLocalDataSource.getMessages(conversationId, limit, offset)
 
     override suspend fun createMessage(message: Message) {
         messageLocalDataSource.insertMessage(message)
@@ -40,17 +25,24 @@ internal class MessageRepositoryImpl(
 
     override suspend fun updateMessage(message: Message) {
         messageLocalDataSource.updateMessage(message)
+        messageRemoteDataSource.updateMessage(message)
     }
 
     override suspend fun upsertMessage(message: Message) {
         messageLocalDataSource.upsertMessage(message)
     }
 
+    override suspend fun deleteMessages(conversationId: String) {
+        messageLocalDataSource.deleteMessages(conversationId)
+        messageRemoteDataSource.deleteMessages(conversationId)
+    }
+
     override suspend fun deleteLocalMessages() {
         messageLocalDataSource.deleteMessages()
     }
 
-    override fun stopListenMessages() {
-        jobs.forEach { it.cancel() }
+    override suspend fun listenRemoteMessages(conversationId: String) {
+        messageRemoteDataSource.listenMessages(conversationId)
+            .collect { messageLocalDataSource.upsertMessage(it) }
     }
 }

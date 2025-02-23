@@ -16,7 +16,7 @@ internal object MessageMapper {
         conversationId = remoteMessage.conversationId,
         content = remoteMessage.content,
         date = LocalDateTime.ofInstant(remoteMessage.timestamp.toInstant(), ZoneOffset.UTC),
-        isRead = remoteMessage.isRead,
+        seen = remoteMessage.seen,
         state = MessageState.SENT,
         type = remoteMessage.type
     )
@@ -27,7 +27,7 @@ internal object MessageMapper {
         conversationId = localMessage.conversationId,
         content = localMessage.content,
         date = Instant.ofEpochMilli(localMessage.timestamp).atZone(ZoneOffset.UTC).toLocalDateTime(),
-        isRead = localMessage.isRead,
+        seen = localMessage.seen,
         state = MessageState.valueOf(localMessage.state),
         type = localMessage.type
     )
@@ -38,7 +38,7 @@ internal object MessageMapper {
         conversationId = message.conversationId,
         content = message.content,
         timestamp = message.date.toInstant(ZoneOffset.UTC).toEpochMilli(),
-        isRead = message.isRead,
+        seen = message.seen,
         state = message.state.name,
         type = message.type
     )
@@ -49,7 +49,7 @@ internal object MessageMapper {
         senderId = message.senderId,
         content = message.content,
         timestamp = Timestamp(message.date.atZone(ZoneOffset.UTC).toInstant()),
-        isRead = message.isRead,
+        seen = message.seen,
         type = message.type
     )
 }

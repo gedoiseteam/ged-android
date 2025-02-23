@@ -14,7 +14,6 @@ import com.upsaclay.common.domain.userFixture
 import com.upsaclay.common.domain.userFixture2
 import com.upsaclay.news.domain.announcementFixture
 import com.upsaclay.news.domain.entity.AnnouncementScreenState
-import com.upsaclay.news.domain.entity.AnnouncementState
 import com.upsaclay.news.presentation.screens.EditAnnouncementScreen
 import com.upsaclay.news.presentation.screens.ReadAnnouncementScreen
 import com.upsaclay.news.presentation.viewmodels.ReadAnnouncementViewModel

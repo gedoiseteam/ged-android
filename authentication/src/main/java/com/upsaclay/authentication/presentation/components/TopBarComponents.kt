@@ -32,6 +32,7 @@ import com.upsaclay.common.presentation.theme.spacing
 internal fun RegistrationTopBar(
     navController: NavController,
     currentStep: Int,
+    onBackClick: () -> Unit = { navController.popBackStack() },
     content: @Composable BoxScope.() -> Unit
 ) {
     Scaffold(
@@ -45,7 +46,7 @@ internal fun RegistrationTopBar(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(onClick = onBackClick) {
                         Icon(
                             painter = painterResource(id = com.upsaclay.common.R.drawable.ic_partial_arrow_left),
                             contentDescription = stringResource(

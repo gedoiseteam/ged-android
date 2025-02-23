@@ -53,7 +53,12 @@ fun FirstRegistrationScreen(
 
     RegistrationTopBar(
         navController = navController,
-        currentStep = CURRENT_STEP
+        currentStep = CURRENT_STEP,
+        onBackClick = {
+            focusManager.clearFocus()
+            keyboardController?.hide()
+            navController.popBackStack()
+        }
     ) {
         Column(
             modifier = Modifier

@@ -4,9 +4,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -24,6 +29,11 @@ import com.upsaclay.authentication.presentation.screens.SecondRegistrationScreen
 import com.upsaclay.authentication.presentation.screens.ThirdRegistrationScreen
 import com.upsaclay.authentication.presentation.viewmodels.RegistrationViewModel
 import com.upsaclay.common.domain.entity.Screen
+import com.upsaclay.common.domain.entity.SnackbarType
+import com.upsaclay.common.presentation.components.ErrorSnackBar
+import com.upsaclay.common.presentation.components.InfoSnackbar
+import com.upsaclay.common.presentation.components.SuccessSnackBar
+import com.upsaclay.common.presentation.components.WarningSnackBar
 import com.upsaclay.common.utils.showToast
 import com.upsaclay.gedoise.R
 import com.upsaclay.gedoise.data.BottomNavigationItem
@@ -142,12 +152,21 @@ fun Navigation(mainViewModel: MainViewModel = koinViewModel()) {
         }
 
         composable(Screen.CONVERSATION.route) {
+            val snackbarHostState = remember { SnackbarHostState() }
+            var snackbarType by remember { mutableStateOf(SnackbarType.INFO) }
+
             MainNavigationBars(
                 navController = navController,
                 topBar = { MainTopBar(title = stringResource(R.string.messages)) },
+                snackbarHostState = snackbarHostState,
+                type = snackbarType,
                 bottomNavigationItems = mainViewModel.bottomNavigationItem.values.toList(),
             ) {
-                ConversationScreen(navController = navController)
+                ConversationScreen(
+                    navController = navController,
+                    snackbarHostState = snackbarHostState,
+                    updateSnackbarType = { snackbarType = it }
+                )
             }
         }
 
@@ -184,11 +203,23 @@ fun Navigation(mainViewModel: MainViewModel = koinViewModel()) {
 private fun MainNavigationBars(
     navController: NavController,
     topBar: @Composable () -> Unit,
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    type: SnackbarType = SnackbarType.INFO,
     bottomNavigationItems: List<BottomNavigationItem>,
     content: @Composable BoxScope.() -> Unit
 ) {
     Scaffold(
         topBar = topBar,
+        snackbarHost = {
+            SnackbarHost(snackbarHostState) {
+                when (type) {
+                    SnackbarType.INFO -> InfoSnackbar(message = it.visuals.message)
+                    SnackbarType.SUCCESS -> SuccessSnackBar(message = it.visuals.message)
+                    SnackbarType.ERROR -> ErrorSnackBar(message = it.visuals.message)
+                    SnackbarType.WARNING -> WarningSnackBar(message = it.visuals.message)
+                }
+            }
+        },
         bottomBar = {
             MainBottomBar(
                 navController = navController,

@@ -4,55 +4,27 @@ import com.upsaclay.common.domain.repository.UserRepository
 import com.upsaclay.message.data.mapper.ConversationMapper
 import com.upsaclay.message.domain.entity.ConversationUser
 import com.upsaclay.message.domain.repository.UserConversationRepository
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class UserConversationRepositoryImpl(
     private val conversationRepository: ConversationRepository,
     private val userRepository: UserRepository,
-    private val scope: CoroutineScope
 ) : UserConversationRepository {
     private val _userConversations = MutableStateFlow<Map<String, ConversationUser>>(mapOf())
     override val userConversations: Flow<ConversationUser> = _userConversations
         .flatMapConcat { conversations ->
             flow { conversations.forEach { emit(it.value) } }
         }
-    private val jobs = mutableListOf<Job>()
-
-    private fun listenLocalConversations() {
-        val job = scope.launch {
-            conversationRepository.getConversationFromLocal().collect { (conversation, interlocutor) ->
-                val conversationUser = ConversationMapper.toConversationUser(conversation, interlocutor)
-                _userConversations.value += (conversationUser.id to conversationUser)
-            }
-        }
-        jobs.add(job)
-    }
-
-    private fun listenRemoteConversations() {
-        val job = scope.launch {
-            userRepository.currentUser.filterNotNull().collect { currentUser ->
-                conversationRepository.getConversationsFromRemote(currentUser.id).collect { conversation ->
-                    userRepository.getUserFlow(conversation.interlocutorId).collect { interlocutor ->
-                        conversationRepository.upsertLocalConversation(conversation, interlocutor)
-                    }
-                }
-            }
-        }
-        jobs.add(job)
-    }
-
-    override fun getUserConversation(conversationId: String): ConversationUser? =
-        _userConversations.value.values.find { it.id == conversationId }
 
     override suspend fun createConversation(conversationUser: ConversationUser) {
         val currentUser = userRepository.currentUser.first() ?: throw Exception()
@@ -75,6 +47,7 @@ internal class UserConversationRepositoryImpl(
             ConversationMapper.toConversation(conversationUser),
             conversationUser.interlocutor
         )
+        _userConversations.value = _userConversations.value.filter { it.key != conversationUser.id }
     }
 
     override suspend fun deleteLocalConversations() {
@@ -82,13 +55,27 @@ internal class UserConversationRepositoryImpl(
         conversationRepository.deleteLocalConversations()
     }
 
-    override fun stopListenConversations() {
-        jobs.forEach { it.cancel() }
+    override suspend fun listenLocalConversations() {
+        conversationRepository.getConversationFromLocal()
+            .map { (conversation, user) ->
+                ConversationMapper.toConversationUser(conversation, user)
+            }
+            .collect { conversationUser ->
+                _userConversations.update { currentMap ->
+                    currentMap.toMutableMap().apply { put(conversationUser.id, conversationUser) }
+                }
+            }
     }
 
-    override fun listenConversations() {
-        stopListenConversations()
-        listenLocalConversations()
-        listenRemoteConversations()
+    override suspend fun listenRemoteConversations() {
+        userRepository.currentUser.filterNotNull().flatMapConcat { currentUser ->
+            conversationRepository.getConversationsFromRemote(currentUser.id).flatMapMerge { conversation ->
+                userRepository.getUserFlow(conversation.interlocutorId).map { interlocutor ->
+                    Pair(conversation, interlocutor)
+                }
+            }
+        }.collect { (conversation, interlocutor) ->
+            conversationRepository.upsertLocalConversation(conversation, interlocutor)
+        }
     }
 }

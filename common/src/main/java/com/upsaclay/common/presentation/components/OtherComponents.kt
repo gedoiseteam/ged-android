@@ -2,6 +2,7 @@ package com.upsaclay.common.presentation.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -75,7 +76,7 @@ fun PullToRefreshComponent(
 fun ClickableItem(
     modifier: Modifier = Modifier,
     text: @Composable () -> Unit,
-    icon: @Composable () -> Unit,
+    icon: @Composable () -> Unit = {},
     onClick: () -> Unit
 ) {
     Row(
@@ -100,17 +101,25 @@ fun ClickableItem(
 @Composable
 private fun ClickableMenuItemPreview() {
     GedoiseTheme {
-        ClickableItem(
-            modifier = Modifier.width(300.dp),
-            text = { Text(text = "Item") },
-            icon = {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_person),
-                    contentDescription = null
-                )
-            },
-            onClick = {}
-        )
+        Column {
+            ClickableItem(
+                modifier = Modifier.width(300.dp),
+                text = { Text(text = "Item") },
+                icon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_person),
+                        contentDescription = null
+                    )
+                },
+                onClick = {}
+            )
+
+            ClickableItem(
+                modifier = Modifier.width(300.dp),
+                text = { Text(text = "Item") },
+                onClick = {}
+            )
+        }
     }
 }
 

@@ -25,9 +25,9 @@ internal data class RemoteMessage(
     @set:PropertyName(MessageField.TIMESTAMP)
     var timestamp: Timestamp = Timestamp.now(),
 
-    @get:PropertyName(MessageField.IS_READ)
-    @set:PropertyName(MessageField.IS_READ)
-    var isRead: Boolean = false,
+    @get:PropertyName(MessageField.SEEN)
+    @set:PropertyName(MessageField.SEEN)
+    var seen: Boolean = false,
 
     @get:PropertyName(MessageField.TYPE)
     @set:PropertyName(MessageField.TYPE)

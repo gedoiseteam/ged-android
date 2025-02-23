@@ -76,6 +76,7 @@ dependencies {
     implementation(libs.jakewharton.timber)
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.firestore)
     implementation(platform(libs.firebase.bom))
 
     testImplementation(libs.junit)

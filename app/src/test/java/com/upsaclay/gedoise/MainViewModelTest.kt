@@ -6,7 +6,7 @@ import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
 import com.upsaclay.common.domain.userFixture
 import com.upsaclay.gedoise.data.BottomNavigationItem
 import com.upsaclay.gedoise.data.BottomNavigationItemType
-import com.upsaclay.gedoise.domain.usecase.DeleteLocalDataUseCase
+import com.upsaclay.gedoise.domain.usecase.ClearDataUseCase
 import com.upsaclay.gedoise.domain.usecase.StartListeningDataUseCase
 import com.upsaclay.gedoise.domain.usecase.StopListeningDataUseCase
 import com.upsaclay.gedoise.presentation.viewmodels.MainViewModel
@@ -32,7 +32,7 @@ class MainViewModelTest {
     private val getCurrentUserUseCase: GetCurrentUserUseCase = mockk()
     private val startListeningDataUseCase: StartListeningDataUseCase = mockk()
     private val stopListeningDataUseCase: StopListeningDataUseCase = mockk()
-    private val deleteLocalDataUseCase: DeleteLocalDataUseCase = mockk()
+    private val clearDataUseCase: ClearDataUseCase = mockk()
 
     private lateinit var mainViewModel: MainViewModel
     private val testDispatcher = UnconfinedTestDispatcher()
@@ -45,7 +45,7 @@ class MainViewModelTest {
         every { isUserAuthenticatedUseCase() } returns flowOf(true)
         coEvery { startListeningDataUseCase() } returns Unit
         coEvery { stopListeningDataUseCase() } returns Unit
-        coEvery { deleteLocalDataUseCase() } returns Unit
+        coEvery { clearDataUseCase() } returns Unit
     }
 
     @Test
@@ -59,7 +59,7 @@ class MainViewModelTest {
             getCurrentUserUseCase = getCurrentUserUseCase,
             startListeningDataUseCase = startListeningDataUseCase,
             stopListeningDataUseCase = stopListeningDataUseCase,
-            deleteLocalDataUseCase = deleteLocalDataUseCase
+            clearDataUseCase = clearDataUseCase
         )
 
         // Then
@@ -85,7 +85,7 @@ class MainViewModelTest {
             getCurrentUserUseCase = getCurrentUserUseCase,
             startListeningDataUseCase = startListeningDataUseCase,
             stopListeningDataUseCase = stopListeningDataUseCase,
-            deleteLocalDataUseCase = deleteLocalDataUseCase
+            clearDataUseCase = clearDataUseCase
         )
 
         // Then
@@ -103,7 +103,7 @@ class MainViewModelTest {
             getCurrentUserUseCase = getCurrentUserUseCase,
             startListeningDataUseCase = startListeningDataUseCase,
             stopListeningDataUseCase = stopListeningDataUseCase,
-            deleteLocalDataUseCase = deleteLocalDataUseCase
+            clearDataUseCase = clearDataUseCase
         )
 
         // Then
@@ -118,7 +118,7 @@ class MainViewModelTest {
             getCurrentUserUseCase = getCurrentUserUseCase,
             startListeningDataUseCase = startListeningDataUseCase,
             stopListeningDataUseCase = stopListeningDataUseCase,
-            deleteLocalDataUseCase = deleteLocalDataUseCase
+            clearDataUseCase = clearDataUseCase
         )
 
         // Then
@@ -136,7 +136,7 @@ class MainViewModelTest {
             getCurrentUserUseCase = getCurrentUserUseCase,
             startListeningDataUseCase = startListeningDataUseCase,
             stopListeningDataUseCase = stopListeningDataUseCase,
-            deleteLocalDataUseCase = deleteLocalDataUseCase
+            clearDataUseCase = clearDataUseCase
         )
 
         // Then
@@ -154,12 +154,12 @@ class MainViewModelTest {
             getCurrentUserUseCase = getCurrentUserUseCase,
             startListeningDataUseCase = startListeningDataUseCase,
             stopListeningDataUseCase = stopListeningDataUseCase,
-            deleteLocalDataUseCase = deleteLocalDataUseCase
+            clearDataUseCase = clearDataUseCase
         )
 
         advanceUntilIdle()
 
         // Then
-        coVerify { deleteLocalDataUseCase() }
+        coVerify { clearDataUseCase() }
     }
 }

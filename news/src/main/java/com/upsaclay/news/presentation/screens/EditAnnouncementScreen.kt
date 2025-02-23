@@ -31,7 +31,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import com.upsaclay.common.domain.entity.SnackbarType
 import com.upsaclay.common.presentation.components.ErrorSnackBar
-import com.upsaclay.common.presentation.components.InfoSnackbar
 import com.upsaclay.common.presentation.components.LinearProgressBar
 import com.upsaclay.common.presentation.components.SmallTopBarAction
 import com.upsaclay.common.presentation.components.TransparentFocusedTextField

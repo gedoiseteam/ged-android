@@ -26,7 +26,7 @@
     <string name="empty_field_error">Veuillez remplir le champ</string>
     <string name="unknown_error">Une erreur inconnue est survenue</string>
     <string name="server_communication_error">La communication avec le serveur a echoué. Veuillez réessayer dans quelques minutes.</string>
-    <string name="server_connection_error">Erreur de connexion au serveur</string>
+    <string name="server_connection_error">Erreur de connexion </string>
     <string name="occurred_error">Une erreur est survenue</string>
     <string name="icon_add_descrption">Icône d\'ajout</string>
 

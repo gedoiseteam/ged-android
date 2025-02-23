@@ -9,4 +9,7 @@ class GetMessagesUseCase(
 ) {
     operator fun invoke(conversationId: String): Flow<Message> =
         messageRepository.getMessages(conversationId)
+
+    suspend operator fun invoke(conversationId: String, limit: Int, offset: Int): List<Message> =
+        messageRepository.getMessages(conversationId, limit, offset)
 }

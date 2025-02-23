@@ -46,7 +46,11 @@ fun CreateAnnouncementScreen(
             SmallTopBarAction(
                 modifier = Modifier.fillMaxWidth(),
                 buttonText = stringResource(id = com.upsaclay.common.R.string.publish),
-                onCancelClick = { navController.popBackStack() },
+                onCancelClick = {
+                    focusManager.clearFocus()
+                    keyboardController?.hide()
+                    navController.popBackStack()
+                },
                 onActionClick = {
                     focusManager.clearFocus()
                     keyboardController?.hide()

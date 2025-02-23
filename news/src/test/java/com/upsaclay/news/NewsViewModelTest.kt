@@ -3,7 +3,9 @@ package com.upsaclay.news
 import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
 import com.upsaclay.common.domain.userFixture
 import com.upsaclay.news.domain.announcementsFixture
+import com.upsaclay.news.domain.usecase.DeleteAnnouncementUseCase
 import com.upsaclay.news.domain.usecase.GetAnnouncementsUseCase
+import com.upsaclay.news.domain.usecase.RecreateAnnouncementUseCase
 import com.upsaclay.news.domain.usecase.RefreshAnnouncementsUseCase
 import com.upsaclay.news.presentation.viewmodels.NewsViewModel
 import io.mockk.coEvery
@@ -27,6 +29,8 @@ class NewsViewModelTest {
     private val getAnnouncementsUseCase: GetAnnouncementsUseCase = mockk()
     private val getCurrentUserUseCase: GetCurrentUserUseCase = mockk()
     private val refreshAnnouncementsUseCase: RefreshAnnouncementsUseCase = mockk()
+    private val recreateAnnouncementUseCase: RecreateAnnouncementUseCase = mockk()
+    private val deleteAnnouncementUseCase: DeleteAnnouncementUseCase = mockk()
 
     private lateinit var newsViewModel: NewsViewModel
     private val testDispatcher = UnconfinedTestDispatcher()
@@ -42,7 +46,9 @@ class NewsViewModelTest {
         newsViewModel = NewsViewModel(
             getAnnouncementsUseCase = getAnnouncementsUseCase,
             getCurrentUserUseCase = getCurrentUserUseCase,
-            refreshAnnouncementsUseCase = refreshAnnouncementsUseCase
+            refreshAnnouncementsUseCase = refreshAnnouncementsUseCase,
+            recreateAnnouncementUseCase = recreateAnnouncementUseCase,
+            deleteAnnouncementUseCase = deleteAnnouncementUseCase
         )
     }
 

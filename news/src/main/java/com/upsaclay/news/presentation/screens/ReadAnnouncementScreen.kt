@@ -149,7 +149,6 @@ fun ReadAnnouncementScreen(
             modifier = Modifier.testTag(stringResource(id = R.string.read_screen_delete_dialog_tag)),
             title = stringResource(id = R.string.delete_announcement_dialog_title),
             text = stringResource(id = R.string.delete_announcement_dialog_text),
-            onDismiss = { showDeleteAnnouncementDialog = false },
             confirmText = stringResource(id = com.upsaclay.common.R.string.delete),
             onConfirm = {
                 showDeleteAnnouncementDialog = false
@@ -158,6 +157,7 @@ fun ReadAnnouncementScreen(
             onCancel = { showDeleteAnnouncementDialog = false }
         )
     }
+
     Scaffold(
         topBar = {
             SmallTopBarBack(
@@ -290,7 +290,7 @@ fun ReadAnnouncementScreen(
                             .testTag(stringResource(id = R.string.read_screen_sheet_delete_field_tag)),
                         text = {
                             Text(
-                                text = stringResource(id = R.string.delete_announcement),
+                                text = stringResource(id = com.upsaclay.common.R.string.delete),
                                 color = MaterialTheme.colorScheme.error
                             )
                         },

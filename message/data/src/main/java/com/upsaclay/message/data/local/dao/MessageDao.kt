@@ -18,16 +18,24 @@ interface MessageDao {
                 "ORDER BY timestamp DESC " +
                 "LIMIT 1"
     )
-    fun getLastMessage(conversationId: String): Flow<LocalMessage?>
+    fun getLastMessage(conversationId: String): Flow<LocalMessage>
 
     @Query(
         "SELECT * FROM $MESSAGES_TABLE_NAME " +
                 "WHERE ${MessageField.CONVERSATION_ID} = :conversationId " +
                 "ORDER BY timestamp DESC " +
-                "LIMIT 10 " +
+                "LIMIT 20"
+    )
+    fun getMessages(conversationId: String): Flow<List<LocalMessage>>
+
+    @Query(
+        "SELECT * FROM $MESSAGES_TABLE_NAME " +
+                "WHERE ${MessageField.CONVERSATION_ID} = :conversationId " +
+                "ORDER BY timestamp DESC " +
+                "LIMIT :limit " +
                 "OFFSET :offset"
     )
-    fun getMessages(conversationId: String, offset: Int): Flow<List<LocalMessage>>
+    suspend fun getMessages(conversationId: String, limit: Int, offset: Int): List<LocalMessage>
 
     @Insert
     suspend fun insertMessage(localMessage: LocalMessage)
@@ -38,6 +46,9 @@ interface MessageDao {
     @Upsert
     suspend fun upsertMessage(localMessage: LocalMessage)
 
+    @Query("DELETE FROM $MESSAGES_TABLE_NAME WHERE ${MessageField.CONVERSATION_ID} = :conversationId")
+    suspend fun deleteMessages(conversationId: String)
+
     @Query("DELETE FROM $MESSAGES_TABLE_NAME")
-    suspend fun deleteMessages()
+    suspend fun deleteAllMessages()
 }

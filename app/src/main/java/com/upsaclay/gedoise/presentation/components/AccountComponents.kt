@@ -17,7 +17,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -81,7 +80,7 @@ internal fun AccountModelBottomSheet(
                 onClick = onDeleteProfilePictureClick
             )
         }
-        Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
+        Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))
     }
 }
 
@@ -90,7 +89,8 @@ internal fun AccountInfoItem(
     modifier: Modifier = Modifier,
     accountInfo: AccountInfo
 ) {
-    val labelColor = if (isSystemInDarkTheme()) Color.Gray else GedoiseColor.PreviewText
+    val labelColor = if (isSystemInDarkTheme()) GedoiseColor.PreviewTextDark else GedoiseColor.PreviewTextLight
+
     Column(
         modifier = modifier.padding(vertical = MaterialTheme.spacing.smallMedium)
     ) {

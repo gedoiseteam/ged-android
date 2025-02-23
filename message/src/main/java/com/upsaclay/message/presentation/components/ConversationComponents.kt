@@ -1,7 +1,9 @@
 package com.upsaclay.message.presentation.components
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,13 +39,16 @@ import com.upsaclay.message.R
 import com.upsaclay.message.domain.conversationUIFixture
 import com.upsaclay.message.domain.entity.ConversationUI
 import com.upsaclay.message.domain.entity.Message
+import com.upsaclay.message.domain.entity.MessageState
 import com.upsaclay.message.domain.messageFixture2
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ConversationItem(
     modifier: Modifier = Modifier,
     conversation: ConversationUI,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onLongClick: () -> Unit
 ) {
     val elapsedTimeValue = conversation.lastMessage?.let { lastMessage ->
         when (val elapsedTime = GetElapsedTimeUseCase.fromLocalDateTime(lastMessage.date)) {
@@ -75,7 +80,10 @@ fun ConversationItem(
 
     Row(
         modifier = modifier
-            .clickable(onClick = onClick)
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = onLongClick
+            )
             .padding(
                 horizontal = MaterialTheme.spacing.medium,
                 vertical = MaterialTheme.spacing.smallMedium
@@ -93,14 +101,17 @@ fun ConversationItem(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium)
         ) {
-            conversation.lastMessage?.let {
-                if (!it.isRead && it.senderId == conversation.interlocutor.id) {
+            conversation.lastMessage?.let { message ->
+                val text = if (message.state == MessageState.SENT) message.content else stringResource(R.string.sending)
+                val isNotSender = message.senderId == conversation.interlocutor.id
+
+                if (isNotSender && !message.seen) {
                     UnreadConversationItem(
                         modifier = Modifier
                             .weight(1f)
                             .testTag(stringResource(id = R.string.conversation_screen_unread_conversation_item_tag)),
                         interlocutor = conversation.interlocutor,
-                        lastMessage = it,
+                        lastMessage = message,
                         elapsedTime = elapsedTimeValue
                     )
                 } else {
@@ -109,7 +120,7 @@ fun ConversationItem(
                             .weight(1f)
                             .testTag(stringResource(id = R.string.conversation_screen_read_conversation_item_tag)),
                         interlocutor = conversation.interlocutor,
-                        lastMessage = it,
+                        lastMessage = message.copy(content = text),
                         elapsedTime = elapsedTimeValue
                     )
                 }
@@ -132,6 +143,12 @@ private fun ReadConversationItem(
     lastMessage: Message,
     elapsedTime: String
 ) {
+    val textColor = if (isSystemInDarkTheme()) {
+        GedoiseColor.PreviewTextDark
+    } else {
+        GedoiseColor.PreviewTextLight
+    }
+
     Column(modifier = modifier) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
@@ -148,7 +165,7 @@ private fun ReadConversationItem(
             Text(
                 text = elapsedTime,
                 style = MaterialTheme.typography.bodyMedium,
-                color = GedoiseColor.PreviewText
+                color = textColor
             )
         }
 
@@ -157,7 +174,7 @@ private fun ReadConversationItem(
         Text(
             text = lastMessage.content,
             style = MaterialTheme.typography.bodyMedium,
-            color = GedoiseColor.PreviewText,
+            color = textColor,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
@@ -235,7 +252,7 @@ private fun EmptyConversationItem(
         Text(
             text = stringResource(id = R.string.tap_to_chat),
             style = MaterialTheme.typography.bodyMedium,
-            color = GedoiseColor.PreviewText,
+            color = GedoiseColor.PreviewTextLight,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
@@ -255,7 +272,8 @@ private fun ReadConversationItemPreview() {
         ConversationItem(
             modifier = Modifier.fillMaxWidth(),
             conversation = conversationUIFixture,
-            onClick = { }
+            onClick = { },
+            onLongClick = { }
         )
     }
 }
@@ -269,7 +287,8 @@ private fun UnreadConversationItemPreview() {
             conversation = conversationUIFixture.copy(
                 lastMessage = messageFixture2
             ),
-            onClick = { }
+            onClick = { },
+            onLongClick = { }
         )
     }
 }
@@ -281,7 +300,8 @@ private fun EmptyConversationPreview() {
         ConversationItem(
             modifier = Modifier.fillMaxWidth(),
             conversation = conversationUIFixture.copy(lastMessage = null),
-            onClick = { }
+            onClick = { },
+            onLongClick = { }
         )
     }
 }

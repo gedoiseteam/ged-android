@@ -1,5 +1,6 @@
 package com.upsaclay.authentication
 
+import android.accounts.NetworkErrorException
 import com.upsaclay.authentication.domain.entity.AuthenticationScreenState
 import com.upsaclay.authentication.domain.entity.exception.AuthenticationException
 import com.upsaclay.authentication.domain.usecase.IsEmailVerifiedUseCase
@@ -14,6 +15,7 @@ import com.upsaclay.common.domain.userFixture
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -116,9 +118,9 @@ class AuthenticationViewModelTest {
     }
 
     @Test
-    fun login_sets_screen_state_to_SERVER_COMMUNICATION_ERROR_when_a_server_communication_exception_is_thrown() = runTest {
+    fun login_sets_screen_state_to_SERVER_COMMUNICATION_ERROR_when_a_io_exception_is_thrown() = runTest {
         // Given
-        coEvery { loginUseCase(any(), any()) } throws ServerCommunicationException()
+        coEvery { loginUseCase(any(), any()) } throws IOException()
 
         // When
         authenticationViewModel.login()
@@ -152,7 +154,7 @@ class AuthenticationViewModelTest {
     }
 
     @Test
-    fun login_sets_screen_state_to_USERVER_COMMUNICATION_ERROR_when_an_io_exception_is_thrown() = runTest {
+    fun login_sets_screen_state_to_SERVER_COMMUNICATION_ERROR_when_an_io_exception_is_thrown() = runTest {
         // Given
         coEvery { loginUseCase(any(), any()) } throws IOException()
 
@@ -161,6 +163,18 @@ class AuthenticationViewModelTest {
 
         // Then
         assertEquals(AuthenticationScreenState.SERVER_COMMUNICATION_ERROR, authenticationViewModel.screenState.value)
+    }
+
+    @Test
+    fun login_sets_screen_state_to_NETWORK_ERROR_when_an_network_error_exception_is_thrown() = runTest {
+        // Given
+        coEvery { loginUseCase(any(), any()) } throws NetworkErrorException()
+
+        // When
+        authenticationViewModel.login()
+
+        // Then
+        assertEquals(AuthenticationScreenState.NETWORK_ERROR, authenticationViewModel.screenState.value)
     }
 
     @Test
@@ -174,7 +188,6 @@ class AuthenticationViewModelTest {
         // Then
         assertEquals(AuthenticationScreenState.UNKNOWN_ERROR, authenticationViewModel.screenState.value)
     }
-
 
     @Test
     fun login_sets_screen_state_to_TOO_MANY_REQUESTS_ERROR_when_an_too_many_request_exception_is_thrown() = runTest {
@@ -198,6 +211,20 @@ class AuthenticationViewModelTest {
 
         // Then
         assertEquals(AuthenticationScreenState.AUTHENTICATION_ERROR, authenticationViewModel.screenState.value)
+    }
+
+    @Test
+    fun login_should_reset_password_when_exception_is_thrown() = runTest {
+        // Given
+        coEvery { loginUseCase(any(), any()) } throws Exception()
+        authenticationViewModel.updatePassword(password)
+        authenticationViewModel.updateEmail(email)
+
+        // When
+        authenticationViewModel.login()
+
+        // Then
+        assertEquals("", authenticationViewModel.password)
     }
 
     @Test

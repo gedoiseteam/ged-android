@@ -8,7 +8,7 @@ data class Message(
     val conversationId: String,
     val content: String,
     val date: LocalDateTime,
-    val isRead: Boolean = false,
+    val seen: Boolean = false,
     val state: MessageState,
     val type: String = "text"
 )

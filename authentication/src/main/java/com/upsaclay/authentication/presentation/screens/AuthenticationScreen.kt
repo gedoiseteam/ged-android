@@ -61,46 +61,26 @@ fun AuthenticationScreen(
     authenticationViewModel: AuthenticationViewModel = koinViewModel()
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
     val scrollState = rememberScrollState()
     var showVerifyEmailDialog by remember { mutableStateOf(false) }
     val screenState by authenticationViewModel.screenState.collectAsState()
-    val focusManager = LocalFocusManager.current
 
     val (errorMessage, inputsError) = when (screenState) {
-        AuthenticationScreenState.AUTHENTICATION_ERROR -> {
-            authenticationViewModel.resetPassword()
-            stringResource(id = R.string.error_connection) to true
-        }
+        AuthenticationScreenState.AUTHENTICATION_ERROR -> stringResource(id = R.string.error_connection) to true
 
-        AuthenticationScreenState.EMPTY_FIELDS_ERROR -> {
-            authenticationViewModel.resetPassword()
-            stringResource(id = com.upsaclay.common.R.string.empty_fields_error) to true
-        }
+        AuthenticationScreenState.EMPTY_FIELDS_ERROR -> stringResource(id = com.upsaclay.common.R.string.empty_fields_error) to true
 
-        AuthenticationScreenState.AUTHENTICATED_USER_NOT_FOUND -> {
-            authenticationViewModel.resetPassword()
-            stringResource(id = R.string.authenticated_user_not_found) to true
-        }
+        AuthenticationScreenState.AUTHENTICATED_USER_NOT_FOUND -> stringResource(id = R.string.authenticated_user_not_found) to true
 
-        AuthenticationScreenState.TOO_MANY_REQUESTS_ERROR -> {
-            authenticationViewModel.resetPassword()
-            stringResource(id = R.string.too_many_request_error) to false
-        }
+        AuthenticationScreenState.TOO_MANY_REQUESTS_ERROR -> stringResource(id = R.string.too_many_request_error) to false
 
-        AuthenticationScreenState.EMAIL_FORMAT_ERROR -> {
-            authenticationViewModel.resetPassword()
-            stringResource(id = R.string.error_incorrect_email_format) to true
-        }
+        AuthenticationScreenState.EMAIL_FORMAT_ERROR -> stringResource(id = R.string.error_incorrect_email_format) to true
 
-        AuthenticationScreenState.SERVER_COMMUNICATION_ERROR -> {
-            authenticationViewModel.resetPassword()
-            stringResource(id = com.upsaclay.common.R.string.server_communication_error) to false
-        }
+        AuthenticationScreenState.SERVER_COMMUNICATION_ERROR, AuthenticationScreenState.NETWORK_ERROR ->
+            stringResource(id = R.string.server_communication_error) to false
 
-        AuthenticationScreenState.UNKNOWN_ERROR -> {
-            authenticationViewModel.resetPassword()
-            stringResource(id = com.upsaclay.common.R.string.unknown_error) to false
-        }
+        AuthenticationScreenState.UNKNOWN_ERROR -> stringResource(id = com.upsaclay.common.R.string.unknown_error) to false
 
         else -> "" to false
     }
@@ -123,11 +103,6 @@ fun AuthenticationScreen(
             title = stringResource(id = R.string.email_not_verified_dialog_title),
             text = stringResource(id = R.string.email_not_verified),
             confirmText = stringResource(id = com.upsaclay.common.R.string.keep_going),
-            onDismiss = {
-                authenticationViewModel.resetPassword()
-                showVerifyEmailDialog = false
-                authenticationViewModel.resetScreenState()
-            },
             onConfirm = {
                 authenticationViewModel.resetEmail()
                 authenticationViewModel.resetPassword()
@@ -199,6 +174,8 @@ fun AuthenticationScreen(
                     authenticationViewModel.resetEmail()
                     authenticationViewModel.resetPassword()
                     authenticationViewModel.resetScreenState()
+                    keyboardController?.hide()
+                    focusManager.clearFocus()
                     navController.navigate(Screen.FIRST_REGISTRATION.route)
                 }
             )

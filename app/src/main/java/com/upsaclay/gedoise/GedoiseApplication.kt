@@ -1,6 +1,8 @@
 package com.upsaclay.gedoise
 
 import android.app.Application
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
 import com.upsaclay.authentication.authenticationModule
 import com.upsaclay.authentication.data.authenticationDataModule
 import com.upsaclay.authentication.domain.authenticationDomainModule
@@ -21,6 +23,7 @@ import timber.log.Timber.Forest.plant
 class GedoiseApplication : Application() {
     override fun onCreate() {
         super.onCreate()
+        Firebase.firestore.clearPersistence()
         startKoin {
             androidLogger()
             androidContext(this@GedoiseApplication)
