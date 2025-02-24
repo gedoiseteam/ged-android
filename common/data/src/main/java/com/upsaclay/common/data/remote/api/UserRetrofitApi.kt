@@ -9,6 +9,7 @@ import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 
 internal interface UserRetrofitApi {
@@ -24,7 +25,7 @@ internal interface UserRetrofitApi {
     suspend fun createUser(@Body user: UserDTO): Response<Unit>
 
     @FormUrlEncoded
-    @POST("users/update/profile-picture-url")
+    @PUT("users/profile-picture-url")
     suspend fun updateProfilePictureUrl(
         @Field("USER_ID") userId: String,
         @Field("USER_PROFILE_PICTURE_URL") userProfilePictureUrl: String
