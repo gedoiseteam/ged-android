@@ -10,7 +10,7 @@ import java.io.File
 
 internal class FileRepositoryImpl(private val context: Context) : FileRepository {
     override suspend fun createFileFromUri(fileName: String, uri: Uri): File = withContext(Dispatchers.IO) {
-        val extension = getFileType(uri) ?: "jpg"
+        val extension = getFileType(uri) ?: "jpeg"
         val fileByteArray = getFileByteArray(uri)
         return@withContext createFileFromByteArray("$fileName.$extension", fileByteArray)
     }
