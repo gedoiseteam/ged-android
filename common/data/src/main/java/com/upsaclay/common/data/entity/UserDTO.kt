@@ -9,5 +9,5 @@ internal data class UserDTO(
     @SerializedName("USER_EMAIL") val userEmail: String,
     @SerializedName("USER_SCHOOL_LEVEL") val userSchoolLevel: String,
     @SerializedName("USER_IS_MEMBER") val userIsMember: Int = 0,
-    @SerializedName("USER_PROFILE_PICTURE_URL") val userProfilePictureUrl: String? = null
+    @SerializedName("USER_PROFILE_PICTURE_FILE_NAME") val userProfilePictureFileName: String? = null
 )

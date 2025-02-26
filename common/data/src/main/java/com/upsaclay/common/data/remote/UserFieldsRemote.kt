@@ -7,7 +7,7 @@ internal object UserFieldsRemote {
     const val EMAIL = "email"
     const val SCHOOL_LEVEL = "school_level"
     const val IS_MEMBER = "is_member"
-    const val PROFILE_PICTURE_URL = "profile_picture_url"
+    const val PROFILE_PICTURE_FILE_NAME = "profile_picture_file_name"
     const val IS_ONLINE = "is_online"
     const val CONVERSATIONS = "conversations"
 }

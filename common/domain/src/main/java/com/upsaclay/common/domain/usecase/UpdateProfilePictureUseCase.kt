@@ -1,7 +1,7 @@
 package com.upsaclay.common.domain.usecase
 
 import android.net.Uri
-import com.upsaclay.common.domain.formatProfilePictureUrl
+import com.upsaclay.common.domain.UrlUtils.getFileNameFromUrl
 import com.upsaclay.common.domain.repository.FileRepository
 import com.upsaclay.common.domain.repository.ImageRepository
 import com.upsaclay.common.domain.repository.UserRepository
@@ -16,18 +16,15 @@ class UpdateProfilePictureUseCase(
     suspend operator fun invoke(profilePictureUri: Uri) {
         val currentUser = userRepository.currentUser.first() ?: throw IOException("No user logged in")
 
-        val currentTime = System.currentTimeMillis()
-        val fileName = "${currentUser.id}-profile-picture-$currentTime"
+        val fileName = "${currentUser.id}-profile-picture-${System.currentTimeMillis()}"
         val file = fileRepository.createFileFromUri(fileName, profilePictureUri)
-        val url = formatProfilePictureUrl(fileName, file.extension)
 
         imageRepository.uploadImage(file)
-        userRepository.updateProfilePictureUrl(currentUser.id, url)
+        userRepository.updateProfilePictureUrl(currentUser.id, file.name)
         currentUser.profilePictureUrl?.let { deletePreviousProfilePicture(it) }
     }
 
     private suspend fun deletePreviousProfilePicture(userProfilePictureUrl: String) {
-        val fileName = userProfilePictureUrl.substringAfterLast("/")
-        imageRepository.deleteImage(fileName)
+        getFileNameFromUrl(userProfilePictureUrl)?.let { imageRepository.deleteImage(it) }
     }
 }

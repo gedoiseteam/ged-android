@@ -14,7 +14,7 @@ internal interface UserFirestoreApi {
 
     suspend fun createUser(firestoreUser: FirestoreUser)
 
-    suspend fun updateProfilePictureUrl(userId: String, profilePictureUrl: String?)
+    suspend fun updateProfilePictureFileName(userId: String, fileName: String?)
 
     suspend fun isUserExist(email: String): Boolean
 }

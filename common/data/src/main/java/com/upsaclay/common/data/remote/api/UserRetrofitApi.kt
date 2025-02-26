@@ -25,12 +25,12 @@ internal interface UserRetrofitApi {
     suspend fun createUser(@Body user: UserDTO): Response<Unit>
 
     @FormUrlEncoded
-    @PUT("users/profile-picture-url")
-    suspend fun updateProfilePictureUrl(
+    @PUT("users/profile-picture-file-name")
+    suspend fun updateProfilePictureFileName(
         @Field("USER_ID") userId: String,
-        @Field("USER_PROFILE_PICTURE_URL") userProfilePictureUrl: String
+        @Field("USER_PROFILE_PICTURE_FILE_NAME") userProfilePictureFileName: String
     ): Response<EmptyResponse>
 
-    @DELETE("users/profile-picture-url/{userId}")
-    suspend fun deleteProfilePictureUrl(@Path("userId") userId: String): Response<EmptyResponse>
+    @DELETE("users/profile-picture-file-name/{userId}")
+    suspend fun deleteProfilePictureFileName(@Path("userId") userId: String): Response<EmptyResponse>
 }
