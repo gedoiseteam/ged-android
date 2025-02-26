@@ -37,10 +37,10 @@ import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
 import kotlinx.coroutines.launch
 
-private val infoContentColor = Color(0xFF3975EA)
-private val successContentColor = Color(0xFF55AB43)
-private val errorContentColor = Color(0xFFC65052)
-private val warningContentColor = Color(0xFFB79633)
+private val infoIconColor = Color(0xFF3975EA)
+private val successIconColor = Color(0xFF55AB43)
+private val errorIconColor = Color(0xFFC65052)
+private val warningIconColor = Color(0xFFB79633)
 
 @Composable
 fun InfoSnackbar(
@@ -57,7 +57,7 @@ fun InfoSnackbar(
             Icon(
                 imageVector = Icons.Filled.Info,
                 contentDescription = null,
-                tint = infoContentColor
+                tint = infoIconColor
             )
             Text(message)
         }
@@ -79,7 +79,7 @@ fun SuccessSnackBar(
             Icon(
                 imageVector = Icons.Filled.CheckCircle,
                 contentDescription = null,
-                tint = successContentColor
+                tint = successIconColor
             )
             Text(message)
         }
@@ -100,7 +100,7 @@ fun ErrorSnackBar(
             Icon(
                 painter = painterResource(id = R.drawable.ic_fill_cross_circle),
                 contentDescription = null,
-                tint = errorContentColor
+                tint = errorIconColor
             )
 
             Text(message)
@@ -123,7 +123,7 @@ fun WarningSnackBar(
             Icon(
                 imageVector = Icons.Filled.Info,
                 contentDescription = null,
-                tint = warningContentColor
+                tint = warningIconColor
             )
 
             Text(message)
@@ -168,7 +168,7 @@ private fun SnackBarPreview() {
                     modifier = Modifier.width(200.dp),
                     colors = ButtonDefaults.outlinedButtonColors(
                         containerColor = MaterialTheme.colorScheme.onBackground,
-                        contentColor = infoContentColor
+                        contentColor = infoIconColor
                     ),
                     onClick = {
                         scope.launch {
@@ -184,7 +184,7 @@ private fun SnackBarPreview() {
                     modifier = Modifier.width(200.dp),
                     colors = ButtonDefaults.outlinedButtonColors(
                         containerColor = MaterialTheme.colorScheme.onBackground,
-                        contentColor = successContentColor
+                        contentColor = successIconColor
                     ),
                     onClick = {
                         scope.launch {
@@ -200,7 +200,7 @@ private fun SnackBarPreview() {
                     modifier = Modifier.width(200.dp),
                     colors = ButtonDefaults.outlinedButtonColors(
                         containerColor = MaterialTheme.colorScheme.onBackground,
-                        contentColor = errorContentColor
+                        contentColor = errorIconColor
                     ),
                     onClick = {
                         scope.launch {
@@ -216,7 +216,7 @@ private fun SnackBarPreview() {
                     modifier = Modifier.width(200.dp),
                     colors = ButtonDefaults.outlinedButtonColors(
                         containerColor = MaterialTheme.colorScheme.onBackground,
-                        contentColor = warningContentColor
+                        contentColor = warningIconColor
                     ),
                     onClick = {
                         scope.launch {

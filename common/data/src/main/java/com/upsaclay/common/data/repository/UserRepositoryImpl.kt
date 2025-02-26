@@ -50,7 +50,7 @@ internal class UserRepositoryImpl(
     }
 
     override suspend fun updateProfilePictureUrl(userId: String, profilePictureUrl: String) {
-        userRemoteDataSource.updateProfilePictureUrl(userId, profilePictureUrl)
+        userRemoteDataSource.updateProfilePictureFileName(userId, profilePictureUrl)
         userLocalDataSource.updateProfilePictureUrl(profilePictureUrl)
     }
 

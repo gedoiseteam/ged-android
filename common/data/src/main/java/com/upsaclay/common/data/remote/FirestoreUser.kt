@@ -27,9 +27,9 @@ internal data class FirestoreUser(
     @set:PropertyName("is_member")
     var isMember: Boolean = false,
 
-    @get:PropertyName("profile_picture_url")
-    @set:PropertyName("profile_picture_url")
-    var profilePictureUrl: String? = null,
+    @get:PropertyName("profile_picture_file_name")
+    @set:PropertyName("profile_picture_file_name")
+    var profilePictureFileName: String? = null,
 
     @get:PropertyName("is_online")
     @set:PropertyName("is_online")

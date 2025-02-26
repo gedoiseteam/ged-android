@@ -113,6 +113,12 @@ fun AccountScreen(
             resetScreenState()
         }
 
+        AccountScreenState.PROFILE_PICTURE_DELETED -> {
+            showLoadingDialog = false
+            showSnackBar(SnackbarType.SUCCESS, context.getString(R.string.profile_picture_updated))
+            resetScreenState()
+        }
+
         AccountScreenState.PROFILE_PICTURE_UPDATE_ERROR -> {
             showLoadingDialog = false
             showSnackBar(SnackbarType.ERROR, context.getString(R.string.error_updating_profile_picture))
@@ -264,10 +270,9 @@ private fun ProfilePictureSection(
 
     profilePictureUri?.let { uri ->
         if (isEdited) {
-            ProfilePictureWithIcon(
+            ProfilePicture(
                 modifier = modifier,
                 uri = uri,
-                iconVector = Icons.Default.Edit,
                 scale = scaleImage,
                 onClick = onClick
             )

@@ -16,13 +16,13 @@ internal class UserLocalDataSource(private val userDataStore: UserDataStore) {
 
     suspend fun updateProfilePictureUrl(url: String) {
         userDataStore.getCurrentUser().firstOrNull()?.let { userDTO ->
-            userDataStore.storeCurrentUser(userDTO.copy(userProfilePictureUrl = url))
+            userDataStore.storeCurrentUser(userDTO.copy(userProfilePictureFileName = url))
         }
     }
 
     suspend fun deleteProfilePictureUrl() {
         userDataStore.getCurrentUser().firstOrNull()?.let { userDTO ->
-            userDataStore.storeCurrentUser(userDTO.copy(userProfilePictureUrl = null))
+            userDataStore.storeCurrentUser(userDTO.copy(userProfilePictureFileName = null))
         }
     }
 

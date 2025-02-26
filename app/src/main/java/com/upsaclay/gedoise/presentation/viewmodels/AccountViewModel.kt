@@ -57,7 +57,7 @@ class AccountViewModel(
             val (id, url) = currentUser.value?.id to currentUser.value?.profilePictureUrl
             try {
                 deleteProfilePictureUseCase(id!!, url!!)
-                _screenState.value = AccountScreenState.PROFILE_PICTURE_UPDATED
+                _screenState.value = AccountScreenState.PROFILE_PICTURE_DELETED
             } catch (e: Exception) {
                 _screenState.value = AccountScreenState.PROFILE_PICTURE_UPDATE_ERROR
             }

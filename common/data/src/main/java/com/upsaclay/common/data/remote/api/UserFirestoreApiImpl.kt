@@ -82,10 +82,10 @@ internal class UserFirestoreApiImpl : UserFirestoreApi {
         }
     }
 
-    override suspend fun updateProfilePictureUrl(userId: String, profilePictureUrl: String?) {
+    override suspend fun updateProfilePictureFileName(userId: String, fileName: String?) {
         suspendCoroutine { continuation ->
             usersCollection.document(userId)
-                .update(UserFieldsRemote.PROFILE_PICTURE_URL, profilePictureUrl)
+                .update(UserFieldsRemote.PROFILE_PICTURE_FILE_NAME, fileName)
                 .addOnSuccessListener { continuation.resume(Unit) }
                 .addOnFailureListener { e ->
                     e("Error update firestore user pofile picture", e)

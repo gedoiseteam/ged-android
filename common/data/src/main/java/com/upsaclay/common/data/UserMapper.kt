@@ -2,6 +2,8 @@ package com.upsaclay.common.data
 
 import com.upsaclay.common.data.entity.UserDTO
 import com.upsaclay.common.data.remote.FirestoreUser
+import com.upsaclay.common.domain.UrlUtils.formatProfilePictureUrl
+import com.upsaclay.common.domain.UrlUtils.getFileNameFromUrl
 import com.upsaclay.common.domain.entity.User
 
 internal object UserMapper {
@@ -12,7 +14,7 @@ internal object UserMapper {
         userEmail = user.email,
         userSchoolLevel = user.schoolLevel,
         userIsMember = if (user.isMember) 1 else 0,
-        userProfilePictureUrl = user.profilePictureUrl
+        userProfilePictureFileName = getFileNameFromUrl(user.profilePictureUrl)
     )
 
     fun toFirestoreUser(user: User) = FirestoreUser(
@@ -22,7 +24,7 @@ internal object UserMapper {
         email = user.email,
         schoolLevel = user.schoolLevel,
         isMember = user.isMember,
-        profilePictureUrl = user.profilePictureUrl
+        profilePictureFileName = getFileNameFromUrl(user.profilePictureUrl)
     )
 
     fun toFirestoreUser(userDTO: UserDTO) = FirestoreUser(
@@ -32,7 +34,7 @@ internal object UserMapper {
         email = userDTO.userEmail,
         schoolLevel = userDTO.userSchoolLevel,
         isMember = userDTO.userIsMember == 1,
-        profilePictureUrl = userDTO.userProfilePictureUrl
+        profilePictureFileName = userDTO.userProfilePictureFileName
     )
 
     fun toDomain(userDTO: UserDTO) = User(
@@ -42,7 +44,7 @@ internal object UserMapper {
         email = userDTO.userEmail,
         schoolLevel = userDTO.userSchoolLevel,
         isMember = userDTO.userIsMember == 1,
-        profilePictureUrl = userDTO.userProfilePictureUrl
+        profilePictureUrl = formatProfilePictureUrl(userDTO.userProfilePictureFileName)
     )
 
     fun toDomain(firestoreUser: FirestoreUser) = User(
@@ -52,6 +54,6 @@ internal object UserMapper {
         email = firestoreUser.email,
         schoolLevel = firestoreUser.schoolLevel,
         isMember = firestoreUser.isMember,
-        profilePictureUrl = firestoreUser.profilePictureUrl
+        profilePictureUrl = formatProfilePictureUrl(firestoreUser.profilePictureFileName)
     )
 }

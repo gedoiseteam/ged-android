@@ -44,13 +44,13 @@ internal class UserRemoteDataSource(
         }
     }
 
-    suspend fun updateProfilePictureUrl(userId: String, url: String) {
+    suspend fun updateProfilePictureFileName(userId: String, fileName: String) {
         withContext(Dispatchers.IO) {
-            launch { userFirestoreApi.updateProfilePictureUrl(userId, url) }
+            launch { userFirestoreApi.updateProfilePictureFileName(userId, fileName) }
             launch {
-                val response = userRetrofitApi.updateProfilePictureUrl(userId, url)
+                val response = userRetrofitApi.updateProfilePictureFileName(userId, fileName)
                 if (!response.isSuccessful) {
-                    val errorMessage = formatHttpError("Error updating profile picture url", response)
+                    val errorMessage = formatHttpError("Error updating profile picture file name", response)
                     e(errorMessage)
                     throw IOException(errorMessage)
                 }
@@ -60,11 +60,11 @@ internal class UserRemoteDataSource(
 
     suspend fun deleteProfilePictureUrl(userId: String) {
         withContext(Dispatchers.IO) {
-            launch { userFirestoreApi.updateProfilePictureUrl(userId, null) }
+            launch { userFirestoreApi.updateProfilePictureFileName(userId, null) }
             launch {
-                val response = userRetrofitApi.deleteProfilePictureUrl(userId)
+                val response = userRetrofitApi.deleteProfilePictureFileName(userId)
                 if (!response.isSuccessful) {
-                    val errorMessage = formatHttpError("Error deleting profile picture url", response)
+                    val errorMessage = formatHttpError("Error deleting profile picture file name", response)
                     e(errorMessage)
                     throw IOException(errorMessage)
                 }
