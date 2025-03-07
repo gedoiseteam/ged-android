@@ -1,24 +1,125 @@
 package com.upsaclay.authentication.data.repository.firebase
 
-import com.upsaclay.authentication.data.remote.firebase.FirebaseAuthenticationRemoteDataSource
+import android.accounts.NetworkErrorException
+import com.google.firebase.FirebaseNetworkException
+import com.google.firebase.FirebaseTooManyRequestsException
+import com.google.firebase.auth.FirebaseAuthException
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
+import com.upsaclay.authentication.data.remote.FirebaseAuthenticationApi
+import com.upsaclay.authentication.domain.entity.exception.AuthErrorCode
+import com.upsaclay.authentication.domain.entity.exception.AuthUserNotFoundException
+import com.upsaclay.authentication.domain.entity.exception.InvalidCredentialsException
+import com.upsaclay.authentication.domain.entity.exception.UserAlreadyExistsException
+import com.upsaclay.common.domain.e
+import com.upsaclay.common.domain.entity.ServerCommunicationException
+import com.upsaclay.common.domain.entity.TooManyRequestException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.io.IOException
 
 class FirebaseAuthenticationRepositoryImpl(
-    private val firebaseAuthenticationRemoteDataSource: FirebaseAuthenticationRemoteDataSource
-) : FirebaseAuthenticationRepository {
+    private val firebaseAuthenticationApi: FirebaseAuthenticationApi
+): FirebaseAuthenticationRepository {
     override suspend fun loginWithEmailAndPassword(email: String, password: String) {
-        firebaseAuthenticationRemoteDataSource.signInWithEmailAndPassword(email, password)
+        withContext(Dispatchers.IO) {
+            try {
+                firebaseAuthenticationApi.signInWithEmailAndPassword(email, password)
+            } catch (e: FirebaseAuthException) {
+                e("Error to sign in with email and password with Firebase: ${e.message}", e)
+                when (AuthErrorCode.fromCode(e.errorCode)) {
+                    AuthErrorCode.EMAIL_ALREADY_AFFILIATED -> throw UserAlreadyExistsException()
+                    AuthErrorCode.INVALID_CREDENTIALS -> throw InvalidCredentialsException()
+                    else -> throw IOException()
+                }
+            } catch (e: FirebaseNetworkException) {
+                e("Error to sign in with email and password with Firebase because of network connection ${e.message}", e)
+                throw NetworkErrorException()
+            } catch (e: FirebaseTooManyRequestsException) {
+                e("Error to sign in with email and password with Firebase: ${e.message}", e)
+                throw TooManyRequestException()
+            } catch (e: Exception) {
+                e("Error to sign in with email and password with Firebase: ${e.message}", e)
+                throw IOException()
+            }
+        }
     }
 
     override suspend fun registerWithEmailAndPassword(email: String, password: String): String =
-        firebaseAuthenticationRemoteDataSource.signUpWithEmailAndPassword(email, password)
+        withContext(Dispatchers.IO) {
+            try {
+                firebaseAuthenticationApi.signUpWithEmailAndPassword(email, password)
+            } catch (e: FirebaseAuthException) {
+                e("Error to sign up with email and password with Firebase: ${e.message}", e)
+                when (AuthErrorCode.fromCode(e.errorCode)) {
+                    AuthErrorCode.EMAIL_ALREADY_AFFILIATED -> throw UserAlreadyExistsException()
+                    AuthErrorCode.INVALID_CREDENTIALS -> throw InvalidCredentialsException()
+                    else -> throw IOException()
+                }
+            } catch (e: FirebaseNetworkException) {
+                e("Error to sign up with email and password with Firebase because of network connection ${e.message}", e)
+                throw ServerCommunicationException()
+            } catch (e: FirebaseTooManyRequestsException) {
+                e("Error to sign up with email and password with Firebase: ${e.message}", e)
+                throw TooManyRequestException()
+            } catch (e: Exception) {
+                e("Error to sign up with email and password with Firebase: ${e.message}", e)
+                throw IOException()
+            }
+        }
 
     override suspend fun logout() {
-        firebaseAuthenticationRemoteDataSource.signOut()
+        withContext(Dispatchers.IO) {
+            try {
+                firebaseAuthenticationApi.signOut()
+            } catch (e: FirebaseAuthException) {
+                e("Error to logout with Firebase: ${e.message}", e)
+            } catch (e: FirebaseNetworkException) {
+                e("Error network connection ${e.message}", e)
+            } catch (e: FirebaseTooManyRequestsException) {
+                e("Error to logout with Firebase: ${e.message}", e)
+            } catch (e: Exception) {
+                e("Error to logout with Firebase: ${e.message}", e)
+            }
+        }
     }
 
     override suspend fun sendVerificationEmail() {
-        firebaseAuthenticationRemoteDataSource.sendVerificationEmail()
+        withContext(Dispatchers.IO) {
+            try {
+                firebaseAuthenticationApi.sendVerificationEmail()
+            } catch (e: FirebaseNetworkException) {
+                e("Error network connection: ${e.message}", e)
+                throw NetworkErrorException()
+            } catch (e: FirebaseTooManyRequestsException) {
+                e("Error to send verification email with Firebase: ${e.message}", e)
+                throw TooManyRequestException()
+            } catch (e: FirebaseAuthInvalidUserException) {
+                e("Error to send verification email with Firebase: ${e.message}", e)
+                throw AuthUserNotFoundException()
+            } catch (e: Exception) {
+                e("Error to send verification email with Firebase: ${e.message}", e)
+                throw IOException()
+            }
+        }
     }
 
-    override suspend fun isUserEmailVerified(): Boolean = firebaseAuthenticationRemoteDataSource.isUserEmailVerified()
+    override suspend fun isUserEmailVerified(): Boolean {
+        try {
+            return firebaseAuthenticationApi.isUserEmailVerified()
+        } catch (e: FirebaseNetworkException) {
+            e("Error network connection: ${e.message}", e)
+            throw NetworkErrorException()
+        } catch (e: FirebaseTooManyRequestsException) {
+            e("Error to verify email with Firebase: ${e.message}", e)
+            throw TooManyRequestException()
+        } catch (e: FirebaseAuthInvalidUserException) {
+            e("Error to verify email with Firebase: ${e.message}", e)
+            throw AuthUserNotFoundException()
+        } catch (e: Exception) {
+            e("Error to verify email with Firebase: ${e.message}", e)
+            throw IOException()
+        }
+    }
+
+    override fun isAuthenticated(): Boolean = firebaseAuthenticationApi.isAuthenticated()
 }

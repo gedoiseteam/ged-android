@@ -75,9 +75,7 @@ internal class UserFirestoreApiImpl : UserFirestoreApi {
         suspendCoroutine { continuation ->
             usersCollection.document(firestoreUser.userId).set(firestoreUser)
                 .addOnSuccessListener { continuation.resume(Unit) }
-                .addOnFailureListener {
-                    e("Error creating firestore user", it)
-                    continuation.resumeWithException(it)
+                .addOnFailureListener { continuation.resumeWithException(it)
                 }
         }
     }
@@ -96,12 +94,7 @@ internal class UserFirestoreApiImpl : UserFirestoreApi {
 
     override suspend fun isUserExist(email: String): Boolean = suspendCoroutine { continuation ->
         usersCollection.whereEqualTo(UserFieldsRemote.EMAIL, email).get()
-            .addOnSuccessListener { snapshot ->
-                continuation.resume(!snapshot.isEmpty)
-            }
-            .addOnFailureListener { e ->
-                e("Error checking is firestore user exists", e)
-                continuation.resumeWithException(e)
-            }
+            .addOnSuccessListener { continuation.resume(!it.isEmpty) }
+            .addOnFailureListener { continuation.resumeWithException(it) }
     }
 }

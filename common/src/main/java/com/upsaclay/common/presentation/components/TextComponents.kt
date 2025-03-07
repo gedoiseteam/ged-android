@@ -31,32 +31,6 @@ fun ErrorText(
     )
 }
 
-@Composable
-fun ErrorTextWithIcon(
-    modifier: Modifier = Modifier,
-    text: String
-) {
-    Row(
-        modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            modifier = Modifier.size(MaterialTheme.spacing.medium),
-            imageVector = Icons.Outlined.Info,
-            tint = MaterialTheme.colorScheme.error,
-            contentDescription = null
-        )
-
-        Spacer(modifier = Modifier.width(MaterialTheme.spacing.small))
-
-        Text(
-            text = text,
-            color = MaterialTheme.colorScheme.error,
-            style = MaterialTheme.typography.bodyMedium
-        )
-    }
-}
-
 /*
  =====================================================================
                                 Preview
@@ -68,13 +42,5 @@ fun ErrorTextWithIcon(
 private fun ErrorTextPreview() {
     GedoiseTheme {
         ErrorText(text = "Error text")
-    }
-}
-
-@Preview
-@Composable
-private fun ErrorTextWithIconPreview() {
-    GedoiseTheme {
-        ErrorTextWithIcon(text = userFixture.email + userFixture2.email)
     }
 }

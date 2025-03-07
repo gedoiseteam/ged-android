@@ -1,7 +1,8 @@
-package com.upsaclay.authentication.data.remote.firebase
+package com.upsaclay.authentication.data.remote
 
 import android.security.keystore.UserNotAuthenticatedException
 import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.auth
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -34,15 +35,12 @@ class FirebaseAuthenticationApiImpl : FirebaseAuthenticationApi {
     }
 
     override suspend fun sendVerificationEmail() = suspendCoroutine { continuation ->
-        val currentUser = firebaseAuth.currentUser
-            ?: return@suspendCoroutine continuation.resumeWithException(
-                UserNotAuthenticatedException("User not found")
-            )
-
-        currentUser.reload()
-        currentUser.sendEmailVerification()
-            .addOnSuccessListener { continuation.resume(Unit) }
-            .addOnFailureListener { e -> continuation.resumeWithException(e) }
+        firebaseAuth.currentUser?.let { currentUser ->
+            currentUser.reload()
+            currentUser.sendEmailVerification()
+                .addOnSuccessListener { continuation.resume(Unit) }
+                .addOnFailureListener { e -> continuation.resumeWithException(e) }
+        } ?: continuation.resumeWithException(FirebaseAuthInvalidUserException("ERROR_USER_NOT_FOUND", "Firebase auth current user is null"))
     }
 
     override suspend fun isUserEmailVerified(): Boolean = suspendCoroutine { continuation ->
@@ -50,6 +48,8 @@ class FirebaseAuthenticationApiImpl : FirebaseAuthenticationApi {
             currentUser.reload()
                 .addOnSuccessListener { continuation.resume(currentUser.isEmailVerified) }
                 .addOnFailureListener { continuation.resume(false) }
-        } ?: continuation.resume(false)
+        } ?: continuation.resumeWithException(FirebaseAuthInvalidUserException("ERROR_USER_NOT_FOUND", "Firebase auth current user is null"))
     }
+
+    override fun isAuthenticated(): Boolean = firebaseAuth.currentUser != null
 }

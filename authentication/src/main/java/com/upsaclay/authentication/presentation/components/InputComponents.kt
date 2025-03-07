@@ -3,8 +3,6 @@ package com.upsaclay.authentication.presentation.components
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -25,40 +23,15 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
-import com.upsaclay.common.R
+import com.upsaclay.authentication.R
 import com.upsaclay.common.presentation.theme.GedoiseTheme
+import com.upsaclay.common.presentation.theme.inputForeground
 import com.upsaclay.common.presentation.theme.spacing
 
 @Composable
-internal fun OutlinedEmailInput(
+fun OutlinePasswordTextField(
     modifier: Modifier = Modifier,
     text: String,
-    label: String = stringResource(id = R.string.email),
-    onValueChange: (String) -> Unit,
-    keyboardActions: KeyboardActions = KeyboardActions.Default,
-    isError: Boolean = false,
-    isEnable: Boolean = true,
-    readOnly: Boolean = false
-) {
-    OutlinedTextField(
-        modifier = modifier,
-        value = text,
-        label = { Text(text = label) },
-        onValueChange = onValueChange,
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-        isError = isError,
-        keyboardActions = keyboardActions,
-        singleLine = true,
-        enabled = isEnable,
-        readOnly = readOnly
-    )
-}
-
-@Composable
-fun OutlinedPasswordInput(
-    modifier: Modifier = Modifier,
-    text: String,
-    label: String = stringResource(id = com.upsaclay.authentication.R.string.password),
     onValueChange: (String) -> Unit,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     isError: Boolean = false,
@@ -67,21 +40,23 @@ fun OutlinedPasswordInput(
     var passwordVisible by remember { mutableStateOf(false) }
     val icon: Painter
     val contentDescription: String
-    if (!passwordVisible) {
-        icon = painterResource(id = R.drawable.ic_visibility)
-        contentDescription = stringResource(
-            id = com.upsaclay.authentication.R.string.show_password_icon_description
-        )
+    if (passwordVisible) {
+        icon = painterResource(com.upsaclay.common.R.drawable.ic_visibility)
+        contentDescription = stringResource( R.string.show_password_icon_description)
     } else {
-        icon = painterResource(id = R.drawable.ic_visibility_off)
-        contentDescription = stringResource(
-            id = com.upsaclay.authentication.R.string.hide_password_icon_description
-        )
+        icon = painterResource(com.upsaclay.common.R.drawable.ic_visibility_off)
+        contentDescription = stringResource(R.string.hide_password_icon_description)
     }
+
     OutlinedTextField(
         modifier = modifier,
         value = text,
-        label = { Text(text = label) },
+        label = {
+            Text(
+                text = stringResource(id = R.string.password),
+                color = MaterialTheme.colorScheme.inputForeground
+            )
+        },
         onValueChange = onValueChange,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         keyboardActions = keyboardActions,
@@ -90,13 +65,10 @@ fun OutlinedPasswordInput(
                 painter = icon,
                 contentDescription = contentDescription,
                 modifier = Modifier.clickable { passwordVisible = !passwordVisible },
+                tint = MaterialTheme.colorScheme.inputForeground
             )
         },
-        visualTransformation = if (passwordVisible) {
-            VisualTransformation.None
-        } else {
-            PasswordVisualTransformation()
-        },
+        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
         isError = isError,
         enabled = isEnable,
         singleLine = true
@@ -112,7 +84,6 @@ fun OutlinedPasswordInput(
 @Preview(showBackground = true)
 @Composable
 private fun OutlinedInputsPreview() {
-    var mail by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
     GedoiseTheme {
@@ -120,14 +91,10 @@ private fun OutlinedInputsPreview() {
             verticalArrangement = Arrangement.Center,
             modifier = Modifier.padding(MaterialTheme.spacing.mediumLarge)
         ) {
-            OutlinedEmailInput(
-                text = mail,
-                onValueChange = { mail = it }
-            )
-            Spacer(modifier = Modifier.height(MaterialTheme.spacing.mediumLarge))
-            OutlinedPasswordInput(
+            OutlinePasswordTextField(
                 text = password,
-                onValueChange = { password = it }
+                onValueChange = { password = it },
+                keyboardActions = KeyboardActions.Default
             )
         }
     }

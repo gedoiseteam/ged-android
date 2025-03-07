@@ -29,6 +29,7 @@ appcompat = "1.7.0"
 material = "1.12.0"
 kotlinx = "1.9.0"
 googleServices = "4.4.2"
+firebaseCrashlyticsKtx = "19.4.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -79,6 +80,7 @@ firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics" }
 firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
 firebase-auth = { module = "com.google.firebase:firebase-auth" }
 androidx-navigation-testing = { group = "androidx.navigation", name = "navigation-testing" ,version.ref = "navigationTesting" }
+firebase-crashlytics-ktx = { group = "com.google.firebase", name = "firebase-crashlytics-ktx", version.ref = "firebaseCrashlyticsKtx" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

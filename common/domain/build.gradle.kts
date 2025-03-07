@@ -14,13 +14,24 @@ android {
     }
 
     buildTypes {
-        release {
+        debug {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
         }
+
+        release {
+            isMinifyEnabled = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
+        }
+    }
+    buildFeatures {
+        buildConfig = true
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -38,6 +49,7 @@ dependencies {
     implementation(libs.gson)
     implementation(libs.koin)
     implementation(libs.koin.core)
+    implementation(libs.firebase.crashlytics.ktx)
 
     testImplementation(libs.junit)
     testImplementation(libs.mockk)

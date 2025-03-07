@@ -1,4 +1,4 @@
-package com.upsaclay.authentication.data.remote.firebase
+package com.upsaclay.authentication.data.remote
 
 interface FirebaseAuthenticationApi {
     suspend fun signInWithEmailAndPassword(email: String, password: String)
@@ -10,4 +10,6 @@ interface FirebaseAuthenticationApi {
     suspend fun sendVerificationEmail()
 
     suspend fun isUserEmailVerified(): Boolean
+
+    fun isAuthenticated(): Boolean
 }

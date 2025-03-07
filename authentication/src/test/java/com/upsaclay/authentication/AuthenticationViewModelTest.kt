@@ -2,12 +2,11 @@ package com.upsaclay.authentication
 
 import android.accounts.NetworkErrorException
 import com.upsaclay.authentication.domain.entity.AuthenticationScreenState
-import com.upsaclay.authentication.domain.entity.exception.AuthenticationException
+import com.upsaclay.authentication.domain.entity.exception.InvalidCredentialsException
 import com.upsaclay.authentication.domain.usecase.IsEmailVerifiedUseCase
 import com.upsaclay.authentication.domain.usecase.LoginUseCase
 import com.upsaclay.authentication.domain.usecase.SetUserAuthenticatedUseCase
 import com.upsaclay.authentication.presentation.viewmodels.AuthenticationViewModel
-import com.upsaclay.common.domain.entity.ServerCommunicationException
 import com.upsaclay.common.domain.entity.TooManyRequestException
 import com.upsaclay.common.domain.usecase.GetUserUseCase
 import com.upsaclay.common.domain.usecase.SetCurrentUserUseCase
@@ -15,7 +14,6 @@ import com.upsaclay.common.domain.userFixture
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
-import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -114,7 +112,7 @@ class AuthenticationViewModelTest {
         authenticationViewModel.login()
 
         // Then
-        assertEquals(AuthenticationScreenState.AUTHENTICATED_USER_NOT_FOUND, authenticationViewModel.screenState.value)
+        assertEquals(AuthenticationScreenState.AUTH_USER_NOT_FOUND, authenticationViewModel.screenState.value)
     }
 
     @Test
@@ -126,7 +124,7 @@ class AuthenticationViewModelTest {
         authenticationViewModel.login()
 
         // Then
-        assertEquals(AuthenticationScreenState.SERVER_COMMUNICATION_ERROR, authenticationViewModel.screenState.value)
+        assertEquals(AuthenticationScreenState.INTERNAL_SERVER_ERROR, authenticationViewModel.screenState.value)
     }
 
     @Test
@@ -144,13 +142,13 @@ class AuthenticationViewModelTest {
     @Test
     fun login_sets_screen_state_to_AUTHENTICATION_ERROR_when_an_authentication_exception_is_thrown_with_invalid_credentials_code() = runTest {
         // Given
-        coEvery { loginUseCase(any(), any()) } throws AuthenticationException()
+        coEvery { loginUseCase(any(), any()) } throws InvalidCredentialsException()
 
         // When
         authenticationViewModel.login()
 
         // Then
-        assertEquals(AuthenticationScreenState.AUTHENTICATION_ERROR, authenticationViewModel.screenState.value)
+        assertEquals(AuthenticationScreenState.INVALID_CREDENTIALS_ERROR, authenticationViewModel.screenState.value)
     }
 
     @Test
@@ -162,7 +160,7 @@ class AuthenticationViewModelTest {
         authenticationViewModel.login()
 
         // Then
-        assertEquals(AuthenticationScreenState.SERVER_COMMUNICATION_ERROR, authenticationViewModel.screenState.value)
+        assertEquals(AuthenticationScreenState.INTERNAL_SERVER_ERROR, authenticationViewModel.screenState.value)
     }
 
     @Test
@@ -204,13 +202,13 @@ class AuthenticationViewModelTest {
     @Test
     fun login_sets_screen_state_to_AUTHENTICATION_ERRORERROR_when_an_authentication_exception_is_thrown() = runTest {
         // Given
-        coEvery { loginUseCase(any(), any()) } throws AuthenticationException()
+        coEvery { loginUseCase(any(), any()) } throws InvalidCredentialsException()
 
         // When
         authenticationViewModel.login()
 
         // Then
-        assertEquals(AuthenticationScreenState.AUTHENTICATION_ERROR, authenticationViewModel.screenState.value)
+        assertEquals(AuthenticationScreenState.INVALID_CREDENTIALS_ERROR, authenticationViewModel.screenState.value)
     }
 
     @Test

@@ -24,7 +24,6 @@ import androidx.compose.ui.unit.dp
 import com.upsaclay.common.domain.entity.ElapsedTime
 import com.upsaclay.common.domain.usecase.FormatLocalDateTimeUseCase
 import com.upsaclay.common.domain.usecase.GetElapsedTimeUseCase
-import com.upsaclay.common.presentation.components.CircularProgressBar
 import com.upsaclay.common.presentation.components.ProfilePicture
 import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
@@ -137,7 +136,7 @@ internal fun AnnouncementItem(
         is ElapsedTime.Later -> FormatLocalDateTimeUseCase.formatDayMonthYear(elapsedTime.value)
     }
 
-    val alpha = if (announcement.state != AnnouncementState.PUBLISHED) 0.5f else 1f
+    val alpha = if (announcement.state == AnnouncementState.SENDING) 0.5f else 1f
 
     Row(
         modifier = modifier
@@ -189,20 +188,12 @@ internal fun AnnouncementItem(
             }
         }
 
-        when (announcement.state) {
-            AnnouncementState.SENDING -> {
-                CircularProgressBar(scale = 0.4f)
-            }
-
-            AnnouncementState.ERROR -> {
-                Icon(
-                    imageVector = Icons.Outlined.Info,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.error
-                )
-            }
-
-            else -> {}
+        if (announcement.state == AnnouncementState.ERROR) {
+            Icon(
+                imageVector = Icons.Outlined.Info,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.error
+            )
         }
     }
 }
@@ -228,7 +219,7 @@ private fun AnnouncementHeaderPreview() {
 private fun AnnouncementItemPreview() {
     GedoiseTheme {
         AnnouncementItem(
-            announcement = announcementFixture,
+            announcement = announcementFixture.copy(state = AnnouncementState.ERROR),
             onClick = { }
         )
     }

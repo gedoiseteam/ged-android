@@ -34,13 +34,13 @@ fun SimpleDropDownMenu(
         modifier = modifier
     ) {
         OutlinedTextField(
+            modifier = modifier.menuAnchor(),
             value = selectedItem,
             onValueChange = {},
             readOnly = true,
             enabled = isEnable,
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            modifier = modifier
-                .menuAnchor()
+            colors = fillTextFieldColor()
         )
 
         ExposedDropdownMenu(

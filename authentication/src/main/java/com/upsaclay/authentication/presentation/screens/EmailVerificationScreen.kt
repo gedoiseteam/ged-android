@@ -9,12 +9,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -22,9 +22,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -37,13 +39,13 @@ import com.upsaclay.authentication.R
 import com.upsaclay.authentication.domain.entity.AuthenticationScreenState
 import com.upsaclay.authentication.presentation.viewmodels.EmailVerificationViewModel
 import com.upsaclay.common.presentation.components.ErrorText
-import com.upsaclay.common.presentation.components.ErrorTextWithIcon
 import com.upsaclay.common.presentation.components.PrimaryButton
 import com.upsaclay.common.presentation.components.SmallTopBarBack
 import com.upsaclay.common.presentation.components.TopLinearLoadingScreen
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -54,6 +56,8 @@ fun EmailVerificationScreen(
     emailVerificationViewModel: EmailVerificationViewModel =
         koinViewModel(parameters = { parametersOf(email) })
 ) {
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
     val screenState by emailVerificationViewModel.screenState.collectAsState()
     var errorMessage by remember { mutableStateOf("") }
     val isLoading = screenState == AuthenticationScreenState.LOADING
@@ -72,12 +76,25 @@ fun EmailVerificationScreen(
         append(stringResource(id = R.string.email_verification_explanation_end))
     }
 
+    val snackbarHostState = remember { SnackbarHostState() }
+    val showSnackBar = { message: String ->
+        scope.launch {
+            snackbarHostState.showSnackbar(message = message)
+        }
+    }
+
     errorMessage = when (screenState) {
         AuthenticationScreenState.EMAIL_NOT_VERIFIED -> stringResource(id = R.string.email_not_verified)
 
-        AuthenticationScreenState.UNKNOWN_ERROR -> stringResource(id = com.upsaclay.common.R.string.unknown_error)
-
         else -> ""
+    }
+
+    LaunchedEffect(screenState) {
+        when(screenState) {
+            AuthenticationScreenState.NETWORK_ERROR -> showSnackBar(context.getString(com.upsaclay.common.R.string.unknown_network_error))
+            AuthenticationScreenState.UNKNOWN_ERROR -> showSnackBar(context.getString(com.upsaclay.common.R.string.unknown_error))
+            else -> {}
+        }
     }
 
     LaunchedEffect(Unit) {
@@ -98,6 +115,11 @@ fun EmailVerificationScreen(
                 onBackClick = { navController.popBackStack() },
                 title = stringResource(id = R.string.email_verification_title)
             )
+        },
+        snackbarHost = {
+            SnackbarHost(snackbarHostState) {
+                Snackbar(it)
+            }
         }
     ) { contentPadding ->
         if (isLoading) {
@@ -137,11 +159,6 @@ fun EmailVerificationScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small)
                     ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Info,
-                            contentDescription = "",
-                            tint = MaterialTheme.colorScheme.error
-                        )
                         ErrorText(text = errorMessage)
                     }
                 }
@@ -232,7 +249,7 @@ private fun EmailVerificationScreenPreview() {
                     )
 
                     if (isError) {
-                        ErrorTextWithIcon(text = stringResource(id = R.string.email_not_verified))
+                        ErrorText(text = stringResource(id = R.string.email_not_verified))
                     }
 
                     OutlinedButton(

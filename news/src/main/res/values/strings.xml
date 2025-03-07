@@ -37,10 +37,9 @@
     <string name="read_screen_sheet_delete_field_tag">Read screen sheet delete field tag</string>
     <string name="read_screen_delete_dialog_tag">Read screen delete dialog tag</string>
     <string name="read_screen_delete_dialog_title_tag">Read screen delete dialog title tag</string>
-    <string name="read_screen_error_snackbar_tag">Read screen error snackbar tag</string>
-    <string name="read_screen_info_snackbar_tag">Read screen info snackbar tag</string>
+    <string name="read_screen_snackbar_tag">Read screen snackbar tag</string>
 
     <string name="create_screen_post_button_tag">Create screen post button tag</string>
 
-    <string name="edit_screen_error_snackbar_tag">Edit screen error snackbar tag</string>
+    <string name="edit_screen_snackbar_tag">Edit screen snackbar tag</string>
 </resources>

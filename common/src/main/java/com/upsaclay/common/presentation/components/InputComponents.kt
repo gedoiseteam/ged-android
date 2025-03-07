@@ -6,11 +6,14 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -34,8 +37,36 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import com.upsaclay.common.presentation.theme.GedoiseTheme
+import com.upsaclay.common.presentation.theme.inputBackground
+import com.upsaclay.common.presentation.theme.inputForeground
 import com.upsaclay.common.presentation.theme.spacing
 import kotlinx.coroutines.android.awaitFrame
+
+@Composable
+fun OutlineTextField(
+    modifier: Modifier = Modifier,
+    value: String,
+    label: String,
+    onValueChange: (String) -> Unit,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    isError: Boolean = false,
+    enabled: Boolean = true,
+    readOnly: Boolean = false
+) {
+    OutlinedTextField(
+        modifier = modifier,
+        value = value,
+        label = { Text(text = label, color = MaterialTheme.colorScheme.inputForeground) },
+        onValueChange = onValueChange,
+        keyboardOptions = keyboardOptions,
+        isError = isError,
+        keyboardActions = keyboardActions,
+        singleLine = true,
+        enabled = enabled,
+        readOnly = readOnly
+    )
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,14 +77,12 @@ fun TransparentTextField(
     placeholder: @Composable (() -> Unit),
     textStyle: TextStyle = TextStyle.Default,
     backgroundColor: Color = MaterialTheme.colorScheme.background,
-    padding: Dp = MaterialTheme.spacing.default,
-    shape: Shape = TextFieldDefaults.shape
+    padding: Dp = MaterialTheme.spacing.default
 ) {
     val colors: TextFieldColors = TextFieldDefaults.colors()
 
     BasicTextField(
         modifier = modifier
-            .clip(shape)
             .background(backgroundColor)
             .padding(padding),
         value = value,
@@ -164,6 +193,20 @@ fun TransparentFocusedTextField(
  =====================================================================
  */
 
+@Preview(showBackground = true)
+@Composable
+private fun OutlinedInputsPreview() {
+    var text by remember { mutableStateOf("") }
+
+    GedoiseTheme {
+        OutlineTextField(
+            value = text,
+            label = "Label",
+            onValueChange = { text = it }
+        )
+    }
+}
+
 @Preview
 @Composable
 private fun TransparentTextFieldPreview() {
@@ -176,7 +219,6 @@ private fun TransparentTextFieldPreview() {
             placeholder = { Text("Placeholder") },
             backgroundColor = MaterialTheme.colorScheme.background,
             padding = MaterialTheme.spacing.medium,
-            shape = ShapeDefaults.ExtraLarge,
         )
     }
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="connect_with_paris_saclay_email">Connectez-vous avec vos identifiants de l\'Université Paris-Saclay</string>
+    <string name="login_with_paris_saclay_email">Connectez-vous avec vos identifiants de l\'Université Paris-Saclay</string>
     <string name="presentation_text">L\'application qui réunit toutes les actualités de la GED, faite pour les gédois par les gédois.</string>
     <string name="title_login_screen">Gedoise Application</string>
     <string name="show_password_icon_description">Icône pour montrer le mot de passe</string>
@@ -10,7 +10,7 @@
     <string name="password">Mot de passe</string>
     <string name="sign_up">S\'inscrire</string>
     <string name="not_register_yet">Pas encore inscrit ?</string>
-    <string name="error_connection">Adresse e-mail ou mot de passe incorrect</string>
+    <string name="login_error">Adresse e-mail ou mot de passe incorrect</string>
 
     <string name="registration">Inscription</string>
     <string name="partial_arrow_left_icon_description">Icône de retour à l\'écran précédent</string>
@@ -27,13 +27,11 @@
     <string name="forward_verification_email">Renvoyer l\'e-mail</string>
 
     <string name="unrecognized_account">Compte universitaire non reconnu</string>
-    <string name="error_update_profile_picture">Une erreur est survenue lors de la mise à jour de la photo de profil. Veuillez réesayer.</string>
+    <string name="error_update_profile_picture">Une erreur est survenue lors de la mise à jour de la photo de profil.</string>
     <string name="error_incorrect_email_format">Veuillez entrer une adresse e-mail valide</string>
     <string name="error_password_length">Le mot de passe doit comporter au moins 8 caractères</string>
-    <string name="server_communication_error">La communication avec le serveur a echoué. Vérifier votre connexion internet.</string>
     <string name="email_already_associated">Cette adresse e-mail est déjà associée à un compte. Veuillez vous connecter ou réinitialiser votre mot de passe.</string>
-    <string name="authenticated_user_not_found">La création de vore compte a été comprise. Veuillez contacter le support à l\'adresse suivante : application.gedoise@gmail.com</string>
-    <string name="too_many_request_error">Vous avez effectué trop de tentatives de connexion. Veuillez réessayer dans quelques minutes.</string>
+    <string name="authenticated_user_not_found">L\'utilisateur n\'a pas été trouvé. Veuillez vous re-authentifier.</string>
     <string name="user_creation_error">Une erreur est survenue lors de la création de votre compte. Veuillez réessayer.</string>
 
     <string name="authentication_screen_login_button_tag">Authentication Screen Login Button Tag</string>

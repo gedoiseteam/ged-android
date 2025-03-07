@@ -16,8 +16,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -25,12 +30,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
@@ -38,21 +45,23 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.upsaclay.authentication.R
 import com.upsaclay.authentication.domain.entity.AuthenticationScreenState
+import com.upsaclay.authentication.presentation.components.OutlinePasswordTextField
 import com.upsaclay.authentication.presentation.components.LoginButton
-import com.upsaclay.authentication.presentation.components.OutlinedEmailInput
-import com.upsaclay.authentication.presentation.components.OutlinedPasswordInput
 import com.upsaclay.authentication.presentation.viewmodels.AuthenticationViewModel
 import com.upsaclay.common.domain.entity.Screen
-import com.upsaclay.common.presentation.components.ErrorTextWithIcon
+import com.upsaclay.common.presentation.components.ErrorText
+import com.upsaclay.common.presentation.components.OutlineTextField
 import com.upsaclay.common.presentation.components.SimpleDialog
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -60,27 +69,30 @@ fun AuthenticationScreen(
     navController: NavController,
     authenticationViewModel: AuthenticationViewModel = koinViewModel()
 ) {
+    val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
     val scrollState = rememberScrollState()
+    val scope = rememberCoroutineScope()
     var showVerifyEmailDialog by remember { mutableStateOf(false) }
     val screenState by authenticationViewModel.screenState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val showSnackBar = { message: String ->
+        scope.launch {
+            snackbarHostState.showSnackbar(message = message)
+        }
+    }
 
     val (errorMessage, inputsError) = when (screenState) {
-        AuthenticationScreenState.AUTHENTICATION_ERROR -> stringResource(id = R.string.error_connection) to true
+        AuthenticationScreenState.INVALID_CREDENTIALS_ERROR -> stringResource(id = R.string.login_error) to true
 
         AuthenticationScreenState.EMPTY_FIELDS_ERROR -> stringResource(id = com.upsaclay.common.R.string.empty_fields_error) to true
 
-        AuthenticationScreenState.AUTHENTICATED_USER_NOT_FOUND -> stringResource(id = R.string.authenticated_user_not_found) to true
+        AuthenticationScreenState.AUTH_USER_NOT_FOUND -> stringResource(id = R.string.authenticated_user_not_found) to true
 
-        AuthenticationScreenState.TOO_MANY_REQUESTS_ERROR -> stringResource(id = R.string.too_many_request_error) to false
+        AuthenticationScreenState.TOO_MANY_REQUESTS_ERROR -> stringResource(id = com.upsaclay.common.R.string.too_many_request_error) to false
 
         AuthenticationScreenState.EMAIL_FORMAT_ERROR -> stringResource(id = R.string.error_incorrect_email_format) to true
-
-        AuthenticationScreenState.SERVER_COMMUNICATION_ERROR, AuthenticationScreenState.NETWORK_ERROR ->
-            stringResource(id = R.string.server_communication_error) to false
-
-        AuthenticationScreenState.UNKNOWN_ERROR -> stringResource(id = com.upsaclay.common.R.string.unknown_error) to false
 
         else -> "" to false
     }
@@ -90,7 +102,22 @@ fun AuthenticationScreen(
     }
 
     LaunchedEffect(screenState) {
-        when (screenState) {
+        when(screenState) {
+            AuthenticationScreenState.INTERNAL_SERVER_ERROR -> {
+                showSnackBar(context.getString(com.upsaclay.common.R.string.internal_server_error))
+                authenticationViewModel.resetScreenState()
+            }
+
+            AuthenticationScreenState.NETWORK_ERROR-> {
+                showSnackBar(context.getString(com.upsaclay.common.R.string.unknown_network_error))
+                authenticationViewModel.resetScreenState()
+            }
+
+            AuthenticationScreenState.UNKNOWN_ERROR -> {
+                showSnackBar(context.getString(com.upsaclay.common.R.string.unknown_error))
+                authenticationViewModel.resetScreenState()
+            }
+
             AuthenticationScreenState.EMAIL_NOT_VERIFIED -> showVerifyEmailDialog = true
 
             else -> {}
@@ -119,66 +146,75 @@ fun AuthenticationScreen(
         )
     }
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.aligned { size, space ->
-            size + (30 * space / 100)
-        },
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .verticalScroll(scrollState)
-            .padding(MaterialTheme.spacing.medium)
-            .pointerInput(Unit) {
-                detectTapGestures(onTap = {
-                    focusManager.clearFocus()
-                })
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(snackbarHostState) {
+                Snackbar(it)
             }
-    ) {
-        TitleSection()
+        }
+    ) { innerPadding ->
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.aligned { size, space ->
+                size + (20 * space / 100)
+            },
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .verticalScroll(scrollState)
+                .padding(innerPadding)
+                .padding(horizontal = MaterialTheme.spacing.medium)
+                .pointerInput(Unit) {
+                    detectTapGestures(onTap = {
+                        focusManager.clearFocus()
+                    })
+                }
+        ) {
+            TitleSection()
 
-        Spacer(modifier = Modifier.height(MaterialTheme.spacing.extraLarge))
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.extraLarge))
 
-        Column {
-            InputsSection(
-                email = authenticationViewModel.email,
-                onEmailChange = { authenticationViewModel.updateEmail(it) },
-                password = authenticationViewModel.password,
-                onPasswordChange = { authenticationViewModel.updatePassword(it) },
-                keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
-                errorMessage = errorMessage,
-                isError = inputsError,
-            )
+            Column {
+                InputsSection(
+                    email = authenticationViewModel.email,
+                    onEmailChange = { authenticationViewModel.updateEmail(it) },
+                    password = authenticationViewModel.password,
+                    onPasswordChange = { authenticationViewModel.updatePassword(it) },
+                    keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
+                    errorMessage = errorMessage,
+                    isError = inputsError
+                )
 
-            Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))
+                Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))
 
-            LoginButton(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag(stringResource(id = R.string.authentication_screen_login_button_tag)),
-                text = stringResource(id = R.string.login),
-                isLoading = screenState == AuthenticationScreenState.LOADING,
-                onClick = {
-                    keyboardController?.hide()
-                    if (authenticationViewModel.verifyInputs()) {
-                        authenticationViewModel.login()
+                LoginButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag(stringResource(id = R.string.authentication_screen_login_button_tag)),
+                    text = stringResource(id = R.string.login),
+                    isLoading = screenState == AuthenticationScreenState.LOADING,
+                    onClick = {
+                        keyboardController?.hide()
+                        if (authenticationViewModel.verifyInputs()) {
+                            authenticationViewModel.login()
+                        }
                     }
-                }
-            )
+                )
 
-            Spacer(modifier = Modifier.height(MaterialTheme.spacing.smallMedium))
+                Spacer(modifier = Modifier.height(MaterialTheme.spacing.smallMedium))
 
-            RegistrationText(
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                onRegistrationClick = {
-                    authenticationViewModel.resetEmail()
-                    authenticationViewModel.resetPassword()
-                    authenticationViewModel.resetScreenState()
-                    keyboardController?.hide()
-                    focusManager.clearFocus()
-                    navController.navigate(Screen.FIRST_REGISTRATION.route)
-                }
-            )
+                RegistrationText(
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    onRegistrationClick = {
+                        authenticationViewModel.resetEmail()
+                        authenticationViewModel.resetPassword()
+                        authenticationViewModel.resetScreenState()
+                        keyboardController?.hide()
+                        focusManager.clearFocus()
+                        navController.navigate(Screen.FIRST_REGISTRATION.route)
+                    }
+                )
+            }
         }
     }
 }
@@ -257,17 +293,18 @@ private fun InputsSection(
     isError: Boolean
 ) {
     Column {
-        OutlinedEmailInput(
+        OutlineTextField(
             modifier = Modifier.fillMaxWidth(),
-            text = email,
+            value = email,
             onValueChange = onEmailChange,
             keyboardActions = keyboardActions,
-            isError = isError
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            isError = isError,
+            label = stringResource(com.upsaclay.common.R.string.email)
         )
 
-        Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
-
-        OutlinedPasswordInput(
+        Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
+        OutlinePasswordTextField(
             modifier = Modifier.fillMaxWidth(),
             text = password,
             onValueChange = onPasswordChange,
@@ -278,7 +315,7 @@ private fun InputsSection(
         if (errorMessage.isNotEmpty()) {
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
 
-            ErrorTextWithIcon(text = errorMessage)
+            ErrorText(text = errorMessage)
         }
     }
 }

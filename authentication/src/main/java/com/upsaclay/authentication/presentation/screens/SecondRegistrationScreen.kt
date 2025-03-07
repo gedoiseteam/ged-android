@@ -32,8 +32,6 @@ import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
 import org.koin.androidx.compose.koinViewModel
 
-private const val CURRENT_STEP = 2
-
 @Composable
 fun SecondRegistrationScreen(
     navController: NavController,
@@ -46,10 +44,7 @@ fun SecondRegistrationScreen(
         registrationViewModel.resetScreenState()
     }
 
-    RegistrationTopBar(
-        navController = navController,
-        currentStep = CURRENT_STEP
-    ) {
+    RegistrationTopBar(navController = navController) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -105,12 +100,9 @@ private fun SecondRegistrationScreenPreview() {
     var expanded by remember { mutableStateOf(false) }
 
     GedoiseTheme {
-        RegistrationTopBar(
-            navController = rememberNavController(),
-            currentStep = CURRENT_STEP
-        ) {
+        RegistrationTopBar(navController = rememberNavController()) {
             Column(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize()
             ) {
                 Text(
                     text = stringResource(id = R.string.select_level_school),

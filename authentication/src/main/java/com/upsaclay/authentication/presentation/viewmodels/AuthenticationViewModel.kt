@@ -7,7 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.upsaclay.authentication.domain.entity.AuthenticationScreenState
-import com.upsaclay.authentication.domain.entity.exception.AuthenticationException
+import com.upsaclay.authentication.domain.entity.exception.InvalidCredentialsException
 import com.upsaclay.authentication.domain.usecase.IsEmailVerifiedUseCase
 import com.upsaclay.authentication.domain.usecase.LoginUseCase
 import com.upsaclay.authentication.domain.usecase.SetUserAuthenticatedUseCase
@@ -58,21 +58,21 @@ class AuthenticationViewModel(
                         _screenState.value = AuthenticationScreenState.EMAIL_NOT_VERIFIED
                     }
                 } ?: run {
-                    _screenState.value = AuthenticationScreenState.AUTHENTICATED_USER_NOT_FOUND
+                    _screenState.value = AuthenticationScreenState.AUTH_USER_NOT_FOUND
                     resetPassword()
                 }
             } catch (e: Exception) {
                 _screenState.value = when (e) {
                     is TooManyRequestException -> AuthenticationScreenState.TOO_MANY_REQUESTS_ERROR
 
-                    is AuthenticationException -> {
+                    is InvalidCredentialsException -> {
                         resetPassword()
-                        AuthenticationScreenState.AUTHENTICATION_ERROR
+                        AuthenticationScreenState.INVALID_CREDENTIALS_ERROR
                     }
 
                     is IOException -> {
                         resetPassword()
-                        AuthenticationScreenState.SERVER_COMMUNICATION_ERROR
+                        AuthenticationScreenState.INTERNAL_SERVER_ERROR
                     }
 
                     is NetworkErrorException -> {

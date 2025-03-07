@@ -67,7 +67,7 @@ class AccountScreenUITest {
         }
 
         // Then
-        rule.onNodeWithTag(rule.activity.getString(R.string.account_screen_error_snackbar_tag)).assertExists()
+        rule.onNodeWithTag(rule.activity.getString(R.string.account_screen_snackbar_tag)).assertExists()
     }
 
     @Test

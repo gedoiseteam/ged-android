@@ -26,7 +26,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -50,6 +49,8 @@ import com.upsaclay.common.domain.usecase.FormatLocalDateTimeUseCase
 import com.upsaclay.common.presentation.components.ProfilePicture
 import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
+import com.upsaclay.common.presentation.theme.inputBackground
+import com.upsaclay.common.presentation.theme.inputForeground
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.message.R
 import com.upsaclay.message.domain.entity.Message
@@ -104,7 +105,6 @@ fun ReceiveMessageItem(
     message: Message,
     displayProfilePicture: Boolean
 ) {
-    val background = if (isSystemInDarkTheme()) GedoiseColor.InputBackgroundDark else GedoiseColor.InputBackgroundLight
     val foreground = if (isSystemInDarkTheme()) GedoiseColor.White else GedoiseColor.Black
 
     Row(
@@ -122,7 +122,7 @@ fun ReceiveMessageItem(
         MessageText(
             text = message.content,
             date = message.date,
-            backgroundColor = background,
+            backgroundColor = MaterialTheme.colorScheme.inputBackground,
             textColor = foreground,
             dateTimeTextColor = Color(0xFF8E8E93)
         )
@@ -176,15 +176,12 @@ fun MessageInput(
     onSendClick: () -> Unit
 ) {
     val interactionSource = remember { MutableInteractionSource() }
-    val colors: TextFieldColors = TextFieldDefaults.colors()
-    val backgroundColor = if(isSystemInDarkTheme()) GedoiseColor.InputBackgroundDark else GedoiseColor.InputBackgroundLight
-    val placeholderColor = if(isSystemInDarkTheme()) GedoiseColor.InputForegroundDark else GedoiseColor.InputForegroundLight
     val textColor = if (isSystemInDarkTheme()) GedoiseColor.White else GedoiseColor.Black
 
     Row(
         modifier = modifier
             .clip(ShapeDefaults.ExtraLarge)
-            .background(backgroundColor)
+            .background(MaterialTheme.colorScheme.inputBackground)
             .padding(end = MaterialTheme.spacing.small),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -195,7 +192,7 @@ fun MessageInput(
             value = value,
             onValueChange = onValueChange,
             keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
-            cursorBrush = SolidColor(colors.cursorColor),
+            cursorBrush = SolidColor(textColor),
             textStyle = TextStyle(color = textColor)
         ) { innerTextField ->
             TextFieldDefaults.DecorationBox(
@@ -205,16 +202,17 @@ fun MessageInput(
                     Text(
                         text = stringResource(id = R.string.message_placeholder),
                         style = TextStyle(platformStyle = PlatformTextStyle(false)),
-                        color = placeholderColor
+                        color = MaterialTheme.colorScheme.inputForeground
                     )
                 },
                 enabled = true,
                 singleLine = false,
                 colors = TextFieldDefaults.colors(
-                    focusedContainerColor = backgroundColor,
-                    unfocusedContainerColor = backgroundColor,
+                    focusedContainerColor = MaterialTheme.colorScheme.inputBackground,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.inputBackground,
                     focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
+                    unfocusedIndicatorColor = Color.Transparent,
+                    cursorColor = textColor
                 ),
                 visualTransformation = VisualTransformation.None,
                 interactionSource = interactionSource,
