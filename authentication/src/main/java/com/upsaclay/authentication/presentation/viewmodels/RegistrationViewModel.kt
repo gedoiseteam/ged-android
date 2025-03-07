@@ -1,12 +1,13 @@
 package com.upsaclay.authentication.presentation.viewmodels
 
+import android.accounts.NetworkErrorException
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.upsaclay.authentication.domain.entity.RegistrationScreenState
-import com.upsaclay.authentication.domain.entity.exception.AuthenticationException
+import com.upsaclay.authentication.domain.entity.exception.InvalidCredentialsException
 import com.upsaclay.authentication.domain.usecase.RegisterUseCase
 import com.upsaclay.common.domain.entity.ServerCommunicationException
 import com.upsaclay.common.domain.entity.User
@@ -19,8 +20,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.io.IOException
+import java.net.ConnectException
 
-const val MAX_REGISTRATION_STEP = 3
 private const val MIN_PASSWORD_LENGTH = 8
 
 class RegistrationViewModel(
@@ -121,7 +122,9 @@ class RegistrationViewModel(
                 _screenState.value = RegistrationScreenState.REGISTERED
             } catch (e: Exception) {
                 _screenState.value = when(e) {
-                    is AuthenticationException -> RegistrationScreenState.USER_ALREADY_EXISTS
+                    is InvalidCredentialsException -> RegistrationScreenState.USER_ALREADY_EXISTS
+
+                    is NetworkErrorException, is ConnectException -> RegistrationScreenState.NETWORK_ERROR
 
                     is ServerCommunicationException -> RegistrationScreenState.SERVER_COMMUNICATION_ERROR
 

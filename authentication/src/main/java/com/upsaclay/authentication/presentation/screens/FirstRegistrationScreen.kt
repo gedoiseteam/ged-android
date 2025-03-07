@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -32,13 +31,12 @@ import com.upsaclay.authentication.domain.entity.RegistrationScreenState
 import com.upsaclay.authentication.presentation.components.RegistrationTopBar
 import com.upsaclay.authentication.presentation.viewmodels.RegistrationViewModel
 import com.upsaclay.common.domain.entity.Screen
-import com.upsaclay.common.presentation.components.ErrorTextWithIcon
+import com.upsaclay.common.presentation.components.ErrorText
+import com.upsaclay.common.presentation.components.OutlineTextField
 import com.upsaclay.common.presentation.components.PrimaryButton
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
 import org.koin.androidx.compose.koinViewModel
-
-private const val CURRENT_STEP = 1
 
 @Composable
 fun FirstRegistrationScreen(
@@ -53,10 +51,9 @@ fun FirstRegistrationScreen(
 
     RegistrationTopBar(
         navController = navController,
-        currentStep = CURRENT_STEP,
         onBackClick = {
-            focusManager.clearFocus()
             keyboardController?.hide()
+            focusManager.clearFocus()
             navController.popBackStack()
         }
     ) {
@@ -73,28 +70,28 @@ fun FirstRegistrationScreen(
                 style = MaterialTheme.typography.titleMedium
             )
 
-            OutlinedTextField(
+            OutlineTextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = registrationViewModel.firstName,
-                isError = emptyFields,
-                enabled = !isLoading,
+                label = stringResource(com.upsaclay.common.R.string.first_name),
+                onValueChange = registrationViewModel::updateFirstName,
                 keyboardOptions = KeyboardOptions(KeyboardCapitalization.Sentences),
-                placeholder = { Text(text = stringResource(id = com.upsaclay.common.R.string.first_name)) },
-                onValueChange = { registrationViewModel.updateFirstName(it) },
+                isError = emptyFields,
+                enabled = !isLoading
             )
 
-            OutlinedTextField(
+            OutlineTextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = registrationViewModel.lastName,
-                isError = emptyFields,
-                enabled = !isLoading,
-                placeholder = { Text(text = stringResource(id = com.upsaclay.common.R.string.last_name)) },
+                label = stringResource(com.upsaclay.common.R.string.last_name),
+                onValueChange = registrationViewModel::updateLastName,
                 keyboardOptions = KeyboardOptions(KeyboardCapitalization.Sentences),
-                onValueChange = { registrationViewModel.updateLastName(it) },
+                isError = emptyFields,
+                enabled = !isLoading
             )
 
             if (emptyFields) {
-                ErrorTextWithIcon(
+                ErrorText(
                     modifier = Modifier.align(Alignment.Start),
                     text = stringResource(id = com.upsaclay.common.R.string.empty_fields_error)
                 )
@@ -134,10 +131,7 @@ private fun FirstRegistrationScreenPreview() {
     val focusManager = LocalFocusManager.current
 
     GedoiseTheme {
-        RegistrationTopBar(
-            navController = rememberNavController(),
-            currentStep = 1
-        ) {
+        RegistrationTopBar(navController = rememberNavController()) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -153,24 +147,26 @@ private fun FirstRegistrationScreenPreview() {
                     style = MaterialTheme.typography.titleMedium
                 )
 
-                OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    placeholder = { Text(text = stringResource(id = com.upsaclay.common.R.string.last_name)) },
-                    value = lastName,
-                    isError = isError,
-                    onValueChange = { lastName = it }
-                )
-
-                OutlinedTextField(
+                OutlineTextField(
                     modifier = Modifier.fillMaxWidth(),
                     value = firstName,
-                    isError = isError,
-                    placeholder = { Text(text = stringResource(id = com.upsaclay.common.R.string.first_name)) },
-                    onValueChange = { firstName = it }
+                    label = stringResource(com.upsaclay.common.R.string.first_name),
+                    onValueChange = { firstName = it },
+                    keyboardOptions = KeyboardOptions(KeyboardCapitalization.Sentences),
+                    isError = isError
+                )
+
+                OutlineTextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = lastName,
+                    label = stringResource(com.upsaclay.common.R.string.last_name),
+                    onValueChange = { lastName = it },
+                    keyboardOptions = KeyboardOptions(KeyboardCapitalization.Sentences),
+                    isError = isError
                 )
 
                 if (isError) {
-                    ErrorTextWithIcon(text = stringResource(id = com.upsaclay.common.R.string.empty_fields_error))
+                    ErrorText(text = stringResource(id = com.upsaclay.common.R.string.empty_fields_error))
                 }
             }
 

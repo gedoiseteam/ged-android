@@ -20,6 +20,9 @@ internal class AuthenticationRepositoryImpl(
 
     init {
         scope.launch {
+            if (!firebaseAuthenticationRepository.isAuthenticated()) {
+                setAuthenticated(false)
+            }
             authenticationLocalDataSource.getAuthenticationState().collect {
                 _isAuthenticated.value = it
             }

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -29,8 +30,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
-import com.upsaclay.common.domain.entity.SnackbarType
-import com.upsaclay.common.presentation.components.ErrorSnackBar
 import com.upsaclay.common.presentation.components.LinearProgressBar
 import com.upsaclay.common.presentation.components.SmallTopBarAction
 import com.upsaclay.common.presentation.components.TransparentFocusedTextField
@@ -63,9 +62,7 @@ fun EditAnnouncementScreen(
     val announcement by editAnnouncementViewModel.announcement.collectAsState()
 
     val snackbarHostState = remember { SnackbarHostState() }
-    var snackBarType by remember { mutableStateOf(SnackbarType.INFO) }
-    val showSnackBar = { type: SnackbarType, message: String ->
-        snackBarType = type
+    val showSnackBar = { message: String ->
         scope.launch {
             snackbarHostState.showSnackbar(message = message)
         }
@@ -90,13 +87,13 @@ fun EditAnnouncementScreen(
 
             AnnouncementScreenState.CONNECTION_ERROR -> {
                 isLoading = false
-                showSnackBar(SnackbarType.ERROR, context.getString(com.upsaclay.common.R.string.server_connection_error))
+                showSnackBar(context.getString(com.upsaclay.common.R.string.unknown_network_error))
                 resetScreenState()
             }
 
             AnnouncementScreenState.ERROR -> {
                 isLoading = false
-                showSnackBar(SnackbarType.ERROR, context.getString(R.string.announcement_update_error))
+                showSnackBar(context.getString(R.string.announcement_update_error))
                 resetScreenState()
             }
 
@@ -125,7 +122,7 @@ fun EditAnnouncementScreen(
                             )
                         )
                     } ?: run {
-                        showSnackBar(SnackbarType.ERROR, context.getString(R.string.announcement_update_error))
+                        showSnackBar(context.getString(R.string.announcement_update_error))
                         navController.popBackStack()
                     }
                 },
@@ -135,12 +132,10 @@ fun EditAnnouncementScreen(
         },
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState) {
-                if (snackBarType == SnackbarType.ERROR) {
-                    ErrorSnackBar(
-                        modifier = Modifier.testTag(stringResource(R.string.edit_screen_error_snackbar_tag)),
-                        message = it.visuals.message
-                    )
-                }
+                Snackbar(
+                    modifier = Modifier.testTag(stringResource(R.string.edit_screen_snackbar_tag)),
+                    snackbarData = it
+                )
             }
         }
     ) { contentPadding ->

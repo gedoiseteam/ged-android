@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -14,12 +15,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
@@ -29,29 +32,36 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.upsaclay.authentication.R
 import com.upsaclay.authentication.domain.entity.RegistrationScreenState
-import com.upsaclay.authentication.presentation.components.OutlinedEmailInput
-import com.upsaclay.authentication.presentation.components.OutlinedPasswordInput
+import com.upsaclay.authentication.presentation.components.OutlinePasswordTextField
 import com.upsaclay.authentication.presentation.components.RegistrationTopBar
 import com.upsaclay.authentication.presentation.viewmodels.RegistrationViewModel
 import com.upsaclay.common.domain.entity.Screen
-import com.upsaclay.common.presentation.components.ErrorTextWithIcon
+import com.upsaclay.common.presentation.components.ErrorText
+import com.upsaclay.common.presentation.components.OutlineTextField
 import com.upsaclay.common.presentation.components.PrimaryButton
 import com.upsaclay.common.presentation.components.TopLinearLoadingScreen
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
-
-private const val CURRENT_STEP = 3
 
 @Composable
 fun ThirdRegistrationScreen(
     navController: NavController,
     registrationViewModel: RegistrationViewModel = koinViewModel()
 ) {
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
     val registrationState by registrationViewModel.screenState.collectAsState()
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
     val isLoading = registrationState == RegistrationScreenState.LOADING
+    val snackbarHostState = remember { SnackbarHostState() }
+    val showSnackBar = { message: String ->
+        scope.launch {
+            snackbarHostState.showSnackbar(message = message)
+        }
+    }
 
     val (errorMessage, inputsError) = when (registrationState) {
         RegistrationScreenState.UNRECOGNIZED_ACCOUNT -> stringResource(id = R.string.unrecognized_account) to true
@@ -61,7 +71,6 @@ fun ThirdRegistrationScreen(
         RegistrationScreenState.USER_ALREADY_EXISTS -> stringResource(id = R.string.email_already_associated) to true
         RegistrationScreenState.USER_CREATION_ERROR -> stringResource(id = R.string.user_creation_error) to false
         RegistrationScreenState.UNKNOWN_ERROR -> stringResource(id = com.upsaclay.common.R.string.unknown_error) to false
-        RegistrationScreenState.SERVER_COMMUNICATION_ERROR -> stringResource(id = com.upsaclay.common.R.string.server_communication_error) to false
         else -> null to false
     }
 
@@ -70,6 +79,16 @@ fun ThirdRegistrationScreen(
             RegistrationScreenState.REGISTERED -> {
                 registrationViewModel.resetScreenState()
                 navController.navigate(Screen.EMAIL_VERIFICATION.route + "?email=${registrationViewModel.email}")
+            }
+
+            RegistrationScreenState.NETWORK_ERROR -> {
+                showSnackBar(context.getString(com.upsaclay.common.R.string.unknown_network_error))
+                registrationViewModel.resetScreenState()
+            }
+
+            RegistrationScreenState.SERVER_COMMUNICATION_ERROR -> {
+                showSnackBar(context.getString(com.upsaclay.common.R.string.internal_server_error))
+                registrationViewModel.resetScreenState()
             }
 
             else -> {}
@@ -82,12 +101,12 @@ fun ThirdRegistrationScreen(
 
     RegistrationTopBar(
         navController = navController,
-        currentStep = CURRENT_STEP,
         onBackClick = {
-            focusManager.clearFocus()
             keyboardController?.hide()
+            focusManager.clearFocus()
             navController.popBackStack()
-        }
+        },
+        snackbarHostState = snackbarHostState
     ) {
         Column(
             modifier = Modifier
@@ -103,19 +122,20 @@ fun ThirdRegistrationScreen(
 
             Spacer(Modifier.height(MaterialTheme.spacing.medium))
 
-            OutlinedEmailInput(
+            OutlineTextField(
                 modifier = Modifier
                     .fillMaxWidth()
                     .testTag(stringResource(R.string.registration_screen_email_input_tag)),
-                text = registrationViewModel.email,
+                value = registrationViewModel.email,
                 isError = inputsError,
-                isEnable = !isLoading,
-                onValueChange = { registrationViewModel.updateEmail(it) }
+                enabled = !isLoading,
+                onValueChange = { registrationViewModel.updateEmail(it) },
+                label = stringResource(com.upsaclay.common.R.string.email)
             )
 
             Spacer(Modifier.height(MaterialTheme.spacing.medium))
 
-            OutlinedPasswordInput(
+            OutlinePasswordTextField(
                 modifier = Modifier
                     .fillMaxWidth()
                     .testTag(stringResource(R.string.registration_screen_password_input_tag)),
@@ -128,7 +148,7 @@ fun ThirdRegistrationScreen(
             errorMessage?.let {
                 Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
 
-                ErrorTextWithIcon(
+                ErrorText(
                     modifier = Modifier.align(Alignment.Start),
                     text = errorMessage
                 )
@@ -172,10 +192,7 @@ private fun ThirdRegistrationScreenPreview() {
             TopLinearLoadingScreen()
         }
 
-        RegistrationTopBar(
-            navController = rememberNavController(),
-            currentStep = CURRENT_STEP
-        ) {
+        RegistrationTopBar(navController = rememberNavController()) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -192,19 +209,20 @@ private fun ThirdRegistrationScreenPreview() {
 
                 Spacer(Modifier.height(MaterialTheme.spacing.medium))
 
-                OutlinedEmailInput(
+                OutlineTextField(
                     modifier = Modifier
                         .fillMaxWidth()
                         .focusRequester(focusRequester),
-                    text = mail,
-                    isEnable = !isLoading,
+                    value = mail,
+                    enabled = !isLoading,
                     isError = isError,
-                    onValueChange = { mail = it }
+                    onValueChange = { mail = it },
+                    label = stringResource(com.upsaclay.common.R.string.email)
                 )
 
                 Spacer(Modifier.height(MaterialTheme.spacing.medium))
 
-                OutlinedPasswordInput(
+                OutlinePasswordTextField(
                     modifier = Modifier
                         .fillMaxWidth()
                         .focusRequester(focusRequester),

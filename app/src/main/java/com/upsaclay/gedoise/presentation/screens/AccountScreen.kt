@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -36,16 +37,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.upsaclay.common.domain.entity.SnackbarType
 import com.upsaclay.common.domain.userFixture
-import com.upsaclay.common.presentation.components.ErrorSnackBar
 import com.upsaclay.common.presentation.components.LoadingDialog
 import com.upsaclay.common.presentation.components.ProfilePicture
 import com.upsaclay.common.presentation.components.ProfilePictureWithIcon
 import com.upsaclay.common.presentation.components.SensibleActionDialog
 import com.upsaclay.common.presentation.components.SmallTopBarAction
 import com.upsaclay.common.presentation.components.SmallTopBarBack
-import com.upsaclay.common.presentation.components.SuccessSnackBar
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.gedoise.R
@@ -75,7 +73,6 @@ fun AccountScreen(
     var showLoadingDialog by remember { mutableStateOf(false) }
 
     val snackbarHostState = remember { SnackbarHostState() }
-    var snackBarType by remember { mutableStateOf(SnackbarType.INFO) }
 
     val hideBottomSheet: () -> Unit = {
         scope.launch { sheetState.hide() }.invokeOnCompletion {
@@ -85,8 +82,7 @@ fun AccountScreen(
         }
     }
 
-    val showSnackBar = { type: SnackbarType, message: String ->
-        snackBarType = type
+    val showSnackBar = { message: String ->
         scope.launch {
             snackbarHostState.showSnackbar(message = message)
         }
@@ -109,19 +105,19 @@ fun AccountScreen(
     when (screenState) {
         AccountScreenState.PROFILE_PICTURE_UPDATED -> {
             showLoadingDialog = false
-            showSnackBar(SnackbarType.SUCCESS, context.getString(R.string.profile_picture_updated))
+            showSnackBar(context.getString(R.string.profile_picture_updated))
             resetScreenState()
         }
 
         AccountScreenState.PROFILE_PICTURE_DELETED -> {
             showLoadingDialog = false
-            showSnackBar(SnackbarType.SUCCESS, context.getString(R.string.profile_picture_updated))
+            showSnackBar(context.getString(R.string.profile_picture_updated))
             resetScreenState()
         }
 
         AccountScreenState.PROFILE_PICTURE_UPDATE_ERROR -> {
             showLoadingDialog = false
-            showSnackBar(SnackbarType.ERROR, context.getString(R.string.error_updating_profile_picture))
+            showSnackBar(context.getString(R.string.error_updating_profile_picture))
             resetScreenState()
         }
 
@@ -181,21 +177,10 @@ fun AccountScreen(
         },
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState) {
-                when (snackBarType) {
-                    SnackbarType.SUCCESS ->
-                        SuccessSnackBar(
-                            modifier = Modifier.testTag(stringResource(id = R.string.account_screen_success_snackbar_tag)),
-                            message = it.visuals.message
-                        )
-
-                    SnackbarType.ERROR ->
-                        ErrorSnackBar(
-                            modifier = Modifier.testTag(stringResource(id = R.string.account_screen_error_snackbar_tag)),
-                            message = it.visuals.message
-                        )
-
-                    else -> {}
-                }
+                Snackbar(
+                    snackbarData = it,
+                    modifier = Modifier.testTag(stringResource(id = R.string.account_screen_snackbar_tag))
+                )
             }
         }
     ) {

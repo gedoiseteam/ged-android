@@ -15,28 +15,17 @@
     <string name="modify">Modifier</string>
     <string name="publish">Publier</string>
     <string name="discard">Abandonner</string>
-
     <string name="deletion">Supression...</string>
     <string name="loading">Chargement...</string>
-
     <string name="arrow_back_icon_description">Retour en arrière</string>
     <string name="ged_logo_description">Logo de l\'université de La Grande École du Droit</string>
     <string name="profile_picture_description">Photo de profil de l\'utilisateur</string>
-    <string name="empty_fields_error">Veuillez remplir tous les champs</string>
-    <string name="empty_field_error">Veuillez remplir le champ</string>
-    <string name="unknown_error">Une erreur inconnue est survenue</string>
-    <string name="server_communication_error">La communication avec le serveur a echoué. Veuillez réessayer dans quelques minutes.</string>
-    <string name="server_connection_error">Erreur de connexion </string>
-    <string name="occurred_error">Une erreur est survenue</string>
     <string name="icon_add_descrption">Icône d\'ajout</string>
-
     <string name="school_level">Niveau d\'étude</string>
     <string name="first_name">Prénom</string>
     <string name="last_name">Nom</string>
     <string name="email">Adresse e-mail</string>
-
     <string name="discard_modification_dialog_text">Abandonner les modifications ?</string>
-
     <string name="now">Maintenant</string>
     <string name="second_ago_short">%d sec</string>
     <string name="minute_ago_short">%d min</string>
@@ -48,6 +37,12 @@
     <string name="hour_ago_medium">%d heures</string>
     <string name="day_ago_medium">%d jours</string>
     <string name="week_ago_medium">%d semaines</string>
-
+    <string name="empty_fields_error">Veuillez remplir tous les champs</string>
+    <string name="empty_field_error">Veuillez remplir le champ</string>
+    <string name="unknown_error">Une erreur inconnue est survenue</string>
+    <string name="internal_server_error">Une erreur interne au serveur est survenue</string>
+    <string name="unknown_network_error">Une erreur réseau est survenue.</string>
+    <string name="occurred_error">Une erreur est survenue</string>
+    <string name="too_many_request_error">Vous avez effectué trop de requêtes. Veuillez réessayer dans quelques minutes.</string>
     <string name="no_user_found">Aucun utilisateur trouvé</string>
 </resources>

@@ -11,6 +11,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -23,7 +26,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.upsaclay.authentication.R
-import com.upsaclay.authentication.presentation.viewmodels.MAX_REGISTRATION_STEP
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
 
@@ -31,8 +33,8 @@ import com.upsaclay.common.presentation.theme.spacing
 @Composable
 internal fun RegistrationTopBar(
     navController: NavController,
-    currentStep: Int,
     onBackClick: () -> Unit = { navController.popBackStack() },
+    snackbarHostState: SnackbarHostState? = null,
     content: @Composable BoxScope.() -> Unit
 ) {
     Scaffold(
@@ -55,16 +57,17 @@ internal fun RegistrationTopBar(
                         )
                     }
                 },
-                actions = {
-                    Text(
-                        modifier = Modifier.padding(end = MaterialTheme.spacing.medium),
-                        text = stringResource(id = R.string.step, currentStep, MAX_REGISTRATION_STEP)
-                    )
-                },
                 colors = TopAppBarDefaults.topAppBarColors(
                    containerColor = MaterialTheme.colorScheme.background
                 )
             )
+        },
+        snackbarHost = {
+            snackbarHostState?.let {
+                SnackbarHost(it) {
+                    Snackbar(it)
+                }
+            }
         }
     ) {
         Box(
@@ -92,11 +95,6 @@ internal fun RegistrationTopBar(
 @Composable
 internal fun RegistrationTopBarPreview() {
     GedoiseTheme {
-        RegistrationTopBar(
-            navController = rememberNavController(),
-            currentStep = 1
-        ) {
-
-        }
+        RegistrationTopBar(navController = rememberNavController()) {}
     }
 }

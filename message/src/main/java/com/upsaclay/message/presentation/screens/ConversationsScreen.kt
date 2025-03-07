@@ -47,7 +47,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import com.upsaclay.common.domain.entity.Screen
-import com.upsaclay.common.domain.entity.SnackbarType
 import com.upsaclay.common.presentation.components.ClickableItem
 import com.upsaclay.common.presentation.components.LoadingDialog
 import com.upsaclay.common.presentation.components.SensibleActionDialog
@@ -69,7 +68,6 @@ import org.koin.androidx.compose.koinViewModel
 fun ConversationScreen(
     navController: NavController,
     snackbarHostState: SnackbarHostState,
-    updateSnackbarType: (SnackbarType) -> Unit,
     conversationViewModel: ConversationViewModel = koinViewModel()
 ) {
     val conversations by conversationViewModel.conversations.collectAsState(emptyList())
@@ -93,8 +91,7 @@ fun ConversationScreen(
         }
     }
 
-    val showSnackBar = { type: SnackbarType, message: String ->
-        updateSnackbarType(type)
+    val showSnackBar = { message: String ->
         scope.launch {
             snackbarHostState.showSnackbar(message = message)
         }
@@ -104,11 +101,11 @@ fun ConversationScreen(
         when (screenState) {
             ConversationScreenState.ERROR -> {
                 showLoadingDialog = false
-                showSnackBar(SnackbarType.ERROR, context.getString(com.upsaclay.common.R.string.occurred_error))
+                showSnackBar(context.getString(com.upsaclay.common.R.string.occurred_error))
             }
 
             ConversationScreenState.SUCCESS -> {
-                showSnackBar(SnackbarType.SUCCESS, context.getString(R.string.conversation_deleted))
+                showSnackBar(context.getString(R.string.conversation_deleted))
             }
 
             else -> {}

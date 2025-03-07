@@ -1,5 +1,8 @@
 package com.upsaclay.common.presentation.theme
 
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.ColorScheme
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
 internal val white = Color(0xFFE3E3E3)
@@ -35,6 +38,18 @@ internal val onBackgroundDark = white
 internal val outlineDark = Color(0xFF8F9299)
 internal val outlineVariantDark = Color(0xFFC4C8D0)
 
+val ColorScheme.inputBackground: Color
+    @Composable
+    get() = if(isSystemInDarkTheme()) Color(0xFF323232) else Color(0xFFEEEEEE)
+
+val ColorScheme.inputForeground: Color
+    @Composable
+    get() = if(isSystemInDarkTheme()) Color(0xFF929298) else Color(0xFF646464)
+
+val ColorScheme.previewText: Color
+    @Composable
+    get() = if(isSystemInDarkTheme()) Color(0xFFA1A4B0) else Color(0xFF6F7181)
+
 object GedoiseColor {
     val LittleTransparentWhite = Color(0x66FFFFFF)
     val PrimaryVariant = Color(0xFFDBE0E9)
@@ -43,10 +58,6 @@ object GedoiseColor {
     val PreviewTextDark = Color(0xFFA1A4B0)
     val ProfilePictureErrorLight = Color(0xFFEBEDEE)
     val OnlineColor = Color(0xFF4ACB1B)
-    val InputBackgroundLight = Color(0xFFEEEEEE)
-    val InputBackgroundDark = Color(0xFF323232)
-    val InputForegroundLight =  Color(0xFF646464)
-    val InputForegroundDark =  Color(0xFF929298)
     val Black = black
     val White = white
 }

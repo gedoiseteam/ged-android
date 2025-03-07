@@ -23,6 +23,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -46,10 +47,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.upsaclay.common.domain.entity.Screen
-import com.upsaclay.common.domain.entity.SnackbarType
 import com.upsaclay.common.presentation.components.ClickableItem
-import com.upsaclay.common.presentation.components.ErrorSnackBar
-import com.upsaclay.common.presentation.components.InfoSnackbar
 import com.upsaclay.common.presentation.components.LinearProgressBar
 import com.upsaclay.common.presentation.components.SensibleActionDialog
 import com.upsaclay.common.presentation.components.SmallTopBarBack
@@ -84,7 +82,6 @@ fun ReadAnnouncementScreen(
     val scope = rememberCoroutineScope()
 
     val snackbarHostState = remember { SnackbarHostState() }
-    var snackBarType by remember { mutableStateOf(SnackbarType.ERROR) }
 
     val user by readAnnouncementViewModel.currentUser.collectAsState()
     val screenState by readAnnouncementViewModel.screenState.collectAsState()
@@ -98,8 +95,7 @@ fun ReadAnnouncementScreen(
         }
     }
 
-    val showSnackBar = { type: SnackbarType, message: String ->
-        snackBarType = type
+    val showSnackBar = { message: String ->
         scope.launch {
             snackbarHostState.showSnackbar(message = message)
         }
@@ -125,18 +121,12 @@ fun ReadAnnouncementScreen(
             AnnouncementScreenState.LOADING -> isLoading = true
 
             AnnouncementScreenState.CONNECTION_ERROR -> {
-                showSnackBar(
-                    SnackbarType.ERROR,
-                    context.getString(com.upsaclay.common.R.string.server_connection_error)
-                )
+                showSnackBar(context.getString(com.upsaclay.common.R.string.unknown_network_error))
                 resetState()
             }
 
             AnnouncementScreenState.ERROR -> {
-                showSnackBar(
-                    SnackbarType.ERROR,
-                    context.getString(R.string.announcement_delete_error)
-                )
+                showSnackBar(context.getString(R.string.announcement_delete_error))
                 resetState()
             }
 
@@ -169,25 +159,11 @@ fun ReadAnnouncementScreen(
             SnackbarHost(
                 hostState = snackbarHostState,
                 modifier = Modifier
-                    .testTag(stringResource(id = R.string.read_screen_delete_dialog_title_tag))
             ) {
-                when (snackBarType) {
-                    SnackbarType.INFO -> {
-                        InfoSnackbar(
-                            modifier = Modifier.testTag(stringResource(id = R.string.read_screen_info_snackbar_tag)),
-                            message = it.visuals.message
-                        )
-                    }
-
-                    SnackbarType.ERROR -> {
-                        ErrorSnackBar(
-                            modifier = Modifier.testTag(stringResource(id = R.string.read_screen_error_snackbar_tag)),
-                            message = it.visuals.message
-                        )
-                    }
-
-                    else -> { }
-                }
+               Snackbar(
+                   snackbarData = it,
+                   modifier = Modifier.testTag(stringResource(id = R.string.read_screen_snackbar_tag))
+               )
             }
         }
     ) { contentPadding ->
@@ -277,8 +253,8 @@ fun ReadAnnouncementScreen(
                             onClick = {
                                 announcement?.let {
                                     readAnnouncementViewModel.recreateAnnouncement(it)
-                                    showSnackBar(SnackbarType.INFO, context.getString(R.string.announcement_sent))
-                                } ?: showSnackBar(SnackbarType.ERROR, context.getString(com.upsaclay.common.R.string.occurred_error))
+                                    showSnackBar(context.getString(R.string.announcement_sent))
+                                } ?: showSnackBar(context.getString(com.upsaclay.common.R.string.occurred_error))
                                 hideBottomSheet()
                             }
                         )

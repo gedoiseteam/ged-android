@@ -5,8 +5,10 @@ import com.upsaclay.common.data.formatHttpError
 import com.upsaclay.common.data.remote.api.UserFirestoreApi
 import com.upsaclay.common.data.remote.api.UserRetrofitApi
 import com.upsaclay.common.domain.e
+import com.upsaclay.common.domain.entity.InternalServerException
 import com.upsaclay.common.domain.entity.ServerCommunicationException
 import com.upsaclay.common.domain.entity.User
+import com.upsaclay.common.domain.w
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -14,6 +16,7 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.IOException
+import java.net.ConnectException
 
 internal class UserRemoteDataSource(
     private val userRetrofitApi: UserRetrofitApi,
@@ -77,28 +80,14 @@ internal class UserRemoteDataSource(
     }
 
     private suspend fun createUserWithOracle(user: User) {
-        runCatching { userRetrofitApi.createUser(UserMapper.toDTO(user)) }
-            .onSuccess { response ->
-                if (!response.isSuccessful) {
-                    val errorMessage = formatHttpError("Error creating user with Oracle", response)
-                    e(errorMessage)
-                    throw IOException(errorMessage)
-                }
-            }
-            .onFailure {
-                val errorMessage = "Error creating user with Oracle"
-                e(errorMessage, it)
-                throw ServerCommunicationException(errorMessage)
-            }
+        val response = userRetrofitApi.createUser(UserMapper.toDTO(user))
+        if (!response.isSuccessful) {
+            val errorMessage = formatHttpError("Error creating user with Oracle", response)
+            throw InternalServerException(errorMessage)
+        }
     }
 
     private suspend fun createUserWithFirestore(user: User) {
-        try {
-            userFirestoreApi.createUser(UserMapper.toFirestoreUser(user))
-        } catch (e: Exception) {
-            val errorMessage = "Error creating user with Firestore"
-            e(errorMessage, e)
-            throw IOException(errorMessage)
-        }
+        userFirestoreApi.createUser(UserMapper.toFirestoreUser(user))
     }
 }

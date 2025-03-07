@@ -123,7 +123,7 @@ class AuthenticationScreenUiTest {
     @Test
     fun invalid_credentials_show_error_message() {
         // Given
-        every { authenticationViewModel.screenState } returns MutableStateFlow(AuthenticationScreenState.AUTHENTICATION_ERROR)
+        every { authenticationViewModel.screenState } returns MutableStateFlow(AuthenticationScreenState.INVALID_CREDENTIALS_ERROR)
 
         // When
         rule.setContent {
@@ -134,7 +134,7 @@ class AuthenticationScreenUiTest {
         }
 
         // Then
-        rule.onNodeWithText(rule.activity.getString(R.string.error_connection)).assertExists()
+        rule.onNodeWithText(rule.activity.getString(R.string.login_error)).assertExists()
     }
 
     @Test
@@ -157,7 +157,7 @@ class AuthenticationScreenUiTest {
     @Test
     fun user_not_found_show_error_message() {
         // Given
-        every { authenticationViewModel.screenState } returns MutableStateFlow(AuthenticationScreenState.AUTHENTICATED_USER_NOT_FOUND)
+        every { authenticationViewModel.screenState } returns MutableStateFlow(AuthenticationScreenState.AUTH_USER_NOT_FOUND)
 
         // When
         rule.setContent {

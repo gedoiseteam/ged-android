@@ -1,7 +1,6 @@
 package com.upsaclay.gedoise.presentation.components
 
 import android.content.res.Configuration
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,8 +24,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.upsaclay.common.presentation.components.ClickableItem
 import com.upsaclay.common.presentation.components.SmallTopBarAction
 import com.upsaclay.common.presentation.components.SmallTopBarBack
-import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
+import com.upsaclay.common.presentation.theme.previewText
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.gedoise.R
 import com.upsaclay.gedoise.domain.entities.AccountInfo
@@ -89,14 +88,12 @@ internal fun AccountInfoItem(
     modifier: Modifier = Modifier,
     accountInfo: AccountInfo
 ) {
-    val labelColor = if (isSystemInDarkTheme()) GedoiseColor.PreviewTextDark else GedoiseColor.PreviewTextLight
-
     Column(
         modifier = modifier.padding(vertical = MaterialTheme.spacing.smallMedium)
     ) {
         Text(
             text = accountInfo.label,
-            color = labelColor,
+            color = MaterialTheme.colorScheme.previewText,
             fontWeight = FontWeight.SemiBold,
             style = MaterialTheme.typography.labelLarge
         )

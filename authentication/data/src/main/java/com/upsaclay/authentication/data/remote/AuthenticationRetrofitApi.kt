@@ -1,4 +1,4 @@
-package com.upsaclay.authentication.data.remote.parissaclay
+package com.upsaclay.authentication.data.remote
 
 import com.upsaclay.common.domain.entity.ServerResponse
 import retrofit2.Response

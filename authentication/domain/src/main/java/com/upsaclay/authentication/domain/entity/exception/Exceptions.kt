@@ -1,11 +1,16 @@
 package com.upsaclay.authentication.domain.entity.exception
 
-class AuthenticationException(
+class InvalidCredentialsException(
     override val message: String? = null,
     override val cause: Throwable? = null,
 ) : Exception()
 
 class UserAlreadyExistsException(
+    override val message: String? = null,
+    override val cause: Throwable? = null,
+) : Exception()
+
+class AuthUserNotFoundException(
     override val message: String? = null,
     override val cause: Throwable? = null,
 ) : Exception()

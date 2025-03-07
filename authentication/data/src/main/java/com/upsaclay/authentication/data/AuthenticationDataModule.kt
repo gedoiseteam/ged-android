@@ -1,11 +1,9 @@
 package com.upsaclay.authentication.data
 
 import com.upsaclay.authentication.data.local.AuthenticationLocalDataSource
-import com.upsaclay.authentication.data.remote.firebase.FirebaseAuthenticationApi
-import com.upsaclay.authentication.data.remote.firebase.FirebaseAuthenticationApiImpl
-import com.upsaclay.authentication.data.remote.firebase.FirebaseAuthenticationRemoteDataSource
-import com.upsaclay.authentication.data.remote.parissaclay.AuthenticationRetrofitApi
-import com.upsaclay.authentication.data.remote.parissaclay.ParisSaclayAuthenticationRemoteDataSource
+import com.upsaclay.authentication.data.remote.AuthenticationRetrofitApi
+import com.upsaclay.authentication.data.remote.FirebaseAuthenticationApi
+import com.upsaclay.authentication.data.remote.FirebaseAuthenticationApiImpl
 import com.upsaclay.authentication.data.repository.AuthenticationRepositoryImpl
 import com.upsaclay.authentication.data.repository.firebase.FirebaseAuthenticationRepository
 import com.upsaclay.authentication.data.repository.firebase.FirebaseAuthenticationRepositoryImpl
@@ -54,10 +52,7 @@ val authenticationDataModule = module {
 
     singleOf(::FirebaseAuthenticationRepositoryImpl) { bind<FirebaseAuthenticationRepository>() }
     singleOf(::FirebaseAuthenticationApiImpl) { bind<FirebaseAuthenticationApi>() }
-    singleOf(::FirebaseAuthenticationRemoteDataSource)
-
     singleOf(::ParisSaclayAuthenticationRepositoryImpl) { bind<ParisSaclayAuthenticationRepository>() }
-    singleOf(::ParisSaclayAuthenticationRemoteDataSource)
 
     single<AuthenticationRepository> {
         AuthenticationRepositoryImpl(

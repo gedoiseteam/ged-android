@@ -42,6 +42,5 @@
     <string name="account_screen_delete_profile_picture_button_tag">Account screen delete profile picture button tag</string>
     <string name="account_screen_delete_profile_picture_dialog_tag">Account screen delete profile picture button tag</string>
     <string name="account_screen_profile_picture_tag">Account screen profile picture tag</string>
-    <string name="account_screen_error_snackbar_tag">Account screen error snackbar tag</string>
-    <string name="account_screen_success_snackbar_tag">Account screen success snackbar tag</string>
+    <string name="account_screen_snackbar_tag">Account screen snackbar tag</string>
 </resources>

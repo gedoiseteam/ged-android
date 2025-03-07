@@ -109,6 +109,6 @@ class EditAnnouncementScreenUITest {
         }
 
         // Then
-        rule.onNodeWithTag(rule.activity.getString(R.string.edit_screen_error_snackbar_tag)).assertExists()
+        rule.onNodeWithTag(rule.activity.getString(R.string.edit_screen_snackbar_tag)).assertExists()
     }
 }

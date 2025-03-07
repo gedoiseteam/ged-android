@@ -3,7 +3,6 @@ package com.upsaclay.message.presentation.components
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,8 +31,8 @@ import com.upsaclay.common.domain.entity.User
 import com.upsaclay.common.domain.usecase.FormatLocalDateTimeUseCase
 import com.upsaclay.common.domain.usecase.GetElapsedTimeUseCase
 import com.upsaclay.common.presentation.components.ProfilePicture
-import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
+import com.upsaclay.common.presentation.theme.previewText
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.message.R
 import com.upsaclay.message.domain.conversationUIFixture
@@ -143,12 +142,6 @@ private fun ReadConversationItem(
     lastMessage: Message,
     elapsedTime: String
 ) {
-    val textColor = if (isSystemInDarkTheme()) {
-        GedoiseColor.PreviewTextDark
-    } else {
-        GedoiseColor.PreviewTextLight
-    }
-
     Column(modifier = modifier) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
@@ -165,7 +158,7 @@ private fun ReadConversationItem(
             Text(
                 text = elapsedTime,
                 style = MaterialTheme.typography.bodyMedium,
-                color = textColor
+                color = MaterialTheme.colorScheme.previewText
             )
         }
 
@@ -174,7 +167,7 @@ private fun ReadConversationItem(
         Text(
             text = lastMessage.content,
             style = MaterialTheme.typography.bodyMedium,
-            color = textColor,
+            color = MaterialTheme.colorScheme.previewText,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
@@ -252,7 +245,7 @@ private fun EmptyConversationItem(
         Text(
             text = stringResource(id = R.string.tap_to_chat),
             style = MaterialTheme.typography.bodyMedium,
-            color = GedoiseColor.PreviewTextLight,
+            color = MaterialTheme.colorScheme.previewText,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )

@@ -36,8 +36,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.upsaclay.common.domain.entity.User
 import com.upsaclay.common.domain.usecase.FormatLocalDateTimeUseCase
-import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
+import com.upsaclay.common.presentation.theme.previewText
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.message.R
 import com.upsaclay.message.domain.conversationUIFixture
@@ -183,7 +183,7 @@ private fun MessageSection(
                             .fillMaxWidth(),
                         text = FormatLocalDateTimeUseCase.formatDayMonthYear(message.date),
                         style = MaterialTheme.typography.bodySmall,
-                        color = GedoiseColor.PreviewTextLight,
+                        color = MaterialTheme.colorScheme.previewText,
                         textAlign = TextAlign.Center
                     )
                 } else {
