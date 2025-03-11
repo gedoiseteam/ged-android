@@ -16,6 +16,7 @@ val messageModule = module {
             conversation = conversation,
             getCurrentUserUseCase = get(),
             getMessagesUseCase = get(),
+            getLastMessageUseCase = get(),
             sendMessageUseCase = get(),
             createConversationUseCase = get(),
             updateMessageUseCase = get()

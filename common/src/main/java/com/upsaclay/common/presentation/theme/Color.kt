@@ -5,8 +5,10 @@ import androidx.compose.material3.ColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
-internal val white = Color(0xFFE3E3E3)
+internal val white = Color(0xFFE6E6E6)
 internal val black = Color(0xFF1D1D1D)
+internal val lightGray = Color(0xFFCCCCCC)
+internal val darkGray = Color(0xFF3C3C3C)
 
 internal val primaryLight = Color(0xFF67708A)
 internal val secondaryLight = Color(0xFF0B86FF)
@@ -50,14 +52,25 @@ val ColorScheme.previewText: Color
     @Composable
     get() = if(isSystemInDarkTheme()) Color(0xFFA1A4B0) else Color(0xFF6F7181)
 
+val ColorScheme.black: Color
+    @Composable
+    get() = com.upsaclay.common.presentation.theme.black
+
+val ColorScheme.white: Color
+    @Composable
+    get() = com.upsaclay.common.presentation.theme.white
+
+val ColorScheme.lightGray: Color
+    @Composable
+    get() = com.upsaclay.common.presentation.theme.lightGray
+
+val ColorScheme.darkGray: Color
+    @Composable
+    get() = com.upsaclay.common.presentation.theme.darkGray
+
 object GedoiseColor {
     val LittleTransparentWhite = Color(0x66FFFFFF)
     val PrimaryVariant = Color(0xFFDBE0E9)
-    val DarkGray = Color(0xFF3C3C3C)
-    val PreviewTextLight = Color(0xFF6F7181)
-    val PreviewTextDark = Color(0xFFA1A4B0)
     val ProfilePictureErrorLight = Color(0xFFEBEDEE)
     val OnlineColor = Color(0xFF4ACB1B)
-    val Black = black
-    val White = white
 }

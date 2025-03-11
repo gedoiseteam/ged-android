@@ -17,6 +17,9 @@
     <string name="tap_to_chat">Appuyer pour discuter</string>
     <string name="message_seen">Vu</string>
     <string name="sending">Envoi...</string>
+    <string name="new_message">Nouveau messages</string>
+    <string name="error_fetch_messages">Une erreur est survenue durant la récupération des messages</string>
+    <string name="error_fetch_conversations">Une erreur est survenue durant la récupération des conversations</string>
 
     <string name="conversation_screen_conversation_item_tag">Conversation Screen Conversation Item Tag</string>
     <string name="conversation_screen_empty_conversation_item_tag">Conversation Screen Empty Conversation Item Tag</string>

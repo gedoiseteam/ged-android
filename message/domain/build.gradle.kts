@@ -38,6 +38,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.koin)
     implementation(libs.koin.core)
+    implementation(libs.androidx.paging.common.android)
 
     testImplementation(libs.junit)
     testImplementation(libs.mockk)

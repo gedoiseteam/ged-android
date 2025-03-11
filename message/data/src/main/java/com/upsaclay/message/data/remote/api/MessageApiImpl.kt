@@ -9,7 +9,7 @@ import com.upsaclay.common.domain.e
 import com.upsaclay.message.data.model.CONVERSATIONS_TABLE_NAME
 import com.upsaclay.message.data.model.MESSAGES_TABLE_NAME
 import com.upsaclay.message.data.model.MessageField
-import com.upsaclay.message.data.model.MessageField.TIMESTAMP
+import com.upsaclay.message.data.model.MessageField.MESSAGE_TIMESTAMP
 import com.upsaclay.message.data.remote.model.RemoteMessage
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -21,10 +21,10 @@ import kotlin.coroutines.suspendCoroutine
 internal class MessageApiImpl : MessageApi {
     private val conversationsCollection = Firebase.firestore.collection(CONVERSATIONS_TABLE_NAME)
 
-    override fun listenMessages(conversationId: String): Flow<RemoteMessage> = callbackFlow {
-        val listener = conversationsCollection.document(conversationId)
+    override fun listenMessages(conversationId: Int): Flow<RemoteMessage> = callbackFlow {
+        val listener = conversationsCollection.document(conversationId.toString())
             .collection(MESSAGES_TABLE_NAME)
-            .orderBy(TIMESTAMP, Query.Direction.DESCENDING)
+            .orderBy(MESSAGE_TIMESTAMP, Query.Direction.DESCENDING)
             .addSnapshotListener { snapshot, error ->
                 error?.let {
                     e("Error getting last messages", it)
@@ -46,9 +46,9 @@ internal class MessageApiImpl : MessageApi {
 
     override suspend fun createMessage(remoteMessage: RemoteMessage) {
         suspendCoroutine { continuation ->
-            conversationsCollection.document(remoteMessage.conversationId)
+            conversationsCollection.document(remoteMessage.conversationId.toString())
                 .collection(MESSAGES_TABLE_NAME)
-                .document(remoteMessage.messageId)
+                .document(remoteMessage.messageId.toString())
                 .set(remoteMessage)
                 .addOnSuccessListener {
                     continuation.resume(Unit)
@@ -60,11 +60,15 @@ internal class MessageApiImpl : MessageApi {
         }
     }
 
-    override suspend fun updateMessage(remoteMessage: RemoteMessage) { suspendCoroutine { continuation ->
-        val update = mapOf(MessageField.SEEN to remoteMessage.seen)
-        conversationsCollection.document(remoteMessage.conversationId)
+    override suspend fun updateSeenMessage(remoteMessage: RemoteMessage) { suspendCoroutine { continuation ->
+       val update = mapOf(
+            MessageField.Remote.SEEN_VALUE to remoteMessage.seen?.value,
+            MessageField.Remote.SEEN_TIME to remoteMessage.seen?.time
+        )
+
+        conversationsCollection.document(remoteMessage.conversationId.toString())
             .collection(MESSAGES_TABLE_NAME)
-            .document(remoteMessage.messageId)
+            .document(remoteMessage.messageId.toString())
             .update(update)
             .addOnSuccessListener {
                 continuation.resume(Unit)
@@ -76,9 +80,9 @@ internal class MessageApiImpl : MessageApi {
         }
     }
 
-    override suspend fun deleteMessages(conversationId: String) {
+    override suspend fun deleteMessages(conversationId: Int) {
         suspendCoroutine { continuation ->
-            conversationsCollection.document(conversationId)
+            conversationsCollection.document(conversationId.toString())
                 .collection(MESSAGES_TABLE_NAME)
                 .get(Source.SERVER)
                 .addOnSuccessListener { snapshot ->

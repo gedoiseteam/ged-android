@@ -41,6 +41,7 @@ import com.upsaclay.common.presentation.components.PullToRefreshComponent
 import com.upsaclay.common.presentation.components.SensibleActionDialog
 import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
+import com.upsaclay.common.presentation.theme.previewText
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.news.R
 import com.upsaclay.news.domain.announcementsFixture
@@ -176,11 +177,6 @@ private fun RecentAnnouncementSection(
     onClickNotSentAnnouncement: (Announcement) -> Unit
 ) {
     val sortedAnnouncements = announcements.sortedByDescending { it.date }
-    val textColor = if (isSystemInDarkTheme()) {
-        GedoiseColor.PreviewTextDark
-    } else {
-        GedoiseColor.PreviewTextLight
-    }
 
     Text(
         text = stringResource(id = R.string.recent_announcements),
@@ -201,7 +197,7 @@ private fun RecentAnnouncementSection(
                     modifier = Modifier.fillMaxWidth(),
                     text = stringResource(id = R.string.no_announcement),
                     style = MaterialTheme.typography.bodyLarge,
-                    color = textColor,
+                    color = MaterialTheme.colorScheme.previewText,
                     textAlign = TextAlign.Center
                 )
                 Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))

@@ -1,5 +1,6 @@
 package com.upsaclay.message.presentation.screens
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -12,6 +13,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -20,16 +25,18 @@ import androidx.navigation.NavController
 import com.upsaclay.common.domain.entity.Screen
 import com.upsaclay.common.domain.entity.User
 import com.upsaclay.common.domain.usersFixture
-import com.upsaclay.common.presentation.components.CircularProgressBar
+import com.upsaclay.common.presentation.components.LinearProgressBar
 import com.upsaclay.common.presentation.components.SmallTopBarBack
 import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
+import com.upsaclay.common.presentation.theme.previewText
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.message.R
 import com.upsaclay.message.domain.entity.ConversationScreenState
 import com.upsaclay.message.domain.usecase.ConvertConversationJsonUseCase
 import com.upsaclay.message.presentation.components.UserItem
 import com.upsaclay.message.presentation.viewmodels.CreateConversationViewModel
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -39,6 +46,7 @@ fun CreateConversationScreen(
 ) {
     val users by createConversationViewModel.users.collectAsState(emptyList())
     val screenState by createConversationViewModel.screenState.collectAsState()
+    val scope = rememberCoroutineScope()
 
     Scaffold(
         topBar = {
@@ -48,29 +56,31 @@ fun CreateConversationScreen(
             )
         }
     ) { contentPadding ->
-        if (screenState == ConversationScreenState.LOADING) {
-            CircularProgressBar()
-        } else {
-            LazyColumn(
-                modifier = Modifier
-                    .padding(top = contentPadding.calculateTopPadding())
-            ) {
+        Column(
+            modifier = Modifier
+                .padding(top = contentPadding.calculateTopPadding())
+        ) {
+            if (screenState == ConversationScreenState.LOADING) {
+                LinearProgressBar(modifier = Modifier.fillMaxWidth())
+            }
+
+            LazyColumn {
                 if (users.isNotEmpty()) {
                     items(users) { user ->
                         UserItem(
                             user = user,
                             onClick = {
-                                createConversationViewModel.getConversation(user.id)?.let {
-                                    navController.navigate(
-                                        Screen.CHAT.route + "?conversation=${ConvertConversationJsonUseCase(it)}"
-                                    ) {
-                                        popUpTo(Screen.CREATE_CONVERSATION.route) {
-                                            inclusive = true
-                                        }
-                                    }
-                                } ?: run {
-                                    val conversationJson = createConversationViewModel.generateConversationJson(user)
-                                    navController.navigate(Screen.CHAT.route + "?conversation=$conversationJson") {
+                                scope.launch {
+                                    val conversation =
+                                        createConversationViewModel.getConversation(user.id)
+                                            ?.let {
+                                                ConvertConversationJsonUseCase(it)
+                                            }
+                                            ?: createConversationViewModel.generateConversationJson(
+                                                user
+                                            )
+
+                                    navController.navigate(Screen.CHAT.route + "?conversation=$conversation") {
                                         popUpTo(Screen.CREATE_CONVERSATION.route) {
                                             inclusive = true
                                         }
@@ -86,7 +96,7 @@ fun CreateConversationScreen(
                             modifier = Modifier.fillMaxWidth(),
                             text = stringResource(id = com.upsaclay.common.R.string.no_user_found),
                             textAlign = TextAlign.Center,
-                            color = GedoiseColor.PreviewTextLight
+                            color = MaterialTheme.colorScheme.previewText
                         )
                     }
                 }
@@ -104,7 +114,8 @@ fun CreateConversationScreen(
 @Preview(showBackground = true)
 @Composable
 private fun CreateConversationScreenPreview() {
-    val users: List<User> = usersFixture
+    val users: List<User> = usersFixture + usersFixture
+    var loading by remember { mutableStateOf(true) }
 
     GedoiseTheme {
         Scaffold(
@@ -115,23 +126,31 @@ private fun CreateConversationScreenPreview() {
                 )
             }
         ) { innerPadding ->
-            LazyColumn(modifier = Modifier.padding(top = innerPadding.calculateTopPadding())) {
-                if (users.isNotEmpty()) {
-                    items(users) { user ->
-                        UserItem(
-                            user = user,
-                            onClick = { }
-                        )
-                    }
-                } else {
-                    item {
-                        Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))
-                        Text(
-                            modifier = Modifier.fillMaxWidth(),
-                            text = stringResource(id = com.upsaclay.common.R.string.no_user_found),
-                            textAlign = TextAlign.Center,
-                            color = GedoiseColor.PreviewTextLight
-                        )
+            Column(
+                modifier = Modifier.padding(top = innerPadding.calculateTopPadding()),
+            ) {
+                if (loading) {
+                    LinearProgressBar(modifier = Modifier.fillMaxWidth())
+                }
+
+                LazyColumn {
+                    if (users.isNotEmpty()) {
+                        items(users) { user ->
+                            UserItem(
+                                user = user,
+                                onClick = { }
+                            )
+                        }
+                    } else {
+                        item {
+                            Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))
+                            Text(
+                                modifier = Modifier.fillMaxWidth(),
+                                text = stringResource(id = com.upsaclay.common.R.string.no_user_found),
+                                textAlign = TextAlign.Center,
+                                color = MaterialTheme.colorScheme.previewText
+                            )
+                        }
                     }
                 }
             }

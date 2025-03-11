@@ -2,7 +2,6 @@ package com.upsaclay.common.domain.entity
 
 import com.upsaclay.common.domain.extensions.uppercaseFirstLetter
 
-
 data class User(
     val id: String,
     val firstName: String,

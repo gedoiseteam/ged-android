@@ -6,12 +6,14 @@ import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
 import com.upsaclay.common.domain.usecase.GetUsersUseCase
 import com.upsaclay.common.domain.userFixture
 import com.upsaclay.common.domain.usersFixture
+import com.upsaclay.message.domain.conversationFixture
 import com.upsaclay.message.domain.conversationsUIFixture
 import com.upsaclay.message.domain.entity.ConversationScreenState
 import com.upsaclay.message.domain.entity.ConversationState
 import com.upsaclay.message.domain.entity.ConversationUI
 import com.upsaclay.message.domain.entity.Message
-import com.upsaclay.message.domain.usecase.ListenConversationsUiUseCase
+import com.upsaclay.message.domain.usecase.GetConversationUIUseCase
+import com.upsaclay.message.domain.usecase.GetConversationUseCase
 import com.upsaclay.message.presentation.viewmodels.CreateConversationViewModel
 import io.mockk.coEvery
 import io.mockk.every
@@ -27,12 +29,13 @@ import org.junit.Before
 import org.junit.Test
 import java.time.LocalDateTime
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CreateConversationViewModelTest {
     private val getUsersUseCase: GetUsersUseCase = mockk()
     private val getCurrentUserUseCase: GetCurrentUserUseCase = mockk()
-    private val listenConversationsUiUseCase: ListenConversationsUiUseCase = mockk()
+    private val getConversationUseCase: GetConversationUseCase = mockk()
 
     private lateinit var conversationViewModel: CreateConversationViewModel
     private val testDispatcher = UnconfinedTestDispatcher()
@@ -42,13 +45,13 @@ class CreateConversationViewModelTest {
         Dispatchers.setMain(testDispatcher)
 
         every { getCurrentUserUseCase() } returns MutableStateFlow(userFixture)
-        every { listenConversationsUiUseCase.currentConversationsUI } returns conversationsUIFixture
+        coEvery { getConversationUseCase(any()) } returns conversationFixture
         coEvery { getUsersUseCase() } returns usersFixture
 
         conversationViewModel = CreateConversationViewModel(
             getUsersUseCase = getUsersUseCase,
+            getConversationUseCase = getConversationUseCase,
             getCurrentUserUseCase = getCurrentUserUseCase,
-            listenConversationsUiUseCase = listenConversationsUiUseCase
         )
     }
 
@@ -82,25 +85,23 @@ class CreateConversationViewModelTest {
 
     @Test
     fun getConversation_should_return_conversation_when_present() = runTest {
-        // Given
-        val conversation = conversationsUIFixture.first()
-
         // When
-        val result = conversationViewModel.getConversation(conversation.interlocutor.id)
+        val result = conversationViewModel.getConversation(conversationFixture.interlocutor.id)
 
         // Then
-        assertEquals(conversation, result)
+        assertEquals(conversationFixture, result)
     }
 
     @Test
     fun getConversation_should_return_null_when_not_present() = runTest {
         // Given
         val interlocutorId = "unknown"
+        coEvery { getConversationUseCase(interlocutorId) } returns null
 
         // When
         val result = conversationViewModel.getConversation(interlocutorId)
 
         // Then
-        assertEquals(null, result)
+        assertNull(result)
     }
 }

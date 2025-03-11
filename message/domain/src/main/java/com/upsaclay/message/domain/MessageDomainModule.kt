@@ -3,10 +3,12 @@ package com.upsaclay.message.domain
 import com.upsaclay.common.domain.e
 import com.upsaclay.message.domain.usecase.CreateConversationUseCase
 import com.upsaclay.message.domain.usecase.DeleteConversationUseCase
+import com.upsaclay.message.domain.usecase.GetConversationUIUseCase
+import com.upsaclay.message.domain.usecase.GetConversationUseCase
+import com.upsaclay.message.domain.usecase.GetLastMessageUseCase
 import com.upsaclay.message.domain.usecase.GetMessagesUseCase
-import com.upsaclay.message.domain.usecase.ListenConversationsUiUseCase
-import com.upsaclay.message.domain.usecase.ListenConversationsUseCase
-import com.upsaclay.message.domain.usecase.ListenMessagesUseCase
+import com.upsaclay.message.domain.usecase.ListenRemoteConversationsUseCase
+import com.upsaclay.message.domain.usecase.ListenRemoteMessagesUseCase
 import com.upsaclay.message.domain.usecase.SendMessageUseCase
 import com.upsaclay.message.domain.usecase.UpdateMessageUseCase
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -30,50 +32,27 @@ val messageDomainModule = module {
         )
     }
 
-    single {
-        ListenConversationsUiUseCase(
-            userConversationRepository = get(),
-            messageRepository = get(),
-            scope = get(BACKGROUND_SCOPE)
-        )
-    }
-
-    single {
-        ListenConversationsUseCase(
-            userConversationRepository = get(),
-            scope = get(BACKGROUND_SCOPE)
-        )
-    }
-
-    single {
-        ListenMessagesUseCase(
-            userConversationRepository = get(),
-            messageRepository = get(),
-            scope = get(BACKGROUND_SCOPE)
-        )
-    }
-
-    single {
-        CreateConversationUseCase(
-            userConversationRepository = get(),
-            scope = get(BACKGROUND_SCOPE)
-        )
-    }
-    single {
-        DeleteConversationUseCase(
-            userConversationRepository = get(),
-            messageRepository = get(),
-            listenConversationsUiUseCase = get(),
-            scope = get(BACKGROUND_SCOPE)
-        )
-    }
+    singleOf(::CreateConversationUseCase)
+    singleOf(::DeleteConversationUseCase)
+    singleOf(::GetConversationUIUseCase)
+    singleOf(::GetConversationUseCase)
+    singleOf(::GetLastMessageUseCase)
     singleOf(::GetMessagesUseCase)
+    singleOf(::SendMessageUseCase)
+    singleOf(::UpdateMessageUseCase)
 
     single {
-        SendMessageUseCase(
+        ListenRemoteConversationsUseCase(
+            userConversationRepository = get(),
+            scope = get(BACKGROUND_SCOPE)
+        )
+    }
+
+    single {
+        ListenRemoteMessagesUseCase(
+            userConversationRepository = get(),
             messageRepository = get(),
             scope = get(BACKGROUND_SCOPE)
         )
     }
-    singleOf(::UpdateMessageUseCase)
 }

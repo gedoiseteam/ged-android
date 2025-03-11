@@ -27,6 +27,7 @@ import com.upsaclay.common.domain.usecase.GetElapsedTimeUseCase
 import com.upsaclay.common.presentation.components.ProfilePicture
 import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
+import com.upsaclay.common.presentation.theme.previewText
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.news.domain.announcementFixture
 import com.upsaclay.news.domain.entity.Announcement
@@ -92,7 +93,7 @@ internal fun AnnouncementHeader(
         Text(
             text = elapsedTimeValue,
             style = MaterialTheme.typography.bodySmall,
-            color = GedoiseColor.PreviewTextLight
+            color = MaterialTheme.colorScheme.previewText
         )
 
         Spacer(modifier = Modifier.width(MaterialTheme.spacing.smallMedium))
@@ -172,7 +173,7 @@ internal fun AnnouncementItem(
                     Text(
                         text = elapsedTimeValue,
                         style = MaterialTheme.typography.bodySmall,
-                        color = GedoiseColor.PreviewTextLight
+                        color = MaterialTheme.colorScheme.previewText
                     )
                 }
 
@@ -180,7 +181,7 @@ internal fun AnnouncementItem(
 
                 Text(
                     text = announcement.title ?: announcement.content,
-                    color = GedoiseColor.PreviewTextLight,
+                    color = MaterialTheme.colorScheme.previewText,
                     style = MaterialTheme.typography.bodyMedium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis

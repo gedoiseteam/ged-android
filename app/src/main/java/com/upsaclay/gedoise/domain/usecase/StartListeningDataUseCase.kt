@@ -1,17 +1,14 @@
 package com.upsaclay.gedoise.domain.usecase
 
-import com.upsaclay.message.domain.usecase.ListenConversationsUiUseCase
-import com.upsaclay.message.domain.usecase.ListenConversationsUseCase
-import com.upsaclay.message.domain.usecase.ListenMessagesUseCase
+import com.upsaclay.message.domain.usecase.ListenRemoteConversationsUseCase
+import com.upsaclay.message.domain.usecase.ListenRemoteMessagesUseCase
 
 class StartListeningDataUseCase(
-    private val listenConversationsUseCase: ListenConversationsUseCase,
-    private val listenMessagesUseCase: ListenMessagesUseCase,
-    private val listenConversationsUiUseCase: ListenConversationsUiUseCase
+    private val listenRemoteConversationsUseCase: ListenRemoteConversationsUseCase,
+    private val listenRemoteMessagesUseCase: ListenRemoteMessagesUseCase
 ) {
     operator fun invoke() {
-        listenConversationsUseCase.start()
-        listenMessagesUseCase.start()
-        listenConversationsUiUseCase.start()
+        listenRemoteConversationsUseCase.start()
+        listenRemoteMessagesUseCase.start()
     }
 }

@@ -52,8 +52,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.upsaclay.authentication.R
 import com.upsaclay.authentication.domain.entity.AuthenticationScreenState
-import com.upsaclay.authentication.presentation.components.OutlinePasswordTextField
 import com.upsaclay.authentication.presentation.components.LoginButton
+import com.upsaclay.authentication.presentation.components.OutlinePasswordTextField
 import com.upsaclay.authentication.presentation.viewmodels.AuthenticationViewModel
 import com.upsaclay.common.domain.entity.Screen
 import com.upsaclay.common.presentation.components.ErrorText

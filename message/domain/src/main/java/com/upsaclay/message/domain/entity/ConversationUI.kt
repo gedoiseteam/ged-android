@@ -4,7 +4,7 @@ import com.upsaclay.common.domain.entity.User
 import java.time.LocalDateTime
 
 data class ConversationUI(
-    val id: String,
+    val id: Int,
     val interlocutor: User,
     val lastMessage: Message?,
     val createdAt: LocalDateTime,

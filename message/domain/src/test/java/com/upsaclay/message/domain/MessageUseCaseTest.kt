@@ -1,20 +1,19 @@
 package com.upsaclay.message.domain
 
+import com.upsaclay.common.domain.userFixture
 import com.upsaclay.message.domain.repository.MessageRepository
 import com.upsaclay.message.domain.repository.UserConversationRepository
 import com.upsaclay.message.domain.usecase.CreateConversationUseCase
 import com.upsaclay.message.domain.usecase.DeleteConversationUseCase
-import com.upsaclay.message.domain.usecase.ListenConversationsUiUseCase
-import com.upsaclay.message.domain.usecase.ListenConversationsUseCase
-import com.upsaclay.message.domain.usecase.ListenMessagesUseCase
+import com.upsaclay.message.domain.usecase.GetConversationUIUseCase
+import com.upsaclay.message.domain.usecase.GetConversationUseCase
+import com.upsaclay.message.domain.usecase.ListenRemoteConversationsUseCase
+import com.upsaclay.message.domain.usecase.ListenRemoteMessagesUseCase
 import com.upsaclay.message.domain.usecase.SendMessageUseCase
 import io.mockk.coEvery
 import io.mockk.coVerify
-import io.mockk.every
 import io.mockk.mockk
-import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -28,64 +27,50 @@ import kotlin.test.assertFalse
 class MessageUseCaseTest {
     private val messageRepository: MessageRepository = mockk()
     private val userConversationRepository: UserConversationRepository = mockk()
-    private val listenConversationsUiUseCaseMockk: ListenConversationsUiUseCase = mockk()
 
     private lateinit var createConversationUseCase: CreateConversationUseCase
     private lateinit var deleteConversationUseCase: DeleteConversationUseCase
     private lateinit var sendMessageUseCase: SendMessageUseCase
-    private lateinit var listenConversationsUiUseCase: ListenConversationsUiUseCase
-    private lateinit var listenConversationsUseCase: ListenConversationsUseCase
-    private lateinit var listenMessagesUseCase: ListenMessagesUseCase
+    private lateinit var getConversationUIUseCase: GetConversationUIUseCase
+    private lateinit var getConversationUseCase: GetConversationUseCase
+    private lateinit var listenRemoteConversationsUseCase: ListenRemoteConversationsUseCase
+    private lateinit var listenRemoteMessagesUseCase: ListenRemoteMessagesUseCase
 
     private val testScope = TestScope(UnconfinedTestDispatcher())
 
     @Before
     fun setUp() {
-        listenConversationsUiUseCase = ListenConversationsUiUseCase(
-            userConversationRepository = userConversationRepository,
-            messageRepository = messageRepository,
-            scope = testScope
-        )
-        createConversationUseCase = CreateConversationUseCase(
-            userConversationRepository = userConversationRepository,
-            scope = testScope
-        )
+        getConversationUIUseCase = GetConversationUIUseCase(userConversationRepository = userConversationRepository)
+        getConversationUseCase = GetConversationUseCase(userConversationRepository = userConversationRepository)
+        createConversationUseCase = CreateConversationUseCase(userConversationRepository = userConversationRepository)
+        sendMessageUseCase = SendMessageUseCase(messageRepository = messageRepository)
         deleteConversationUseCase = DeleteConversationUseCase(
             userConversationRepository = userConversationRepository,
-            messageRepository = messageRepository,
-            listenConversationsUiUseCase = listenConversationsUiUseCaseMockk,
-            scope = testScope
+            messageRepository = messageRepository
         )
-        sendMessageUseCase = SendMessageUseCase(
-            messageRepository = messageRepository,
-            scope = testScope
-        )
-        listenConversationsUseCase = ListenConversationsUseCase(
+        listenRemoteConversationsUseCase = ListenRemoteConversationsUseCase(
             userConversationRepository = userConversationRepository,
             scope = testScope
         )
-        listenMessagesUseCase = ListenMessagesUseCase(
+        listenRemoteMessagesUseCase = ListenRemoteMessagesUseCase(
             userConversationRepository = userConversationRepository,
             messageRepository = messageRepository,
             scope = testScope
         )
 
-        every { listenConversationsUiUseCaseMockk.deleteConversation(any()) } returns Unit
-        every { userConversationRepository.userConversations } returns MutableStateFlow(conversationUserFixture)
-        every { messageRepository.getMessages(any()) } returns MutableStateFlow(messageFixture)
-        every { messageRepository.getLastMessage(any()) } returns MutableStateFlow(messageFixture)
-        coEvery { userConversationRepository.userConversations } returns flowOf(conversationUserFixture)
+        coEvery { userConversationRepository.conversations } returns flowOf(conversationsFixture)
+        coEvery { userConversationRepository.getConversation(any()) } returns conversationFixture
         coEvery { userConversationRepository.createConversation(any()) } returns Unit
         coEvery { userConversationRepository.updateConversation(any()) } returns Unit
         coEvery { userConversationRepository.deleteConversation(any()) } returns Unit
         coEvery { userConversationRepository.deleteLocalConversations() } returns Unit
         coEvery { userConversationRepository.listenRemoteConversations() } returns Unit
-        coEvery { userConversationRepository.listenLocalConversations() } returns Unit
-        coEvery { messageRepository.getLastMessage(any()) } returns flowOf(messageFixture)
+        coEvery { messageRepository.listenRemoteMessages(any()) } returns Unit
         coEvery { messageRepository.createMessage(any()) } returns Unit
         coEvery { messageRepository.updateMessage(any()) } returns Unit
         coEvery { messageRepository.upsertMessage(any()) } returns Unit
         coEvery { messageRepository.deleteLocalMessages() } returns Unit
+        coEvery { messageRepository.deleteMessages(any()) } returns Unit
     }
 
     @Test
@@ -94,7 +79,7 @@ class MessageUseCaseTest {
         createConversationUseCase(conversationUIFixture)
 
         // Then
-        coVerify { userConversationRepository.createConversation(conversationUserFixture) }
+        coVerify { userConversationRepository.createConversation(conversationFixture) }
     }
 
     @Test
@@ -107,7 +92,6 @@ class MessageUseCaseTest {
 
         // Then
         coVerify { userConversationRepository.deleteConversation(ConversationMapper.toConversationUser(conversation)) }
-        verify { listenConversationsUiUseCaseMockk.deleteConversation(conversation) }
         coVerify { messageRepository.deleteMessages(conversation.id) }
     }
 
@@ -121,75 +105,57 @@ class MessageUseCaseTest {
     }
 
     @Test
-    fun listenConversationsUIUseCase_should_listen_conversations_ui() = runTest {
-        // Given
-        val conversationExpected = ConversationMapper.toConversationUI(conversationUserFixture, messageFixture)
-        val expectedResult = listOf(conversationExpected)
-
+    fun listenConversationsUseCase_should_start_remote_conversations_listening() = runTest {
         // When
-        listenConversationsUiUseCase.start()
-        val result = listenConversationsUiUseCase.currentConversationsUI
+        listenRemoteConversationsUseCase.start()
 
         // Then
-        assert(listenConversationsUiUseCase.job != null)
-        coVerify { userConversationRepository.userConversations }
-        coVerify { messageRepository.getLastMessage(conversationUserFixture.id) }
-        assertEquals(expectedResult, result)
-    }
-
-    @Test
-    fun listenConversationsUIUseCase_should_stop_conversations_listening() = runTest {
-        // Given
-        listenConversationsUiUseCase.start()
-
-        // When
-        listenConversationsUiUseCase.stop()
-
-        // Then
-        assertFalse(listenConversationsUiUseCase.job!!.isActive)
-    }
-
-    @Test
-    fun listenConversationsUseCase_should_start_conversations_listening() = runTest {
-        // When
-        listenConversationsUseCase.start()
-
-        // Then
-        assert(listenConversationsUseCase.job != null)
-        coVerify { userConversationRepository.listenLocalConversations() }
+        assert(listenRemoteConversationsUseCase.job != null)
         coVerify { userConversationRepository.listenRemoteConversations() }
     }
 
     @Test
     fun listenConversationsUseCase_should_stop_conversations_listening() = runTest {
         // Given
-        listenConversationsUseCase.start()
+        listenRemoteConversationsUseCase.start()
 
         // When
-        listenConversationsUseCase.stop()
+        listenRemoteConversationsUseCase.stop()
 
         // Then
-        assertFalse(listenConversationsUseCase.job!!.isCancelled)
+        assertFalse(listenRemoteConversationsUseCase.job!!.isCancelled)
     }
 
     @Test
-    fun listenMessagesUseCase_should_start_messages_listening() = runTest {
+    fun listenRemoteMessagesUseCase_should_start_remote_messages_listening() = runTest {
         // When
-        listenMessagesUseCase.start()
+        listenRemoteMessagesUseCase.start()
 
         // Then
-        coVerify { messageRepository.listenRemoteMessages(conversationUserFixture.id) }
+        coVerify { messageRepository.listenRemoteMessages(conversationFixture.id) }
     }
 
     @Test
-    fun listenMessagesUseCase_should_stop_messages_listening() = runTest {
+    fun listenRemoteMessagesUseCase_should_stop_remote_messages_listening() = runTest {
         // Given
-        listenMessagesUseCase.start()
+        listenRemoteMessagesUseCase.start()
 
         // When
-        listenMessagesUseCase.stop()
+        listenRemoteMessagesUseCase.stop()
 
         // Then
-        assert(listenMessagesUseCase.job!!.isCancelled)
+        assertFalse(listenRemoteMessagesUseCase.job!!.isActive)
+    }
+
+    @Test
+    fun getConversationUseCase_should_return_conversation() = runTest {
+        // Given
+        coEvery { userConversationRepository.getConversation(any()) } returns conversationFixture
+
+        // When
+        val result = getConversationUseCase(userFixture.id)
+
+        // Then
+        assertEquals(result, conversationFixture)
     }
 }

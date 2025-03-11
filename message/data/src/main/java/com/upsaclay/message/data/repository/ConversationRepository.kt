@@ -1,21 +1,28 @@
 package com.upsaclay.message.data.repository
 
+import androidx.paging.PagingData
 import com.upsaclay.common.domain.entity.User
-import com.upsaclay.message.data.remote.model.Conversation
+import com.upsaclay.message.data.remote.model.RemoteConversation
+import com.upsaclay.message.domain.entity.Conversation
+import com.upsaclay.message.domain.entity.ConversationMessage
 import kotlinx.coroutines.flow.Flow
 
 internal interface ConversationRepository {
-    fun getConversationsFromRemote(currentUserId: String): Flow<Conversation>
+    fun getConversationUser(): Flow<List<Conversation>>
 
-    fun getConversationFromLocal(): Flow<Pair<Conversation, User>>
+    fun getPagedConversationMessages(): Flow<PagingData<ConversationMessage>>
 
-    suspend fun createConversation(conversation: Conversation, interlocutor: User, currentUser: User)
+    suspend fun getConversationFromLocal(interlocutorId: String): Conversation?
 
-    suspend fun upsertLocalConversation(conversation: Conversation, interlocutor: User)
+    fun getConversationsFromRemote(currentUserId: String): Flow<RemoteConversation>
 
-    suspend fun updateLocalConversation(conversation: Conversation, interlocutor: User)
+    suspend fun createConversation(conversation: Conversation, currentUser: User)
 
-    suspend fun deleteConversation(conversation: Conversation, interlocutor: User)
+    suspend fun upsertLocalConversation(conversation: Conversation)
+
+    suspend fun updateLocalConversation(conversation: Conversation)
+
+    suspend fun deleteConversation(conversation: Conversation)
 
     suspend fun deleteLocalConversations()
 }

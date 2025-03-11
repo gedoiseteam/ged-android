@@ -1,14 +1,13 @@
 package com.upsaclay.message.domain.repository
 
+import androidx.paging.PagingData
 import com.upsaclay.message.domain.entity.Message
 import kotlinx.coroutines.flow.Flow
 
 interface MessageRepository {
-    fun getMessages(conversationId: String): Flow<Message>
+    fun getMessages(conversationId: Int): Flow<PagingData<Message>>
 
-    fun getLastMessage(conversationId: String): Flow<Message>
-
-    suspend fun getMessages(conversationId: String, limit: Int, offset: Int): List<Message>
+    fun getLastMessage(conversationId: Int): Flow<Message>
 
     suspend fun createMessage(message: Message)
 
@@ -18,7 +17,7 @@ interface MessageRepository {
 
     suspend fun deleteLocalMessages()
 
-    suspend fun deleteMessages(conversationId: String)
+    suspend fun deleteMessages(conversationId: Int)
 
-    suspend fun listenRemoteMessages(conversationId: String)
+    suspend fun listenRemoteMessages(conversationId: Int)
 }

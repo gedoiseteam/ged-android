@@ -39,8 +39,7 @@ fun SimpleDropDownMenu(
             onValueChange = {},
             readOnly = true,
             enabled = isEnable,
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            colors = fillTextFieldColor()
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) }
         )
 
         ExposedDropdownMenu(

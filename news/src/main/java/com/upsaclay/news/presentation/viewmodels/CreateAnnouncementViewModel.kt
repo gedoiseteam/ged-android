@@ -44,7 +44,7 @@ class CreateAnnouncementViewModel(
         }
 
         val announcement = Announcement(
-            id = GenerateIdUseCase(),
+            id = GenerateIdUseCase.asString(),
             title = if (title.isBlank()) null else title.trim(),
             content = content.trim(),
             date = LocalDateTime.now(),

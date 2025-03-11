@@ -1,67 +1,49 @@
 package com.upsaclay.message.data.repository
 
+import androidx.paging.PagingData
 import com.upsaclay.common.domain.e
 import com.upsaclay.common.domain.entity.User
 import com.upsaclay.message.data.local.ConversationLocalDataSource
-import com.upsaclay.message.data.mapper.ConversationMapper
 import com.upsaclay.message.data.remote.ConversationRemoteDataSource
-import com.upsaclay.message.data.remote.model.Conversation
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import com.upsaclay.message.data.remote.model.RemoteConversation
+import com.upsaclay.message.domain.entity.Conversation
+import com.upsaclay.message.domain.entity.ConversationMessage
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flatMapConcat
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.mapNotNull
 import java.io.IOException
 
-@OptIn(ExperimentalCoroutinesApi::class)
 internal class ConversationRepositoryImpl(
     private val conversationLocalDataSource: ConversationLocalDataSource,
     private val conversationRemoteDataSource: ConversationRemoteDataSource
-) : ConversationRepository {
-    override fun getConversationsFromRemote(currentUserId: String): Flow<Conversation> =
-        conversationRemoteDataSource.listenConversations(currentUserId).mapNotNull {
-            ConversationMapper.toConversation(it, currentUserId)
-        }
+): ConversationRepository {
+    override fun getConversationUser(): Flow<List<Conversation>> =
+        conversationLocalDataSource.getConversationsUser()
 
-    override fun getConversationFromLocal(): Flow<Pair<Conversation, User>> =
-        conversationLocalDataSource.getConversations()
-            .flatMapConcat { conversations ->
-                flow {
-                    conversations.forEach {
-                        emit(ConversationMapper.toConversationWithInterlocutor(it))
-                    }
-                }
-            }
+    override fun getPagedConversationMessages(): Flow<PagingData<ConversationMessage>> =
+        conversationLocalDataSource.getConversationsMessage()
 
-    override suspend fun createConversation(
-        conversation: Conversation,
-        interlocutor: User,
-        currentUser: User
-    ) {
-        conversationLocalDataSource.insertConversation(
-            ConversationMapper.toLocal(conversation, interlocutor)
-        )
-        conversationRemoteDataSource.createConversation(
-            ConversationMapper.toRemote(conversation, currentUser.id)
-        )
+    override suspend fun getConversationFromLocal(interlocutorId: String): Conversation? =
+        conversationLocalDataSource.getConversationUser(interlocutorId)
+
+    override fun getConversationsFromRemote(currentUserId: String): Flow<RemoteConversation> =
+        conversationRemoteDataSource.listenConversations(currentUserId)
+
+    override suspend fun createConversation(conversation: Conversation, currentUser: User) {
+        conversationLocalDataSource.insertConversation(conversation)
+        conversationRemoteDataSource.createConversation(conversation, currentUser.id)
     }
 
-    override suspend fun upsertLocalConversation(conversation: Conversation, interlocutor: User) {
-        conversationLocalDataSource.upsertConversation(
-            ConversationMapper.toLocal(conversation, interlocutor)
-        )
+    override suspend fun upsertLocalConversation(conversation: Conversation) {
+        conversationLocalDataSource.upsertConversation(conversation)
     }
 
-    override suspend fun updateLocalConversation(conversation: Conversation, interlocutor: User) {
-        conversationLocalDataSource.updateConversation(
-            ConversationMapper.toLocal(conversation, interlocutor)
-        )
+    override suspend fun updateLocalConversation(conversation: Conversation) {
+        conversationLocalDataSource.updateConversation(conversation)
     }
 
-    override suspend fun deleteConversation(conversation: Conversation, interlocutor: User) {
+    override suspend fun deleteConversation(conversation: Conversation) {
         try {
             conversationRemoteDataSource.deleteConversation(conversation.id)
-            conversationLocalDataSource.deleteConversation(ConversationMapper.toLocal(conversation, interlocutor))
+            conversationLocalDataSource.deleteConversation(conversation)
         } catch (e: Exception) {
             e("Error deleting conversation", e)
             throw IOException()

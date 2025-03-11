@@ -1,64 +1,92 @@
 package com.upsaclay.message.data.mapper
 
 import com.google.firebase.Timestamp
-import com.google.gson.Gson
+import com.upsaclay.common.domain.UrlUtils
 import com.upsaclay.common.domain.entity.User
 import com.upsaclay.common.domain.usecase.ConvertDateUseCase
 import com.upsaclay.message.data.local.model.LocalConversation
-import com.upsaclay.message.data.remote.model.Conversation
+import com.upsaclay.message.data.local.model.LocalConversationMessage
+import com.upsaclay.message.data.local.model.LocalMessage
 import com.upsaclay.message.data.remote.model.RemoteConversation
+import com.upsaclay.message.domain.entity.Conversation
+import com.upsaclay.message.domain.entity.ConversationMessage
 import com.upsaclay.message.domain.entity.ConversationState
-import com.upsaclay.message.domain.entity.ConversationUser
+import com.upsaclay.message.domain.entity.Message
 
 internal object ConversationMapper {
-    fun toLocal(conversation: Conversation, interlocutor: User) = LocalConversation(
+    fun toLocal(conversation: Conversation) = LocalConversation(
         conversationId = conversation.id,
-        interlocutorJson = Gson().toJson(interlocutor),
+        interlocutorId = conversation.interlocutor.id,
+        interlocutorFirstName = conversation.interlocutor.firstName,
+        interlocutorLastName = conversation.interlocutor.lastName,
+        interlocutorEmail = conversation.interlocutor.email,
+        interlocutorIsMember = if (conversation.interlocutor.isMember) 1 else 0,
+        interlocutorSchoolLevel = conversation.interlocutor.schoolLevel,
+        interlocutorProfilePictureFileName = UrlUtils.getFileNameFromUrl(conversation.interlocutor.profilePictureUrl),
         createdAt = ConvertDateUseCase.toTimestamp(conversation.createdAt),
         state = conversation.state.name
     )
 
     fun toRemote(conversation: Conversation, currentUserId: String) = RemoteConversation(
         conversationId = conversation.id,
-        participants = listOf(currentUserId, conversation.interlocutorId),
+        participants = listOf(currentUserId, conversation.interlocutor.id),
         createdAt = Timestamp(ConvertDateUseCase.toInstant(conversation.createdAt))
     )
 
-    fun toConversationUser(conversation: Conversation, interlocutor: User) = ConversationUser(
-        id = conversation.id,
-        interlocutor = interlocutor,
-        createdAt = conversation.createdAt,
-        state = conversation.state
-    )
+    fun toConversation(localConversation: LocalConversation): Conversation {
+        val interlocutor = User(
+            id = localConversation.interlocutorId,
+            firstName = localConversation.interlocutorFirstName,
+            lastName = localConversation.interlocutorLastName,
+            email = localConversation.interlocutorEmail,
+            schoolLevel = localConversation.interlocutorSchoolLevel,
+            isMember = localConversation.interlocutorIsMember == 1,
+            profilePictureUrl = UrlUtils.formatProfilePictureUrl(localConversation.interlocutorProfilePictureFileName)
+        )
 
-    fun toConversationWithInterlocutor(localConversation: LocalConversation): Pair<Conversation, User> {
-        val interlocutor = Gson().fromJson(localConversation.interlocutorJson, User::class.java)
-        val conversation = Conversation(
+        return Conversation(
             id = localConversation.conversationId,
-            interlocutorId = interlocutor.id,
+            interlocutor = interlocutor,
             createdAt = ConvertDateUseCase.toLocalDateTime(localConversation.createdAt),
             state = ConversationState.valueOf(localConversation.state)
         )
-        return Pair<Conversation, User>(conversation, interlocutor)
     }
 
-    fun toConversation(
-        remoteConversation: RemoteConversation,
-        currentUserId: String
-    ): Conversation? {
-        val interlocutorId = remoteConversation.participants.firstOrNull { it != currentUserId } ?: return null
+    fun toConversation(remoteConversation: RemoteConversation, interlocutor: User): Conversation {
         return Conversation(
             id = remoteConversation.conversationId,
-            interlocutorId = interlocutorId,
+            interlocutor = interlocutor,
             createdAt = ConvertDateUseCase.toLocalDateTime(remoteConversation.createdAt.toInstant()),
             state = ConversationState.CREATED
         )
     }
 
-    fun toConversation(conversationUser: ConversationUser) = Conversation(
-        id = conversationUser.id,
-        interlocutorId = conversationUser.interlocutor.id,
-        createdAt = conversationUser.createdAt,
-        state = conversationUser.state
+    fun toConversationMessage(localConversationMessage: LocalConversationMessage) = ConversationMessage(
+        conversation = toConversation(
+            LocalConversation(
+                conversationId = localConversationMessage.conversationId,
+                interlocutorId = localConversationMessage.interlocutorId,
+                interlocutorFirstName = localConversationMessage.interlocutorFirstName,
+                interlocutorLastName = localConversationMessage.interlocutorLastName,
+                interlocutorEmail = localConversationMessage.interlocutorEmail,
+                interlocutorSchoolLevel = localConversationMessage.interlocutorSchoolLevel,
+                interlocutorIsMember = if (localConversationMessage.interlocutorIsMember) 1 else 0,
+                interlocutorProfilePictureFileName = localConversationMessage.interlocutorProfilePictureFileName,
+                createdAt = localConversationMessage.createdAt,
+                state = localConversationMessage.conversationState
+            )
+        ),
+        lastMessage = MessageMapper.toDomain(
+            LocalMessage(
+                messageId = localConversationMessage.messageId,
+                conversationId = localConversationMessage.conversationId,
+                senderId = localConversationMessage.senderId,
+                content = localConversationMessage.content,
+                messageTimestamp = localConversationMessage.messageTimestamp,
+                seenValue = localConversationMessage.seenValue,
+                seenTimestamp = localConversationMessage.seenTime,
+                state = localConversationMessage.messageState
+            )
+        )
     )
 }
