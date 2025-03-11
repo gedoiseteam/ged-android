@@ -6,11 +6,12 @@ import com.upsaclay.common.domain.entity.User
 import com.upsaclay.common.domain.usecase.GenerateIdUseCase
 import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
 import com.upsaclay.common.domain.usecase.GetUsersUseCase
+import com.upsaclay.message.domain.entity.Conversation
 import com.upsaclay.message.domain.entity.ConversationScreenState
 import com.upsaclay.message.domain.entity.ConversationState
 import com.upsaclay.message.domain.entity.ConversationUI
 import com.upsaclay.message.domain.usecase.ConvertConversationJsonUseCase
-import com.upsaclay.message.domain.usecase.ListenConversationsUiUseCase
+import com.upsaclay.message.domain.usecase.GetConversationUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,7 +20,7 @@ import java.time.LocalDateTime
 
 class CreateConversationViewModel(
     private val getUsersUseCase: GetUsersUseCase,
-    private val listenConversationsUiUseCase: ListenConversationsUiUseCase,
+    private val getConversationUseCase: GetConversationUseCase,
     getCurrentUserUseCase: GetCurrentUserUseCase
 ) : ViewModel() {
     private val _screenState = MutableStateFlow(ConversationScreenState.DEFAULT)
@@ -34,7 +35,7 @@ class CreateConversationViewModel(
 
     fun generateConversationJson(interlocutor: User): String {
         val conversation = ConversationUI(
-            id = GenerateIdUseCase.invoke(),
+            id = GenerateIdUseCase.asInt(),
             interlocutor = interlocutor,
             lastMessage = null,
             createdAt = LocalDateTime.now(),
@@ -43,8 +44,10 @@ class CreateConversationViewModel(
         return ConvertConversationJsonUseCase(conversation)
     }
 
-    fun getConversation(interlocutorId: String): ConversationUI? =
-        listenConversationsUiUseCase.currentConversationsUI.firstOrNull { it.interlocutor.id == interlocutorId }
+    suspend fun getConversation(interlocutorId: String): Conversation? {
+        _screenState.value = ConversationScreenState.LOADING
+        return getConversationUseCase(interlocutorId)
+    }
 
     private fun fetchUsers() {
         _screenState.value = ConversationScreenState.LOADING

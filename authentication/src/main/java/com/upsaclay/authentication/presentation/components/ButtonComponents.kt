@@ -18,6 +18,7 @@ import com.upsaclay.common.presentation.components.CircularProgressBar
 import com.upsaclay.common.presentation.components.PrimaryButton
 import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
+import com.upsaclay.common.presentation.theme.white
 
 @Composable
 fun LoginButton(
@@ -43,7 +44,7 @@ private fun LoadingLargeButton(modifier: Modifier = Modifier) {
         onClick = { },
         enabled = false,
         colors = ButtonColors(
-            contentColor = GedoiseColor.White,
+            contentColor = MaterialTheme.colorScheme.white,
             containerColor = MaterialTheme.colorScheme.primary,
             disabledContainerColor = MaterialTheme.colorScheme.primary,
             disabledContentColor = MaterialTheme.colorScheme.primary
@@ -51,7 +52,7 @@ private fun LoadingLargeButton(modifier: Modifier = Modifier) {
         modifier = modifier.height(45.dp)
     ) {
         CircularProgressBar(
-            color = GedoiseColor.White,
+            color = MaterialTheme.colorScheme.white,
             scale = 0.6f
         )
     }

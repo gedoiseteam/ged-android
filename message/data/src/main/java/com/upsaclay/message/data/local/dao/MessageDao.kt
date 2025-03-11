@@ -1,5 +1,6 @@
 package com.upsaclay.message.data.local.dao
 
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
@@ -8,34 +9,25 @@ import androidx.room.Upsert
 import com.upsaclay.message.data.local.model.LocalMessage
 import com.upsaclay.message.data.model.MESSAGES_TABLE_NAME
 import com.upsaclay.message.data.model.MessageField
+import com.upsaclay.message.domain.entity.Message
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface MessageDao {
-    @Query(
-        "SELECT * FROM $MESSAGES_TABLE_NAME " +
-                "WHERE ${MessageField.CONVERSATION_ID} = :conversationId " +
-                "ORDER BY timestamp DESC " +
-                "LIMIT 1"
-    )
-    fun getLastMessage(conversationId: String): Flow<LocalMessage>
+    @Query("""
+        SELECT * FROM $MESSAGES_TABLE_NAME
+        WHERE ${MessageField.CONVERSATION_ID} = :conversationId 
+        ORDER BY ${MessageField.MESSAGE_TIMESTAMP} DESC
+    """)
+    fun getPagedMessages(conversationId: Int): PagingSource<Int, LocalMessage>
 
-    @Query(
-        "SELECT * FROM $MESSAGES_TABLE_NAME " +
-                "WHERE ${MessageField.CONVERSATION_ID} = :conversationId " +
-                "ORDER BY timestamp DESC " +
-                "LIMIT 20"
-    )
-    fun getMessages(conversationId: String): Flow<List<LocalMessage>>
-
-    @Query(
-        "SELECT * FROM $MESSAGES_TABLE_NAME " +
-                "WHERE ${MessageField.CONVERSATION_ID} = :conversationId " +
-                "ORDER BY timestamp DESC " +
-                "LIMIT :limit " +
-                "OFFSET :offset"
-    )
-    suspend fun getMessages(conversationId: String, limit: Int, offset: Int): List<LocalMessage>
+    @Query("""
+       SELECT * FROM $MESSAGES_TABLE_NAME 
+       WHERE ${MessageField.CONVERSATION_ID} = :conversationId
+       ORDER BY ${MessageField.MESSAGE_TIMESTAMP} DESC
+       LIMIT 1
+    """)
+    fun getLastMessage(conversationId: Int): Flow<LocalMessage?>
 
     @Insert
     suspend fun insertMessage(localMessage: LocalMessage)
@@ -47,7 +39,7 @@ interface MessageDao {
     suspend fun upsertMessage(localMessage: LocalMessage)
 
     @Query("DELETE FROM $MESSAGES_TABLE_NAME WHERE ${MessageField.CONVERSATION_ID} = :conversationId")
-    suspend fun deleteMessages(conversationId: String)
+    suspend fun deleteMessages(conversationId: Int)
 
     @Query("DELETE FROM $MESSAGES_TABLE_NAME")
     suspend fun deleteAllMessages()

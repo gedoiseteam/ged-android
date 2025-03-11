@@ -8,5 +8,5 @@ internal interface ConversationApi {
 
     suspend fun createConversation(remoteConversation: RemoteConversation)
 
-    suspend fun deleteConversation(conversationId: String)
+    suspend fun deleteConversation(conversationId: Int)
 }

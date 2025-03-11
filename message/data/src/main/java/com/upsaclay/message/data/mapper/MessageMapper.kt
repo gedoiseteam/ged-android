@@ -1,12 +1,13 @@
 package com.upsaclay.message.data.mapper
 
 import com.google.firebase.Timestamp
+import com.upsaclay.common.domain.usecase.ConvertDateUseCase
 import com.upsaclay.message.data.local.model.LocalMessage
 import com.upsaclay.message.data.remote.model.RemoteMessage
 import com.upsaclay.message.domain.entity.Message
 import com.upsaclay.message.domain.entity.MessageState
+import com.upsaclay.message.domain.entity.Seen
 import java.time.Instant
-import java.time.LocalDateTime
 import java.time.ZoneOffset
 
 internal object MessageMapper {
@@ -15,10 +16,9 @@ internal object MessageMapper {
         senderId = remoteMessage.senderId,
         conversationId = remoteMessage.conversationId,
         content = remoteMessage.content,
-        date = LocalDateTime.ofInstant(remoteMessage.timestamp.toInstant(), ZoneOffset.UTC),
+        date = ConvertDateUseCase.toLocalDateTime(remoteMessage.timestamp.toInstant()),
         seen = remoteMessage.seen,
-        state = MessageState.SENT,
-        type = remoteMessage.type
+        state = MessageState.SENT
     )
 
     fun toDomain(localMessage: LocalMessage) = Message(
@@ -26,10 +26,16 @@ internal object MessageMapper {
         senderId = localMessage.senderId,
         conversationId = localMessage.conversationId,
         content = localMessage.content,
-        date = Instant.ofEpochMilli(localMessage.timestamp).atZone(ZoneOffset.UTC).toLocalDateTime(),
-        seen = localMessage.seen,
-        state = MessageState.valueOf(localMessage.state),
-        type = localMessage.type
+        date = Instant.ofEpochMilli(localMessage.messageTimestamp).atZone(ZoneOffset.UTC).toLocalDateTime(),
+        seen = if (localMessage.seenValue == null || localMessage.seenTimestamp == null) {
+            null
+        } else {
+            Seen(
+                value = localMessage.seenValue,
+                time = ConvertDateUseCase.toLocalDateTime(localMessage.seenTimestamp)
+            )
+        },
+        state = MessageState.valueOf(localMessage.state)
     )
 
     fun toLocal(message: Message) = LocalMessage(
@@ -37,10 +43,10 @@ internal object MessageMapper {
         senderId = message.senderId,
         conversationId = message.conversationId,
         content = message.content,
-        timestamp = message.date.toInstant(ZoneOffset.UTC).toEpochMilli(),
-        seen = message.seen,
-        state = message.state.name,
-        type = message.type
+        messageTimestamp = message.date.toInstant(ZoneOffset.UTC).toEpochMilli(),
+        seenValue = message.seen?.value,
+        seenTimestamp = message.seen?.time?.let { ConvertDateUseCase.toTimestamp(it) },
+        state = message.state.name
     )
 
     fun toRemote(message: Message) = RemoteMessage(
@@ -49,7 +55,6 @@ internal object MessageMapper {
         senderId = message.senderId,
         content = message.content,
         timestamp = Timestamp(message.date.atZone(ZoneOffset.UTC).toInstant()),
-        seen = message.seen,
-        type = message.type
+        seen = message.seen
     )
 }

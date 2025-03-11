@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 
@@ -16,12 +17,13 @@ import com.upsaclay.common.presentation.theme.GedoiseTheme
 fun CircularProgressBar(
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colorScheme.primary,
-    scale: Float = 1f
+    scale: Float = 1f,
+    strokeWidth : Dp = ProgressIndicatorDefaults.CircularStrokeWidth
 ) {
     CircularProgressIndicator(
         modifier = modifier.size(42.dp * scale),
         color = color,
-        strokeWidth = ProgressIndicatorDefaults.CircularStrokeWidth * (0.9f * scale)
+        strokeWidth = strokeWidth * (0.9f * scale)
     )
 }
 

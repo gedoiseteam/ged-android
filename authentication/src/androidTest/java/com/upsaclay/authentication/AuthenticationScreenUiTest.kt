@@ -185,6 +185,6 @@ class AuthenticationScreenUiTest {
         }
 
         // Then
-        rule.onNodeWithText(rule.activity.getString(R.string.too_many_request_error)).assertExists()
+        rule.onNodeWithText(rule.activity.getString(com.upsaclay.common.R.string.too_many_request_error)).assertExists()
     }
 }

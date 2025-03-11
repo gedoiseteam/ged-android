@@ -3,15 +3,12 @@ package com.upsaclay.common.data.repository
 import android.accounts.NetworkErrorException
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.FirebaseTooManyRequestsException
-import com.google.firebase.firestore.FirebaseFirestoreException
 import com.upsaclay.common.data.local.UserLocalDataSource
 import com.upsaclay.common.data.remote.UserRemoteDataSource
 import com.upsaclay.common.domain.e
 import com.upsaclay.common.domain.entity.TooManyRequestException
 import com.upsaclay.common.domain.entity.User
 import com.upsaclay.common.domain.repository.UserRepository
-import com.upsaclay.common.domain.w
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow

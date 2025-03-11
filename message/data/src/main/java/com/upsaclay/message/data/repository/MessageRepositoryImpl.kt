@@ -1,5 +1,6 @@
 package com.upsaclay.message.data.repository
 
+import androidx.paging.PagingData
 import com.upsaclay.message.data.local.MessageLocalDataSource
 import com.upsaclay.message.data.remote.MessageRemoteDataSource
 import com.upsaclay.message.domain.entity.Message
@@ -10,13 +11,11 @@ internal class MessageRepositoryImpl(
     private val messageLocalDataSource: MessageLocalDataSource,
     private val messageRemoteDataSource: MessageRemoteDataSource
 ): MessageRepository {
-    override fun getMessages(conversationId: String): Flow<Message> = messageLocalDataSource.getMessages(conversationId)
+    override fun getMessages(conversationId: Int): Flow<PagingData<Message>> =
+        messageLocalDataSource.getMessages(conversationId)
 
-    override fun getLastMessage(conversationId: String): Flow<Message> =
+    override fun getLastMessage(conversationId: Int): Flow<Message> =
         messageLocalDataSource.getLastMessage(conversationId)
-
-    override suspend fun getMessages(conversationId: String, limit: Int, offset: Int): List<Message> =
-        messageLocalDataSource.getMessages(conversationId, limit, offset)
 
     override suspend fun createMessage(message: Message) {
         messageLocalDataSource.insertMessage(message)
@@ -32,7 +31,7 @@ internal class MessageRepositoryImpl(
         messageLocalDataSource.upsertMessage(message)
     }
 
-    override suspend fun deleteMessages(conversationId: String) {
+    override suspend fun deleteMessages(conversationId: Int) {
         messageLocalDataSource.deleteMessages(conversationId)
         messageRemoteDataSource.deleteMessages(conversationId)
     }
@@ -41,7 +40,7 @@ internal class MessageRepositoryImpl(
         messageLocalDataSource.deleteMessages()
     }
 
-    override suspend fun listenRemoteMessages(conversationId: String) {
+    override suspend fun listenRemoteMessages(conversationId: Int) {
         messageRemoteDataSource.listenMessages(conversationId)
             .collect { messageLocalDataSource.upsertMessage(it) }
     }

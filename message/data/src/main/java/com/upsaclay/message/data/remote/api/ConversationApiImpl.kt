@@ -41,7 +41,7 @@ internal class ConversationApiImpl : ConversationApi {
 
     override suspend fun createConversation(remoteConversation: RemoteConversation) = suspendCoroutine { continuation ->
         conversationsCollection
-            .document(remoteConversation.conversationId)
+            .document(remoteConversation.conversationId.toString())
             .set(remoteConversation)
             .addOnSuccessListener {
                 continuation.resume(Unit)
@@ -52,8 +52,8 @@ internal class ConversationApiImpl : ConversationApi {
             }
     }
 
-    override suspend fun deleteConversation(conversationId: String) = suspendCoroutine { continuation ->
-        conversationsCollection.document(conversationId)
+    override suspend fun deleteConversation(conversationId: Int) = suspendCoroutine { continuation ->
+        conversationsCollection.document(conversationId.toString())
             .delete()
             .addOnSuccessListener {
                 continuation.resume(Unit)

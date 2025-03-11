@@ -6,9 +6,7 @@ import com.upsaclay.common.data.remote.api.UserFirestoreApi
 import com.upsaclay.common.data.remote.api.UserRetrofitApi
 import com.upsaclay.common.domain.e
 import com.upsaclay.common.domain.entity.InternalServerException
-import com.upsaclay.common.domain.entity.ServerCommunicationException
 import com.upsaclay.common.domain.entity.User
-import com.upsaclay.common.domain.w
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -16,7 +14,6 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.IOException
-import java.net.ConnectException
 
 internal class UserRemoteDataSource(
     private val userRetrofitApi: UserRetrofitApi,

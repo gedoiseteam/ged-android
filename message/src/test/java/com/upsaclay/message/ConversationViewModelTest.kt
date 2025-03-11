@@ -2,7 +2,7 @@ package com.upsaclay.message
 
 import com.upsaclay.message.domain.conversationsUIFixture
 import com.upsaclay.message.domain.usecase.DeleteConversationUseCase
-import com.upsaclay.message.domain.usecase.ListenConversationsUiUseCase
+import com.upsaclay.message.domain.usecase.GetConversationUIUseCase
 import com.upsaclay.message.presentation.viewmodels.ConversationViewModel
 import io.mockk.every
 import io.mockk.mockk
@@ -14,17 +14,17 @@ import org.junit.Test
 import kotlin.test.assertEquals
 
 class ConversationViewModelTest {
-    private val listenConversationsUiUseCase: ListenConversationsUiUseCase = mockk()
+    private val getConversationUIUseCase: GetConversationUIUseCase = mockk()
     private val deleteConversationUseCase: DeleteConversationUseCase = mockk()
 
     private lateinit var conversationViewModel: ConversationViewModel
 
     @Before
     fun setUp() {
-        every { listenConversationsUiUseCase.conversationsUI } returns flowOf(conversationsUIFixture)
+        every { getConversationUIUseCase.conversationsUI } returns flowOf(conversationsUIFixture)
 
         conversationViewModel = ConversationViewModel(
-            listenConversationsUiUseCase = listenConversationsUiUseCase,
+            getConversationUIUseCase = getConversationUIUseCase,
             deleteConversationUseCase = deleteConversationUseCase
         )
     }

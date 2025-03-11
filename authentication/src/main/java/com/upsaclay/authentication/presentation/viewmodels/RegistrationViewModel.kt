@@ -29,7 +29,7 @@ class RegistrationViewModel(
     private val registerUseCase: RegisterUseCase,
     private val isUserExistUseCase: IsUserExistUseCase,
 ) : ViewModel() {
-    private val userId = GenerateIdUseCase()
+    private val userId = GenerateIdUseCase.asString()
     private val _screenState = MutableStateFlow(RegistrationScreenState.NOT_REGISTERED)
     val screenState: StateFlow<RegistrationScreenState> = _screenState
 

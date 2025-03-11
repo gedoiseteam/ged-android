@@ -125,8 +125,8 @@ class CommonUseCaseTest {
     fun generateIdUseCase_should_generate_unique_id() {
         for (i in 0..100) {
             // When
-            val id1 = generateIdUseCase()
-            val id2 = generateIdUseCase()
+            val id1 = generateIdUseCase.asString()
+            val id2 = generateIdUseCase.asString()
 
             // Then
             assertNotEquals(id1, id2)

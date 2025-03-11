@@ -9,6 +9,7 @@ import androidx.room.Update
 import androidx.room.Upsert
 import com.upsaclay.message.data.local.model.LocalConversation
 import com.upsaclay.message.data.model.CONVERSATIONS_TABLE_NAME
+import com.upsaclay.message.data.model.ConversationField
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -16,7 +17,10 @@ interface ConversationDao {
     @Query("SELECT * FROM $CONVERSATIONS_TABLE_NAME")
     fun getConversations(): Flow<List<LocalConversation>>
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Query("SELECT * FROM $CONVERSATIONS_TABLE_NAME WHERE ${ConversationField.Local.INTERLOCUTOR_ID} = :interlocutorId")
+    suspend fun getConversation(interlocutorId: String): LocalConversation?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertConversation(localConversation: LocalConversation)
 
     @Update

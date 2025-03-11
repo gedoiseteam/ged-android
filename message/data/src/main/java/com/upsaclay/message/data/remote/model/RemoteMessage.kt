@@ -3,15 +3,16 @@ package com.upsaclay.message.data.remote.model
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.PropertyName
 import com.upsaclay.message.data.model.MessageField
+import com.upsaclay.message.domain.entity.Seen
 
 internal data class RemoteMessage(
     @get:PropertyName(MessageField.MESSAGE_ID)
     @set:PropertyName(MessageField.MESSAGE_ID)
-    var messageId: String = "",
+    var messageId: Int = 0,
 
     @get:PropertyName(MessageField.CONVERSATION_ID)
     @set:PropertyName(MessageField.CONVERSATION_ID)
-    var conversationId: String = "",
+    var conversationId: Int = 0,
 
     @get:PropertyName(MessageField.SENDER_ID)
     @set:PropertyName(MessageField.SENDER_ID)
@@ -21,15 +22,11 @@ internal data class RemoteMessage(
     @set:PropertyName(MessageField.CONTENT)
     var content: String = "",
 
-    @get:PropertyName(MessageField.TIMESTAMP)
-    @set:PropertyName(MessageField.TIMESTAMP)
+    @get:PropertyName(MessageField.MESSAGE_TIMESTAMP)
+    @set:PropertyName(MessageField.MESSAGE_TIMESTAMP)
     var timestamp: Timestamp = Timestamp.now(),
 
-    @get:PropertyName(MessageField.SEEN)
-    @set:PropertyName(MessageField.SEEN)
-    var seen: Boolean = false,
-
-    @get:PropertyName(MessageField.TYPE)
-    @set:PropertyName(MessageField.TYPE)
-    var type: String = ""
+    @get:PropertyName(MessageField.Remote.SEEN)
+    @set:PropertyName(MessageField.Remote.SEEN)
+    var seen: Seen? = null,
 )

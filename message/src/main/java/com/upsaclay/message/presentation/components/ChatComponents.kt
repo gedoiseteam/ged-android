@@ -2,9 +2,11 @@ package com.upsaclay.message.presentation.components
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -36,22 +38,29 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.upsaclay.common.domain.e
 import com.upsaclay.common.domain.usecase.FormatLocalDateTimeUseCase
 import com.upsaclay.common.presentation.components.ProfilePicture
 import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
+import com.upsaclay.common.presentation.theme.black
 import com.upsaclay.common.presentation.theme.inputBackground
 import com.upsaclay.common.presentation.theme.inputForeground
 import com.upsaclay.common.presentation.theme.spacing
+import com.upsaclay.common.presentation.theme.white
 import com.upsaclay.message.R
 import com.upsaclay.message.domain.entity.Message
 import com.upsaclay.message.domain.entity.MessageState
@@ -62,38 +71,51 @@ import java.time.LocalDateTime
 fun SentMessageItem(
     modifier: Modifier = Modifier,
     message: Message,
-    seen: Boolean = false
+    showSeen: Boolean = false
 ) {
+    val dateTimeTextColor = if (isSystemInDarkTheme())
+        Color(0xFFBEBEBE)
+    else
+        Color(0xFFC8C8C8)
+
     Column(
         horizontalAlignment = Alignment.End
     ) {
-        Row(
-            modifier = modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End,
-            verticalAlignment = Alignment.Bottom
-        ) {
-            Spacer(modifier = Modifier.fillMaxWidth(0.2f))
+        Box {
+            Row(
+                modifier = modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.Bottom
+            ) {
+                Spacer(modifier = Modifier.fillMaxWidth(0.2f))
 
-            MessageText(
-                text = message.content,
-                textColor = Color.White,
-                date = message.date,
-                backgroundColor = MaterialTheme.colorScheme.primary,
-                dateTimeTextColor = Color(0xFFD1D3D8)
-            )
+                MessageText(
+                    text = message.content,
+                    textColor = Color.White,
+                    date = message.date,
+                    backgroundColor = MaterialTheme.colorScheme.primary,
+                    dateTimeTextColor = dateTimeTextColor
+                )
+            }
         }
 
-        if (seen) {
-            Text(
-                modifier = Modifier
-                    .padding(
+        if (showSeen) {
+            message.seen?.time?.let { seenTime ->
+                val annotatedString = buildAnnotatedString {
+                    append(stringResource(id = R.string.message_seen) + " ")
+                    append(FormatLocalDateTimeUseCase.formatHourMinute(seenTime))
+                }
+
+                Text(
+                    modifier = Modifier.padding(
                         top = MaterialTheme.spacing.extraSmall,
                         end = MaterialTheme.spacing.smallMedium
                     ),
-                text = stringResource(id = R.string.message_seen),
-                style = MaterialTheme.typography.labelSmall,
-                color = Color.Gray
-            )
+                    text = annotatedString,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color.Gray
+                )
+            }
         }
     }
 }
@@ -105,7 +127,7 @@ fun ReceiveMessageItem(
     message: Message,
     displayProfilePicture: Boolean
 ) {
-    val foreground = if (isSystemInDarkTheme()) GedoiseColor.White else GedoiseColor.Black
+    val foreground = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.white else MaterialTheme.colorScheme.black
 
     Row(
         modifier = modifier.fillMaxWidth(0.8f),
@@ -176,7 +198,7 @@ fun MessageInput(
     onSendClick: () -> Unit
 ) {
     val interactionSource = remember { MutableInteractionSource() }
-    val textColor = if (isSystemInDarkTheme()) GedoiseColor.White else GedoiseColor.Black
+    val textColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.white else MaterialTheme.colorScheme.black
 
     Row(
         modifier = modifier
@@ -233,9 +255,42 @@ fun MessageInput(
                 Icon(
                     imageVector = Icons.AutoMirrored.Default.Send,
                     contentDescription = stringResource(id = R.string.send_message_icon_description),
-                    tint = GedoiseColor.White
+                    tint = MaterialTheme.colorScheme.white
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun NewMessageIndicator(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = MaterialTheme.spacing.smallMedium),
+        Arrangement.Center
+    ) {
+        Box(
+            modifier = Modifier
+                .shadow(
+                    elevation = 2.dp,
+                    shape = ShapeDefaults.Small
+                )
+        ) {
+            Text(
+                text = stringResource(id = R.string.new_message),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.black,
+                modifier = Modifier
+                    .clip(ShapeDefaults.Small)
+                    .background(Color.White)
+                    .clickable { onClick() }
+                    .padding(horizontal = MaterialTheme.spacing.large)
+                    .padding(vertical = MaterialTheme.spacing.small)
+            )
         }
     }
 }
@@ -262,7 +317,7 @@ private val longtext = "Bonjour, j'espère que vous allez bien. " +
 private fun SentMessageItemPreview() {
     GedoiseTheme {
         Column(verticalArrangement = Arrangement.SpaceAround) {
-            SentMessageItem(message = messageFixture, seen = true)
+            SentMessageItem(message = messageFixture, showSeen = true)
 
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
 
@@ -298,5 +353,13 @@ private fun MessageTextFieldPreview() {
             onValueChange = { text = it },
             onSendClick = { },
         )
+    }
+}
+
+@Preview(widthDp = 200, heightDp = 100)
+@Composable
+private fun NewMessageIndicatorPreview() {
+    GedoiseTheme {
+        NewMessageIndicator {}
     }
 }

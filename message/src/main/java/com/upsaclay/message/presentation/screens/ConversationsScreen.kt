@@ -1,6 +1,5 @@
 package com.upsaclay.message.presentation.screens
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -46,12 +45,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
+import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemContentType
+import androidx.paging.compose.itemKey
 import com.upsaclay.common.domain.entity.Screen
+import com.upsaclay.common.presentation.components.CircularProgressBar
 import com.upsaclay.common.presentation.components.ClickableItem
 import com.upsaclay.common.presentation.components.LoadingDialog
 import com.upsaclay.common.presentation.components.SensibleActionDialog
-import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
+import com.upsaclay.common.presentation.theme.previewText
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.message.R
 import com.upsaclay.message.domain.conversationsUIFixture
@@ -70,14 +75,13 @@ fun ConversationScreen(
     snackbarHostState: SnackbarHostState,
     conversationViewModel: ConversationViewModel = koinViewModel()
 ) {
-    val conversations by conversationViewModel.conversations.collectAsState(emptyList())
+    val conversations = conversationViewModel.conversations.collectAsLazyPagingItems()
     val screenState by conversationViewModel.screenState.collectAsState()
     val context = LocalContext.current
 
     var conversationClicked by remember { mutableStateOf<ConversationUI?>(null) }
     val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState()
-    val textColor = if (isSystemInDarkTheme()) GedoiseColor.PreviewTextDark else GedoiseColor.PreviewTextLight
 
     var showBottomSheet by remember { mutableStateOf(false) }
     var showDeleteConversationDialog by remember { mutableStateOf(false) }
@@ -130,53 +134,23 @@ fun ConversationScreen(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        if (conversations.isEmpty()) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = MaterialTheme.spacing.large),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = stringResource(id = R.string.no_conversation),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = textColor,
-                    textAlign = TextAlign.Center
-                )
-
-                TextButton(
-                    contentPadding = PaddingValues(MaterialTheme.spacing.default),
-                    modifier = Modifier.height(MaterialTheme.spacing.large),
-                    onClick = {
-                        navController.navigate(Screen.CREATE_CONVERSATION.route)
-                    }
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.new_conversation),
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
+        if (conversations.itemCount == 0) {
+            StartConversation(
+                onCreateClick = { navController.navigate(Screen.CREATE_CONVERSATION.route) }
+            )
         } else {
-            LazyColumn {
-                items(conversations) { conversation ->
-                    ConversationItem(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .testTag(stringResource(id = R.string.conversation_screen_conversation_item_tag)),
-                        conversation = conversation,
-                        onClick = {
-                            navController.navigate(
-                                Screen.CHAT.route + "?conversation=${ConvertConversationJsonUseCase(conversation)}"
-                            )
-                        },
-                        onLongClick = {
-                            conversationClicked = conversation
-                            showBottomSheet = true
-                        }
+            ConversationFeed(
+                conversationItems = conversations,
+                onClick = {
+                    navController.navigate(
+                        Screen.CHAT.route + "?conversation=${ConvertConversationJsonUseCase(it)}"
                     )
+                },
+                onLongClick = {
+                    conversationClicked = it
+                    showBottomSheet = true
                 }
-            }
+            )
         }
 
         CreateConversationFAB(
@@ -218,6 +192,111 @@ fun ConversationScreen(
     }
 }
 
+@Composable
+private fun ConversationFeed(
+    conversationItems: LazyPagingItems<ConversationUI>,
+    onClick: (ConversationUI) -> Unit,
+    onLongClick: (ConversationUI) -> Unit
+) {
+    LazyColumn {
+        items(
+            count = conversationItems.itemCount,
+            key = conversationItems.itemKey { it.id },
+            contentType = conversationItems.itemContentType { "Conversation feed" }
+        ) { index ->
+            conversationItems[index]?.let { conversation ->
+                ConversationItem(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag(stringResource(id = R.string.conversation_screen_conversation_item_tag)),
+                    conversation = conversation,
+                    onClick = { onClick(conversation) },
+                    onLongClick = { onLongClick(conversation) }
+                )
+            }
+        }
+
+        item {
+            when (conversationItems.loadState.refresh) {
+                is LoadState.Error -> {
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = stringResource(R.string.error_fetch_conversations),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.error,
+                        textAlign = TextAlign.Center
+                    )
+                }
+
+                is LoadState.Loading -> {
+                    Column(
+                        modifier = Modifier.fillParentMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        CircularProgressBar()
+                    }
+                }
+
+                else -> {}
+            }
+        }
+
+        item {
+            when (conversationItems.loadState.append) {
+                is LoadState.Error -> {
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = stringResource(R.string.error_fetch_messages),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.error,
+                        textAlign = TextAlign.Center
+                    )
+                }
+
+                is LoadState.Loading -> {
+                    Column(
+                        modifier = Modifier.fillParentMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        CircularProgressBar()
+                    }
+                }
+
+                else -> {}
+            }
+        }
+    }
+}
+
+@Composable
+private fun StartConversation(onCreateClick: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = MaterialTheme.spacing.large),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = stringResource(id = R.string.no_conversation),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.previewText,
+            textAlign = TextAlign.Center
+        )
+
+        TextButton(
+            contentPadding = PaddingValues(MaterialTheme.spacing.default),
+            modifier = Modifier.height(MaterialTheme.spacing.large),
+            onClick = onCreateClick
+        ) {
+            Text(
+                text = stringResource(id = R.string.new_conversation),
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
+}
 
 @Composable
 private fun CreateConversationFAB(

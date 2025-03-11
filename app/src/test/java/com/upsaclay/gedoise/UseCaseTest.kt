@@ -6,9 +6,9 @@ import com.upsaclay.gedoise.domain.usecase.StartListeningDataUseCase
 import com.upsaclay.gedoise.domain.usecase.StopListeningDataUseCase
 import com.upsaclay.message.domain.repository.MessageRepository
 import com.upsaclay.message.domain.repository.UserConversationRepository
-import com.upsaclay.message.domain.usecase.ListenConversationsUiUseCase
-import com.upsaclay.message.domain.usecase.ListenConversationsUseCase
-import com.upsaclay.message.domain.usecase.ListenMessagesUseCase
+import com.upsaclay.message.domain.usecase.GetConversationUIUseCase
+import com.upsaclay.message.domain.usecase.ListenRemoteConversationsUseCase
+import com.upsaclay.message.domain.usecase.ListenRemoteMessagesUseCase
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -21,9 +21,9 @@ class UseCaseTest {
     private val userRepository: UserRepository = mockk()
     private val userConversationRepository: UserConversationRepository = mockk()
     private val messageRepository: MessageRepository = mockk()
-    private val listenConversationsUiUseCase: ListenConversationsUiUseCase = mockk()
-    private val listenMessagesUseCase: ListenMessagesUseCase = mockk()
-    private val listenConversationsUseCase: ListenConversationsUseCase = mockk()
+    private val getConversationUIUseCase: GetConversationUIUseCase = mockk()
+    private val listenRemoteMessagesUseCase: ListenRemoteMessagesUseCase = mockk()
+    private val listenRemoteConversationsUseCase: ListenRemoteConversationsUseCase = mockk()
 
     private lateinit var clearDataUseCase: ClearDataUseCase
     private lateinit var startListeningDataUseCase: StartListeningDataUseCase
@@ -31,13 +31,13 @@ class UseCaseTest {
 
     @Before
     fun setUp() {
-        every { listenConversationsUiUseCase.start() } returns Unit
-        every { listenConversationsUiUseCase.stop() } returns Unit
-        every { listenConversationsUiUseCase.clearCache() } returns Unit
-        every { listenConversationsUseCase.start() } returns Unit
-        every { listenConversationsUseCase.stop() } returns Unit
-        every { listenMessagesUseCase.start() } returns Unit
-        every { listenMessagesUseCase.stop() } returns Unit
+        every { getConversationUIUseCase.start() } returns Unit
+        every { getConversationUIUseCase.stop() } returns Unit
+        every { getConversationUIUseCase.clearCache() } returns Unit
+        every { listenRemoteConversationsUseCase.start() } returns Unit
+        every { listenRemoteConversationsUseCase.stop() } returns Unit
+        every { listenRemoteMessagesUseCase.start() } returns Unit
+        every { listenRemoteMessagesUseCase.stop() } returns Unit
         coEvery { userRepository.deleteCurrentUser() } returns Unit
         coEvery { userConversationRepository.deleteLocalConversations() } returns Unit
         coEvery { messageRepository.deleteLocalMessages() } returns Unit
@@ -47,19 +47,19 @@ class UseCaseTest {
             userRepository = userRepository,
             userConversationRepository = userConversationRepository,
             messageRepository = messageRepository,
-            listenConversationsUiUseCase = listenConversationsUiUseCase
+            getConversationUIUseCase = getConversationUIUseCase
         )
 
         startListeningDataUseCase = StartListeningDataUseCase(
-            listenConversationsUiUseCase = listenConversationsUiUseCase,
-            listenMessagesUseCase = listenMessagesUseCase,
-            listenConversationsUseCase = listenConversationsUseCase
+            getConversationUIUseCase = getConversationUIUseCase,
+            listenRemoteMessagesUseCase = listenRemoteMessagesUseCase,
+            listenRemoteConversationsUseCase = listenRemoteConversationsUseCase
         )
 
         stopListeningDataUseCase = StopListeningDataUseCase(
-            listenConversationsUiUseCase = listenConversationsUiUseCase,
-            listenMessagesUseCase = listenMessagesUseCase,
-            listenConversationsUseCase = listenConversationsUseCase
+            getConversationUIUseCase = getConversationUIUseCase,
+            listenRemoteMessagesUseCase = listenRemoteMessagesUseCase,
+            listenRemoteConversationsUseCase = listenRemoteConversationsUseCase
         )
     }
 
@@ -72,7 +72,7 @@ class UseCaseTest {
         coVerify { userRepository.deleteCurrentUser() }
         coVerify { userConversationRepository.deleteLocalConversations() }
         coVerify { messageRepository.deleteLocalMessages() }
-        every { listenConversationsUiUseCase.clearCache() }
+        every { getConversationUIUseCase.clearCache() }
     }
 
     @Test
@@ -81,9 +81,9 @@ class UseCaseTest {
         startListeningDataUseCase()
 
         // Then
-        every { listenConversationsUiUseCase.start() }
-        every { listenConversationsUseCase.start() }
-        every { listenMessagesUseCase.start() }
+        every { getConversationUIUseCase.start() }
+        every { listenRemoteConversationsUseCase.start() }
+        every { listenRemoteMessagesUseCase.start() }
     }
 
     @Test
@@ -92,8 +92,8 @@ class UseCaseTest {
         stopListeningDataUseCase()
 
         // Then
-        every { listenConversationsUiUseCase.stop() }
-        every { listenConversationsUseCase.stop() }
-        every { listenMessagesUseCase.stop() }
+        every { getConversationUIUseCase.stop() }
+        every { listenRemoteConversationsUseCase.stop() }
+        every { listenRemoteMessagesUseCase.stop() }
     }
 }

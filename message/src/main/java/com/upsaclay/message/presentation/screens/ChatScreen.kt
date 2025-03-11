@@ -2,28 +2,30 @@ package com.upsaclay.message.presentation.screens
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
@@ -34,23 +36,40 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import androidx.paging.LoadState
+import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemContentType
+import androidx.paging.compose.itemKey
 import com.upsaclay.common.domain.entity.User
 import com.upsaclay.common.domain.usecase.FormatLocalDateTimeUseCase
+import com.upsaclay.common.presentation.components.CircularProgressBar
 import com.upsaclay.common.presentation.theme.GedoiseTheme
+import com.upsaclay.common.presentation.theme.lightGray
 import com.upsaclay.common.presentation.theme.previewText
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.message.R
 import com.upsaclay.message.domain.conversationUIFixture
+import com.upsaclay.message.domain.entity.ChatEvent
 import com.upsaclay.message.domain.entity.ConversationUI
 import com.upsaclay.message.domain.entity.Message
 import com.upsaclay.message.domain.entity.MessageState
+import com.upsaclay.message.domain.messagesFixture
 import com.upsaclay.message.presentation.components.ChatTopBar
 import com.upsaclay.message.presentation.components.MessageInput
+import com.upsaclay.message.presentation.components.NewMessageIndicator
 import com.upsaclay.message.presentation.components.ReceiveMessageItem
 import com.upsaclay.message.presentation.components.SentMessageItem
 import com.upsaclay.message.presentation.viewmodels.ChatViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
+import java.time.Duration
+import java.time.Instant
 import java.time.LocalDateTime
 
 @Composable
@@ -61,21 +80,18 @@ fun ChatScreen(
         parameters = { parametersOf(conversation) }
     )
 ) {
-    val messages by chatViewModel.messages.collectAsState(emptyList())
+    val lazyPagingItems = chatViewModel.messages.collectAsLazyPagingItems()
     val keyboardController = LocalSoftwareKeyboardController.current
-    val listState = rememberLazyListState()
-    val topList by remember {
-        derivedStateOf {
-            listState.layoutInfo.visibleItemsInfo
-                .filterNot { it.key == -2 }
-                .lastOrNull()?.index == messages.size - 1 &&
-                    listState.firstVisibleItemIndex != 0
-        }
-    }
+    var newMessageReceivedTimestamp by remember { mutableLongStateOf(0L) }
+    var newMessageSentTimestamp by remember { mutableLongStateOf(0L) }
 
-    LaunchedEffect(topList) {
-        if (topList) {
-            chatViewModel.loadOldMessages()
+    LaunchedEffect(Unit) {
+        chatViewModel.event.collectLatest { event ->
+            when (event) {
+                is ChatEvent.NewMessageReceived -> newMessageReceivedTimestamp = event.timestamp
+
+                is ChatEvent.NewMessageSent -> newMessageSentTimestamp = event.timestamp
+            }
         }
     }
 
@@ -83,7 +99,7 @@ fun ChatScreen(
         topBar = {
             ChatTopBar(
                 navController = navController,
-                interlocutor = chatViewModel.conversation.interlocutor,
+                interlocutor = conversation.interlocutor,
                 onClickBack = {
                     keyboardController?.hide()
                 }
@@ -98,11 +114,12 @@ fun ChatScreen(
                 bottom = MaterialTheme.spacing.medium
             )
         ) {
-            MessageSection(
+            MessageFeed(
                 modifier = Modifier.weight(1f),
-                messages = messages,
-                interlocutor = chatViewModel.conversation.interlocutor,
-                listState = listState
+                messageItems = lazyPagingItems,
+                interlocutor = conversation.interlocutor,
+                newMessageReceivedTimestamp = newMessageReceivedTimestamp,
+                newMessageSentTimestamp = newMessageSentTimestamp
             )
 
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
@@ -118,77 +135,163 @@ fun ChatScreen(
 }
 
 @Composable
-private fun MessageSection(
+private fun MessageFeed(
     modifier: Modifier = Modifier,
-    messages: List<Message>,
+    messageItems: LazyPagingItems<Message>,
     interlocutor: User,
-    listState: LazyListState
+    newMessageReceivedTimestamp: Long,
+    newMessageSentTimestamp: Long
 ) {
-    LazyColumn(
-        modifier = modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Bottom,
-        reverseLayout = true,
-        state = listState
-    ) {
-        if (messages.isNotEmpty()) {
-            itemsIndexed(messages) { index, message ->
-                val currentUserSender = message.senderId != interlocutor.id
-                val firstMessage = index == messages.size - 1
-                val lastMessage = index == 0
-                val previousSenderId = if (!firstMessage) messages[index + 1].senderId else ""
-                val sameSender = previousSenderId == message.senderId
-                val nextSenderId = if (!lastMessage) messages[index - 1].senderId else ""
-                val showSeenMessage = lastMessage && currentUserSender && message.seen
+    val listState = rememberLazyListState()
+    val scope = rememberCoroutineScope()
+    var showNewMessageIndicator by remember { mutableStateOf(false) }
 
-                val sameTime = if (!firstMessage) {
-                    message.date
-                        .withSecond(0)
-                        .withNano(0)
-                        .isEqual(
-                            messages[index + 1].date
-                                .withSecond(0)
-                                .withNano(0)
+    LaunchedEffect(newMessageReceivedTimestamp) {
+        delay(50)
+        when {
+            listState.firstVisibleItemIndex == 1 -> listState.animateScrollToItem(0)
+
+            listState.firstVisibleItemIndex > 1 -> showNewMessageIndicator = true
+        }
+    }
+
+    LaunchedEffect(newMessageSentTimestamp) {
+        delay(50)
+        if (listState.firstVisibleItemIndex == 1) {
+            listState.animateScrollToItem(0)
+        }
+    }
+
+    LaunchedEffect(listState) {
+        snapshotFlow { listState.firstVisibleItemIndex }.collectLatest { index ->
+            if (index == 0) {
+                showNewMessageIndicator = false
+            }
+        }
+    }
+
+    Box(modifier = modifier.fillMaxSize()) {
+        LazyColumn(
+            reverseLayout = true,
+            state = listState
+        ) {
+            items(
+                count = messageItems.itemCount,
+                key = messageItems.itemKey { it.id },
+                contentType = messageItems.itemContentType { "Message feed" }
+            ) { index ->
+                if (messageItems.itemCount > 0) {
+                    val message = messageItems[index] ?: return@items
+                    val currentUserSender = message.senderId != interlocutor.id
+                    val firstMessage = index == messageItems.itemCount - 1
+                    val lastMessage = index == 0
+                    val previousMessage = if (index + 1 < messageItems.itemCount) messageItems[index + 1] else null
+                    val nextMessage = if (index - 1 >= 0) messageItems[index - 1] else null
+
+                    val previousSenderId = previousMessage?.senderId ?: ""
+                    val nextSenderId = nextMessage?.senderId ?: ""
+                    val sameSender = previousSenderId == message.senderId
+                    val showSeenMessage = lastMessage && currentUserSender && message.seen?.value == true
+
+                    val sameTime = previousMessage?.let {
+                        Duration.between(it.date, message.date).toMinutes() < 1L
+                    } ?: false
+
+                    val sameDay = previousMessage?.let {
+                        Duration.between(it.date, message.date).toDays() < 1L
+                    } ?: false
+
+                    val displayProfilePicture = !sameTime || (!currentUserSender && message.senderId != nextSenderId)
+
+                    if (message.senderId != interlocutor.id) {
+                        SentMessageItem(
+                            modifier = Modifier.testTag(stringResource(R.string.chat_screen_send_message_item_tag)),
+                            message = message,
+                            showSeen = showSeenMessage
                         )
-                } else false
+                    } else {
+                        ReceiveMessageItem(
+                            modifier = Modifier.testTag(stringResource(R.string.chat_screen_receive_message_item_tag)),
+                            message = message,
+                            displayProfilePicture = displayProfilePicture,
+                            profilePictureUrl = interlocutor.profilePictureUrl
+                        )
+                    }
 
-                val sameDay = if (!firstMessage) {
-                    message.date
-                        .toLocalDate()
-                        .isEqual(messages[index + 1].date.toLocalDate())
+                    if (firstMessage || !sameDay) {
+                        Text(
+                            modifier = Modifier
+                                .padding(vertical = MaterialTheme.spacing.mediumLarge)
+                                .fillMaxWidth(),
+                            text = FormatLocalDateTimeUseCase.formatDayMonthYear(message.date),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.previewText,
+                            textAlign = TextAlign.Center
+                        )
+                    } else {
+                        Spacer(modifier = Modifier.height(messagePadding(sameSender, sameTime)))
+                    }
                 }
-                else false
+            }
 
-                val displayProfilePicture =
-                    !sameTime || (!currentUserSender && message.senderId != nextSenderId )
+            item {
+                when (messageItems.loadState.refresh) {
+                    is LoadState.Error -> {
+                        Text(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = stringResource(R.string.error_fetch_messages),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error,
+                            textAlign = TextAlign.Center
+                        )
+                    }
 
-                if (message.senderId != interlocutor.id) {
-                    SentMessageItem(
-                        modifier = Modifier.testTag(stringResource(R.string.chat_screen_send_message_item_tag)),
-                        message = message,
-                        seen = showSeenMessage
-                    )
-                } else {
-                    ReceiveMessageItem(
-                        modifier = Modifier.testTag(stringResource(R.string.chat_screen_receive_message_item_tag)),
-                        message = message,
-                        displayProfilePicture = displayProfilePicture,
-                        profilePictureUrl = interlocutor.profilePictureUrl
-                    )
+                    is LoadState.Loading -> {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            CircularProgressBar(
+                                strokeWidth = 2.dp,
+                                color = MaterialTheme.colorScheme.lightGray.copy(alpha = 0.8f)
+                            )
+                        }
+                    }
+
+                    else -> {}
                 }
+            }
 
-                if (firstMessage || !sameDay) {
-                    Text(
-                        modifier = Modifier
-                            .padding(vertical = MaterialTheme.spacing.mediumLarge)
-                            .fillMaxWidth(),
-                        text = FormatLocalDateTimeUseCase.formatDayMonthYear(message.date),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.previewText,
-                        textAlign = TextAlign.Center
-                    )
-                } else {
-                    Spacer(modifier = Modifier.height(messagePadding(sameSender, sameTime)))
+            item {
+                when (messageItems.loadState.append) {
+                    is LoadState.Error -> {
+                        Text(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = stringResource(R.string.error_fetch_messages),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+
+                    is LoadState.Loading -> {
+                        Column(
+                            modifier = Modifier.fillParentMaxSize(),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            CircularProgressBar()
+                        }
+                    }
+
+                    else -> {}
                 }
+            }
+        }
+
+        if (showNewMessageIndicator) {
+            NewMessageIndicator(modifier = Modifier.align(Alignment.BottomCenter)) {
+                scope.launch { listState.animateScrollToItem(0) }
             }
         }
     }
@@ -212,13 +315,14 @@ private fun messagePadding(
  =====================================================================
  */
 
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
 @Composable
 private fun ChatScreenPreview() {
     var text by remember { mutableStateOf("") }
-    var messages by remember { mutableStateOf(emptyList<Message>()) }
+    var messages by remember { mutableStateOf(messagesFixture) }
     var id by remember { mutableIntStateOf(10) }
-    val listState = rememberLazyListState()
+    var newMessageReceivedTimestamp by remember { mutableLongStateOf(0L) }
+    var newMessageSentTimestamp by remember { mutableLongStateOf(0L) }
 
     GedoiseTheme {
         Scaffold(
@@ -230,46 +334,48 @@ private fun ChatScreenPreview() {
                 )
             }
         ) { innerPadding ->
-            Column {
-                Column(
-                    modifier = Modifier.padding(
-                        top = innerPadding.calculateTopPadding(),
-                        start = MaterialTheme.spacing.medium,
-                        end = MaterialTheme.spacing.medium,
-                        bottom = MaterialTheme.spacing.medium
-                    )
-                ) {
-                    MessageSection(
-                        modifier = Modifier.weight(1f),
-                        messages = messages,
-                        interlocutor = conversationUIFixture.interlocutor,
-                        listState = listState
-                    )
+            Column(
+                modifier = Modifier.padding(
+                    top = innerPadding.calculateTopPadding(),
+                    start = MaterialTheme.spacing.medium,
+                    end = MaterialTheme.spacing.medium,
+                    bottom = MaterialTheme.spacing.medium
+                )
+            ) {
+                MessageFeed(
+                    modifier = Modifier.weight(1f),
+                    messageItems = flowOf(PagingData.from(messages.sortedByDescending { it.date })).collectAsLazyPagingItems(),
+                    interlocutor = conversationUIFixture.interlocutor,
+                    newMessageReceivedTimestamp = newMessageReceivedTimestamp,
+                    newMessageSentTimestamp = newMessageSentTimestamp
+                )
 
-                    Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
+                Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
 
-                    MessageInput(
-                        modifier = Modifier.fillMaxWidth(),
-                        value = text,
-                        onValueChange = { text = it },
-                        onSendClick = {
-                            id++
-                            messages = messages.toMutableList().apply {
-                                add(
-                                    Message(
-                                        id = id.toString(),
-                                        conversationId = "conversationId",
-                                        senderId = "senderId",
-                                        content = text,
-                                        date = LocalDateTime.now(),
-                                        state = MessageState.SENT
-                                    )
+                MessageInput(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = text,
+                    onValueChange = { text = it },
+                    onSendClick = {
+                        id++
+                        if (text.isBlank()) return@MessageInput
+                        messages = messages.toMutableList().apply {
+                            add(
+                                Message(
+                                    id = id,
+                                    conversationId = 1,
+                                    senderId = "senderId",
+                                    content = text,
+                                    date = LocalDateTime.now(),
+                                    state = MessageState.SENT
                                 )
-                                sortedByDescending { it.date }
-                            }
+                            )
+                            sortedByDescending { it.date }
                         }
-                    )
-                }
+                        newMessageSentTimestamp = Instant.now().toEpochMilli()
+                        text = ""
+                    }
+                )
             }
         }
     }

@@ -11,7 +11,7 @@ import com.upsaclay.message.domain.entity.ConversationScreenState
 import com.upsaclay.message.domain.entity.ConversationState
 import com.upsaclay.message.domain.entity.ConversationUI
 import com.upsaclay.message.domain.entity.Message
-import com.upsaclay.message.domain.usecase.ListenConversationsUiUseCase
+import com.upsaclay.message.domain.usecase.GetConversationUIUseCase
 import com.upsaclay.message.presentation.viewmodels.CreateConversationViewModel
 import io.mockk.coEvery
 import io.mockk.every
@@ -32,7 +32,7 @@ import kotlin.test.assertEquals
 class CreateConversationViewModelTest {
     private val getUsersUseCase: GetUsersUseCase = mockk()
     private val getCurrentUserUseCase: GetCurrentUserUseCase = mockk()
-    private val listenConversationsUiUseCase: ListenConversationsUiUseCase = mockk()
+    private val getConversationUIUseCase: GetConversationUIUseCase = mockk()
 
     private lateinit var conversationViewModel: CreateConversationViewModel
     private val testDispatcher = UnconfinedTestDispatcher()
@@ -42,13 +42,13 @@ class CreateConversationViewModelTest {
         Dispatchers.setMain(testDispatcher)
 
         every { getCurrentUserUseCase() } returns MutableStateFlow(userFixture)
-        every { listenConversationsUiUseCase.currentConversationsUI } returns conversationsUIFixture
+        every { getConversationUIUseCase.currentConversationsUI } returns conversationsUIFixture
         coEvery { getUsersUseCase() } returns usersFixture
 
         conversationViewModel = CreateConversationViewModel(
             getUsersUseCase = getUsersUseCase,
             getCurrentUserUseCase = getCurrentUserUseCase,
-            listenConversationsUiUseCase = listenConversationsUiUseCase
+            getConversationUIUseCase = getConversationUIUseCase
         )
     }
 

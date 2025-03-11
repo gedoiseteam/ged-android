@@ -10,19 +10,19 @@ import com.upsaclay.message.data.model.MessageField
 data class LocalMessage(
     @PrimaryKey
     @ColumnInfo(name = MessageField.MESSAGE_ID)
-    val messageId: String,
+    val messageId: Int,
     @ColumnInfo(name = MessageField.SENDER_ID)
     val senderId: String,
     @ColumnInfo(name = MessageField.CONVERSATION_ID)
-    val conversationId: String,
+    val conversationId: Int,
     @ColumnInfo(name = MessageField.CONTENT)
     val content: String,
-    @ColumnInfo(name = MessageField.TIMESTAMP)
-    val timestamp: Long,
-    @ColumnInfo(name = MessageField.SEEN)
-    val seen: Boolean,
-    @ColumnInfo(name = MessageField.STATE)
-    val state: String,
-    @ColumnInfo(name = MessageField.TYPE)
-    val type: String
+    @ColumnInfo(name = MessageField.MESSAGE_TIMESTAMP)
+    val messageTimestamp: Long,
+    @ColumnInfo(name = MessageField.Local.SEEN_VALUE)
+    val seenValue: Boolean?,
+    @ColumnInfo(name = MessageField.Local.SEEN_TIME)
+    val seenTimestamp: Long?,
+    @ColumnInfo(name = MessageField.MESSAGE_STATE)
+    val state: String
 )

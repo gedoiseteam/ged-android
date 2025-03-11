@@ -5,48 +5,54 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import androidx.paging.filter
+import androidx.paging.map
 import com.upsaclay.common.domain.entity.User
+import com.upsaclay.common.domain.usecase.ConvertDateUseCase
 import com.upsaclay.common.domain.usecase.GenerateIdUseCase
 import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
+import com.upsaclay.message.domain.entity.ChatEvent
 import com.upsaclay.message.domain.entity.ConversationState
 import com.upsaclay.message.domain.entity.ConversationUI
 import com.upsaclay.message.domain.entity.Message
 import com.upsaclay.message.domain.entity.MessageState
+import com.upsaclay.message.domain.entity.Seen
 import com.upsaclay.message.domain.usecase.CreateConversationUseCase
+import com.upsaclay.message.domain.usecase.GetLastMessageUseCase
 import com.upsaclay.message.domain.usecase.GetMessagesUseCase
 import com.upsaclay.message.domain.usecase.SendMessageUseCase
 import com.upsaclay.message.domain.usecase.UpdateMessageUseCase
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import java.time.Duration
 import java.time.LocalDateTime
 
-private const val MESSAGE_LIMIT = 20
-
 class ChatViewModel(
-    conversation: ConversationUI,
+    private var conversation: ConversationUI,
     getCurrentUserUseCase: GetCurrentUserUseCase,
-    private val getMessagesUseCase: GetMessagesUseCase,
+    getMessagesUseCase: GetMessagesUseCase,
+    private val getLastMessageUseCase: GetLastMessageUseCase,
     private val sendMessageUseCase: SendMessageUseCase,
     private val createConversationUseCase: CreateConversationUseCase,
     private val updateMessageUseCase: UpdateMessageUseCase
 ): ViewModel() {
+    private val _event = MutableSharedFlow<ChatEvent>()
+    val event: Flow<ChatEvent> = _event
     private val currentUser: User? = getCurrentUserUseCase().value
-    private val _messages = MutableStateFlow<Map<String, Message>>(mapOf())
-    val messages: Flow<List<Message>> = _messages.map { messageMap ->
-        messageMap.values.toList().sortedByDescending { it.date }
-    }
-    var conversation = conversation
-        private set
+    val messages: Flow<PagingData<Message>> = getMessagesUseCase(conversation.id).cachedIn(viewModelScope)
     var textToSend: String by mutableStateOf("")
         private set
-    private var messagesOffset = MESSAGE_LIMIT
-    private var allOldMessageLoaded = false
 
     init {
-        fetchMessages()
         seeMessage()
+        warnNewMessageReceived()
+        warnNewMessageSent()
     }
 
     fun updateTextToSend(text: String) {
@@ -54,12 +60,11 @@ class ChatViewModel(
     }
 
     fun sendMessage() {
+        if (currentUser == null) throw IllegalArgumentException("User not logged in")
         if (textToSend.isBlank()) return
 
-        if (currentUser == null) throw IllegalArgumentException("User not logged in")
-
         val message = Message(
-            id = GenerateIdUseCase(),
+            id = GenerateIdUseCase.asInt(),
             conversationId = conversation.id,
             senderId = currentUser.id,
             content = textToSend,
@@ -67,53 +72,45 @@ class ChatViewModel(
             state = MessageState.LOADING
         )
 
-        _messages.value = _messages.value.toMutableMap().apply { put(message.id, message) }
+        viewModelScope.launch {
+            try {
+                if (conversation.state == ConversationState.NOT_CREATED) {
+                    createConversationUseCase(conversation)
+                    conversation = conversation.copy(state = ConversationState.CREATED)
+                }
 
-        try {
-            if (conversation.state == ConversationState.NOT_CREATED) {
-                createConversationUseCase(conversation)
-                conversation = conversation.copy(state = ConversationState.CREATED)
-            }
-
-            sendMessageUseCase(message)
-        } catch (e: Exception) {
-            _messages.value = _messages.value.toMutableMap().apply {
-                put(message.id, message.copy(state = MessageState.ERROR))
+                sendMessageUseCase(message)
+            } catch (e: Exception) {
+                updateMessageUseCase(message.copy(state = MessageState.ERROR))
             }
         }
 
         textToSend = ""
     }
 
-    fun loadOldMessages() {
-        if (_messages.value.size < MESSAGE_LIMIT || allOldMessageLoaded) return
-        val currentMessages = _messages.value.values.toList()
-
-        viewModelScope.launch {
-            getMessagesUseCase(conversation.id, messagesOffset, MESSAGE_LIMIT)
-                .apply { messagesOffset += size }
-                .forEach {
-                    _messages.value = _messages.value.toMutableMap().apply { put(it.id, it) }
-                }
-            allOldMessageLoaded = currentMessages.size == _messages.value.size
-        }
-    }
-
     private fun seeMessage() {
         viewModelScope.launch {
-            _messages.collect { messages ->
-                messages.values
-                    .filter { it.senderId != currentUser?.id && !it.seen }
-                    .forEach { updateMessageUseCase(it.copy(seen = true)) }
+            messages.collect { pagingData ->
+                pagingData
+                    .filter { it.senderId != currentUser?.id && it.seen == null }
+                    .map { updateMessageUseCase(it.copy(seen = Seen())) }
             }
         }
     }
 
-    private fun fetchMessages() {
-        viewModelScope.launch {
-            getMessagesUseCase(conversation.id).collect { message ->
-                _messages.value = _messages.value.toMutableMap().apply { put(message.id, message) }
-            }
-        }
+    private fun warnNewMessageReceived() {
+        getLastMessageUseCase(conversation.id)
+            .filter { it.senderId != currentUser?.id }
+            .filter { Duration.between(it.date, LocalDateTime.now()).toMinutes() < 1L }
+            .map { _event.emit(ChatEvent.NewMessageReceived(ConvertDateUseCase.toTimestamp(it.date))) }
+            .launchIn(viewModelScope)
+    }
+
+    private fun warnNewMessageSent() {
+        getLastMessageUseCase(conversation.id)
+            .filter { it.senderId == currentUser?.id }
+            .filter { Duration.between(it.date, LocalDateTime.now()).toMinutes() < 1L }
+            .map { _event.emit(ChatEvent.NewMessageReceived(ConvertDateUseCase.toTimestamp(it.date))) }
+            .launchIn(viewModelScope)
     }
 }
