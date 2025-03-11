@@ -21,7 +21,6 @@ class UseCaseTest {
     private val userRepository: UserRepository = mockk()
     private val userConversationRepository: UserConversationRepository = mockk()
     private val messageRepository: MessageRepository = mockk()
-    private val getConversationUIUseCase: GetConversationUIUseCase = mockk()
     private val listenRemoteMessagesUseCase: ListenRemoteMessagesUseCase = mockk()
     private val listenRemoteConversationsUseCase: ListenRemoteConversationsUseCase = mockk()
 
@@ -31,9 +30,6 @@ class UseCaseTest {
 
     @Before
     fun setUp() {
-        every { getConversationUIUseCase.start() } returns Unit
-        every { getConversationUIUseCase.stop() } returns Unit
-        every { getConversationUIUseCase.clearCache() } returns Unit
         every { listenRemoteConversationsUseCase.start() } returns Unit
         every { listenRemoteConversationsUseCase.stop() } returns Unit
         every { listenRemoteMessagesUseCase.start() } returns Unit
@@ -46,18 +42,15 @@ class UseCaseTest {
         clearDataUseCase = ClearDataUseCase(
             userRepository = userRepository,
             userConversationRepository = userConversationRepository,
-            messageRepository = messageRepository,
-            getConversationUIUseCase = getConversationUIUseCase
+            messageRepository = messageRepository
         )
 
         startListeningDataUseCase = StartListeningDataUseCase(
-            getConversationUIUseCase = getConversationUIUseCase,
             listenRemoteMessagesUseCase = listenRemoteMessagesUseCase,
             listenRemoteConversationsUseCase = listenRemoteConversationsUseCase
         )
 
         stopListeningDataUseCase = StopListeningDataUseCase(
-            getConversationUIUseCase = getConversationUIUseCase,
             listenRemoteMessagesUseCase = listenRemoteMessagesUseCase,
             listenRemoteConversationsUseCase = listenRemoteConversationsUseCase
         )
@@ -72,7 +65,6 @@ class UseCaseTest {
         coVerify { userRepository.deleteCurrentUser() }
         coVerify { userConversationRepository.deleteLocalConversations() }
         coVerify { messageRepository.deleteLocalMessages() }
-        every { getConversationUIUseCase.clearCache() }
     }
 
     @Test
@@ -81,7 +73,6 @@ class UseCaseTest {
         startListeningDataUseCase()
 
         // Then
-        every { getConversationUIUseCase.start() }
         every { listenRemoteConversationsUseCase.start() }
         every { listenRemoteMessagesUseCase.start() }
     }
@@ -92,7 +83,6 @@ class UseCaseTest {
         stopListeningDataUseCase()
 
         // Then
-        every { getConversationUIUseCase.stop() }
         every { listenRemoteConversationsUseCase.stop() }
         every { listenRemoteMessagesUseCase.stop() }
     }

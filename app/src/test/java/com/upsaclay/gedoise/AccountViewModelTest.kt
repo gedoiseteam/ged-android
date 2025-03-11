@@ -133,7 +133,7 @@ class AccountViewModelTest {
         accountViewModel.deleteUserProfilePicture()
 
         // Then
-        assertEquals(AccountScreenState.PROFILE_PICTURE_UPDATED, accountViewModel.screenState.value)
+        assertEquals(AccountScreenState.PROFILE_PICTURE_DELETED, accountViewModel.screenState.value)
         coVerify { deleteProfilePictureUseCase(userFixture.id, userFixture.profilePictureUrl!!) }
     }
 
