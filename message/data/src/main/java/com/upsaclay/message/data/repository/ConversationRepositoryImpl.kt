@@ -1,13 +1,11 @@
 package com.upsaclay.message.data.repository
 
-import androidx.paging.PagingData
 import com.upsaclay.common.domain.e
 import com.upsaclay.common.domain.entity.User
 import com.upsaclay.message.data.local.ConversationLocalDataSource
 import com.upsaclay.message.data.remote.ConversationRemoteDataSource
 import com.upsaclay.message.data.remote.model.RemoteConversation
 import com.upsaclay.message.domain.entity.Conversation
-import com.upsaclay.message.domain.entity.ConversationMessage
 import kotlinx.coroutines.flow.Flow
 import java.io.IOException
 
@@ -15,14 +13,10 @@ internal class ConversationRepositoryImpl(
     private val conversationLocalDataSource: ConversationLocalDataSource,
     private val conversationRemoteDataSource: ConversationRemoteDataSource
 ): ConversationRepository {
-    override fun getConversationUser(): Flow<List<Conversation>> =
-        conversationLocalDataSource.getConversationsUser()
-
-    override fun getPagedConversationMessages(): Flow<PagingData<ConversationMessage>> =
-        conversationLocalDataSource.getConversationsMessage()
+    override fun getConversations(): Flow<List<Conversation>> = conversationLocalDataSource.getConversations()
 
     override suspend fun getConversationFromLocal(interlocutorId: String): Conversation? =
-        conversationLocalDataSource.getConversationUser(interlocutorId)
+        conversationLocalDataSource.getConversation(interlocutorId)
 
     override fun getConversationsFromRemote(currentUserId: String): Flow<RemoteConversation> =
         conversationRemoteDataSource.listenConversations(currentUserId)

@@ -7,8 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import androidx.paging.filter
-import androidx.paging.map
 import com.upsaclay.common.domain.entity.User
 import com.upsaclay.common.domain.usecase.ConvertDateUseCase
 import com.upsaclay.common.domain.usecase.GenerateIdUseCase
@@ -22,10 +20,12 @@ import com.upsaclay.message.domain.entity.Seen
 import com.upsaclay.message.domain.usecase.CreateConversationUseCase
 import com.upsaclay.message.domain.usecase.GetLastMessageUseCase
 import com.upsaclay.message.domain.usecase.GetMessagesUseCase
+import com.upsaclay.message.domain.usecase.GetUnreadMessagesUseCase
 import com.upsaclay.message.domain.usecase.SendMessageUseCase
 import com.upsaclay.message.domain.usecase.UpdateMessageUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -40,7 +40,8 @@ class ChatViewModel(
     private val getLastMessageUseCase: GetLastMessageUseCase,
     private val sendMessageUseCase: SendMessageUseCase,
     private val createConversationUseCase: CreateConversationUseCase,
-    private val updateMessageUseCase: UpdateMessageUseCase
+    private val updateMessageUseCase: UpdateMessageUseCase,
+    private val getUnreadMessagesUseCase: GetUnreadMessagesUseCase
 ): ViewModel() {
     private val _event = MutableSharedFlow<ChatEvent>()
     val event: Flow<ChatEvent> = _event
@@ -51,8 +52,8 @@ class ChatViewModel(
 
     init {
         seeMessage()
-        warnNewMessageReceived()
-        warnNewMessageSent()
+        newMessageReceived()
+        newMessageSent()
     }
 
     fun updateTextToSend(text: String) {
@@ -90,15 +91,15 @@ class ChatViewModel(
 
     private fun seeMessage() {
         viewModelScope.launch {
-            messages.collect { pagingData ->
-                pagingData
-                    .filter { it.senderId != currentUser?.id && it.seen == null }
+            getUnreadMessagesUseCase(conversation.id).collectLatest { messages ->
+                messages
+                    .filter { it.senderId != currentUser?.id }
                     .map { updateMessageUseCase(it.copy(seen = Seen())) }
             }
         }
     }
 
-    private fun warnNewMessageReceived() {
+    private fun newMessageReceived() {
         getLastMessageUseCase(conversation.id)
             .filter { it.senderId != currentUser?.id }
             .filter { Duration.between(it.date, LocalDateTime.now()).toMinutes() < 1L }
@@ -106,7 +107,7 @@ class ChatViewModel(
             .launchIn(viewModelScope)
     }
 
-    private fun warnNewMessageSent() {
+    private fun newMessageSent() {
         getLastMessageUseCase(conversation.id)
             .filter { it.senderId == currentUser?.id }
             .filter { Duration.between(it.date, LocalDateTime.now()).toMinutes() < 1L }

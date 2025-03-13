@@ -28,5 +28,15 @@ internal data class RemoteMessage(
 
     @get:PropertyName(MessageField.Remote.SEEN)
     @set:PropertyName(MessageField.Remote.SEEN)
-    var seen: Seen? = null,
+    var seen: RemoteSeen? = null
+)
+
+internal data class RemoteSeen(
+    @get:PropertyName(MessageField.Remote.SEEN_VALUE)
+    @set:PropertyName(MessageField.Remote.SEEN_VALUE)
+    var value: Boolean = true,
+
+    @get:PropertyName(MessageField.Remote.SEEN_TIME)
+    @set:PropertyName(MessageField.Remote.SEEN_TIME)
+    var time: Timestamp = Timestamp.now(),
 )

@@ -34,7 +34,7 @@ import com.upsaclay.common.domain.entity.Screen
 import com.upsaclay.common.presentation.components.ProfilePicture
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.gedoise.R
-import com.upsaclay.gedoise.data.BottomNavigationItem
+import com.upsaclay.gedoise.data.NavigationItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -78,10 +78,7 @@ fun HomeTopBar(navController: NavController, profilePictureUrl: String?) {
 fun MainTopBar(title: String) {
     TopAppBar(
         title = {
-            Text(
-                text = title,
-                fontWeight = FontWeight.Bold
-            )
+            Text(text = title, fontWeight = FontWeight.Bold)
         },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.background
@@ -92,14 +89,14 @@ fun MainTopBar(title: String) {
 @Composable
 fun MainBottomBar(
     navController: NavController,
-    bottomNavigationItems: List<BottomNavigationItem>
+    navigationItems: List<NavigationItem>
 ) {
     val currentRoute = remember {
         navController.currentDestination?.route
     }
 
     NavigationBar {
-        bottomNavigationItems.forEachIndexed { _, navigationItem ->
+        navigationItems.forEach { navigationItem ->
             val selected = navigationItem.screen.route == currentRoute
             val iconRes = if (selected) navigationItem.filledIcon else navigationItem.outlinedIcon
 
@@ -173,8 +170,7 @@ private fun MainTopBarPreview() {
                     Image(
                         painter = painterResource(id = com.upsaclay.common.R.drawable.default_profile_picture),
                         contentDescription = stringResource(id = R.string.profile_icon_description),
-                        contentScale = ContentScale.Fit,
-                        modifier = Modifier.border(1.dp, Color.LightGray, CircleShape)
+                        contentScale = ContentScale.Fit
                     )
                 }
             }
@@ -185,17 +181,11 @@ private fun MainTopBarPreview() {
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun MainBottomBarPreview() {
-    val messageWithNotification = BottomNavigationItem.Message()
-    messageWithNotification.badges = 5
-
-    val calendarWithNews = BottomNavigationItem.Calendar()
-    calendarWithNews.hasNews = true
-
     val itemList = listOf(
-        BottomNavigationItem.Home(),
-        messageWithNotification,
-        calendarWithNews,
-        BottomNavigationItem.Forum()
+        NavigationItem.Home(),
+        NavigationItem.Message(badges = 5),
+        NavigationItem.Calendar(hasNews = true),
+        NavigationItem.Forum()
     )
 
     GedoiseTheme {

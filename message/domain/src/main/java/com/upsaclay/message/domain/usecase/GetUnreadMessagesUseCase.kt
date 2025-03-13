@@ -4,8 +4,8 @@ import com.upsaclay.message.domain.entity.Message
 import com.upsaclay.message.domain.repository.MessageRepository
 import kotlinx.coroutines.flow.Flow
 
-class GetLastMessageUseCase(
+class GetUnreadMessagesUseCase(
     private val messageRepository: MessageRepository
 ) {
-    operator fun invoke(conversationId: Int): Flow<Message> = messageRepository.getLastMessage(conversationId)
+    operator fun invoke(conversationId: Int): Flow<List<Message>> = messageRepository.getUnreadMessages(conversationId)
 }

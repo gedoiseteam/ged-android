@@ -75,7 +75,7 @@ fun ConversationScreen(
     snackbarHostState: SnackbarHostState,
     conversationViewModel: ConversationViewModel = koinViewModel()
 ) {
-    val conversations = conversationViewModel.conversations.collectAsLazyPagingItems()
+    val conversationItems = conversationViewModel.conversations.collectAsLazyPagingItems()
     val screenState by conversationViewModel.screenState.collectAsState()
     val context = LocalContext.current
 
@@ -134,13 +134,13 @@ fun ConversationScreen(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        if (conversations.itemCount == 0) {
+        if (conversationItems.itemCount == 0) {
             StartConversation(
                 onCreateClick = { navController.navigate(Screen.CREATE_CONVERSATION.route) }
             )
         } else {
             ConversationFeed(
-                conversationItems = conversations,
+                conversationItems = conversationItems,
                 onClick = {
                     navController.navigate(
                         Screen.CHAT.route + "?conversation=${ConvertConversationJsonUseCase(it)}"

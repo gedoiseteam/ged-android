@@ -39,6 +39,7 @@ import com.upsaclay.message.domain.conversationUIFixture
 import com.upsaclay.message.domain.entity.ConversationUI
 import com.upsaclay.message.domain.entity.Message
 import com.upsaclay.message.domain.entity.MessageState
+import com.upsaclay.message.domain.entity.Seen
 import com.upsaclay.message.domain.messageFixture2
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -104,7 +105,7 @@ fun ConversationItem(
                 val text = if (message.state == MessageState.SENT) message.content else stringResource(R.string.sending)
                 val isNotSender = message.senderId == conversation.interlocutor.id
 
-                if (isNotSender && message.seen?.value == false) {
+                if (isNotSender && !message.isSeen()) {
                     UnreadConversationItem(
                         modifier = Modifier
                             .weight(1f)

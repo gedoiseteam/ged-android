@@ -2,6 +2,7 @@ package com.upsaclay.common.presentation.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -35,7 +36,6 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import com.upsaclay.common.presentation.theme.GedoiseTheme
-import com.upsaclay.common.presentation.theme.inputForeground
 import com.upsaclay.common.presentation.theme.spacing
 import kotlinx.coroutines.android.awaitFrame
 
@@ -54,7 +54,7 @@ fun OutlineTextField(
     OutlinedTextField(
         modifier = modifier,
         value = value,
-        label = { Text(text = label, color = MaterialTheme.colorScheme.inputForeground) },
+        label = { Text(text = label) },
         onValueChange = onValueChange,
         keyboardOptions = keyboardOptions,
         isError = isError,
@@ -196,11 +196,13 @@ private fun OutlinedInputsPreview() {
     var text by remember { mutableStateOf("") }
 
     GedoiseTheme {
-        OutlineTextField(
-            value = text,
-            label = "Label",
-            onValueChange = { text = it }
-        )
+        Box(modifier = Modifier.padding(MaterialTheme.spacing.small)) {
+            OutlineTextField(
+                value = text,
+                label = "Label",
+                onValueChange = { text = it }
+            )
+        }
     }
 }
 

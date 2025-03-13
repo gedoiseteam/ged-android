@@ -5,7 +5,7 @@ import com.upsaclay.message.domain.repository.MessageRepository
 import com.upsaclay.message.domain.repository.UserConversationRepository
 import com.upsaclay.message.domain.usecase.CreateConversationUseCase
 import com.upsaclay.message.domain.usecase.DeleteConversationUseCase
-import com.upsaclay.message.domain.usecase.GetConversationUIUseCase
+import com.upsaclay.message.domain.usecase.GetConversationsUIUseCase
 import com.upsaclay.message.domain.usecase.GetConversationUseCase
 import com.upsaclay.message.domain.usecase.ListenRemoteConversationsUseCase
 import com.upsaclay.message.domain.usecase.ListenRemoteMessagesUseCase
@@ -31,7 +31,7 @@ class MessageUseCaseTest {
     private lateinit var createConversationUseCase: CreateConversationUseCase
     private lateinit var deleteConversationUseCase: DeleteConversationUseCase
     private lateinit var sendMessageUseCase: SendMessageUseCase
-    private lateinit var getConversationUIUseCase: GetConversationUIUseCase
+    private lateinit var getConversationsUIUseCase: GetConversationsUIUseCase
     private lateinit var getConversationUseCase: GetConversationUseCase
     private lateinit var listenRemoteConversationsUseCase: ListenRemoteConversationsUseCase
     private lateinit var listenRemoteMessagesUseCase: ListenRemoteMessagesUseCase
@@ -40,7 +40,7 @@ class MessageUseCaseTest {
 
     @Before
     fun setUp() {
-        getConversationUIUseCase = GetConversationUIUseCase(userConversationRepository = userConversationRepository)
+        getConversationsUIUseCase = GetConversationsUIUseCase(userConversationRepository = userConversationRepository)
         getConversationUseCase = GetConversationUseCase(userConversationRepository = userConversationRepository)
         createConversationUseCase = CreateConversationUseCase(userConversationRepository = userConversationRepository)
         sendMessageUseCase = SendMessageUseCase(messageRepository = messageRepository)

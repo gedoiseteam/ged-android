@@ -2,6 +2,7 @@ package com.upsaclay.common.presentation.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
@@ -40,11 +41,11 @@ internal val onBackgroundDark = white
 internal val outlineDark = Color(0xFF8F9299)
 internal val outlineVariantDark = Color(0xFFC4C8D0)
 
-val ColorScheme.inputBackground: Color
+val ColorScheme.chatInputBackground: Color
     @Composable
     get() = if(isSystemInDarkTheme()) Color(0xFF323232) else Color(0xFFEEEEEE)
 
-val ColorScheme.inputForeground: Color
+val ColorScheme.chatInputForeground: Color
     @Composable
     get() = if(isSystemInDarkTheme()) Color(0xFF929298) else Color(0xFF646464)
 

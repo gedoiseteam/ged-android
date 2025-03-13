@@ -5,16 +5,14 @@ import com.upsaclay.message.domain.conversationUIFixture
 import com.upsaclay.message.domain.conversationsUIFixture
 import com.upsaclay.message.domain.entity.ConversationScreenState
 import com.upsaclay.message.domain.usecase.DeleteConversationUseCase
-import com.upsaclay.message.domain.usecase.GetConversationUIUseCase
+import com.upsaclay.message.domain.usecase.GetConversationsUIUseCase
 import com.upsaclay.message.presentation.viewmodels.ConversationViewModel
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -25,7 +23,7 @@ import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ConversationViewModelTest {
-    private val getConversationUIUseCase: GetConversationUIUseCase = mockk()
+    private val getConversationsUIUseCase: GetConversationsUIUseCase = mockk()
     private val deleteConversationUseCase: DeleteConversationUseCase = mockk()
 
     private lateinit var conversationViewModel: ConversationViewModel
@@ -35,11 +33,11 @@ class ConversationViewModelTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
 
-        every { getConversationUIUseCase() } returns flowOf(PagingData.from(conversationsUIFixture))
+        every { getConversationsUIUseCase() } returns flowOf(PagingData.from(conversationsUIFixture))
         coEvery { deleteConversationUseCase(any()) } returns Unit
 
         conversationViewModel = ConversationViewModel(
-            getConversationUIUseCase = getConversationUIUseCase,
+            getConversationsUIUseCase = getConversationsUIUseCase,
             deleteConversationUseCase = deleteConversationUseCase
         )
     }

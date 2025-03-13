@@ -31,7 +31,7 @@
     <string name="error_incorrect_email_format">Veuillez entrer une adresse e-mail valide</string>
     <string name="error_password_length">Le mot de passe doit comporter au moins 8 caractères</string>
     <string name="email_already_associated">Cette adresse e-mail est déjà associée à un compte. Veuillez vous connecter ou réinitialiser votre mot de passe.</string>
-    <string name="authenticated_user_not_found">L\'utilisateur n\'a pas été trouvé. Veuillez vous re-authentifier.</string>
+    <string name="authenticated_user_not_found">L\'utilisateur n\'a pas été trouvé. Veuillez réessayer.</string>
     <string name="user_creation_error">Une erreur est survenue lors de la création de votre compte. Veuillez réessayer.</string>
 
     <string name="authentication_screen_login_button_tag">Authentication Screen Login Button Tag</string>

@@ -31,6 +31,11 @@ internal class MessageLocalDataSource(private val messageDao: MessageDao) {
             localMessage?.let { MessageMapper.toDomain(it) }
         }
 
+    fun getUnreadMessages(conversationId: Int): Flow<List<Message>> =
+        messageDao.getUnreadMessages(conversationId).map { messages ->
+            messages.map(MessageMapper::toDomain)
+        }
+
     suspend fun insertMessage(message: Message) {
         withContext(Dispatchers.IO) {
             messageDao.insertMessage(MessageMapper.toLocal(message))

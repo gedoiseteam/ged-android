@@ -19,7 +19,8 @@ val messageModule = module {
             getLastMessageUseCase = get(),
             sendMessageUseCase = get(),
             createConversationUseCase = get(),
-            updateMessageUseCase = get()
+            updateMessageUseCase = get(),
+            getUnreadMessagesUseCase = get()
         )
     }
 }

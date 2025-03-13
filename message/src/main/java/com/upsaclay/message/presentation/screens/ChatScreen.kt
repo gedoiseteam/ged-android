@@ -80,7 +80,7 @@ fun ChatScreen(
         parameters = { parametersOf(conversation) }
     )
 ) {
-    val lazyPagingItems = chatViewModel.messages.collectAsLazyPagingItems()
+    val messageItems = chatViewModel.messages.collectAsLazyPagingItems()
     val keyboardController = LocalSoftwareKeyboardController.current
     var newMessageReceivedTimestamp by remember { mutableLongStateOf(0L) }
     var newMessageSentTimestamp by remember { mutableLongStateOf(0L) }
@@ -116,7 +116,7 @@ fun ChatScreen(
         ) {
             MessageFeed(
                 modifier = Modifier.weight(1f),
-                messageItems = lazyPagingItems,
+                messageItems = messageItems,
                 interlocutor = conversation.interlocutor,
                 newMessageReceivedTimestamp = newMessageReceivedTimestamp,
                 newMessageSentTimestamp = newMessageSentTimestamp
@@ -149,7 +149,8 @@ private fun MessageFeed(
     LaunchedEffect(newMessageReceivedTimestamp) {
         delay(50)
         when {
-            listState.firstVisibleItemIndex == 1 -> listState.animateScrollToItem(0)
+            listState.firstVisibleItemIndex == 1 &&
+                    listState.layoutInfo.visibleItemsInfo.size < messageItems.itemCount-> listState.animateScrollToItem(0)
 
             listState.firstVisibleItemIndex > 1 -> showNewMessageIndicator = true
         }
@@ -157,7 +158,10 @@ private fun MessageFeed(
 
     LaunchedEffect(newMessageSentTimestamp) {
         delay(50)
-        if (listState.firstVisibleItemIndex == 1) {
+        if (
+            listState.firstVisibleItemIndex == 1 &&
+            listState.layoutInfo.visibleItemsInfo.size < messageItems.itemCount
+        ) {
             listState.animateScrollToItem(0)
         }
     }

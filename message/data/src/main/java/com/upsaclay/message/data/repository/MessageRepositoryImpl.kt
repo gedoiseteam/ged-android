@@ -17,6 +17,9 @@ internal class MessageRepositoryImpl(
     override fun getLastMessage(conversationId: Int): Flow<Message> =
         messageLocalDataSource.getLastMessage(conversationId)
 
+    override fun getUnreadMessages(conversationId: Int): Flow<List<Message>> =
+        messageLocalDataSource.getUnreadMessages(conversationId)
+
     override suspend fun createMessage(message: Message) {
         messageLocalDataSource.insertMessage(message)
         messageRemoteDataSource.createMessage(message)

@@ -61,15 +61,10 @@ internal class MessageApiImpl : MessageApi {
     }
 
     override suspend fun updateSeenMessage(remoteMessage: RemoteMessage) { suspendCoroutine { continuation ->
-       val update = mapOf(
-            MessageField.Remote.SEEN_VALUE to remoteMessage.seen?.value,
-            MessageField.Remote.SEEN_TIME to remoteMessage.seen?.time
-        )
-
         conversationsCollection.document(remoteMessage.conversationId.toString())
             .collection(MESSAGES_TABLE_NAME)
             .document(remoteMessage.messageId.toString())
-            .update(update)
+            .update(MessageField.Remote.SEEN, remoteMessage.seen)
             .addOnSuccessListener {
                 continuation.resume(Unit)
             }

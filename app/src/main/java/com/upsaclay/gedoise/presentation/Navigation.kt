@@ -30,7 +30,7 @@ import com.upsaclay.authentication.presentation.viewmodels.RegistrationViewModel
 import com.upsaclay.common.domain.entity.Screen
 import com.upsaclay.common.utils.showToast
 import com.upsaclay.gedoise.R
-import com.upsaclay.gedoise.data.BottomNavigationItem
+import com.upsaclay.gedoise.data.NavigationItem
 import com.upsaclay.gedoise.presentation.components.HomeTopBar
 import com.upsaclay.gedoise.presentation.components.MainBottomBar
 import com.upsaclay.gedoise.presentation.components.MainTopBar
@@ -46,6 +46,7 @@ import com.upsaclay.news.presentation.screens.CreateAnnouncementScreen
 import com.upsaclay.news.presentation.screens.EditAnnouncementScreen
 import com.upsaclay.news.presentation.screens.NewsScreen
 import com.upsaclay.news.presentation.screens.ReadAnnouncementScreen
+import kotlinx.coroutines.flow.combine
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -54,6 +55,9 @@ fun Navigation(mainViewModel: MainViewModel = koinViewModel()) {
     val authenticationState by mainViewModel.authenticationState.collectAsState()
     val currentUser by mainViewModel.currentUser.collectAsState()
     val registrationViewModel: RegistrationViewModel = koinViewModel()
+    val navigationItems by combine(mainViewModel.homeNavigationItem, mainViewModel.messageNavigationItem) { home, message ->
+        listOf(home, message)
+    }.collectAsState(emptyList())
 
     val startDestination = when (authenticationState) {
         AuthenticationState.WAITING -> Screen.SPLASH.route
@@ -110,7 +114,7 @@ fun Navigation(mainViewModel: MainViewModel = koinViewModel()) {
                         currentUser?.profilePictureUrl
                     )
                 },
-                bottomNavigationItems = mainViewModel.bottomNavigationItem.values.toList(),
+                navigationItems = navigationItems,
             ) {
                 NewsScreen(navController = navController)
             }
@@ -152,7 +156,7 @@ fun Navigation(mainViewModel: MainViewModel = koinViewModel()) {
                 navController = navController,
                 topBar = { MainTopBar(title = stringResource(R.string.messages)) },
                 snackbarHostState = snackbarHostState,
-                bottomNavigationItems = mainViewModel.bottomNavigationItem.values.toList(),
+                navigationItems = navigationItems,
             ) {
                 ConversationScreen(
                     navController = navController,
@@ -195,7 +199,7 @@ private fun MainNavigationBars(
     navController: NavController,
     topBar: @Composable () -> Unit,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
-    bottomNavigationItems: List<BottomNavigationItem>,
+    navigationItems: List<NavigationItem>,
     content: @Composable BoxScope.() -> Unit
 ) {
     Scaffold(
@@ -206,16 +210,13 @@ private fun MainNavigationBars(
         bottomBar = {
             MainBottomBar(
                 navController = navController,
-                bottomNavigationItems = bottomNavigationItems
+                navigationItems = navigationItems
             )
         }
     ) {
         Box(
             modifier = Modifier
-                .padding(
-                    top = it.calculateTopPadding(),
-                    bottom = it.calculateBottomPadding()
-                )
+                .padding(top = it.calculateTopPadding(), bottom = it.calculateBottomPadding())
         ) {
             content()
         }

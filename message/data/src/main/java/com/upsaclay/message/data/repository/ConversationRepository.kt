@@ -8,9 +8,7 @@ import com.upsaclay.message.domain.entity.ConversationMessage
 import kotlinx.coroutines.flow.Flow
 
 internal interface ConversationRepository {
-    fun getConversationUser(): Flow<List<Conversation>>
-
-    fun getPagedConversationMessages(): Flow<PagingData<ConversationMessage>>
+    fun getConversations(): Flow<List<Conversation>>
 
     suspend fun getConversationFromLocal(interlocutorId: String): Conversation?
 

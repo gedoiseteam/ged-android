@@ -4,6 +4,7 @@ import com.google.firebase.Timestamp
 import com.upsaclay.common.domain.usecase.ConvertDateUseCase
 import com.upsaclay.message.data.local.model.LocalMessage
 import com.upsaclay.message.data.remote.model.RemoteMessage
+import com.upsaclay.message.data.remote.model.RemoteSeen
 import com.upsaclay.message.domain.entity.Message
 import com.upsaclay.message.domain.entity.MessageState
 import com.upsaclay.message.domain.entity.Seen
@@ -17,7 +18,7 @@ internal object MessageMapper {
         conversationId = remoteMessage.conversationId,
         content = remoteMessage.content,
         date = ConvertDateUseCase.toLocalDateTime(remoteMessage.timestamp.toInstant()),
-        seen = remoteMessage.seen,
+        seen = remoteMessage.seen?.let { Seen(it.value, ConvertDateUseCase.toLocalDateTime(it.time.toInstant())) },
         state = MessageState.SENT
     )
 
@@ -27,14 +28,11 @@ internal object MessageMapper {
         conversationId = localMessage.conversationId,
         content = localMessage.content,
         date = Instant.ofEpochMilli(localMessage.messageTimestamp).atZone(ZoneOffset.UTC).toLocalDateTime(),
-        seen = if (localMessage.seenValue == null || localMessage.seenTimestamp == null) {
-            null
-        } else {
-            Seen(
-                value = localMessage.seenValue,
-                time = ConvertDateUseCase.toLocalDateTime(localMessage.seenTimestamp)
-            )
-        },
+        seen = if (localMessage.seenValue == null || localMessage.seenTimestamp == null) null
+        else Seen(
+            value = localMessage.seenValue,
+            time = ConvertDateUseCase.toLocalDateTime(localMessage.seenTimestamp)
+        ),
         state = MessageState.valueOf(localMessage.state)
     )
 
@@ -55,6 +53,6 @@ internal object MessageMapper {
         senderId = message.senderId,
         content = message.content,
         timestamp = Timestamp(message.date.atZone(ZoneOffset.UTC).toInstant()),
-        seen = message.seen
+        seen = message.seen?.let { RemoteSeen(it.value, Timestamp(it.time.atZone(ZoneOffset.UTC).toInstant())) }
     )
 }

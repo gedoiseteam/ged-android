@@ -9,7 +9,6 @@ import androidx.room.Upsert
 import com.upsaclay.message.data.local.model.LocalMessage
 import com.upsaclay.message.data.model.MESSAGES_TABLE_NAME
 import com.upsaclay.message.data.model.MessageField
-import com.upsaclay.message.domain.entity.Message
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -29,6 +28,16 @@ interface MessageDao {
     """)
     fun getLastMessage(conversationId: Int): Flow<LocalMessage?>
 
+    @Query("""
+        SELECT * FROM $MESSAGES_TABLE_NAME
+        WHERE ${MessageField.CONVERSATION_ID} = :conversationId
+        AND (
+            ${MessageField.Local.SEEN_TIMESTAMP} IS NULL 
+            OR ${MessageField.Local.SEEN_VALUE} IS NULL
+        )
+    """)
+    fun getUnreadMessages(conversationId: Int): Flow<List<LocalMessage>>
+    
     @Insert
     suspend fun insertMessage(localMessage: LocalMessage)
 

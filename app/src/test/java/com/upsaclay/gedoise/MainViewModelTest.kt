@@ -4,7 +4,7 @@ import com.upsaclay.authentication.domain.entity.AuthenticationState
 import com.upsaclay.authentication.domain.usecase.IsUserAuthenticatedUseCase
 import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
 import com.upsaclay.common.domain.userFixture
-import com.upsaclay.gedoise.data.BottomNavigationItem
+import com.upsaclay.gedoise.data.NavigationItem
 import com.upsaclay.gedoise.data.BottomNavigationItemType
 import com.upsaclay.gedoise.domain.usecase.ClearDataUseCase
 import com.upsaclay.gedoise.domain.usecase.StartListeningDataUseCase
@@ -67,10 +67,10 @@ class MainViewModelTest {
         assertEquals(userFixture, mainViewModel.currentUser.value)
         assertEquals(
             mapOf(
-                BottomNavigationItemType.HOME to BottomNavigationItem.Home(),
-                BottomNavigationItemType.MESSAGE to BottomNavigationItem.Message()
+                BottomNavigationItemType.HOME to NavigationItem.Home(),
+                BottomNavigationItemType.MESSAGE to NavigationItem.Message()
             ),
-            mainViewModel.bottomNavigationItem
+            mainViewModel.navigationItem
         )
     }
 
