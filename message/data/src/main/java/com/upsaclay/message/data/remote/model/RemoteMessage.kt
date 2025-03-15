@@ -3,7 +3,6 @@ package com.upsaclay.message.data.remote.model
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.PropertyName
 import com.upsaclay.message.data.model.MessageField
-import com.upsaclay.message.domain.entity.Seen
 
 internal data class RemoteMessage(
     @get:PropertyName(MessageField.MESSAGE_ID)

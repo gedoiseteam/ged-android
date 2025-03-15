@@ -23,9 +23,11 @@ import com.upsaclay.message.domain.usecase.GetMessagesUseCase
 import com.upsaclay.message.domain.usecase.GetUnreadMessagesUseCase
 import com.upsaclay.message.domain.usecase.SendMessageUseCase
 import com.upsaclay.message.domain.usecase.UpdateMessageUseCase
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -89,13 +91,16 @@ class ChatViewModel(
         textToSend = ""
     }
 
+    @OptIn(FlowPreview::class)
     private fun seeMessage() {
         viewModelScope.launch {
-            getUnreadMessagesUseCase(conversation.id).collectLatest { messages ->
-                messages
-                    .filter { it.senderId != currentUser?.id }
-                    .map { updateMessageUseCase(it.copy(seen = Seen())) }
-            }
+            getUnreadMessagesUseCase(conversation.id)
+                .debounce(50)
+                .collectLatest { messages ->
+                    messages
+                        .filter { it.senderId != currentUser?.id }
+                        .map { updateMessageUseCase(it.copy(seen = Seen())) }
+                }
         }
     }
 

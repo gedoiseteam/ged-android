@@ -1,29 +1,18 @@
 package com.upsaclay.message.data.repository
 
 import androidx.paging.PagingData
-import com.upsaclay.common.domain.i
 import com.upsaclay.common.domain.repository.UserRepository
 import com.upsaclay.message.data.mapper.ConversationMapper
 import com.upsaclay.message.domain.entity.Conversation
 import com.upsaclay.message.domain.entity.ConversationMessage
-import com.upsaclay.message.domain.entity.ConversationUI
-import com.upsaclay.message.domain.entity.Message
 import com.upsaclay.message.domain.repository.UserConversationRepository
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapConcat
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flatMapMerge
-import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapLatest
-import kotlinx.coroutines.flow.transform
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class UserConversationRepositoryImpl(

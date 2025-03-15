@@ -3,7 +3,6 @@ package com.upsaclay.message.domain.repository
 import androidx.paging.PagingData
 import com.upsaclay.message.domain.entity.Conversation
 import com.upsaclay.message.domain.entity.ConversationMessage
-import com.upsaclay.message.domain.entity.Message
 import kotlinx.coroutines.flow.Flow
 
 interface UserConversationRepository {

@@ -3,11 +3,11 @@ package com.upsaclay.message.domain
 import com.upsaclay.common.domain.e
 import com.upsaclay.message.domain.usecase.CreateConversationUseCase
 import com.upsaclay.message.domain.usecase.DeleteConversationUseCase
-import com.upsaclay.message.domain.usecase.GetConversationsUIUseCase
+import com.upsaclay.message.domain.usecase.GetAllLastUnreadMessagesReceivedUseCase
 import com.upsaclay.message.domain.usecase.GetConversationUseCase
+import com.upsaclay.message.domain.usecase.GetConversationsUIUseCase
 import com.upsaclay.message.domain.usecase.GetLastMessageUseCase
 import com.upsaclay.message.domain.usecase.GetMessagesUseCase
-import com.upsaclay.message.domain.usecase.GetAllLastUnreadMessagesReceivedUseCase
 import com.upsaclay.message.domain.usecase.GetUnreadMessagesUseCase
 import com.upsaclay.message.domain.usecase.ListenRemoteConversationsUseCase
 import com.upsaclay.message.domain.usecase.ListenRemoteMessagesUseCase

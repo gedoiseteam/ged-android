@@ -2,7 +2,6 @@ package com.upsaclay.message.data.repository
 
 import androidx.paging.PagingData
 import com.upsaclay.message.data.local.ConversationMessageLocalDataSource
-import com.upsaclay.message.data.local.dao.ConversationMessageDao
 import com.upsaclay.message.domain.entity.ConversationMessage
 import kotlinx.coroutines.flow.Flow
 

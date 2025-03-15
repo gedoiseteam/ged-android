@@ -10,6 +10,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,7 +28,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.upsaclay.authentication.R
-import com.upsaclay.authentication.domain.entity.RegistrationScreenState
+import com.upsaclay.authentication.domain.entity.RegistrationErrorType
+import com.upsaclay.authentication.domain.entity.RegistrationEvent
 import com.upsaclay.authentication.presentation.components.RegistrationTopBar
 import com.upsaclay.authentication.presentation.viewmodels.RegistrationViewModel
 import com.upsaclay.common.domain.entity.Screen
@@ -36,6 +38,7 @@ import com.upsaclay.common.presentation.components.OutlineTextField
 import com.upsaclay.common.presentation.components.PrimaryButton
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
+import kotlinx.coroutines.flow.collectLatest
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -43,11 +46,15 @@ fun FirstRegistrationScreen(
     navController: NavController,
     registrationViewModel: RegistrationViewModel = koinViewModel()
 ) {
-    val registrationState = registrationViewModel.screenState.collectAsState()
-    val emptyFields = registrationState.value == RegistrationScreenState.EMPTY_FIELDS_ERROR
-    val isLoading = registrationState.value == RegistrationScreenState.LOADING
+    var emptyFields by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
+
+    LaunchedEffect(Unit) {
+        registrationViewModel.event.collectLatest { event ->
+            emptyFields = event is RegistrationEvent.Error && event.type == RegistrationErrorType.EMPTY_FIELDS_ERROR
+        }
+    }
 
     RegistrationTopBar(
         navController = navController,
@@ -76,8 +83,7 @@ fun FirstRegistrationScreen(
                 label = stringResource(com.upsaclay.common.R.string.first_name),
                 onValueChange = registrationViewModel::updateFirstName,
                 keyboardOptions = KeyboardOptions(KeyboardCapitalization.Sentences),
-                isError = emptyFields,
-                enabled = !isLoading
+                isError = emptyFields
             )
 
             OutlineTextField(
@@ -86,8 +92,7 @@ fun FirstRegistrationScreen(
                 label = stringResource(com.upsaclay.common.R.string.last_name),
                 onValueChange = registrationViewModel::updateLastName,
                 keyboardOptions = KeyboardOptions(KeyboardCapitalization.Sentences),
-                isError = emptyFields,
-                enabled = !isLoading
+                isError = emptyFields
             )
 
             if (emptyFields) {
@@ -103,10 +108,8 @@ fun FirstRegistrationScreen(
                 .align(Alignment.BottomEnd)
                 .testTag(stringResource(R.string.registration_screen_next_button_tag)),
             text = stringResource(id = com.upsaclay.common.R.string.next),
-            isEnable = !isLoading,
             onClick = {
                 if (registrationViewModel.verifyNamesInputs()) {
-                    registrationViewModel.resetScreenState()
                     focusManager.clearFocus()
                     keyboardController?.hide()
                     navController.navigate(Screen.SECOND_REGISTRATION.route)

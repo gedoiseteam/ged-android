@@ -1,6 +1,7 @@
 package com.upsaclay.message.presentation.components
 
 import android.content.res.Configuration
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -45,7 +47,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
@@ -56,6 +57,7 @@ import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.black
 import com.upsaclay.common.presentation.theme.chatInputBackground
 import com.upsaclay.common.presentation.theme.chatInputForeground
+import com.upsaclay.common.presentation.theme.lightGray
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.common.presentation.theme.white
 import com.upsaclay.message.R
@@ -93,6 +95,21 @@ fun SentMessageItem(
                     backgroundColor = MaterialTheme.colorScheme.primary,
                     dateTimeTextColor = dateTimeTextColor
                 )
+
+                val iconColor =
+                    if (isSystemInDarkTheme()) Color.Gray else MaterialTheme.colorScheme.lightGray
+                AnimatedVisibility(
+                    visible = message.state == MessageState.LOADING
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.Send,
+                        contentDescription = stringResource(id = R.string.send_message_icon_description),
+                        tint = iconColor,
+                        modifier = Modifier
+                            .padding(start = MaterialTheme.spacing.small)
+                            .size(20.dp)
+                    )
+                }
             }
         }
 
@@ -272,14 +289,14 @@ fun NewMessageIndicator(
         ) {
             Text(
                 text = stringResource(id = R.string.new_message),
-                style = MaterialTheme.typography.labelSmall,
+                style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.black,
                 modifier = Modifier
                     .clip(ShapeDefaults.Small)
                     .background(Color.White)
                     .clickable { onClick() }
                     .padding(horizontal = MaterialTheme.spacing.large)
-                    .padding(vertical = MaterialTheme.spacing.small)
+                    .padding(vertical = MaterialTheme.spacing.smallMedium)
             )
         }
     }

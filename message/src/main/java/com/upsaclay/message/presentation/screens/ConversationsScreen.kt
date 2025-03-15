@@ -27,7 +27,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,6 +49,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
+import com.upsaclay.common.domain.entity.ErrorType
 import com.upsaclay.common.domain.entity.Screen
 import com.upsaclay.common.presentation.components.CircularProgressBar
 import com.upsaclay.common.presentation.components.ClickableItem
@@ -60,11 +60,13 @@ import com.upsaclay.common.presentation.theme.previewText
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.message.R
 import com.upsaclay.message.domain.conversationsUIFixture
-import com.upsaclay.message.domain.entity.ConversationScreenState
+import com.upsaclay.message.domain.entity.ConversationEvent
 import com.upsaclay.message.domain.entity.ConversationUI
+import com.upsaclay.message.domain.entity.SuccessType
 import com.upsaclay.message.domain.usecase.ConvertConversationJsonUseCase
 import com.upsaclay.message.presentation.components.ConversationItem
 import com.upsaclay.message.presentation.viewmodels.ConversationViewModel
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -76,7 +78,6 @@ fun ConversationScreen(
     conversationViewModel: ConversationViewModel = koinViewModel()
 ) {
     val conversationItems = conversationViewModel.conversations.collectAsLazyPagingItems()
-    val screenState by conversationViewModel.screenState.collectAsState()
     val context = LocalContext.current
 
     var conversationClicked by remember { mutableStateOf<ConversationUI?>(null) }
@@ -95,24 +96,30 @@ fun ConversationScreen(
         }
     }
 
-    val showSnackBar = { message: String ->
+    val showSnackbar = { message: String ->
         scope.launch {
             snackbarHostState.showSnackbar(message = message)
         }
     }
 
-    LaunchedEffect(screenState) {
-        when (screenState) {
-            ConversationScreenState.ERROR -> {
-                showLoadingDialog = false
-                showSnackBar(context.getString(com.upsaclay.common.R.string.occurred_error))
-            }
+    LaunchedEffect(Unit) {
+        conversationViewModel.event.collectLatest { event ->
+            showLoadingDialog = event == ConversationEvent.Loading
+            when (event) {
+                is ConversationEvent.Success -> {
+                    if (event.type == SuccessType.DELETED) showSnackbar(context.getString(R.string.conversation_deleted))
+                }
 
-            ConversationScreenState.SUCCESS -> {
-                showSnackBar(context.getString(R.string.conversation_deleted))
-            }
+                is ConversationEvent.Error -> {
+                    when (event.type) {
+                        is ErrorType.TooManyRequestsError -> showSnackbar(context.getString(com.upsaclay.common.R.string.too_many_request_error))
+                        is ErrorType.NetworkError -> showSnackbar(context.getString(com.upsaclay.common.R.string.unknown_network_error))
+                        else -> showSnackbar(context.getString(com.upsaclay.common.R.string.unknown_error))
+                    }
+                }
 
-            else -> {}
+                else -> {}
+            }
         }
     }
 

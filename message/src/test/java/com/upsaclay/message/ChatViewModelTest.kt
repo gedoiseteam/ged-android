@@ -10,6 +10,7 @@ import com.upsaclay.message.domain.messagesFixture
 import com.upsaclay.message.domain.usecase.CreateConversationUseCase
 import com.upsaclay.message.domain.usecase.GetLastMessageUseCase
 import com.upsaclay.message.domain.usecase.GetMessagesUseCase
+import com.upsaclay.message.domain.usecase.GetUnreadMessagesUseCase
 import com.upsaclay.message.domain.usecase.SendMessageUseCase
 import com.upsaclay.message.domain.usecase.UpdateMessageUseCase
 import com.upsaclay.message.presentation.viewmodels.ChatViewModel
@@ -36,6 +37,7 @@ class ChatViewModelTest {
     private val sendMessageUseCase: SendMessageUseCase = mockk()
     private val createConversationUseCase: CreateConversationUseCase = mockk()
     private val updateMessageUseCase: UpdateMessageUseCase = mockk()
+    private val getUnreadMessagesUseCase: GetUnreadMessagesUseCase = mockk()
 
     private lateinit var chatViewModel: ChatViewModel
     private val testDispatcher = UnconfinedTestDispatcher()
@@ -57,7 +59,8 @@ class ChatViewModelTest {
             getLastMessageUseCase = getLastMessageUseCase,
             sendMessageUseCase = sendMessageUseCase,
             createConversationUseCase = createConversationUseCase,
-            updateMessageUseCase = updateMessageUseCase
+            updateMessageUseCase = updateMessageUseCase,
+            getUnreadMessagesUseCase = getUnreadMessagesUseCase
         )
     }
 
@@ -123,7 +126,8 @@ class ChatViewModelTest {
             getLastMessageUseCase = getLastMessageUseCase,
             sendMessageUseCase = sendMessageUseCase,
             createConversationUseCase = createConversationUseCase,
-            updateMessageUseCase = updateMessageUseCase
+            updateMessageUseCase = updateMessageUseCase,
+            getUnreadMessagesUseCase = getUnreadMessagesUseCase
         )
         chatViewModel.updateTextToSend("Hello")
 
@@ -145,7 +149,8 @@ class ChatViewModelTest {
             getLastMessageUseCase = getLastMessageUseCase,
             sendMessageUseCase = sendMessageUseCase,
             createConversationUseCase = createConversationUseCase,
-            updateMessageUseCase = updateMessageUseCase
+            updateMessageUseCase = updateMessageUseCase,
+            getUnreadMessagesUseCase = getUnreadMessagesUseCase
         )
         chatViewModel.updateTextToSend("Hello")
 
@@ -168,7 +173,8 @@ class ChatViewModelTest {
             getLastMessageUseCase = getLastMessageUseCase,
             sendMessageUseCase = sendMessageUseCase,
             createConversationUseCase = createConversationUseCase,
-            updateMessageUseCase = updateMessageUseCase
+            updateMessageUseCase = updateMessageUseCase,
+            getUnreadMessagesUseCase = getUnreadMessagesUseCase
         )
         chatViewModel.updateTextToSend("Hello")
 

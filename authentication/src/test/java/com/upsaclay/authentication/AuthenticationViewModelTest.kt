@@ -1,7 +1,6 @@
 package com.upsaclay.authentication
 
 import android.accounts.NetworkErrorException
-import com.upsaclay.authentication.domain.entity.AuthenticationScreenState
 import com.upsaclay.authentication.domain.entity.exception.InvalidCredentialsException
 import com.upsaclay.authentication.domain.usecase.IsEmailVerifiedUseCase
 import com.upsaclay.authentication.domain.usecase.LoginUseCase
@@ -61,7 +60,7 @@ class AuthenticationViewModelTest {
     fun default_values_are_correct() {
         assertEquals("", authenticationViewModel.email)
         assertEquals("", authenticationViewModel.password)
-        assertEquals(AuthenticationScreenState.DEFAULT, authenticationViewModel.screenState.value)
+        assertEquals(AuthenticationScreenState.DEFAULT, authenticationViewModel.event.value)
     }
 
     @Test
@@ -88,7 +87,7 @@ class AuthenticationViewModelTest {
         authenticationViewModel.login()
 
         // Then
-        assertEquals(AuthenticationScreenState.DEFAULT, authenticationViewModel.screenState.value)
+        assertEquals(AuthenticationScreenState.DEFAULT, authenticationViewModel.event.value)
     }
 
     @Test
@@ -100,7 +99,7 @@ class AuthenticationViewModelTest {
         authenticationViewModel.login()
 
         // Then
-        assertEquals(AuthenticationScreenState.EMAIL_NOT_VERIFIED, authenticationViewModel.screenState.value)
+        assertEquals(AuthenticationScreenState.EMAIL_NOT_VERIFIED, authenticationViewModel.event.value)
     }
 
     @Test
@@ -112,7 +111,7 @@ class AuthenticationViewModelTest {
         authenticationViewModel.login()
 
         // Then
-        assertEquals(AuthenticationScreenState.AUTH_USER_NOT_FOUND, authenticationViewModel.screenState.value)
+        assertEquals(AuthenticationScreenState.AUTH_USER_NOT_FOUND, authenticationViewModel.event.value)
     }
 
     @Test
@@ -124,7 +123,7 @@ class AuthenticationViewModelTest {
         authenticationViewModel.login()
 
         // Then
-        assertEquals(AuthenticationScreenState.INTERNAL_SERVER_ERROR, authenticationViewModel.screenState.value)
+        assertEquals(AuthenticationScreenState.INTERNAL_SERVER_ERROR, authenticationViewModel.event.value)
     }
 
     @Test
@@ -136,7 +135,7 @@ class AuthenticationViewModelTest {
         authenticationViewModel.login()
 
         // Then
-        assertEquals(AuthenticationScreenState.TOO_MANY_REQUESTS_ERROR, authenticationViewModel.screenState.value)
+        assertEquals(AuthenticationScreenState.TOO_MANY_REQUESTS_ERROR, authenticationViewModel.event.value)
     }
 
     @Test
@@ -148,7 +147,7 @@ class AuthenticationViewModelTest {
         authenticationViewModel.login()
 
         // Then
-        assertEquals(AuthenticationScreenState.INVALID_CREDENTIALS_ERROR, authenticationViewModel.screenState.value)
+        assertEquals(AuthenticationScreenState.INVALID_CREDENTIALS_ERROR, authenticationViewModel.event.value)
     }
 
     @Test
@@ -160,7 +159,7 @@ class AuthenticationViewModelTest {
         authenticationViewModel.login()
 
         // Then
-        assertEquals(AuthenticationScreenState.INTERNAL_SERVER_ERROR, authenticationViewModel.screenState.value)
+        assertEquals(AuthenticationScreenState.INTERNAL_SERVER_ERROR, authenticationViewModel.event.value)
     }
 
     @Test
@@ -172,7 +171,7 @@ class AuthenticationViewModelTest {
         authenticationViewModel.login()
 
         // Then
-        assertEquals(AuthenticationScreenState.NETWORK_ERROR, authenticationViewModel.screenState.value)
+        assertEquals(AuthenticationScreenState.NETWORK_ERROR, authenticationViewModel.event.value)
     }
 
     @Test
@@ -184,7 +183,7 @@ class AuthenticationViewModelTest {
         authenticationViewModel.login()
 
         // Then
-        assertEquals(AuthenticationScreenState.UNKNOWN_ERROR, authenticationViewModel.screenState.value)
+        assertEquals(AuthenticationScreenState.UNKNOWN_ERROR, authenticationViewModel.event.value)
     }
 
     @Test
@@ -196,7 +195,7 @@ class AuthenticationViewModelTest {
         authenticationViewModel.login()
 
         // Then
-        assertEquals(AuthenticationScreenState.TOO_MANY_REQUESTS_ERROR, authenticationViewModel.screenState.value)
+        assertEquals(AuthenticationScreenState.TOO_MANY_REQUESTS_ERROR, authenticationViewModel.event.value)
     }
 
     @Test
@@ -208,7 +207,7 @@ class AuthenticationViewModelTest {
         authenticationViewModel.login()
 
         // Then
-        assertEquals(AuthenticationScreenState.INVALID_CREDENTIALS_ERROR, authenticationViewModel.screenState.value)
+        assertEquals(AuthenticationScreenState.INVALID_CREDENTIALS_ERROR, authenticationViewModel.event.value)
     }
 
     @Test
@@ -241,7 +240,7 @@ class AuthenticationViewModelTest {
         authenticationViewModel.resetScreenState()
 
         // Then
-        assertEquals(AuthenticationScreenState.DEFAULT, authenticationViewModel.screenState.value)
+        assertEquals(AuthenticationScreenState.DEFAULT, authenticationViewModel.event.value)
     }
 
     @Test
@@ -254,7 +253,7 @@ class AuthenticationViewModelTest {
 
         // Then
         assertFalse(result)
-        assertEquals(AuthenticationScreenState.EMPTY_FIELDS_ERROR, authenticationViewModel.screenState.value)
+        assertEquals(AuthenticationScreenState.EMPTY_FIELDS_ERROR, authenticationViewModel.event.value)
     }
 
     @Test
@@ -267,7 +266,7 @@ class AuthenticationViewModelTest {
 
         // Then
         assertFalse(result)
-        assertEquals(AuthenticationScreenState.EMPTY_FIELDS_ERROR, authenticationViewModel.screenState.value)
+        assertEquals(AuthenticationScreenState.EMPTY_FIELDS_ERROR, authenticationViewModel.event.value)
     }
 
     @Test
@@ -281,7 +280,7 @@ class AuthenticationViewModelTest {
 
         // Then
         assertFalse(result)
-        assertEquals(AuthenticationScreenState.EMAIL_FORMAT_ERROR, authenticationViewModel.screenState.value)
+        assertEquals(AuthenticationScreenState.EMAIL_FORMAT_ERROR, authenticationViewModel.event.value)
     }
 
     @Test

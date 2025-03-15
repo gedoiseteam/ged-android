@@ -7,7 +7,6 @@ import com.upsaclay.common.domain.usecase.GetUsersUseCase
 import com.upsaclay.common.domain.userFixture
 import com.upsaclay.common.domain.usersFixture
 import com.upsaclay.message.domain.conversationFixture
-import com.upsaclay.message.domain.entity.ConversationScreenState
 import com.upsaclay.message.domain.entity.ConversationState
 import com.upsaclay.message.domain.entity.ConversationUI
 import com.upsaclay.message.domain.entity.Message
@@ -56,7 +55,7 @@ class CreateConversationViewModelTest {
     @Test
     fun default_values_are_correct() = runTest {
         val users = usersFixture.filterNot { it.id == userFixture.id }
-        assertEquals(ConversationScreenState.DEFAULT, conversationViewModel.screenState.value)
+        assertEquals(ConversationScreenState.DEFAULT, conversationViewModel.event.value)
         assertEquals(users, conversationViewModel.users.first())
     }
 

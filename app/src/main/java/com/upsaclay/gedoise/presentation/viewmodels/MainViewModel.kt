@@ -2,6 +2,7 @@ package com.upsaclay.gedoise.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.upsaclay.authentication.domain.entity.AuthenticationEvent
 import com.upsaclay.authentication.domain.entity.AuthenticationState
 import com.upsaclay.authentication.domain.usecase.IsUserAuthenticatedUseCase
 import com.upsaclay.common.domain.entity.User
@@ -13,7 +14,9 @@ import com.upsaclay.gedoise.domain.usecase.StopListeningDataUseCase
 import com.upsaclay.message.domain.usecase.GetAllLastUnreadMessagesReceivedUseCase
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filterNotNull
@@ -27,7 +30,7 @@ class MainViewModel(
     private val stopListeningDataUseCase: StopListeningDataUseCase,
     private val clearDataUseCase: ClearDataUseCase,
     private val getAllLastUnreadMessagesReceivedUseCase: GetAllLastUnreadMessagesReceivedUseCase
-) : ViewModel() {
+): ViewModel() {
     private val _authenticationState = MutableStateFlow(AuthenticationState.WAITING)
     val authenticationState: StateFlow<AuthenticationState> = _authenticationState
 

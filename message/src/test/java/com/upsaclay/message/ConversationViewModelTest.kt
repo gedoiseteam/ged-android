@@ -3,7 +3,6 @@ package com.upsaclay.message
 import androidx.paging.PagingData
 import com.upsaclay.message.domain.conversationUIFixture
 import com.upsaclay.message.domain.conversationsUIFixture
-import com.upsaclay.message.domain.entity.ConversationScreenState
 import com.upsaclay.message.domain.usecase.DeleteConversationUseCase
 import com.upsaclay.message.domain.usecase.GetConversationsUIUseCase
 import com.upsaclay.message.presentation.viewmodels.ConversationViewModel

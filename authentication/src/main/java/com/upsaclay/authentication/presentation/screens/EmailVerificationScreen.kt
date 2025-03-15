@@ -36,8 +36,9 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import com.upsaclay.authentication.R
-import com.upsaclay.authentication.domain.entity.AuthenticationScreenState
+import com.upsaclay.authentication.domain.entity.AuthenticationEvent
 import com.upsaclay.authentication.presentation.viewmodels.EmailVerificationViewModel
+import com.upsaclay.common.domain.entity.ErrorType
 import com.upsaclay.common.presentation.components.ErrorText
 import com.upsaclay.common.presentation.components.PrimaryButton
 import com.upsaclay.common.presentation.components.SmallTopBarBack
@@ -45,6 +46,7 @@ import com.upsaclay.common.presentation.components.TopLinearLoadingScreen
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -58,9 +60,8 @@ fun EmailVerificationScreen(
 ) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
-    val screenState by emailVerificationViewModel.screenState.collectAsState()
     var errorMessage by remember { mutableStateOf("") }
-    val isLoading = screenState == AuthenticationScreenState.LOADING
+    var loading by remember { mutableStateOf(false) }
     var isForwardEmailButtonEnable by remember { mutableStateOf(true) }
     var isForwardButtonClicked by remember { mutableStateOf(false) }
 
@@ -77,23 +78,30 @@ fun EmailVerificationScreen(
     }
 
     val snackbarHostState = remember { SnackbarHostState() }
-    val showSnackBar = { message: String ->
+    val showSnackbar = { message: String ->
         scope.launch {
             snackbarHostState.showSnackbar(message = message)
         }
     }
 
-    errorMessage = when (screenState) {
-        AuthenticationScreenState.EMAIL_NOT_VERIFIED -> stringResource(id = R.string.email_not_verified)
+    LaunchedEffect(Unit) {
+        emailVerificationViewModel.event.collectLatest { event ->
+            loading = event == AuthenticationEvent.Loading
+            when (event) {
+                is AuthenticationEvent.Error -> {
+                    errorMessage = if (event == AuthenticationEvent.EmailNotVerified) {
+                        context.getString(R.string.email_not_verified)
+                    } else ""
 
-        else -> ""
-    }
+                    when (event.type) {
+                        ErrorType.NetworkError -> showSnackbar(context.getString(com.upsaclay.common.R.string.unknown_network_error))
+                        ErrorType.UnknownError -> showSnackbar(context.getString(com.upsaclay.common.R.string.unknown_error))
+                        else -> {}
+                    }
+                }
 
-    LaunchedEffect(screenState) {
-        when(screenState) {
-            AuthenticationScreenState.NETWORK_ERROR -> showSnackBar(context.getString(com.upsaclay.common.R.string.unknown_network_error))
-            AuthenticationScreenState.UNKNOWN_ERROR -> showSnackBar(context.getString(com.upsaclay.common.R.string.unknown_error))
-            else -> {}
+                else -> {}
+            }
         }
     }
 
@@ -122,7 +130,7 @@ fun EmailVerificationScreen(
             }
         }
     ) { contentPadding ->
-        if (isLoading) {
+        if (loading) {
             TopLinearLoadingScreen()
         }
 
@@ -172,7 +180,7 @@ fun EmailVerificationScreen(
                         isForwardButtonClicked = true
                         emailVerificationViewModel.sendVerificationEmail()
                     },
-                    enabled = isForwardEmailButtonEnable && !isLoading
+                    enabled = isForwardEmailButtonEnable && !loading
                 ) {
                     Text(text = stringResource(id = R.string.forward_verification_email))
                 }
@@ -182,7 +190,7 @@ fun EmailVerificationScreen(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .testTag(stringResource(id = R.string.email_verification_screen_finish_button_tag)),
-                isEnable = !isLoading,
+                isEnable = !loading,
                 text = stringResource(id = com.upsaclay.common.R.string.next),
                 onClick = { emailVerificationViewModel.verifyIsEmailVerified() }
             )

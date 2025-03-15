@@ -18,7 +18,6 @@ import com.upsaclay.common.domain.entity.Screen
 import com.upsaclay.common.domain.userFixture2
 import com.upsaclay.message.domain.conversationUIFixture
 import com.upsaclay.message.domain.conversationsUIFixture
-import com.upsaclay.message.domain.entity.ConversationScreenState
 import com.upsaclay.message.domain.messageFixture
 import com.upsaclay.message.presentation.screens.ChatScreen
 import com.upsaclay.message.presentation.screens.ConversationScreen

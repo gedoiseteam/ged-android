@@ -40,10 +40,6 @@ fun SecondRegistrationScreen(
     var selectedItem by remember { mutableStateOf(registrationViewModel.schoolLevel) }
     var expanded by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
-        registrationViewModel.resetScreenState()
-    }
-
     RegistrationTopBar(navController = navController) {
         Column(
             modifier = Modifier

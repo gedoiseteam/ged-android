@@ -39,7 +39,6 @@ import com.upsaclay.message.domain.conversationUIFixture
 import com.upsaclay.message.domain.entity.ConversationUI
 import com.upsaclay.message.domain.entity.Message
 import com.upsaclay.message.domain.entity.MessageState
-import com.upsaclay.message.domain.entity.Seen
 import com.upsaclay.message.domain.messageFixture2
 
 @OptIn(ExperimentalFoundationApi::class)

@@ -1,10 +1,8 @@
 package com.upsaclay.message.data.repository
 
-import androidx.paging.PagingData
 import com.upsaclay.common.domain.entity.User
 import com.upsaclay.message.data.remote.model.RemoteConversation
 import com.upsaclay.message.domain.entity.Conversation
-import com.upsaclay.message.domain.entity.ConversationMessage
 import kotlinx.coroutines.flow.Flow
 
 internal interface ConversationRepository {

@@ -8,6 +8,7 @@ import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -20,6 +21,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.upsaclay.authentication.domain.entity.AuthenticationEvent
 import com.upsaclay.authentication.domain.entity.AuthenticationState
 import com.upsaclay.authentication.presentation.screens.AuthenticationScreen
 import com.upsaclay.authentication.presentation.screens.EmailVerificationScreen
@@ -46,6 +48,7 @@ import com.upsaclay.news.presentation.screens.CreateAnnouncementScreen
 import com.upsaclay.news.presentation.screens.EditAnnouncementScreen
 import com.upsaclay.news.presentation.screens.NewsScreen
 import com.upsaclay.news.presentation.screens.ReadAnnouncementScreen
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import org.koin.androidx.compose.koinViewModel
 
@@ -55,7 +58,10 @@ fun Navigation(mainViewModel: MainViewModel = koinViewModel()) {
     val authenticationState by mainViewModel.authenticationState.collectAsState()
     val currentUser by mainViewModel.currentUser.collectAsState()
     val registrationViewModel: RegistrationViewModel = koinViewModel()
-    val navigationItems by combine(mainViewModel.homeNavigationItem, mainViewModel.messageNavigationItem) { home, message ->
+    val navigationItems by combine(
+        mainViewModel.homeNavigationItem,
+        mainViewModel.messageNavigationItem
+    ) { home, message ->
         listOf(home, message)
     }.collectAsState(emptyList())
 

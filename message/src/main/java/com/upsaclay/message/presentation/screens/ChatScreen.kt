@@ -4,7 +4,6 @@ import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -46,7 +45,6 @@ import com.upsaclay.common.domain.entity.User
 import com.upsaclay.common.domain.usecase.FormatLocalDateTimeUseCase
 import com.upsaclay.common.presentation.components.CircularProgressBar
 import com.upsaclay.common.presentation.theme.GedoiseTheme
-import com.upsaclay.common.presentation.theme.lightGray
 import com.upsaclay.common.presentation.theme.previewText
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.message.R
@@ -55,7 +53,7 @@ import com.upsaclay.message.domain.entity.ChatEvent
 import com.upsaclay.message.domain.entity.ConversationUI
 import com.upsaclay.message.domain.entity.Message
 import com.upsaclay.message.domain.entity.MessageState
-import com.upsaclay.message.domain.messagesFixture
+import com.upsaclay.message.domain.messageFixture
 import com.upsaclay.message.presentation.components.ChatTopBar
 import com.upsaclay.message.presentation.components.MessageInput
 import com.upsaclay.message.presentation.components.NewMessageIndicator
@@ -149,8 +147,7 @@ private fun MessageFeed(
     LaunchedEffect(newMessageReceivedTimestamp) {
         delay(50)
         when {
-            listState.firstVisibleItemIndex == 1 &&
-                    listState.layoutInfo.visibleItemsInfo.size < messageItems.itemCount-> listState.animateScrollToItem(0)
+            listState.firstVisibleItemIndex == 1 -> listState.animateScrollToItem(0)
 
             listState.firstVisibleItemIndex > 1 -> showNewMessageIndicator = true
         }
@@ -190,22 +187,20 @@ private fun MessageFeed(
                     val firstMessage = index == messageItems.itemCount - 1
                     val lastMessage = index == 0
                     val previousMessage = if (index + 1 < messageItems.itemCount) messageItems[index + 1] else null
-                    val nextMessage = if (index - 1 >= 0) messageItems[index - 1] else null
 
                     val previousSenderId = previousMessage?.senderId ?: ""
-                    val nextSenderId = nextMessage?.senderId ?: ""
                     val sameSender = previousSenderId == message.senderId
                     val showSeenMessage = lastMessage && currentUserSender && message.seen?.value == true
 
                     val sameTime = previousMessage?.let {
-                        Duration.between(it.date, message.date).toMinutes() < 1L
+                        Duration.between(it.date, message.date).toMinutes() < 2L
                     } ?: false
 
                     val sameDay = previousMessage?.let {
-                        Duration.between(it.date, message.date).toDays() < 1L
+                        Duration.between(it.date, message.date).toDays() < 2L
                     } ?: false
 
-                    val displayProfilePicture = !sameTime || (!currentUserSender && message.senderId != nextSenderId)
+                    val displayProfilePicture = !sameTime || firstMessage || !sameSender
 
                     if (message.senderId != interlocutor.id) {
                         SentMessageItem(
@@ -239,45 +234,7 @@ private fun MessageFeed(
             }
 
             item {
-                when (messageItems.loadState.refresh) {
-                    is LoadState.Error -> {
-                        Text(
-                            modifier = Modifier.fillMaxWidth(),
-                            text = stringResource(R.string.error_fetch_messages),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.error,
-                            textAlign = TextAlign.Center
-                        )
-                    }
-
-                    is LoadState.Loading -> {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            CircularProgressBar(
-                                strokeWidth = 2.dp,
-                                color = MaterialTheme.colorScheme.lightGray.copy(alpha = 0.8f)
-                            )
-                        }
-                    }
-
-                    else -> {}
-                }
-            }
-
-            item {
                 when (messageItems.loadState.append) {
-                    is LoadState.Error -> {
-                        Text(
-                            modifier = Modifier.fillMaxWidth(),
-                            text = stringResource(R.string.error_fetch_messages),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.error,
-                            textAlign = TextAlign.Center
-                        )
-                    }
-
                     is LoadState.Loading -> {
                         Column(
                             modifier = Modifier.fillParentMaxSize(),
@@ -323,7 +280,7 @@ private fun messagePadding(
 @Composable
 private fun ChatScreenPreview() {
     var text by remember { mutableStateOf("") }
-    var messages by remember { mutableStateOf(messagesFixture) }
+    var messages by remember { mutableStateOf(listOf(messageFixture)) }
     var id by remember { mutableIntStateOf(10) }
     var newMessageReceivedTimestamp by remember { mutableLongStateOf(0L) }
     var newMessageSentTimestamp by remember { mutableLongStateOf(0L) }

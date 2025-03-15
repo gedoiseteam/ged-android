@@ -28,11 +28,12 @@ internal object MessageMapper {
         conversationId = localMessage.conversationId,
         content = localMessage.content,
         date = Instant.ofEpochMilli(localMessage.messageTimestamp).atZone(ZoneOffset.UTC).toLocalDateTime(),
-        seen = if (localMessage.seenValue == null || localMessage.seenTimestamp == null) null
-        else Seen(
-            value = localMessage.seenValue,
-            time = ConvertDateUseCase.toLocalDateTime(localMessage.seenTimestamp)
-        ),
+        seen = if (localMessage.seenValue != null && localMessage.seenTimestamp != null) {
+            Seen(
+                value = localMessage.seenValue,
+                time = ConvertDateUseCase.toLocalDateTime(localMessage.seenTimestamp)
+            )
+        } else null,
         state = MessageState.valueOf(localMessage.state)
     )
 

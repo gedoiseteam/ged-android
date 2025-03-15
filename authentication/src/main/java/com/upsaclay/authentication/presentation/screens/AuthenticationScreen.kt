@@ -51,16 +51,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.upsaclay.authentication.R
-import com.upsaclay.authentication.domain.entity.AuthenticationScreenState
+import com.upsaclay.authentication.domain.entity.AuthErrorType
+import com.upsaclay.authentication.domain.entity.AuthenticationEvent
 import com.upsaclay.authentication.presentation.components.LoginButton
 import com.upsaclay.authentication.presentation.components.OutlinePasswordTextField
 import com.upsaclay.authentication.presentation.viewmodels.AuthenticationViewModel
+import com.upsaclay.common.domain.entity.ErrorType
 import com.upsaclay.common.domain.entity.Screen
 import com.upsaclay.common.presentation.components.ErrorText
 import com.upsaclay.common.presentation.components.OutlineTextField
 import com.upsaclay.common.presentation.components.SimpleDialog
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -75,7 +78,8 @@ fun AuthenticationScreen(
     val scrollState = rememberScrollState()
     val scope = rememberCoroutineScope()
     var showVerifyEmailDialog by remember { mutableStateOf(false) }
-    val screenState by authenticationViewModel.screenState.collectAsState()
+    var errorMessage by remember { mutableStateOf("") }
+    var loading by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
     val showSnackBar = { message: String ->
         scope.launch {
@@ -83,44 +87,32 @@ fun AuthenticationScreen(
         }
     }
 
-    val (errorMessage, inputsError) = when (screenState) {
-        AuthenticationScreenState.INVALID_CREDENTIALS_ERROR -> stringResource(id = R.string.login_error) to true
-
-        AuthenticationScreenState.EMPTY_FIELDS_ERROR -> stringResource(id = com.upsaclay.common.R.string.empty_fields_error) to true
-
-        AuthenticationScreenState.AUTH_USER_NOT_FOUND -> stringResource(id = R.string.authenticated_user_not_found) to true
-
-        AuthenticationScreenState.TOO_MANY_REQUESTS_ERROR -> stringResource(id = com.upsaclay.common.R.string.too_many_request_error) to false
-
-        AuthenticationScreenState.EMAIL_FORMAT_ERROR -> stringResource(id = R.string.error_incorrect_email_format) to true
-
-        else -> "" to false
-    }
-
     LaunchedEffect(Unit) {
-        authenticationViewModel.resetScreenState()
-    }
+        authenticationViewModel.event.collectLatest { event ->
+            showVerifyEmailDialog = event == AuthenticationEvent.EmailNotVerified
+            loading = event == AuthenticationEvent.Loading
 
-    LaunchedEffect(screenState) {
-        when(screenState) {
-            AuthenticationScreenState.INTERNAL_SERVER_ERROR -> {
-                showSnackBar(context.getString(com.upsaclay.common.R.string.internal_server_error))
-                authenticationViewModel.resetScreenState()
+            when (event) {
+                is AuthenticationEvent.Error -> {
+                    errorMessage = when(event.type) {
+                        AuthErrorType.INVALID_CREDENTIALS_ERROR -> context.getString(R.string.login_error)
+                        AuthErrorType.EMPTY_FIELDS_ERROR -> context.getString(com.upsaclay.common.R.string.empty_fields_error)
+                        AuthErrorType.AUTH_USER_NOT_FOUND -> context.getString(R.string.authenticated_user_not_found)
+                        AuthErrorType.EMAIL_FORMAT_ERROR -> context.getString(R.string.error_incorrect_email_format)
+                        else -> ""
+                    }
+
+                    when(event.type) {
+                        ErrorType.TooManyRequestsError -> showSnackBar(context.getString(com.upsaclay.common.R.string.too_many_request_error))
+                        ErrorType.InternalServerError -> showSnackBar(context.getString(com.upsaclay.common.R.string.internal_server_error))
+                        ErrorType.NetworkError -> showSnackBar(context.getString(com.upsaclay.common.R.string.unknown_network_error))
+                        ErrorType.UnknownError -> showSnackBar(context.getString(com.upsaclay.common.R.string.unknown_error))
+                        else -> {}
+                    }
+                }
+
+                else -> {}
             }
-
-            AuthenticationScreenState.NETWORK_ERROR-> {
-                showSnackBar(context.getString(com.upsaclay.common.R.string.unknown_network_error))
-                authenticationViewModel.resetScreenState()
-            }
-
-            AuthenticationScreenState.UNKNOWN_ERROR -> {
-                showSnackBar(context.getString(com.upsaclay.common.R.string.unknown_error))
-                authenticationViewModel.resetScreenState()
-            }
-
-            AuthenticationScreenState.EMAIL_NOT_VERIFIED -> showVerifyEmailDialog = true
-
-            else -> {}
         }
     }
 
@@ -133,7 +125,6 @@ fun AuthenticationScreen(
             onConfirm = {
                 authenticationViewModel.resetEmail()
                 authenticationViewModel.resetPassword()
-                authenticationViewModel.resetScreenState()
                 navController.navigate(Screen.EMAIL_VERIFICATION.route + "?email=${authenticationViewModel.email}") {
                     popUpTo(navController.graph.id) { inclusive = true }
                 }
@@ -141,7 +132,6 @@ fun AuthenticationScreen(
             onCancel = {
                 authenticationViewModel.resetPassword()
                 showVerifyEmailDialog = false
-                authenticationViewModel.resetScreenState()
             }
         )
     }
@@ -182,7 +172,7 @@ fun AuthenticationScreen(
                     onPasswordChange = { authenticationViewModel.updatePassword(it) },
                     keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
                     errorMessage = errorMessage,
-                    isError = inputsError
+                    isError = errorMessage.isNotBlank()
                 )
 
                 Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))
@@ -192,7 +182,7 @@ fun AuthenticationScreen(
                         .fillMaxWidth()
                         .testTag(stringResource(id = R.string.authentication_screen_login_button_tag)),
                     text = stringResource(id = R.string.login),
-                    isLoading = screenState == AuthenticationScreenState.LOADING,
+                    isLoading = loading,
                     onClick = {
                         keyboardController?.hide()
                         if (authenticationViewModel.verifyInputs()) {
@@ -208,7 +198,6 @@ fun AuthenticationScreen(
                     onRegistrationClick = {
                         authenticationViewModel.resetEmail()
                         authenticationViewModel.resetPassword()
-                        authenticationViewModel.resetScreenState()
                         keyboardController?.hide()
                         focusManager.clearFocus()
                         navController.navigate(Screen.FIRST_REGISTRATION.route)

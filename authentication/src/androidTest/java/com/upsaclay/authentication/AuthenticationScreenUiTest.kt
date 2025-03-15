@@ -10,7 +10,6 @@ import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.testing.TestNavHostController
-import com.upsaclay.authentication.domain.entity.AuthenticationScreenState
 import com.upsaclay.authentication.presentation.screens.AuthenticationScreen
 import com.upsaclay.authentication.presentation.screens.FirstRegistrationScreen
 import com.upsaclay.authentication.presentation.viewmodels.AuthenticationViewModel
@@ -37,7 +36,7 @@ class AuthenticationScreenUiTest {
     fun setUp() {
         every { authenticationViewModel.email } returns "email"
         every { authenticationViewModel.password } returns "password"
-        every { authenticationViewModel.screenState } returns MutableStateFlow(AuthenticationScreenState.DEFAULT)
+        every { authenticationViewModel.event } returns MutableStateFlow(AuthenticationScreenState.DEFAULT)
         every { authenticationViewModel.login() } returns Unit
         every { authenticationViewModel.resetScreenState() } returns Unit
         every { authenticationViewModel.verifyInputs() } returns true
@@ -106,7 +105,7 @@ class AuthenticationScreenUiTest {
     @Test
     fun display_verify_email_dialog_when_email_is_not_verified() {
         // Given
-        every { authenticationViewModel.screenState } returns MutableStateFlow(AuthenticationScreenState.EMAIL_NOT_VERIFIED)
+        every { authenticationViewModel.event } returns MutableStateFlow(AuthenticationScreenState.EMAIL_NOT_VERIFIED)
 
         // When
         rule.setContent {
@@ -123,7 +122,7 @@ class AuthenticationScreenUiTest {
     @Test
     fun invalid_credentials_show_error_message() {
         // Given
-        every { authenticationViewModel.screenState } returns MutableStateFlow(AuthenticationScreenState.INVALID_CREDENTIALS_ERROR)
+        every { authenticationViewModel.event } returns MutableStateFlow(AuthenticationScreenState.INVALID_CREDENTIALS_ERROR)
 
         // When
         rule.setContent {
@@ -140,7 +139,7 @@ class AuthenticationScreenUiTest {
     @Test
     fun empty_fields_show_error_message() {
         // Given
-        every { authenticationViewModel.screenState } returns MutableStateFlow(AuthenticationScreenState.EMPTY_FIELDS_ERROR)
+        every { authenticationViewModel.event } returns MutableStateFlow(AuthenticationScreenState.EMPTY_FIELDS_ERROR)
 
         // When
         rule.setContent {
@@ -157,7 +156,7 @@ class AuthenticationScreenUiTest {
     @Test
     fun user_not_found_show_error_message() {
         // Given
-        every { authenticationViewModel.screenState } returns MutableStateFlow(AuthenticationScreenState.AUTH_USER_NOT_FOUND)
+        every { authenticationViewModel.event } returns MutableStateFlow(AuthenticationScreenState.AUTH_USER_NOT_FOUND)
 
         // When
         rule.setContent {
@@ -174,7 +173,7 @@ class AuthenticationScreenUiTest {
     @Test
     fun send_to_many_request_show_error_message() {
         // Given
-        every { authenticationViewModel.screenState } returns MutableStateFlow(AuthenticationScreenState.TOO_MANY_REQUESTS_ERROR)
+        every { authenticationViewModel.event } returns MutableStateFlow(AuthenticationScreenState.TOO_MANY_REQUESTS_ERROR)
 
         // When
         rule.setContent {
