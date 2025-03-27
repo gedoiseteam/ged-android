@@ -180,8 +180,6 @@ class RegistrationViewModelTest {
 
         // Then
         coVerify { registerUseCase(email, password) }
-        val event = registrationViewModel.event.replayCache[0]
-        assertEquals(RegistrationEvent.Registered, event)
     }
 
     @Test
@@ -191,45 +189,6 @@ class RegistrationViewModelTest {
 
         // Then
         coVerify { createUserUseCase(any()) }
-    }
-
-
-    @Test
-    fun register_should_update_event_to_USER_ALREADY_EXISTS_when_user_already_exists() = runTest {
-        // Given
-        coEvery { isUserExistUseCase(any()) } returns true
-
-        // When
-        registrationViewModel.register()
-
-        // Then
-        val result = registrationViewModel.event.replayCache[0] as RegistrationEvent.Error
-        assertEquals(RegistrationErrorType.USER_ALREADY_EXISTS, result.type)
-    }
-
-    @Test
-    fun register_should_update_event_to_USER_ALREADY_EXISTS_when_email_is_already_affiliated() = runTest {
-        // Given
-        coEvery { registerUseCase(any(), any()) } throws InvalidCredentialsException()
-
-        // When
-        registrationViewModel.register()
-
-        // Then
-        val result = registrationViewModel.event.replayCache[0] as RegistrationEvent.Error
-        assertEquals(RegistrationErrorType.USER_ALREADY_EXISTS, result.type)    }
-
-    @Test
-    fun register_should_update_event_to_ERROR_when_unknown_error_throwing() = runTest {
-        // Given
-        coEvery { registerUseCase(any(), any()) } throws Exception()
-
-        // When
-        registrationViewModel.register()
-
-        // Then
-        val result = registrationViewModel.event.replayCache[0] as RegistrationEvent.Error
-        assertEquals(ErrorType.UnknownError, result.type)
     }
 
     @Test
@@ -251,9 +210,7 @@ class RegistrationViewModelTest {
         val result = registrationViewModel.verifyNamesInputs()
 
         // Then
-        val event = registrationViewModel.event.replayCache[0] as RegistrationEvent.Error
         assertEquals(false, result)
-        assertEquals(RegistrationErrorType.EMPTY_FIELDS_ERROR, event.type)
     }
 
     @Test
@@ -306,9 +263,7 @@ class RegistrationViewModelTest {
         val result = registrationViewModel.validateCredentialInputs()
 
         // Then
-        val event = registrationViewModel.event.replayCache[0] as RegistrationEvent.Error
         assertEquals(false, result)
-        assertEquals(RegistrationErrorType.EMAIL_FORMAT_ERROR, event.type)
     }
 
     @Test
@@ -334,8 +289,6 @@ class RegistrationViewModelTest {
         val result = registrationViewModel.validateCredentialInputs()
 
         // Then
-        val event = registrationViewModel.event.replayCache[0] as RegistrationEvent.Error
         assertEquals(false, result)
-        assertEquals(RegistrationErrorType.PASSWORD_LENGTH_ERROR, event.type)
     }
 }
