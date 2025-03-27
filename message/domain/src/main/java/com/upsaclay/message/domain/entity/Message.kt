@@ -10,7 +10,9 @@ data class Message(
     val date: LocalDateTime,
     val seen: Seen? = null,
     val state: MessageState,
-)
+) {
+    fun isSeen() = seen?.value ?: false
+}
 
 data class Seen (
     val value: Boolean = true,

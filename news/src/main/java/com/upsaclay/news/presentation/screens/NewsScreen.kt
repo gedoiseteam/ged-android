@@ -1,6 +1,5 @@
 package com.upsaclay.news.presentation.screens
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,11 +34,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
-import com.upsaclay.common.domain.entity.Screen
 import com.upsaclay.common.presentation.components.ClickableItem
 import com.upsaclay.common.presentation.components.PullToRefreshComponent
 import com.upsaclay.common.presentation.components.SensibleActionDialog
-import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.previewText
 import com.upsaclay.common.presentation.theme.spacing
@@ -47,6 +44,7 @@ import com.upsaclay.news.R
 import com.upsaclay.news.domain.announcementsFixture
 import com.upsaclay.news.domain.entity.Announcement
 import com.upsaclay.news.domain.entity.AnnouncementState
+import com.upsaclay.news.domain.entity.NewsScreen
 import com.upsaclay.news.presentation.components.AnnouncementItem
 import com.upsaclay.news.presentation.viewmodels.NewsViewModel
 import kotlinx.coroutines.launch
@@ -60,7 +58,7 @@ fun NewsScreen(
 ) {
     val announcements by newsViewModel.announcements.collectAsState(emptyList())
     val user by newsViewModel.currentUser.collectAsState()
-    val isRefreshing = newsViewModel.isRefreshing
+    val isRefreshing by newsViewModel.isRefreshing.collectAsState()
     var showBottomSheet by remember { mutableStateOf(false) }
     var showDeleteAnnouncementDialog by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
@@ -104,7 +102,7 @@ fun NewsScreen(
             RecentAnnouncementSection(
                 announcements = announcements,
                 onClickAnnouncement = {
-                    navController.navigate(Screen.READ_ANNOUNCEMENT.route + "?announcementId=${it.id}")
+                    navController.navigate(NewsScreen.ReadAnnouncement(it.id).route)
                 },
                 onClickNotSentAnnouncement = {
                     announcementClicked = it
@@ -131,7 +129,7 @@ fun NewsScreen(
                             stringResource(id = R.string.new_announcement)
                         )
                     },
-                    onClick = { navController.navigate(Screen.CREATE_ANNOUNCEMENT.route) }
+                    onClick = { navController.navigate(NewsScreen.CreateAnnouncement.route) }
                 )
             }
         }

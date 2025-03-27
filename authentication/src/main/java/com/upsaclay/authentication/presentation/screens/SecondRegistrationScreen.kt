@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,9 +22,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.upsaclay.authentication.R
+import com.upsaclay.authentication.domain.entity.AuthenticationScreen
 import com.upsaclay.authentication.presentation.components.RegistrationTopBar
 import com.upsaclay.authentication.presentation.viewmodels.RegistrationViewModel
-import com.upsaclay.common.domain.entity.Screen
 import com.upsaclay.common.presentation.components.PrimaryButton
 import com.upsaclay.common.presentation.components.SimpleDropDownMenu
 import com.upsaclay.common.presentation.theme.GedoiseTheme
@@ -40,17 +39,13 @@ fun SecondRegistrationScreen(
     var selectedItem by remember { mutableStateOf(registrationViewModel.schoolLevel) }
     var expanded by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
-        registrationViewModel.resetScreenState()
-    }
-
     RegistrationTopBar(navController = navController) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .pointerInput(Unit) {
                     detectTapGestures(onPress = { expanded = false })
-                },
+                }
         ) {
             Text(
                 text = stringResource(id = R.string.select_level_school),
@@ -80,7 +75,7 @@ fun SecondRegistrationScreen(
             text = stringResource(id = com.upsaclay.common.R.string.next),
             onClick = {
                 registrationViewModel.updateSchoolLevel(selectedItem)
-                navController.navigate(Screen.THIRD_REGISTRATION.route)
+                navController.navigate(AuthenticationScreen.ThirdRegistration.route)
             }
         )
     }

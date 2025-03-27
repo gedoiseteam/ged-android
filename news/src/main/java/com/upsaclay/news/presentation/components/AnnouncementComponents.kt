@@ -25,7 +25,6 @@ import com.upsaclay.common.domain.entity.ElapsedTime
 import com.upsaclay.common.domain.usecase.FormatLocalDateTimeUseCase
 import com.upsaclay.common.domain.usecase.GetElapsedTimeUseCase
 import com.upsaclay.common.presentation.components.ProfilePicture
-import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.previewText
 import com.upsaclay.common.presentation.theme.spacing

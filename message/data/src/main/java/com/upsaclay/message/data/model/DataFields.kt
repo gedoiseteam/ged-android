@@ -36,6 +36,6 @@ internal object MessageField {
 
     object Local {
         const val SEEN_VALUE = "seen_value"
-        const val SEEN_TIME = "seen_time"
+        const val SEEN_TIMESTAMP = "seen_time"
     }
 }

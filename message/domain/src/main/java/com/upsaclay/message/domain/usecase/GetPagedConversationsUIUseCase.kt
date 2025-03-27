@@ -8,11 +8,11 @@ import com.upsaclay.message.domain.repository.UserConversationRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class GetConversationUIUseCase(
+class GetPagedConversationsUIUseCase(
     private val userConversationRepository: UserConversationRepository
 ) {
     operator fun invoke(): Flow<PagingData<ConversationUI>> =
-        userConversationRepository.getPagedConversationMessages().map { conversationsMessage ->
+        userConversationRepository.getPagedConversationsWithLastMessage().map { conversationsMessage ->
             conversationsMessage.map {
                 ConversationMapper.toConversationUI(it.conversation, it.lastMessage)
             }

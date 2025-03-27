@@ -6,19 +6,21 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.upsaclay.authentication.domain.entity.RegistrationScreenState
+import com.upsaclay.authentication.domain.entity.RegistrationErrorType
+import com.upsaclay.authentication.domain.entity.RegistrationEvent
 import com.upsaclay.authentication.domain.entity.exception.InvalidCredentialsException
 import com.upsaclay.authentication.domain.usecase.RegisterUseCase
-import com.upsaclay.common.domain.entity.ServerCommunicationException
+import com.upsaclay.common.domain.entity.ErrorType
 import com.upsaclay.common.domain.entity.User
 import com.upsaclay.common.domain.extensions.uppercaseFirstLetter
 import com.upsaclay.common.domain.usecase.CreateUserUseCase
 import com.upsaclay.common.domain.usecase.GenerateIdUseCase
 import com.upsaclay.common.domain.usecase.IsUserExistUseCase
 import com.upsaclay.common.domain.usecase.VerifyEmailFormatUseCase
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
+import okhttp3.internal.immutableListOf
 import java.io.IOException
 import java.net.ConnectException
 
@@ -30,8 +32,8 @@ class RegistrationViewModel(
     private val isUserExistUseCase: IsUserExistUseCase,
 ) : ViewModel() {
     private val userId = GenerateIdUseCase.asString()
-    private val _screenState = MutableStateFlow(RegistrationScreenState.NOT_REGISTERED)
-    val screenState: StateFlow<RegistrationScreenState> = _screenState
+    private val _event = MutableSharedFlow<RegistrationEvent>()
+    val event: SharedFlow<RegistrationEvent> = _event
 
     var firstName by mutableStateOf("")
         private set
@@ -41,7 +43,7 @@ class RegistrationViewModel(
         private set
     var password by mutableStateOf("")
         private set
-    val schoolLevels = listOf("GED 1", "GED 2", "GED 3", "GED 4")
+    val schoolLevels = immutableListOf("GED 1", "GED 2", "GED 3", "GED 4")
     var schoolLevel by mutableStateOf(schoolLevels[0])
         private set
 
@@ -85,27 +87,23 @@ class RegistrationViewModel(
         schoolLevel = schoolLevels[0]
     }
 
-    fun resetScreenState() {
-        _screenState.value = RegistrationScreenState.NOT_REGISTERED
-    }
-
     fun resetAllValues() {
         resetFirstName()
         resetLastName()
         resetEmail()
         resetPassword()
         resetSchoolLevel()
-        resetScreenState()
     }
 
     fun register() {
-        _screenState.value = RegistrationScreenState.LOADING
-        this.email = email.trim()
+        val email = email.trim()
 
         viewModelScope.launch {
+            _event.emit(RegistrationEvent.Loading)
+
             try {
                 if (isUserExistUseCase(email)) {
-                    _screenState.value = RegistrationScreenState.USER_ALREADY_EXISTS
+                    _event.emit(RegistrationEvent.Error(RegistrationErrorType.USER_ALREADY_EXISTS))
                     return@launch
                 }
 
@@ -119,26 +117,16 @@ class RegistrationViewModel(
 
                 createUserUseCase(user)
                 registerUseCase(email, password)
-                _screenState.value = RegistrationScreenState.REGISTERED
+                _event.emit(RegistrationEvent.Registered)
             } catch (e: Exception) {
-                _screenState.value = when(e) {
-                    is InvalidCredentialsException -> RegistrationScreenState.USER_ALREADY_EXISTS
-
-                    is NetworkErrorException, is ConnectException -> RegistrationScreenState.NETWORK_ERROR
-
-                    is ServerCommunicationException -> RegistrationScreenState.SERVER_COMMUNICATION_ERROR
-
-                    is IOException -> RegistrationScreenState.USER_CREATION_ERROR
-
-                    else -> RegistrationScreenState.UNKNOWN_ERROR
-                }
+                _event.emit(handleException(e))
             }
         }
     }
 
     fun verifyNamesInputs(): Boolean {
         return if (firstName.isBlank() || lastName.isBlank()) {
-            _screenState.value = RegistrationScreenState.EMPTY_FIELDS_ERROR
+            viewModelScope.launch { _event.emit(RegistrationEvent.Error(RegistrationErrorType.EMPTY_FIELDS_ERROR)) }
             false
         } else {
             firstName = firstName.trim().uppercaseFirstLetter()
@@ -152,12 +140,12 @@ class RegistrationViewModel(
     private fun verifyPassword(): Boolean {
         return when {
             password.isBlank() -> {
-                _screenState.value = RegistrationScreenState.EMPTY_FIELDS_ERROR
+                viewModelScope.launch { _event.emit(RegistrationEvent.Error(RegistrationErrorType.EMPTY_FIELDS_ERROR)) }
                 false
             }
 
             password.length < MIN_PASSWORD_LENGTH -> {
-                _screenState.value = RegistrationScreenState.PASSWORD_LENGTH_ERROR
+                viewModelScope.launch { _event.emit(RegistrationEvent.Error(RegistrationErrorType.PASSWORD_LENGTH_ERROR)) }
                 false
             }
 
@@ -168,16 +156,30 @@ class RegistrationViewModel(
     private fun verifyEmail(): Boolean {
         return when {
             email.isBlank() -> {
-                _screenState.value = RegistrationScreenState.EMPTY_FIELDS_ERROR
+                viewModelScope.launch { _event.emit(RegistrationEvent.Error(RegistrationErrorType.EMPTY_FIELDS_ERROR)) }
                 false
             }
 
             !VerifyEmailFormatUseCase(email.trim()) -> {
-                _screenState.value = RegistrationScreenState.EMAIL_FORMAT_ERROR
+                viewModelScope.launch { _event.emit(RegistrationEvent.Error(RegistrationErrorType.EMAIL_FORMAT_ERROR)) }
                 false
             }
 
             else -> true
+        }
+    }
+
+    private fun handleException(e: Exception) : RegistrationEvent.Error {
+        return when(e) {
+            is InvalidCredentialsException -> RegistrationEvent.Error(RegistrationErrorType.USER_ALREADY_EXISTS)
+
+            is NetworkErrorException -> RegistrationEvent.Error(ErrorType.NetworkError)
+
+            is ConnectException -> RegistrationEvent.Error(ErrorType.ServerConnectError)
+
+            is IOException -> RegistrationEvent.Error(RegistrationErrorType.USER_CREATION_ERROR)
+
+            else -> RegistrationEvent.Error(ErrorType.UnknownError)
         }
     }
 }

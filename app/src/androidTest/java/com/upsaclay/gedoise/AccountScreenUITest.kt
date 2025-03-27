@@ -2,6 +2,7 @@ package com.upsaclay.gedoise
 
 import android.net.Uri
 import androidx.activity.ComponentActivity
+import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -84,6 +85,7 @@ class AccountScreenUITest {
         }
 
         // Then
-        rule.onNodeWithTag(rule.activity.getString(R.string.account_screen_success_snackbar_tag)).assertExists()
+        rule.onNodeWithTag(rule.activity.getString(R.string.account_screen_snackbar_tag))
+            .assertExists()
     }
 }

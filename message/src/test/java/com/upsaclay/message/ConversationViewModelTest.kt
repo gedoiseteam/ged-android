@@ -3,15 +3,15 @@ package com.upsaclay.message
 import androidx.paging.PagingData
 import com.upsaclay.message.domain.conversationUIFixture
 import com.upsaclay.message.domain.conversationsUIFixture
-import com.upsaclay.message.domain.entity.ConversationScreenState
+import com.upsaclay.message.domain.entity.ConversationEvent
+import com.upsaclay.message.domain.entity.SuccessType
 import com.upsaclay.message.domain.usecase.DeleteConversationUseCase
-import com.upsaclay.message.domain.usecase.GetConversationUIUseCase
+import com.upsaclay.message.domain.usecase.GetPagedConversationsUIUseCase
 import com.upsaclay.message.presentation.viewmodels.ConversationViewModel
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
@@ -25,7 +25,7 @@ import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ConversationViewModelTest {
-    private val getConversationUIUseCase: GetConversationUIUseCase = mockk()
+    private val getPagedConversationsUIUseCase: GetPagedConversationsUIUseCase = mockk()
     private val deleteConversationUseCase: DeleteConversationUseCase = mockk()
 
     private lateinit var conversationViewModel: ConversationViewModel
@@ -35,11 +35,11 @@ class ConversationViewModelTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
 
-        every { getConversationUIUseCase() } returns flowOf(PagingData.from(conversationsUIFixture))
+        every { getPagedConversationsUIUseCase() } returns flowOf(PagingData.from(conversationsUIFixture))
         coEvery { deleteConversationUseCase(any()) } returns Unit
 
         conversationViewModel = ConversationViewModel(
-            getConversationUIUseCase = getConversationUIUseCase,
+            getPagedConversationsUIUseCase = getPagedConversationsUIUseCase,
             deleteConversationUseCase = deleteConversationUseCase
         )
     }
@@ -54,6 +54,5 @@ class ConversationViewModelTest {
 
         // Then
         coVerify { deleteConversationUseCase(conversation) }
-        assertEquals(ConversationScreenState.SUCCESS, conversationViewModel.screenState.value)
     }
 }

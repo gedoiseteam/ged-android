@@ -25,7 +25,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import com.upsaclay.authentication.R
 import com.upsaclay.common.presentation.theme.GedoiseTheme
-import com.upsaclay.common.presentation.theme.inputForeground
+import com.upsaclay.common.presentation.theme.chatInputForeground
 import com.upsaclay.common.presentation.theme.spacing
 
 @Composable
@@ -53,8 +53,7 @@ fun OutlinePasswordTextField(
         value = text,
         label = {
             Text(
-                text = stringResource(id = R.string.password),
-                color = MaterialTheme.colorScheme.inputForeground
+                text = stringResource(id = R.string.password)
             )
         },
         onValueChange = onValueChange,
@@ -65,7 +64,7 @@ fun OutlinePasswordTextField(
                 painter = icon,
                 contentDescription = contentDescription,
                 modifier = Modifier.clickable { passwordVisible = !passwordVisible },
-                tint = MaterialTheme.colorScheme.inputForeground
+                tint = MaterialTheme.colorScheme.chatInputForeground
             )
         },
         visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),

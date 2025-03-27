@@ -6,17 +6,19 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.upsaclay.authentication.domain.entity.AuthenticationScreenState
+import com.upsaclay.authentication.domain.entity.AuthErrorType
+import com.upsaclay.authentication.domain.entity.AuthenticationEvent
 import com.upsaclay.authentication.domain.entity.exception.InvalidCredentialsException
 import com.upsaclay.authentication.domain.usecase.IsEmailVerifiedUseCase
 import com.upsaclay.authentication.domain.usecase.LoginUseCase
 import com.upsaclay.authentication.domain.usecase.SetUserAuthenticatedUseCase
+import com.upsaclay.common.domain.entity.ErrorType
 import com.upsaclay.common.domain.entity.TooManyRequestException
 import com.upsaclay.common.domain.usecase.GetUserUseCase
 import com.upsaclay.common.domain.usecase.SetCurrentUserUseCase
 import com.upsaclay.common.domain.usecase.VerifyEmailFormatUseCase
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 import java.io.IOException
 
@@ -26,9 +28,9 @@ class AuthenticationViewModel(
     private val getUserUseCase: GetUserUseCase,
     private val setCurrentUserUseCase: SetCurrentUserUseCase,
     private val isEmailVerifiedUseCase: IsEmailVerifiedUseCase
-) : ViewModel() {
-    private val _screenState = MutableStateFlow(AuthenticationScreenState.DEFAULT)
-    val screenState: StateFlow<AuthenticationScreenState> = _screenState
+): ViewModel() {
+    private val _event = MutableSharedFlow<AuthenticationEvent>()
+    val event: SharedFlow<AuthenticationEvent> = _event
     var email by mutableStateOf("")
         private set
     var password by mutableStateOf("")
@@ -43,48 +45,25 @@ class AuthenticationViewModel(
     }
 
     fun login() {
-        _screenState.value = AuthenticationScreenState.LOADING
-
         viewModelScope.launch {
+            _event.emit(AuthenticationEvent.Loading)
+
             try {
                 loginUseCase(email, password)
-                
+
                 getUserUseCase.withEmail(email)?.let {
                     setCurrentUserUseCase(it)
                     if (isEmailVerifiedUseCase()) {
                         setUserAuthenticatedUseCase(true)
-                        _screenState.value = AuthenticationScreenState.DEFAULT
                     } else {
-                        _screenState.value = AuthenticationScreenState.EMAIL_NOT_VERIFIED
+                        _event.emit(AuthenticationEvent.EmailNotVerified)
                     }
                 } ?: run {
-                    _screenState.value = AuthenticationScreenState.AUTH_USER_NOT_FOUND
+                    _event.emit(AuthenticationEvent.Error(AuthErrorType.AUTH_USER_NOT_FOUND))
                     resetPassword()
                 }
             } catch (e: Exception) {
-                _screenState.value = when (e) {
-                    is TooManyRequestException -> AuthenticationScreenState.TOO_MANY_REQUESTS_ERROR
-
-                    is InvalidCredentialsException -> {
-                        resetPassword()
-                        AuthenticationScreenState.INVALID_CREDENTIALS_ERROR
-                    }
-
-                    is IOException -> {
-                        resetPassword()
-                        AuthenticationScreenState.INTERNAL_SERVER_ERROR
-                    }
-
-                    is NetworkErrorException -> {
-                        resetPassword()
-                        AuthenticationScreenState.NETWORK_ERROR
-                    }
-
-                    else -> {
-                        resetPassword()
-                        AuthenticationScreenState.UNKNOWN_ERROR
-                    }
-                }
+                _event.emit(handleException(e))
             }
         }
     }
@@ -97,23 +76,45 @@ class AuthenticationViewModel(
         password = ""
     }
 
-    fun resetScreenState() {
-        _screenState.value = AuthenticationScreenState.DEFAULT
-    }
-
     fun verifyInputs(): Boolean {
         return when {
             email.isBlank() || password.isBlank() -> {
-                _screenState.value = AuthenticationScreenState.EMPTY_FIELDS_ERROR
+                viewModelScope.launch { _event.emit(AuthenticationEvent.Error(AuthErrorType.EMPTY_FIELDS_ERROR)) }
                 return false
             }
 
             !VerifyEmailFormatUseCase(email) -> {
-                _screenState.value = AuthenticationScreenState.EMAIL_FORMAT_ERROR
+               viewModelScope.launch { _event.emit(AuthenticationEvent.Error(AuthErrorType.EMAIL_FORMAT_ERROR)) }
                 return false
             }
 
             else -> true
+        }
+    }
+
+    private fun handleException(e: Exception): AuthenticationEvent.Error {
+        return when (e) {
+            is TooManyRequestException -> AuthenticationEvent.Error(ErrorType.TooManyRequestsError)
+
+            is InvalidCredentialsException -> {
+                resetPassword()
+                AuthenticationEvent.Error(AuthErrorType.INVALID_CREDENTIALS_ERROR)
+            }
+
+            is IOException -> {
+                resetPassword()
+                AuthenticationEvent.Error(ErrorType.InternalServerError)
+            }
+
+            is NetworkErrorException -> {
+                resetPassword()
+                AuthenticationEvent.Error(ErrorType.NetworkError)
+            }
+
+            else -> {
+                resetPassword()
+                AuthenticationEvent.Error(ErrorType.UnknownError)
+            }
         }
     }
 }

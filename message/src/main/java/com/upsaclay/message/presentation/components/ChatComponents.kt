@@ -1,6 +1,7 @@
 package com.upsaclay.message.presentation.components
 
 import android.content.res.Configuration
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -40,25 +42,22 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.upsaclay.common.domain.e
 import com.upsaclay.common.domain.usecase.FormatLocalDateTimeUseCase
 import com.upsaclay.common.presentation.components.ProfilePicture
-import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.black
-import com.upsaclay.common.presentation.theme.inputBackground
-import com.upsaclay.common.presentation.theme.inputForeground
+import com.upsaclay.common.presentation.theme.chatInputBackground
+import com.upsaclay.common.presentation.theme.chatInputForeground
+import com.upsaclay.common.presentation.theme.lightGray
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.common.presentation.theme.white
 import com.upsaclay.message.R
@@ -96,26 +95,34 @@ fun SentMessageItem(
                     backgroundColor = MaterialTheme.colorScheme.primary,
                     dateTimeTextColor = dateTimeTextColor
                 )
+
+                val iconColor =
+                    if (isSystemInDarkTheme()) Color.Gray else MaterialTheme.colorScheme.lightGray
+                AnimatedVisibility(
+                    visible = message.state == MessageState.LOADING
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.Send,
+                        contentDescription = stringResource(id = R.string.send_message_icon_description),
+                        tint = iconColor,
+                        modifier = Modifier
+                            .padding(start = MaterialTheme.spacing.small)
+                            .size(20.dp)
+                    )
+                }
             }
         }
 
         if (showSeen) {
-            message.seen?.time?.let { seenTime ->
-                val annotatedString = buildAnnotatedString {
-                    append(stringResource(id = R.string.message_seen) + " ")
-                    append(FormatLocalDateTimeUseCase.formatHourMinute(seenTime))
-                }
-
-                Text(
-                    modifier = Modifier.padding(
-                        top = MaterialTheme.spacing.extraSmall,
-                        end = MaterialTheme.spacing.smallMedium
-                    ),
-                    text = annotatedString,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = Color.Gray
-                )
-            }
+            Text(
+                modifier = Modifier.padding(
+                    top = MaterialTheme.spacing.extraSmall,
+                    end = MaterialTheme.spacing.smallMedium
+                ),
+                text = stringResource(id = R.string.message_seen),
+                style = MaterialTheme.typography.labelSmall,
+                color = Color.Gray
+            )
         }
     }
 }
@@ -144,7 +151,7 @@ fun ReceiveMessageItem(
         MessageText(
             text = message.content,
             date = message.date,
-            backgroundColor = MaterialTheme.colorScheme.inputBackground,
+            backgroundColor = MaterialTheme.colorScheme.chatInputBackground,
             textColor = foreground,
             dateTimeTextColor = Color(0xFF8E8E93)
         )
@@ -203,7 +210,7 @@ fun MessageInput(
     Row(
         modifier = modifier
             .clip(ShapeDefaults.ExtraLarge)
-            .background(MaterialTheme.colorScheme.inputBackground)
+            .background(MaterialTheme.colorScheme.chatInputBackground)
             .padding(end = MaterialTheme.spacing.small),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -224,14 +231,14 @@ fun MessageInput(
                     Text(
                         text = stringResource(id = R.string.message_placeholder),
                         style = TextStyle(platformStyle = PlatformTextStyle(false)),
-                        color = MaterialTheme.colorScheme.inputForeground
+                        color = MaterialTheme.colorScheme.chatInputForeground
                     )
                 },
                 enabled = true,
                 singleLine = false,
                 colors = TextFieldDefaults.colors(
-                    focusedContainerColor = MaterialTheme.colorScheme.inputBackground,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.inputBackground,
+                    focusedContainerColor = MaterialTheme.colorScheme.chatInputBackground,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.chatInputBackground,
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
                     cursorColor = textColor
@@ -282,14 +289,14 @@ fun NewMessageIndicator(
         ) {
             Text(
                 text = stringResource(id = R.string.new_message),
-                style = MaterialTheme.typography.labelSmall,
+                style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.black,
                 modifier = Modifier
                     .clip(ShapeDefaults.Small)
                     .background(Color.White)
                     .clickable { onClick() }
                     .padding(horizontal = MaterialTheme.spacing.large)
-                    .padding(vertical = MaterialTheme.spacing.small)
+                    .padding(vertical = MaterialTheme.spacing.smallMedium)
             )
         }
     }

@@ -1,9 +1,11 @@
 package com.upsaclay.authentication
 
-import com.upsaclay.authentication.domain.entity.RegistrationScreenState
+import com.upsaclay.authentication.domain.entity.RegistrationErrorType
+import com.upsaclay.authentication.domain.entity.RegistrationEvent
 import com.upsaclay.authentication.domain.entity.exception.InvalidCredentialsException
 import com.upsaclay.authentication.domain.usecase.RegisterUseCase
 import com.upsaclay.authentication.presentation.viewmodels.RegistrationViewModel
+import com.upsaclay.common.domain.entity.ErrorType
 import com.upsaclay.common.domain.usecase.CreateUserUseCase
 import com.upsaclay.common.domain.usecase.IsUserExistUseCase
 import com.upsaclay.common.domain.userFixture
@@ -51,7 +53,6 @@ class RegistrationViewModelTest {
     @Test
     fun default_values_are_correct() {
         // Then
-        assertEquals(RegistrationScreenState.NOT_REGISTERED, registrationViewModel.screenState.value)
         assertEquals("", registrationViewModel.firstName)
         assertEquals("", registrationViewModel.lastName)
         assertEquals("", registrationViewModel.email)
@@ -166,15 +167,6 @@ class RegistrationViewModelTest {
     }
 
     @Test
-    fun reset_screen_state_should_reset_screen_state() {
-        // When
-        registrationViewModel.resetScreenState()
-
-        // Then
-        assertEquals(RegistrationScreenState.NOT_REGISTERED, registrationViewModel.screenState.value)
-    }
-
-    @Test
     fun register_should_register_user() = runTest {
         // Given
         registrationViewModel.updateFirstName(firstName)
@@ -188,7 +180,6 @@ class RegistrationViewModelTest {
 
         // Then
         coVerify { registerUseCase(email, password) }
-        assertEquals(RegistrationScreenState.REGISTERED, registrationViewModel.screenState.value)
     }
 
     @Test
@@ -198,43 +189,6 @@ class RegistrationViewModelTest {
 
         // Then
         coVerify { createUserUseCase(any()) }
-    }
-
-
-    @Test
-    fun register_should_update_screen_state_to_USER_ALREADY_EXISTS_when_user_already_exists() = runTest {
-        // Given
-        coEvery { isUserExistUseCase(any()) } returns true
-
-        // When
-        registrationViewModel.register()
-
-        // Then
-        assertEquals(RegistrationScreenState.USER_ALREADY_EXISTS, registrationViewModel.screenState.value)
-    }
-
-    @Test
-    fun register_should_update_screen_state_to_USER_ALREADY_EXISTS_when_email_is_already_affiliated() = runTest {
-        // Given
-        coEvery { registerUseCase(any(), any()) } throws InvalidCredentialsException()
-
-        // When
-        registrationViewModel.register()
-
-        // Then
-        assertEquals(RegistrationScreenState.USER_ALREADY_EXISTS, registrationViewModel.screenState.value)
-    }
-
-    @Test
-    fun register_should_update_screen_state_to_ERROR_when_unknown_error_throwing() = runTest {
-        // Given
-        coEvery { registerUseCase(any(), any()) } throws Exception()
-
-        // When
-        registrationViewModel.register()
-
-        // Then
-        assertEquals(RegistrationScreenState.UNKNOWN_ERROR, registrationViewModel.screenState.value)
     }
 
     @Test
@@ -256,7 +210,6 @@ class RegistrationViewModelTest {
         val result = registrationViewModel.verifyNamesInputs()
 
         // Then
-        assertEquals(RegistrationScreenState.EMPTY_FIELDS_ERROR, registrationViewModel.screenState.value)
         assertEquals(false, result)
     }
 
@@ -310,7 +263,6 @@ class RegistrationViewModelTest {
         val result = registrationViewModel.validateCredentialInputs()
 
         // Then
-        assertEquals(RegistrationScreenState.EMAIL_FORMAT_ERROR, registrationViewModel.screenState.value)
         assertEquals(false, result)
     }
 
@@ -337,7 +289,6 @@ class RegistrationViewModelTest {
         val result = registrationViewModel.validateCredentialInputs()
 
         // Then
-        assertEquals(RegistrationScreenState.PASSWORD_LENGTH_ERROR, registrationViewModel.screenState.value)
         assertEquals(false, result)
     }
 }

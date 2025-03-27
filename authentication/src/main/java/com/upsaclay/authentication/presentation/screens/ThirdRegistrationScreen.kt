@@ -11,7 +11,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,17 +30,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.upsaclay.authentication.R
-import com.upsaclay.authentication.domain.entity.RegistrationScreenState
+import com.upsaclay.authentication.domain.entity.AuthenticationScreen
+import com.upsaclay.authentication.domain.entity.RegistrationErrorType
+import com.upsaclay.authentication.domain.entity.RegistrationEvent
 import com.upsaclay.authentication.presentation.components.OutlinePasswordTextField
 import com.upsaclay.authentication.presentation.components.RegistrationTopBar
 import com.upsaclay.authentication.presentation.viewmodels.RegistrationViewModel
-import com.upsaclay.common.domain.entity.Screen
+import com.upsaclay.common.domain.entity.ErrorType
 import com.upsaclay.common.presentation.components.ErrorText
 import com.upsaclay.common.presentation.components.OutlineTextField
 import com.upsaclay.common.presentation.components.PrimaryButton
 import com.upsaclay.common.presentation.components.TopLinearLoadingScreen
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -52,10 +54,10 @@ fun ThirdRegistrationScreen(
 ) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
-    val registrationState by registrationViewModel.screenState.collectAsState()
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
-    val isLoading = registrationState == RegistrationScreenState.LOADING
+    var errorMessage by remember { mutableStateOf("") }
+    var loading by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
     val showSnackBar = { message: String ->
         scope.launch {
@@ -63,39 +65,39 @@ fun ThirdRegistrationScreen(
         }
     }
 
-    val (errorMessage, inputsError) = when (registrationState) {
-        RegistrationScreenState.UNRECOGNIZED_ACCOUNT -> stringResource(id = R.string.unrecognized_account) to true
-        RegistrationScreenState.EMPTY_FIELDS_ERROR -> stringResource(id = com.upsaclay.common.R.string.empty_fields_error) to true
-        RegistrationScreenState.EMAIL_FORMAT_ERROR -> stringResource(id = R.string.error_incorrect_email_format) to true
-        RegistrationScreenState.PASSWORD_LENGTH_ERROR -> stringResource(id = R.string.error_password_length) to true
-        RegistrationScreenState.USER_ALREADY_EXISTS -> stringResource(id = R.string.email_already_associated) to true
-        RegistrationScreenState.USER_CREATION_ERROR -> stringResource(id = R.string.user_creation_error) to false
-        RegistrationScreenState.UNKNOWN_ERROR -> stringResource(id = com.upsaclay.common.R.string.unknown_error) to false
-        else -> null to false
-    }
+    LaunchedEffect(registrationViewModel.event) {
+        registrationViewModel.event.collectLatest { event ->
+            loading = event is RegistrationEvent.Loading
+            when (event) {
+                RegistrationEvent.Registered ->
+                    navController.navigate(AuthenticationScreen.EmailVerification(registrationViewModel.email).route)
 
-    LaunchedEffect(registrationState) {
-        when (registrationState) {
-            RegistrationScreenState.REGISTERED -> {
-                registrationViewModel.resetScreenState()
-                navController.navigate(Screen.EMAIL_VERIFICATION.route + "?email=${registrationViewModel.email}")
+                is RegistrationEvent.Error -> {
+                    errorMessage = when (event.type) {
+                        RegistrationErrorType.UNRECOGNIZED_ACCOUNT -> context.getString(R.string.unrecognized_account)
+                        RegistrationErrorType.EMPTY_FIELDS_ERROR -> context.getString(com.upsaclay.common.R.string.empty_fields_error)
+                        RegistrationErrorType.EMAIL_FORMAT_ERROR -> context.getString(R.string.error_incorrect_email_format)
+                        RegistrationErrorType.PASSWORD_LENGTH_ERROR -> context.getString(R.string.error_password_length)
+                        RegistrationErrorType.USER_ALREADY_EXISTS -> context.getString(R.string.email_already_associated)
+                        RegistrationErrorType.USER_CREATION_ERROR -> context.getString(R.string.user_creation_error)
+                        else -> ""
+                    }
+
+                    when (event.type) {
+                        ErrorType.NetworkError -> showSnackBar(context.getString(com.upsaclay.common.R.string.unknown_network_error))
+                        ErrorType.InternalServerError -> showSnackBar(context.getString(com.upsaclay.common.R.string.internal_server_error))
+                        ErrorType.ServerConnectError -> showSnackBar(context.getString(com.upsaclay.common.R.string.server_communication_error))
+                        ErrorType.UnknownError -> showSnackBar(context.getString(com.upsaclay.common.R.string.unknown_error))
+                        else -> {}
+                    }
+                }
+
+                else -> {}
             }
-
-            RegistrationScreenState.NETWORK_ERROR -> {
-                showSnackBar(context.getString(com.upsaclay.common.R.string.unknown_network_error))
-                registrationViewModel.resetScreenState()
-            }
-
-            RegistrationScreenState.SERVER_COMMUNICATION_ERROR -> {
-                showSnackBar(context.getString(com.upsaclay.common.R.string.internal_server_error))
-                registrationViewModel.resetScreenState()
-            }
-
-            else -> {}
         }
     }
 
-    if (isLoading) {
+    if (loading) {
         TopLinearLoadingScreen()
     }
 
@@ -127,8 +129,8 @@ fun ThirdRegistrationScreen(
                     .fillMaxWidth()
                     .testTag(stringResource(R.string.registration_screen_email_input_tag)),
                 value = registrationViewModel.email,
-                isError = inputsError,
-                enabled = !isLoading,
+                isError = errorMessage.isNotBlank(),
+                enabled = !loading,
                 onValueChange = { registrationViewModel.updateEmail(it) },
                 label = stringResource(com.upsaclay.common.R.string.email)
             )
@@ -140,12 +142,12 @@ fun ThirdRegistrationScreen(
                     .fillMaxWidth()
                     .testTag(stringResource(R.string.registration_screen_password_input_tag)),
                 text = registrationViewModel.password,
-                isError = inputsError,
-                isEnable = !isLoading,
+                isError = errorMessage.isNotBlank(),
+                isEnable = !loading,
                 onValueChange = { registrationViewModel.updatePassword(it) }
             )
 
-            errorMessage?.let {
+            if (errorMessage.isNotBlank()) {
                 Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
 
                 ErrorText(
@@ -159,11 +161,10 @@ fun ThirdRegistrationScreen(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .testTag(stringResource(R.string.registration_screen_next_button_tag)),
-            isEnable = !isLoading,
+            isEnable = !loading,
             text = stringResource(id = com.upsaclay.common.R.string.next),
             onClick = {
                 if (registrationViewModel.validateCredentialInputs()) {
-                    registrationViewModel.resetScreenState()
                     registrationViewModel.register()
                 }
             }
@@ -187,7 +188,7 @@ private fun ThirdRegistrationScreenPreview() {
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
 
-    GedoiseTheme {
+    GedoiseTheme(darkTheme = true) {
         if (isLoading) {
             TopLinearLoadingScreen()
         }
@@ -236,7 +237,7 @@ private fun ThirdRegistrationScreenPreview() {
             PrimaryButton(
                 modifier = Modifier.align(Alignment.BottomEnd),
                 text = stringResource(id = com.upsaclay.common.R.string.next),
-                isEnable = !isLoading,
+                isEnable = false,
                 onClick = { isLoading = true }
             )
         }

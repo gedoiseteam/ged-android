@@ -104,7 +104,7 @@ fun ConversationItem(
                 val text = if (message.state == MessageState.SENT) message.content else stringResource(R.string.sending)
                 val isNotSender = message.senderId == conversation.interlocutor.id
 
-                if (isNotSender && message.seen?.value == false) {
+                if (isNotSender && !message.isSeen()) {
                     UnreadConversationItem(
                         modifier = Modifier
                             .weight(1f)

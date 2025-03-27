@@ -9,6 +9,10 @@ interface MessageRepository {
 
     fun getLastMessage(conversationId: Int): Flow<Message>
 
+    fun getUnreadMessages(conversationId: Int): Flow<List<Message>>
+
+    fun getRemoteMessages(conversationId: Int): Flow<List<Message>>
+
     suspend fun createMessage(message: Message)
 
     suspend fun updateMessage(message: Message)

@@ -2,7 +2,6 @@ package com.upsaclay.gedoise.presentation.components
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Badge
@@ -20,31 +19,32 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.upsaclay.common.domain.entity.Screen
 import com.upsaclay.common.presentation.components.ProfilePicture
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.gedoise.R
-import com.upsaclay.gedoise.data.BottomNavigationItem
+import com.upsaclay.gedoise.domain.entities.MainScreen
+import com.upsaclay.gedoise.presentation.NavigationItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeTopBar(navController: NavController, profilePictureUrl: String?) {
+fun HomeTopBar(
+    navController: NavController,
+    profilePictureUrl: String?
+) {
     TopAppBar(
         title = {
             Text(
                 text = stringResource(id = R.string.app_name),
                 fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.titleLarge
             )
         },
         navigationIcon = {
@@ -61,7 +61,7 @@ fun HomeTopBar(navController: NavController, profilePictureUrl: String?) {
         },
         actions = {
             IconButton(
-                onClick = { navController.navigate(Screen.PROFILE.route) },
+                onClick = { navController.navigate(MainScreen.Profile.route) },
                 modifier = Modifier.clip(shape = CircleShape)
             ) {
                 ProfilePicture(url = profilePictureUrl)
@@ -78,10 +78,7 @@ fun HomeTopBar(navController: NavController, profilePictureUrl: String?) {
 fun MainTopBar(title: String) {
     TopAppBar(
         title = {
-            Text(
-                text = title,
-                fontWeight = FontWeight.Bold
-            )
+            Text(text = title, fontWeight = FontWeight.Bold)
         },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.background
@@ -92,15 +89,15 @@ fun MainTopBar(title: String) {
 @Composable
 fun MainBottomBar(
     navController: NavController,
-    bottomNavigationItems: List<BottomNavigationItem>
+    navigationItems: List<NavigationItem>
 ) {
     val currentRoute = remember {
-        navController.currentDestination?.route
+        navController.currentDestination
     }
 
     NavigationBar {
-        bottomNavigationItems.forEachIndexed { _, navigationItem ->
-            val selected = navigationItem.screen.route == currentRoute
+        navigationItems.forEach { navigationItem ->
+            val selected = navigationItem.screen.route == currentRoute?.route
             val iconRes = if (selected) navigationItem.filledIcon else navigationItem.outlinedIcon
 
             NavigationBarItem(
@@ -173,8 +170,7 @@ private fun MainTopBarPreview() {
                     Image(
                         painter = painterResource(id = com.upsaclay.common.R.drawable.default_profile_picture),
                         contentDescription = stringResource(id = R.string.profile_icon_description),
-                        contentScale = ContentScale.Fit,
-                        modifier = Modifier.border(1.dp, Color.LightGray, CircleShape)
+                        contentScale = ContentScale.Fit
                     )
                 }
             }
@@ -185,17 +181,9 @@ private fun MainTopBarPreview() {
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun MainBottomBarPreview() {
-    val messageWithNotification = BottomNavigationItem.Message()
-    messageWithNotification.badges = 5
-
-    val calendarWithNews = BottomNavigationItem.Calendar()
-    calendarWithNews.hasNews = true
-
     val itemList = listOf(
-        BottomNavigationItem.Home(),
-        messageWithNotification,
-        calendarWithNews,
-        BottomNavigationItem.Forum()
+        NavigationItem.Home(),
+        NavigationItem.Message(badges = 5)
     )
 
     GedoiseTheme {

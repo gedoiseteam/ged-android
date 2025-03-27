@@ -9,8 +9,8 @@ import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.testing.TestNavHostController
-import com.upsaclay.common.domain.entity.Screen
 import com.upsaclay.common.domain.userFixture
+import com.upsaclay.gedoise.domain.entities.MainScreen
 import com.upsaclay.gedoise.presentation.screens.AccountScreen
 import com.upsaclay.gedoise.presentation.screens.ProfileScreen
 import com.upsaclay.gedoise.presentation.viewmodels.ProfileViewModel
@@ -59,15 +59,15 @@ class ProfileScreenUITest {
             navController = TestNavHostController(LocalContext.current)
             navController.navigatorProvider.addNavigator(ComposeNavigator())
 
-            NavHost(navController = navController, startDestination = Screen.PROFILE.route) {
-                composable(Screen.PROFILE.route) {
+            NavHost(navController = navController, startDestination = MainScreen.Profile.route) {
+                composable(MainScreen.Profile.route) {
                     ProfileScreen(
                         navController = navController,
                         profileViewModel = profileViewModel
                     )
                 }
 
-                composable(Screen.ACCOUNT.route) {
+                composable(MainScreen.Account.route) {
                     AccountScreen(
                         navController = navController
                     )
@@ -78,6 +78,6 @@ class ProfileScreenUITest {
         rule.onNodeWithTag(rule.activity.getString(R.string.profile_screen_account_info_button_tag)).performClick()
 
         // Then
-        Assert.assertEquals(Screen.ACCOUNT.route, navController.currentDestination?.route)
+        Assert.assertEquals(MainScreen.Account.route, navController.currentDestination?.route)
     }
 }

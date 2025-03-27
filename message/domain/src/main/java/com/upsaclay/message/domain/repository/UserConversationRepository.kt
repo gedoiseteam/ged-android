@@ -6,9 +6,11 @@ import com.upsaclay.message.domain.entity.ConversationMessage
 import kotlinx.coroutines.flow.Flow
 
 interface UserConversationRepository {
-    val conversations: Flow<List<Conversation>>
+    val conversationsWithLastMessage: Flow<List<ConversationMessage>>
 
-    fun getPagedConversationMessages(): Flow<PagingData<ConversationMessage>>
+    fun getPagedConversationsWithLastMessage(): Flow<PagingData<ConversationMessage>>
+
+    fun getConversations(): Flow<List<Conversation>>
 
     suspend fun getConversation(interlocutorId: String): Conversation?
 

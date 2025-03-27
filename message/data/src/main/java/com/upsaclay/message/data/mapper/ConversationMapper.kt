@@ -11,7 +11,6 @@ import com.upsaclay.message.data.remote.model.RemoteConversation
 import com.upsaclay.message.domain.entity.Conversation
 import com.upsaclay.message.domain.entity.ConversationMessage
 import com.upsaclay.message.domain.entity.ConversationState
-import com.upsaclay.message.domain.entity.Message
 
 internal object ConversationMapper {
     fun toLocal(conversation: Conversation) = LocalConversation(
@@ -76,7 +75,13 @@ internal object ConversationMapper {
                 state = localConversationMessage.conversationState
             )
         ),
-        lastMessage = MessageMapper.toDomain(
+        lastMessage = if(
+            localConversationMessage.messageId == null ||
+            localConversationMessage.senderId == null ||
+            localConversationMessage.content == null ||
+            localConversationMessage.messageTimestamp == null ||
+            localConversationMessage.messageState == null
+        ) null else MessageMapper.toDomain(
             LocalMessage(
                 messageId = localConversationMessage.messageId,
                 conversationId = localConversationMessage.conversationId,
@@ -84,7 +89,7 @@ internal object ConversationMapper {
                 content = localConversationMessage.content,
                 messageTimestamp = localConversationMessage.messageTimestamp,
                 seenValue = localConversationMessage.seenValue,
-                seenTimestamp = localConversationMessage.seenTime,
+                seenTimestamp = localConversationMessage.seenTimestamp,
                 state = localConversationMessage.messageState
             )
         )

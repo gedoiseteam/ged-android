@@ -1,10 +1,11 @@
 package com.upsaclay.authentication
 
-import com.upsaclay.authentication.domain.entity.AuthenticationScreenState
+import com.upsaclay.authentication.domain.entity.AuthenticationEvent
 import com.upsaclay.authentication.domain.usecase.IsEmailVerifiedUseCase
 import com.upsaclay.authentication.domain.usecase.SendVerificationEmailUseCase
 import com.upsaclay.authentication.domain.usecase.SetUserAuthenticatedUseCase
 import com.upsaclay.authentication.presentation.viewmodels.EmailVerificationViewModel
+import com.upsaclay.common.domain.entity.ErrorType
 import com.upsaclay.common.domain.entity.TooManyRequestException
 import com.upsaclay.common.domain.userFixture
 import io.mockk.coEvery
@@ -45,12 +46,6 @@ class EmailVerificationViewModelTest {
     }
 
     @Test
-    fun default_values_are_correct() {
-        // Then
-        assertEquals(AuthenticationScreenState.DEFAULT, emailVerificationViewModel.screenState.value)
-    }
-
-    @Test
     fun sendVerificationEmail_should_send_verification_email() {
         // When
         emailVerificationViewModel.sendVerificationEmail()
@@ -60,7 +55,7 @@ class EmailVerificationViewModelTest {
     }
 
     @Test
-    fun sendVerificationEmail_should_update_screen_state_to_TOO_MANY_REQUESTS_ERROR_when_too_many_request_are_sent() = runTest {
+    fun sendVerificationEmail_should_update_event_to_TOO_MANY_REQUESTS_ERROR_when_too_many_request_are_sent() = runTest {
         // Given
         coEvery { sendVerificationEmailUseCase() } throws TooManyRequestException()
 
@@ -68,11 +63,12 @@ class EmailVerificationViewModelTest {
         emailVerificationViewModel.sendVerificationEmail()
 
         // Then
-        assertEquals(AuthenticationScreenState.TOO_MANY_REQUESTS_ERROR, emailVerificationViewModel.screenState.value)
+        val result = emailVerificationViewModel.event.replayCache[0] as AuthenticationEvent.Error
+        assertEquals(ErrorType.TooManyRequestsError, result.type)
     }
 
     @Test
-    fun sendVerificationEmail_should_update_screen_state_to_UNKNOWN_ERROR_when_an_unknown_error_occurs() = runTest {
+    fun sendVerificationEmail_should_update_event_to_UNKNOWN_ERROR_when_an_unknown_error_occurs() = runTest {
         // Given
         coEvery { sendVerificationEmailUseCase() } throws Exception()
 
@@ -80,21 +76,23 @@ class EmailVerificationViewModelTest {
         emailVerificationViewModel.sendVerificationEmail()
 
         // Then
-        assertEquals(AuthenticationScreenState.UNKNOWN_ERROR, emailVerificationViewModel.screenState.value)
+        val result = emailVerificationViewModel.event.replayCache[0] as AuthenticationEvent.Error
+        assertEquals(ErrorType.UnknownError, result.type)
     }
 
     @Test
-    fun verifyIsEmailVerified_should_update_screen_state_to_EMAIL_VERIFIED_and_set_user_authenticated_to_true_when_email_is_verified() = runTest {
+    fun verifyIsEmailVerified_should_update_event_to_EMAIL_VERIFIED_and_set_user_authenticated_to_true_when_email_is_verified() = runTest {
         // When
         emailVerificationViewModel.verifyIsEmailVerified()
 
         // Then
-        assertEquals(AuthenticationScreenState.EMAIL_VERIFIED, emailVerificationViewModel.screenState.value)
         coVerify { setUserAuthenticatedUseCase(true) }
+        val result = emailVerificationViewModel.event.replayCache[0]
+        assertEquals(AuthenticationEvent.EmailVerified, result)
     }
 
     @Test
-    fun verifyIsEmailVerified_should_update_screen_state_to_EMAIL_NOT_VERIFIED_when_email_is_not_verified() = runTest {
+    fun verifyIsEmailVerified_should_update_event_to_EMAIL_NOT_VERIFIED_when_email_is_not_verified() = runTest {
         // Given
         coEvery { isEmailVerifiedUseCase() } returns false
 
@@ -102,11 +100,12 @@ class EmailVerificationViewModelTest {
         emailVerificationViewModel.verifyIsEmailVerified()
 
         // Then
-        assertEquals(AuthenticationScreenState.EMAIL_NOT_VERIFIED, emailVerificationViewModel.screenState.value)
+        val result = emailVerificationViewModel.event.replayCache[0]
+        assertEquals(AuthenticationEvent.EmailNotVerified, result)
     }
 
     @Test
-    fun verifyIsEmailVerified_should_update_screen_state_to_UNKNOWN_ERROR_when_an_unknown_error_occurs() = runTest {
+    fun verifyIsEmailVerified_should_update_event_to_UNKNOWN_ERROR_when_an_unknown_error_occurs() = runTest {
         // Given
         coEvery { isEmailVerifiedUseCase() } throws Exception()
 
@@ -114,6 +113,7 @@ class EmailVerificationViewModelTest {
         emailVerificationViewModel.verifyIsEmailVerified()
 
         // Then
-        assertEquals(AuthenticationScreenState.UNKNOWN_ERROR, emailVerificationViewModel.screenState.value)
+        val result = emailVerificationViewModel.event.replayCache[0] as AuthenticationEvent.Error
+        assertEquals(ErrorType.UnknownError, result.type)
     }
 }

@@ -55,7 +55,7 @@ class NewsViewModelTest {
     @Test
     fun default_values_are_correct() = runTest {
         assertEquals(userFixture, newsViewModel.currentUser.value)
-        assertEquals(false, newsViewModel.isRefreshing)
+        assertEquals(false, newsViewModel.isRefreshing.value)
     }
 
     @Test
@@ -84,6 +84,6 @@ class NewsViewModelTest {
 
         // Then
         coVerify { refreshAnnouncementsUseCase() }
-        assertEquals(false, newsViewModel.isRefreshing)
+        assertEquals(false, newsViewModel.isRefreshing.value)
     }
 }

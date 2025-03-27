@@ -8,7 +8,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
-class FirebaseAuthenticationApiImpl : FirebaseAuthenticationApi {
+class FirebaseAuthenticationApiImpl: FirebaseAuthenticationApi {
     private val firebaseAuth = Firebase.auth
 
     override suspend fun signInWithEmailAndPassword(email: String, password: String) =

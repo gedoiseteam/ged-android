@@ -2,14 +2,18 @@ package com.upsaclay.gedoise
 
 import androidx.room.Room
 import com.upsaclay.gedoise.data.GedoiseDatabase
+import com.upsaclay.gedoise.data.ScreenRepository
+import com.upsaclay.gedoise.data.ScreenRepositoryImpl
 import com.upsaclay.gedoise.domain.usecase.ClearDataUseCase
 import com.upsaclay.gedoise.domain.usecase.StartListeningDataUseCase
 import com.upsaclay.gedoise.domain.usecase.StopListeningDataUseCase
+import com.upsaclay.gedoise.presentation.NotificationPresenter
 import com.upsaclay.gedoise.presentation.viewmodels.AccountViewModel
-import com.upsaclay.gedoise.presentation.viewmodels.MainViewModel
+import com.upsaclay.gedoise.presentation.viewmodels.NavigationViewModel
 import com.upsaclay.gedoise.presentation.viewmodels.ProfileViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModelOf
+import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
@@ -29,11 +33,15 @@ val appModule = module {
     single { get<GedoiseDatabase>().messageDao() }
     single { get<GedoiseDatabase>().conversationMessageDao() }
 
-    viewModelOf(::MainViewModel)
+    singleOf(::NotificationPresenter)
+
+    viewModelOf(::NavigationViewModel)
     viewModelOf(::ProfileViewModel)
     viewModelOf(::AccountViewModel)
 
     singleOf(::ClearDataUseCase)
     singleOf(::StartListeningDataUseCase)
     singleOf(::StopListeningDataUseCase)
+
+    singleOf(::ScreenRepositoryImpl) { bind<ScreenRepository>() }
 }

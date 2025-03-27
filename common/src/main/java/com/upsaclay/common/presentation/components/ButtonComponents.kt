@@ -7,10 +7,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.tooling.preview.Preview
-import com.upsaclay.common.domain.w
-import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.white
 
@@ -19,16 +16,17 @@ fun PrimaryButton(
     modifier: Modifier = Modifier,
     text: String,
     isEnable: Boolean = true,
-    shape: Shape = ButtonDefaults.shape,
     onClick: () -> Unit
 ) {
     Button(
         modifier = modifier,
-        shape = shape,
         enabled = isEnable,
-        onClick = onClick
+        onClick = onClick,
+        colors = ButtonDefaults.buttonColors(
+            contentColor = MaterialTheme.colorScheme.white
+        )
     ) {
-        Text(text = text, color = MaterialTheme.colorScheme.white)
+        Text(text = text)
     }
 }
 
@@ -41,7 +39,7 @@ fun PrimaryButton(
 @Preview
 @Composable
 private fun PrimaryButtonPreview() {
-    GedoiseTheme {
+    GedoiseTheme(darkTheme = true) {
         PrimaryButton(
             modifier = Modifier.fillMaxWidth(),
             text = "Primary Button",

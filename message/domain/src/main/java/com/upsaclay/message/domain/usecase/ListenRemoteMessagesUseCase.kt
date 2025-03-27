@@ -18,8 +18,8 @@ class ListenRemoteMessagesUseCase(
 
     fun start() {
         job?.cancel()
-        job = userConversationRepository.conversations.mapLatest { userConversations ->
-            userConversations.map {
+        job = userConversationRepository.getConversations().mapLatest { userConversations ->
+            userConversations.forEach {
                 messageRepository.listenRemoteMessages(it.id)
             }
         }.launchIn(scope)

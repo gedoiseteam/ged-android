@@ -29,11 +29,13 @@ internal class AnnouncementRepositoryImpl(
         _announcements.value.firstOrNull { it.id == announcementId }
 
     override suspend fun refreshAnnouncements() {
-        val announcements = announcementRemoteDataSource.getAnnouncement()
-        if (announcements.isNotEmpty()) {
-            val announcementsToUpdate = announcements.filterNot { _announcements.value.contains(it) }
-            announcementsToUpdate.forEach { announcementLocalDataSource.upsertAnnouncement(it) }
-        }
+        val remoteAnnouncements = runCatching { announcementRemoteDataSource.getAnnouncement() }.getOrElse { return }
+
+        val announcementToDelete = _announcements.value.filterNot { remoteAnnouncements.contains(it) }
+        announcementToDelete.forEach { announcementLocalDataSource.deleteAnnouncement(it) }
+
+        val announcementsToUpsert = remoteAnnouncements.filterNot { _announcements.value.contains(it) }
+        announcementsToUpsert.forEach { announcementLocalDataSource.upsertAnnouncement(it) }
     }
 
     override suspend fun createAnnouncement(announcement: Announcement) {

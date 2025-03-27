@@ -8,21 +8,25 @@ import com.upsaclay.message.domain.entity.ConversationMessage
 import com.upsaclay.message.domain.repository.UserConversationRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapConcat
-import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.map
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class UserConversationRepositoryImpl(
     private val conversationRepository: ConversationRepository,
+    private val conversationMessageRepository: ConversationMessageRepository,
     private val userRepository: UserRepository
 ) : UserConversationRepository {
-    override val conversations: Flow<List<Conversation>> = conversationRepository.getConversationUser()
+    override val conversationsWithLastMessage: Flow<List<ConversationMessage>> =
+        conversationMessageRepository.getConversationsWithLastMessage()
 
-    override fun getPagedConversationMessages(): Flow<PagingData<ConversationMessage>> =
-        conversationRepository.getPagedConversationMessages()
+    override fun getPagedConversationsWithLastMessage(): Flow<PagingData<ConversationMessage>> =
+        conversationMessageRepository.getPagedConversationsWithLastMessage()
+
+    override fun getConversations(): Flow<List<Conversation>> = conversationRepository.getConversations()
 
     override suspend fun getConversation(interlocutorId: String): Conversation? =
         conversationRepository.getConversationFromLocal(interlocutorId)
@@ -45,17 +49,15 @@ internal class UserConversationRepositoryImpl(
     }
 
     override suspend fun listenRemoteConversations() {
-        userRepository.currentUser.filterNotNull().flatMapConcat { currentUser ->
-            conversationRepository.getConversationsFromRemote(currentUser.id)
-                .flatMapLatest { remoteConversation ->
-                    val interlocutorId =
-                        remoteConversation.participants.first { it != currentUser.id }
-                    userRepository.getUserFlow(interlocutorId).map { interlocutor ->
-                        ConversationMapper.toConversation(remoteConversation, interlocutor)
-                    }
+        userRepository.currentUser.filterNotNull().collectLatest { currentUser ->
+            conversationRepository.getConversationsFromRemote(currentUser.id).flatMapMerge { remoteConversation ->
+                val interlocutorId = remoteConversation.participants.first { it != currentUser.id }
+                userRepository.getUserFlow(interlocutorId).map { interlocutor ->
+                    ConversationMapper.toConversation(remoteConversation, interlocutor)
                 }
-        }.collect {
-            conversationRepository.upsertLocalConversation(it)
+            }.collect {
+                conversationRepository.upsertLocalConversation(it)
+            }
         }
     }
 }

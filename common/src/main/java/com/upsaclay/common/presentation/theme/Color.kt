@@ -19,7 +19,7 @@ internal val surfaceVariantLight = Color(0xFFE0E4EC)
 internal val onSurfaceVariantLight = Color(0xFF4F4F4F)
 internal val inverseSurfaceLight = Color(0xFF303133)
 internal val inverseOnSurfaceLight = Color(0xFFEFF1F4)
-internal val onSurfaceLight = white
+internal val onSurfaceLight = Color(0xFF1B1D1F)
 internal val backgroundLight = Color(0xFFFFFFFF)
 internal val onBackgroundLight = black
 internal val outlineLight = Color(0xFF74777E)
@@ -30,6 +30,7 @@ internal val onPrimaryDark = Color(0xFF0E1B34)
 internal val errorDark = Color(0xFFD64A4C)
 internal val surfaceDark = Color(0xFF1B1C1F)
 internal val surfaceVariantDark = Color(0xFF45484F)
+internal val onSurfaceDark = Color(0xFFE1E3E6)
 internal val onSurfaceVariantDark = Color(0xFFC4C7D0)
 internal val inverseSurfaceDark = Color(0xFFE1E3E6)
 internal val inverseOnSurfaceDark = Color(0xFF303133)
@@ -40,11 +41,11 @@ internal val onBackgroundDark = white
 internal val outlineDark = Color(0xFF8F9299)
 internal val outlineVariantDark = Color(0xFFC4C8D0)
 
-val ColorScheme.inputBackground: Color
+val ColorScheme.chatInputBackground: Color
     @Composable
     get() = if(isSystemInDarkTheme()) Color(0xFF323232) else Color(0xFFEEEEEE)
 
-val ColorScheme.inputForeground: Color
+val ColorScheme.chatInputForeground: Color
     @Composable
     get() = if(isSystemInDarkTheme()) Color(0xFF929298) else Color(0xFF646464)
 

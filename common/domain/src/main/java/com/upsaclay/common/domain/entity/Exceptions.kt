@@ -13,4 +13,17 @@ class ServerCommunicationException(
 class TooManyRequestException(
     override val message: String? = null,
     override val cause: Throwable? = null
-) : Exception()
+): Exception()
+
+class UserNotFoundException(
+    override val message: String? = null,
+    override val cause: Throwable? = null
+): Exception()
+
+interface ErrorType {
+    data object TooManyRequestsError: ErrorType
+    data object InternalServerError: ErrorType
+    data object ServerConnectError: ErrorType
+    data object NetworkError: ErrorType
+    data object UnknownError: ErrorType
+}

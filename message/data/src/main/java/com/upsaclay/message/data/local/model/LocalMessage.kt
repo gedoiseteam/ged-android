@@ -21,7 +21,7 @@ data class LocalMessage(
     val messageTimestamp: Long,
     @ColumnInfo(name = MessageField.Local.SEEN_VALUE)
     val seenValue: Boolean?,
-    @ColumnInfo(name = MessageField.Local.SEEN_TIME)
+    @ColumnInfo(name = MessageField.Local.SEEN_TIMESTAMP)
     val seenTimestamp: Long?,
     @ColumnInfo(name = MessageField.MESSAGE_STATE)
     val state: String
