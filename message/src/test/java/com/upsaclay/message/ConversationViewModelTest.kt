@@ -3,8 +3,10 @@ package com.upsaclay.message
 import androidx.paging.PagingData
 import com.upsaclay.message.domain.conversationUIFixture
 import com.upsaclay.message.domain.conversationsUIFixture
+import com.upsaclay.message.domain.entity.ConversationEvent
+import com.upsaclay.message.domain.entity.SuccessType
 import com.upsaclay.message.domain.usecase.DeleteConversationUseCase
-import com.upsaclay.message.domain.usecase.GetConversationsUIUseCase
+import com.upsaclay.message.domain.usecase.GetPagedConversationsUIUseCase
 import com.upsaclay.message.presentation.viewmodels.ConversationViewModel
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -22,7 +24,7 @@ import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ConversationViewModelTest {
-    private val getConversationsUIUseCase: GetConversationsUIUseCase = mockk()
+    private val getPagedConversationsUIUseCase: GetPagedConversationsUIUseCase = mockk()
     private val deleteConversationUseCase: DeleteConversationUseCase = mockk()
 
     private lateinit var conversationViewModel: ConversationViewModel
@@ -32,11 +34,11 @@ class ConversationViewModelTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
 
-        every { getConversationsUIUseCase() } returns flowOf(PagingData.from(conversationsUIFixture))
+        every { getPagedConversationsUIUseCase() } returns flowOf(PagingData.from(conversationsUIFixture))
         coEvery { deleteConversationUseCase(any()) } returns Unit
 
         conversationViewModel = ConversationViewModel(
-            getConversationsUIUseCase = getConversationsUIUseCase,
+            getPagedConversationsUIUseCase = getPagedConversationsUIUseCase,
             deleteConversationUseCase = deleteConversationUseCase
         )
     }
@@ -51,6 +53,6 @@ class ConversationViewModelTest {
 
         // Then
         coVerify { deleteConversationUseCase(conversation) }
-        assertEquals(ConversationScreenState.SUCCESS, conversationViewModel.screenState.value)
+        assertEquals(ConversationEvent.Success(SuccessType.DELETED), conversationViewModel.event.replayCache.first())
     }
 }

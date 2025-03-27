@@ -3,16 +3,9 @@ package com.upsaclay.message.domain
 import com.upsaclay.common.domain.e
 import com.upsaclay.message.domain.usecase.CreateConversationUseCase
 import com.upsaclay.message.domain.usecase.DeleteConversationUseCase
-import com.upsaclay.message.domain.usecase.GetAllLastUnreadMessagesReceivedUseCase
-import com.upsaclay.message.domain.usecase.GetConversationUseCase
-import com.upsaclay.message.domain.usecase.GetConversationsUIUseCase
-import com.upsaclay.message.domain.usecase.GetLastMessageUseCase
-import com.upsaclay.message.domain.usecase.GetMessagesUseCase
-import com.upsaclay.message.domain.usecase.GetUnreadMessagesUseCase
+import com.upsaclay.message.domain.usecase.GetPagedConversationsUIUseCase
 import com.upsaclay.message.domain.usecase.ListenRemoteConversationsUseCase
 import com.upsaclay.message.domain.usecase.ListenRemoteMessagesUseCase
-import com.upsaclay.message.domain.usecase.SendMessageUseCase
-import com.upsaclay.message.domain.usecase.UpdateMessageUseCase
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -36,14 +29,7 @@ val messageDomainModule = module {
 
     singleOf(::CreateConversationUseCase)
     singleOf(::DeleteConversationUseCase)
-    singleOf(::GetAllLastUnreadMessagesReceivedUseCase)
-    singleOf(::GetConversationsUIUseCase)
-    singleOf(::GetConversationUseCase)
-    singleOf(::GetLastMessageUseCase)
-    singleOf(::GetMessagesUseCase)
-    singleOf(::GetUnreadMessagesUseCase)
-    singleOf(::SendMessageUseCase)
-    singleOf(::UpdateMessageUseCase)
+    singleOf(::GetPagedConversationsUIUseCase)
 
     single {
         ListenRemoteConversationsUseCase(

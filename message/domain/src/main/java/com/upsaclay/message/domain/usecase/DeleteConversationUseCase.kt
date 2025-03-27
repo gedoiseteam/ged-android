@@ -10,7 +10,7 @@ class DeleteConversationUseCase(
     private val messageRepository: MessageRepository
 ) {
     suspend operator fun invoke(conversation: ConversationUI) {
-        userConversationRepository.deleteConversation(ConversationMapper.toConversationUser(conversation))
+        userConversationRepository.deleteConversation(ConversationMapper.toConversation(conversation))
         messageRepository.deleteMessages(conversation.id)
     }
 }

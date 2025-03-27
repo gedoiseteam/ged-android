@@ -1,12 +1,16 @@
 package com.upsaclay.authentication
 
 import android.accounts.NetworkErrorException
+import com.upsaclay.authentication.domain.entity.AuthErrorType
+import com.upsaclay.authentication.domain.entity.AuthenticationEvent
 import com.upsaclay.authentication.domain.entity.exception.InvalidCredentialsException
 import com.upsaclay.authentication.domain.usecase.IsEmailVerifiedUseCase
 import com.upsaclay.authentication.domain.usecase.LoginUseCase
 import com.upsaclay.authentication.domain.usecase.SetUserAuthenticatedUseCase
 import com.upsaclay.authentication.presentation.viewmodels.AuthenticationViewModel
+import com.upsaclay.common.domain.entity.ErrorType
 import com.upsaclay.common.domain.entity.TooManyRequestException
+import com.upsaclay.common.domain.usecase.CreateUserUseCase
 import com.upsaclay.common.domain.usecase.GetUserUseCase
 import com.upsaclay.common.domain.usecase.SetCurrentUserUseCase
 import com.upsaclay.common.domain.userFixture
@@ -31,6 +35,7 @@ class AuthenticationViewModelTest {
     private val getUserUseCase: GetUserUseCase = mockk()
     private val setCurrentUserUseCase: SetCurrentUserUseCase = mockk()
     private val isEmailVerifiedUseCase: IsEmailVerifiedUseCase = mockk()
+    private val createUserUseCase: CreateUserUseCase = mockk()
 
     private lateinit var authenticationViewModel: AuthenticationViewModel
     private val email = "email@example.com"
@@ -60,7 +65,6 @@ class AuthenticationViewModelTest {
     fun default_values_are_correct() {
         assertEquals("", authenticationViewModel.email)
         assertEquals("", authenticationViewModel.password)
-        assertEquals(AuthenticationScreenState.DEFAULT, authenticationViewModel.event.value)
     }
 
     @Test
@@ -82,15 +86,6 @@ class AuthenticationViewModelTest {
     }
 
     @Test
-    fun login_sets_screen_state_to_DEFAULT_when_login_is_successful() = runTest {
-        // When
-        authenticationViewModel.login()
-
-        // Then
-        assertEquals(AuthenticationScreenState.DEFAULT, authenticationViewModel.event.value)
-    }
-
-    @Test
     fun login_sets_screen_state_to_EMAIL_NOT_VERIFIED_when_email_is_not_verified() = runTest {
         // Given
         coEvery { isEmailVerifiedUseCase() } returns false
@@ -99,7 +94,7 @@ class AuthenticationViewModelTest {
         authenticationViewModel.login()
 
         // Then
-        assertEquals(AuthenticationScreenState.EMAIL_NOT_VERIFIED, authenticationViewModel.event.value)
+        assertEquals(AuthenticationEvent.EmailNotVerified, authenticationViewModel.event.replayCache[0])
     }
 
     @Test
@@ -111,7 +106,8 @@ class AuthenticationViewModelTest {
         authenticationViewModel.login()
 
         // Then
-        assertEquals(AuthenticationScreenState.AUTH_USER_NOT_FOUND, authenticationViewModel.event.value)
+        val result = authenticationViewModel.event.replayCache[0] as AuthenticationEvent.Error
+        assertEquals(AuthErrorType.AUTH_USER_NOT_FOUND, result.type)
     }
 
     @Test
@@ -123,7 +119,8 @@ class AuthenticationViewModelTest {
         authenticationViewModel.login()
 
         // Then
-        assertEquals(AuthenticationScreenState.INTERNAL_SERVER_ERROR, authenticationViewModel.event.value)
+        val result = authenticationViewModel.event.replayCache[0] as AuthenticationEvent.Error
+        assertEquals(ErrorType.InternalServerError, result.type)
     }
 
     @Test
@@ -135,7 +132,8 @@ class AuthenticationViewModelTest {
         authenticationViewModel.login()
 
         // Then
-        assertEquals(AuthenticationScreenState.TOO_MANY_REQUESTS_ERROR, authenticationViewModel.event.value)
+        val result = authenticationViewModel.event.replayCache[0] as AuthenticationEvent.Error
+        assertEquals(ErrorType.TooManyRequestsError, result.type)
     }
 
     @Test
@@ -147,7 +145,8 @@ class AuthenticationViewModelTest {
         authenticationViewModel.login()
 
         // Then
-        assertEquals(AuthenticationScreenState.INVALID_CREDENTIALS_ERROR, authenticationViewModel.event.value)
+        val result = authenticationViewModel.event.replayCache[0] as AuthenticationEvent.Error
+        assertEquals(AuthErrorType.INVALID_CREDENTIALS_ERROR, result.type)
     }
 
     @Test
@@ -159,7 +158,8 @@ class AuthenticationViewModelTest {
         authenticationViewModel.login()
 
         // Then
-        assertEquals(AuthenticationScreenState.INTERNAL_SERVER_ERROR, authenticationViewModel.event.value)
+        val result = authenticationViewModel.event.replayCache[0] as AuthenticationEvent.Error
+        assertEquals(ErrorType.InternalServerError, result.type)
     }
 
     @Test
@@ -171,7 +171,8 @@ class AuthenticationViewModelTest {
         authenticationViewModel.login()
 
         // Then
-        assertEquals(AuthenticationScreenState.NETWORK_ERROR, authenticationViewModel.event.value)
+        val result = authenticationViewModel.event.replayCache[0] as AuthenticationEvent.Error
+        assertEquals(ErrorType.NetworkError, result.type)
     }
 
     @Test
@@ -183,7 +184,8 @@ class AuthenticationViewModelTest {
         authenticationViewModel.login()
 
         // Then
-        assertEquals(AuthenticationScreenState.UNKNOWN_ERROR, authenticationViewModel.event.value)
+        val result = authenticationViewModel.event.replayCache[0] as AuthenticationEvent.Error
+        assertEquals(ErrorType.UnknownError, result.type)
     }
 
     @Test
@@ -195,7 +197,8 @@ class AuthenticationViewModelTest {
         authenticationViewModel.login()
 
         // Then
-        assertEquals(AuthenticationScreenState.TOO_MANY_REQUESTS_ERROR, authenticationViewModel.event.value)
+        val result = authenticationViewModel.event.replayCache[0] as AuthenticationEvent.Error
+        assertEquals(ErrorType.TooManyRequestsError, result.type)
     }
 
     @Test
@@ -207,7 +210,8 @@ class AuthenticationViewModelTest {
         authenticationViewModel.login()
 
         // Then
-        assertEquals(AuthenticationScreenState.INVALID_CREDENTIALS_ERROR, authenticationViewModel.event.value)
+        val result = authenticationViewModel.event.replayCache[0] as AuthenticationEvent.Error
+        assertEquals(AuthErrorType.INVALID_CREDENTIALS_ERROR, result.type)
     }
 
     @Test
@@ -235,15 +239,6 @@ class AuthenticationViewModelTest {
     }
 
     @Test
-    fun resetScreenState_sets_screen_state_to_DEFAULT() {
-        // When
-        authenticationViewModel.resetScreenState()
-
-        // Then
-        assertEquals(AuthenticationScreenState.DEFAULT, authenticationViewModel.event.value)
-    }
-
-    @Test
     fun verifyInputs_returns_false_when_email_is_blank() {
         // Given
         authenticationViewModel.updatePassword(email)
@@ -253,7 +248,8 @@ class AuthenticationViewModelTest {
 
         // Then
         assertFalse(result)
-        assertEquals(AuthenticationScreenState.EMPTY_FIELDS_ERROR, authenticationViewModel.event.value)
+        val event = authenticationViewModel.event.replayCache[0] as AuthenticationEvent.Error
+        assertEquals(AuthErrorType.EMPTY_FIELDS_ERROR, event.type)
     }
 
     @Test
@@ -266,7 +262,8 @@ class AuthenticationViewModelTest {
 
         // Then
         assertFalse(result)
-        assertEquals(AuthenticationScreenState.EMPTY_FIELDS_ERROR, authenticationViewModel.event.value)
+        val event = authenticationViewModel.event.replayCache[0] as AuthenticationEvent.Error
+        assertEquals(AuthErrorType.EMPTY_FIELDS_ERROR, event.type)
     }
 
     @Test
@@ -280,7 +277,8 @@ class AuthenticationViewModelTest {
 
         // Then
         assertFalse(result)
-        assertEquals(AuthenticationScreenState.EMAIL_FORMAT_ERROR, authenticationViewModel.event.value)
+        val event = authenticationViewModel.event.replayCache[0] as AuthenticationEvent.Error
+        assertEquals(AuthErrorType.EMAIL_FORMAT_ERROR, event.type)
     }
 
     @Test

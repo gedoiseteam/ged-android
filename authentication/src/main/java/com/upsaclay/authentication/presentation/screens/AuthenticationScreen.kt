@@ -26,7 +26,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,11 +52,11 @@ import androidx.navigation.NavController
 import com.upsaclay.authentication.R
 import com.upsaclay.authentication.domain.entity.AuthErrorType
 import com.upsaclay.authentication.domain.entity.AuthenticationEvent
+import com.upsaclay.authentication.domain.entity.AuthenticationScreen
 import com.upsaclay.authentication.presentation.components.LoginButton
 import com.upsaclay.authentication.presentation.components.OutlinePasswordTextField
 import com.upsaclay.authentication.presentation.viewmodels.AuthenticationViewModel
 import com.upsaclay.common.domain.entity.ErrorType
-import com.upsaclay.common.domain.entity.Screen
 import com.upsaclay.common.presentation.components.ErrorText
 import com.upsaclay.common.presentation.components.OutlineTextField
 import com.upsaclay.common.presentation.components.SimpleDialog
@@ -125,7 +124,7 @@ fun AuthenticationScreen(
             onConfirm = {
                 authenticationViewModel.resetEmail()
                 authenticationViewModel.resetPassword()
-                navController.navigate(Screen.EMAIL_VERIFICATION.route + "?email=${authenticationViewModel.email}") {
+                navController.navigate(AuthenticationScreen.EmailVerification(authenticationViewModel.email).route) {
                     popUpTo(navController.graph.id) { inclusive = true }
                 }
             },
@@ -200,7 +199,7 @@ fun AuthenticationScreen(
                         authenticationViewModel.resetPassword()
                         keyboardController?.hide()
                         focusManager.clearFocus()
-                        navController.navigate(Screen.FIRST_REGISTRATION.route)
+                        navController.navigate(AuthenticationScreen.FirstRegistration.route)
                     }
                 )
             }

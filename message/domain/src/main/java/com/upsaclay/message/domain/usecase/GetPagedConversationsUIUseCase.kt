@@ -8,7 +8,7 @@ import com.upsaclay.message.domain.repository.UserConversationRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class GetConversationsUIUseCase(
+class GetPagedConversationsUIUseCase(
     private val userConversationRepository: UserConversationRepository
 ) {
     operator fun invoke(): Flow<PagingData<ConversationUI>> =

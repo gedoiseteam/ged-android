@@ -11,7 +11,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,11 +27,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.upsaclay.authentication.R
+import com.upsaclay.authentication.domain.entity.AuthenticationScreen
 import com.upsaclay.authentication.domain.entity.RegistrationErrorType
 import com.upsaclay.authentication.domain.entity.RegistrationEvent
 import com.upsaclay.authentication.presentation.components.RegistrationTopBar
 import com.upsaclay.authentication.presentation.viewmodels.RegistrationViewModel
-import com.upsaclay.common.domain.entity.Screen
 import com.upsaclay.common.presentation.components.ErrorText
 import com.upsaclay.common.presentation.components.OutlineTextField
 import com.upsaclay.common.presentation.components.PrimaryButton
@@ -52,7 +51,8 @@ fun FirstRegistrationScreen(
 
     LaunchedEffect(Unit) {
         registrationViewModel.event.collectLatest { event ->
-            emptyFields = event is RegistrationEvent.Error && event.type == RegistrationErrorType.EMPTY_FIELDS_ERROR
+            emptyFields = event is RegistrationEvent.Error &&
+                    event.type == RegistrationErrorType.EMPTY_FIELDS_ERROR
         }
     }
 
@@ -112,7 +112,7 @@ fun FirstRegistrationScreen(
                 if (registrationViewModel.verifyNamesInputs()) {
                     focusManager.clearFocus()
                     keyboardController?.hide()
-                    navController.navigate(Screen.SECOND_REGISTRATION.route)
+                    navController.navigate(AuthenticationScreen.SecondRegistration.route)
                 }
             }
         )

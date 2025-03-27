@@ -28,8 +28,8 @@ class AuthenticationViewModel(
     private val getUserUseCase: GetUserUseCase,
     private val setCurrentUserUseCase: SetCurrentUserUseCase,
     private val isEmailVerifiedUseCase: IsEmailVerifiedUseCase
-) : ViewModel() {
-    private val _event = MutableSharedFlow<AuthenticationEvent>(replay = 1, extraBufferCapacity = 1)
+): ViewModel() {
+    private val _event = MutableSharedFlow<AuthenticationEvent>()
     val event: SharedFlow<AuthenticationEvent> = _event
     var email by mutableStateOf("")
         private set
@@ -79,12 +79,12 @@ class AuthenticationViewModel(
     fun verifyInputs(): Boolean {
         return when {
             email.isBlank() || password.isBlank() -> {
-                _event.tryEmit(AuthenticationEvent.Error(AuthErrorType.EMPTY_FIELDS_ERROR))
+                viewModelScope.launch { _event.emit(AuthenticationEvent.Error(AuthErrorType.EMPTY_FIELDS_ERROR)) }
                 return false
             }
 
             !VerifyEmailFormatUseCase(email) -> {
-                _event.tryEmit(AuthenticationEvent.Error(AuthErrorType.EMAIL_FORMAT_ERROR))
+               viewModelScope.launch { _event.emit(AuthenticationEvent.Error(AuthErrorType.EMAIL_FORMAT_ERROR)) }
                 return false
             }
 

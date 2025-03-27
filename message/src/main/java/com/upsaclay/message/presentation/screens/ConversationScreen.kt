@@ -50,7 +50,6 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
 import com.upsaclay.common.domain.entity.ErrorType
-import com.upsaclay.common.domain.entity.Screen
 import com.upsaclay.common.presentation.components.CircularProgressBar
 import com.upsaclay.common.presentation.components.ClickableItem
 import com.upsaclay.common.presentation.components.LoadingDialog
@@ -59,11 +58,12 @@ import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.previewText
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.message.R
+import com.upsaclay.message.domain.ConversationMapper
 import com.upsaclay.message.domain.conversationsUIFixture
 import com.upsaclay.message.domain.entity.ConversationEvent
 import com.upsaclay.message.domain.entity.ConversationUI
+import com.upsaclay.message.domain.entity.MessageScreen
 import com.upsaclay.message.domain.entity.SuccessType
-import com.upsaclay.message.domain.usecase.ConvertConversationJsonUseCase
 import com.upsaclay.message.presentation.components.ConversationItem
 import com.upsaclay.message.presentation.viewmodels.ConversationViewModel
 import kotlinx.coroutines.flow.collectLatest
@@ -143,15 +143,14 @@ fun ConversationScreen(
     Box(modifier = Modifier.fillMaxSize()) {
         if (conversationItems.itemCount == 0) {
             StartConversation(
-                onCreateClick = { navController.navigate(Screen.CREATE_CONVERSATION.route) }
+                onCreateClick = { navController.navigate(MessageScreen.CreateConversation.route) }
             )
         } else {
             ConversationFeed(
                 conversationItems = conversationItems,
                 onClick = {
-                    navController.navigate(
-                        Screen.CHAT.route + "?conversation=${ConvertConversationJsonUseCase(it)}"
-                    )
+                    val conversation = ConversationMapper.toConversation(it)
+                    navController.navigate(MessageScreen.Chat(conversation).route)
                 },
                 onLongClick = {
                     conversationClicked = it
@@ -164,7 +163,7 @@ fun ConversationScreen(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .testTag(stringResource(id = R.string.conversation_screen_create_conversation_button_tag)),
-            onClick = { navController.navigate(Screen.CREATE_CONVERSATION.route) },
+            onClick = { navController.navigate(MessageScreen.CreateConversation.route) },
         )
 
         if (showBottomSheet) {

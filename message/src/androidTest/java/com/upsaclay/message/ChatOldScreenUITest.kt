@@ -9,7 +9,7 @@ import io.mockk.mockk
 import org.junit.Before
 import org.junit.Rule
 
-class ChatScreenUITest {
+class ChatOldScreenUITest {
     @get:Rule
     val rule = createAndroidComposeRule<ComponentActivity>()
 

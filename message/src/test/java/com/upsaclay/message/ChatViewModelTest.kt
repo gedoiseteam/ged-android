@@ -3,16 +3,12 @@ package com.upsaclay.message
 import androidx.paging.PagingData
 import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
 import com.upsaclay.common.domain.userFixture
-import com.upsaclay.message.domain.conversationUIFixture
+import com.upsaclay.message.domain.conversationFixture
 import com.upsaclay.message.domain.entity.ConversationState
 import com.upsaclay.message.domain.messageFixture
 import com.upsaclay.message.domain.messagesFixture
+import com.upsaclay.message.domain.repository.MessageRepository
 import com.upsaclay.message.domain.usecase.CreateConversationUseCase
-import com.upsaclay.message.domain.usecase.GetLastMessageUseCase
-import com.upsaclay.message.domain.usecase.GetMessagesUseCase
-import com.upsaclay.message.domain.usecase.GetUnreadMessagesUseCase
-import com.upsaclay.message.domain.usecase.SendMessageUseCase
-import com.upsaclay.message.domain.usecase.UpdateMessageUseCase
 import com.upsaclay.message.presentation.viewmodels.ChatViewModel
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -32,12 +28,8 @@ import kotlin.test.assertEquals
 @OptIn(ExperimentalCoroutinesApi::class)
 class ChatViewModelTest {
     private val getCurrentUserUseCase: GetCurrentUserUseCase = mockk()
-    private val getMessagesUseCase: GetMessagesUseCase = mockk()
-    private val getLastMessageUseCase: GetLastMessageUseCase = mockk()
-    private val sendMessageUseCase: SendMessageUseCase = mockk()
     private val createConversationUseCase: CreateConversationUseCase = mockk()
-    private val updateMessageUseCase: UpdateMessageUseCase = mockk()
-    private val getUnreadMessagesUseCase: GetUnreadMessagesUseCase = mockk()
+    private val messageRepository: MessageRepository = mockk()
 
     private lateinit var chatViewModel: ChatViewModel
     private val testDispatcher = UnconfinedTestDispatcher()
@@ -47,20 +39,16 @@ class ChatViewModelTest {
         Dispatchers.setMain(testDispatcher)
 
         every { getCurrentUserUseCase() } returns MutableStateFlow(userFixture)
-        every { getMessagesUseCase(any()) } returns flowOf(PagingData.from(messagesFixture))
-        every { getLastMessageUseCase(any()) } returns flowOf(messageFixture)
-        coEvery { sendMessageUseCase(any()) } returns Unit
+        every { messageRepository.getMessages(any()) } returns flowOf(PagingData.from(messagesFixture))
+        every { messageRepository.getLastMessage(any()) } returns flowOf(messageFixture)
+        coEvery { messageRepository.createMessage(any()) } returns Unit
         coEvery { createConversationUseCase(any()) } returns Unit
 
         chatViewModel = ChatViewModel(
-            conversation = conversationUIFixture,
+            conversation = conversationFixture,
             getCurrentUserUseCase = getCurrentUserUseCase,
-            getMessagesUseCase = getMessagesUseCase,
-            getLastMessageUseCase = getLastMessageUseCase,
-            sendMessageUseCase = sendMessageUseCase,
+            messageRepository = messageRepository,
             createConversationUseCase = createConversationUseCase,
-            updateMessageUseCase = updateMessageUseCase,
-            getUnreadMessagesUseCase = getUnreadMessagesUseCase
         )
     }
 
@@ -91,7 +79,7 @@ class ChatViewModelTest {
         chatViewModel.sendMessage()
 
         // Then
-        coVerify { sendMessageUseCase(any()) }
+        coVerify { messageRepository.createMessage(any()) }
     }
 
     @Test
@@ -100,7 +88,7 @@ class ChatViewModelTest {
         chatViewModel.sendMessage()
 
         // Then
-        coVerify(exactly = 0) { sendMessageUseCase(any()) }
+        coVerify(exactly = 0) { messageRepository.createMessage(any()) }
     }
 
     @Test
@@ -118,16 +106,12 @@ class ChatViewModelTest {
     @Test
     fun send_message_should_create_conversation_when_it_is_not_created() {
         // Given
-        val conversation = conversationUIFixture.copy(state = ConversationState.NOT_CREATED)
+        val conversation = conversationFixture.copy(state = ConversationState.NOT_CREATED)
         chatViewModel = ChatViewModel(
             conversation = conversation,
             getCurrentUserUseCase = getCurrentUserUseCase,
-            getMessagesUseCase = getMessagesUseCase,
-            getLastMessageUseCase = getLastMessageUseCase,
-            sendMessageUseCase = sendMessageUseCase,
+            messageRepository = messageRepository,
             createConversationUseCase = createConversationUseCase,
-            updateMessageUseCase = updateMessageUseCase,
-            getUnreadMessagesUseCase = getUnreadMessagesUseCase
         )
         chatViewModel.updateTextToSend("Hello")
 
@@ -141,16 +125,12 @@ class ChatViewModelTest {
     @Test
     fun send_message_should_not_create_conversation_when_it_is_created() {
         // Given
-        val conversation = conversationUIFixture.copy(state = ConversationState.CREATED)
+        val conversation = conversationFixture.copy(state = ConversationState.CREATED)
         chatViewModel = ChatViewModel(
             conversation = conversation,
             getCurrentUserUseCase = getCurrentUserUseCase,
-            getMessagesUseCase = getMessagesUseCase,
-            getLastMessageUseCase = getLastMessageUseCase,
-            sendMessageUseCase = sendMessageUseCase,
+            messageRepository = messageRepository,
             createConversationUseCase = createConversationUseCase,
-            updateMessageUseCase = updateMessageUseCase,
-            getUnreadMessagesUseCase = getUnreadMessagesUseCase
         )
         chatViewModel.updateTextToSend("Hello")
 
@@ -159,7 +139,7 @@ class ChatViewModelTest {
 
         // Then
         coVerify(exactly = 0) { createConversationUseCase(conversation) }
-        coVerify { sendMessageUseCase(any()) }
+        coVerify { messageRepository.createMessage(any()) }
     }
 
     @Test(expected = IllegalArgumentException::class)
@@ -167,14 +147,10 @@ class ChatViewModelTest {
         // Given
         every { getCurrentUserUseCase() } returns MutableStateFlow(null)
         chatViewModel = ChatViewModel(
-            conversation = conversationUIFixture,
+            conversation = conversationFixture,
             getCurrentUserUseCase = getCurrentUserUseCase,
-            getMessagesUseCase = getMessagesUseCase,
-            getLastMessageUseCase = getLastMessageUseCase,
-            sendMessageUseCase = sendMessageUseCase,
+            messageRepository = messageRepository,
             createConversationUseCase = createConversationUseCase,
-            updateMessageUseCase = updateMessageUseCase,
-            getUnreadMessagesUseCase = getUnreadMessagesUseCase
         )
         chatViewModel.updateTextToSend("Hello")
 

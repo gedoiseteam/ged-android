@@ -27,21 +27,24 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.upsaclay.common.domain.entity.Screen
 import com.upsaclay.common.presentation.components.ProfilePicture
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.gedoise.R
-import com.upsaclay.gedoise.data.NavigationItem
+import com.upsaclay.gedoise.domain.entities.MainScreen
+import com.upsaclay.gedoise.presentation.NavigationItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeTopBar(navController: NavController, profilePictureUrl: String?) {
+fun HomeTopBar(
+    navController: NavController,
+    profilePictureUrl: String?
+) {
     TopAppBar(
         title = {
             Text(
                 text = stringResource(id = R.string.app_name),
                 fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.titleLarge
             )
         },
         navigationIcon = {
@@ -58,7 +61,7 @@ fun HomeTopBar(navController: NavController, profilePictureUrl: String?) {
         },
         actions = {
             IconButton(
-                onClick = { navController.navigate(Screen.PROFILE.route) },
+                onClick = { navController.navigate(MainScreen.Profile.route) },
                 modifier = Modifier.clip(shape = CircleShape)
             ) {
                 ProfilePicture(url = profilePictureUrl)
@@ -89,12 +92,12 @@ fun MainBottomBar(
     navigationItems: List<NavigationItem>
 ) {
     val currentRoute = remember {
-        navController.currentDestination?.route
+        navController.currentDestination
     }
 
     NavigationBar {
         navigationItems.forEach { navigationItem ->
-            val selected = navigationItem.screen.route == currentRoute
+            val selected = navigationItem.screen.route == currentRoute?.route
             val iconRes = if (selected) navigationItem.filledIcon else navigationItem.outlinedIcon
 
             NavigationBarItem(
@@ -180,9 +183,7 @@ private fun MainTopBarPreview() {
 private fun MainBottomBarPreview() {
     val itemList = listOf(
         NavigationItem.Home(),
-        NavigationItem.Message(badges = 5),
-        NavigationItem.Calendar(hasNews = true),
-        NavigationItem.Forum()
+        NavigationItem.Message(badges = 5)
     )
 
     GedoiseTheme {

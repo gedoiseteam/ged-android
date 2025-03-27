@@ -11,7 +11,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,13 +30,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.upsaclay.authentication.R
+import com.upsaclay.authentication.domain.entity.AuthenticationScreen
 import com.upsaclay.authentication.domain.entity.RegistrationErrorType
 import com.upsaclay.authentication.domain.entity.RegistrationEvent
 import com.upsaclay.authentication.presentation.components.OutlinePasswordTextField
 import com.upsaclay.authentication.presentation.components.RegistrationTopBar
 import com.upsaclay.authentication.presentation.viewmodels.RegistrationViewModel
 import com.upsaclay.common.domain.entity.ErrorType
-import com.upsaclay.common.domain.entity.Screen
 import com.upsaclay.common.presentation.components.ErrorText
 import com.upsaclay.common.presentation.components.OutlineTextField
 import com.upsaclay.common.presentation.components.PrimaryButton
@@ -58,7 +57,7 @@ fun ThirdRegistrationScreen(
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
     var errorMessage by remember { mutableStateOf("") }
-    val loading by remember { mutableStateOf(false) }
+    var loading by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
     val showSnackBar = { message: String ->
         scope.launch {
@@ -68,9 +67,10 @@ fun ThirdRegistrationScreen(
 
     LaunchedEffect(registrationViewModel.event) {
         registrationViewModel.event.collectLatest { event ->
+            loading = event is RegistrationEvent.Loading
             when (event) {
                 RegistrationEvent.Registered ->
-                    navController.navigate(Screen.EMAIL_VERIFICATION.route + "?email=${registrationViewModel.email}")
+                    navController.navigate(AuthenticationScreen.EmailVerification(registrationViewModel.email).route)
 
                 is RegistrationEvent.Error -> {
                     errorMessage = when (event.type) {
@@ -147,7 +147,7 @@ fun ThirdRegistrationScreen(
                 onValueChange = { registrationViewModel.updatePassword(it) }
             )
 
-            errorMessage?.let {
+            if (errorMessage.isNotBlank()) {
                 Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
 
                 ErrorText(
@@ -188,7 +188,7 @@ private fun ThirdRegistrationScreenPreview() {
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
 
-    GedoiseTheme {
+    GedoiseTheme(darkTheme = true) {
         if (isLoading) {
             TopLinearLoadingScreen()
         }
@@ -237,7 +237,7 @@ private fun ThirdRegistrationScreenPreview() {
             PrimaryButton(
                 modifier = Modifier.align(Alignment.BottomEnd),
                 text = stringResource(id = com.upsaclay.common.R.string.next),
-                isEnable = !isLoading,
+                isEnable = false,
                 onClick = { isLoading = true }
             )
         }

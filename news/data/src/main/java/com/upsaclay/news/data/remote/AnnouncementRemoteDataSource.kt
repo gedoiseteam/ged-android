@@ -19,12 +19,13 @@ internal class AnnouncementRemoteDataSource(private val announcementApi: Announc
                 val remoteAnnouncements = response.body().takeIf { it != null } ?: emptyList()
                 remoteAnnouncements.map(AnnouncementMapper::toDomain)
             } else {
-                e(formatHttpError("Error getting remote announcements", response))
-                emptyList()
+                val errorMessage = formatHttpError("Error getting remote announcements", response)
+                e(errorMessage)
+                throw IOException(errorMessage)
             }
         } catch (e: Exception) {
             e("Error getting remote announcements: ${e.message}", e)
-            emptyList()
+            throw e
         }
     }
 

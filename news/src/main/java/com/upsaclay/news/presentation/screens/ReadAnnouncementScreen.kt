@@ -46,7 +46,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.upsaclay.common.domain.entity.Screen
 import com.upsaclay.common.presentation.components.ClickableItem
 import com.upsaclay.common.presentation.components.LinearProgressBar
 import com.upsaclay.common.presentation.components.SensibleActionDialog
@@ -58,6 +57,7 @@ import com.upsaclay.news.domain.announcementFixture
 import com.upsaclay.news.domain.entity.Announcement
 import com.upsaclay.news.domain.entity.AnnouncementScreenState
 import com.upsaclay.news.domain.entity.AnnouncementState
+import com.upsaclay.news.domain.entity.NewsScreen
 import com.upsaclay.news.presentation.components.AnnouncementHeader
 import com.upsaclay.news.presentation.viewmodels.ReadAnnouncementViewModel
 import kotlinx.coroutines.launch
@@ -178,18 +178,11 @@ fun ReadAnnouncementScreen(
                 )
                 .verticalScroll(rememberScrollState())
         ) {
-            if (user?.isMember == true && announcement?.author == user) {
+            if (user?.isMember == true && announcement?.author?.id == user?.id) {
                 announcement?.let {
                     EditableTopSection(
                         announcement = it,
                         onEditClick = { showBottomSheet = true }
-                    )
-                }
-            } else {
-                announcement?.let {
-                    AnnouncementHeader(
-                        modifier = Modifier.testTag(stringResource(id = R.string.read_screen_announcement_header_tag)),
-                        announcement = it
                     )
                 }
             }
@@ -234,7 +227,7 @@ fun ReadAnnouncementScreen(
                                 )
                             },
                             onClick = {
-                                navController.navigate(Screen.EDIT_ANNOUNCEMENT.route + "?announcementId=$announcementId")
+                                navController.navigate(NewsScreen.EditAnnouncement(announcementId).route)
                                 hideBottomSheet()
                             }
                         )

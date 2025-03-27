@@ -9,9 +9,11 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 internal class MessageRemoteDataSource(private val messageApi: MessageApi) {
-    fun listenMessages(conversationId: Int): Flow<Message> =
+    fun listenMessages(conversationId: Int): Flow<List<Message>> =
         messageApi.listenMessages(conversationId)
-            .map(MessageMapper::toDomain)
+            .map { messages ->
+                messages.map(MessageMapper::toDomain)
+            }
 
     suspend fun createMessage(message: Message) {
         withContext(Dispatchers.IO) {

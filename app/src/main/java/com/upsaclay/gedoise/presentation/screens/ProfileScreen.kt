@@ -34,7 +34,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.upsaclay.common.domain.entity.Screen
 import com.upsaclay.common.domain.userFixture
 import com.upsaclay.common.presentation.components.ClickableItem
 import com.upsaclay.common.presentation.components.LoadingDialog
@@ -46,6 +45,7 @@ import com.upsaclay.common.presentation.theme.darkGray
 import com.upsaclay.common.presentation.theme.lightGray
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.gedoise.R
+import com.upsaclay.gedoise.domain.entities.MainScreen
 import com.upsaclay.gedoise.presentation.viewmodels.ProfileViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -110,7 +110,7 @@ fun ProfileScreen(
                             contentDescription = stringResource(id = R.string.account_icon_description)
                         )
                     },
-                    onClick = { navController.navigate(Screen.ACCOUNT.route) }
+                    onClick = { navController.navigate(MainScreen.Account.route) }
                 )
 
                 ClickableItem(

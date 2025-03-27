@@ -14,10 +14,12 @@ import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.testing.TestNavHostController
-import com.upsaclay.common.domain.entity.Screen
+import androidx.paging.PagingData
 import com.upsaclay.common.domain.userFixture2
+import com.upsaclay.message.domain.conversationFixture
 import com.upsaclay.message.domain.conversationUIFixture
 import com.upsaclay.message.domain.conversationsUIFixture
+import com.upsaclay.message.domain.entity.MessageScreenRoute
 import com.upsaclay.message.domain.messageFixture
 import com.upsaclay.message.presentation.screens.ChatScreen
 import com.upsaclay.message.presentation.screens.ConversationScreen
@@ -25,14 +27,13 @@ import com.upsaclay.message.presentation.screens.CreateConversationScreen
 import com.upsaclay.message.presentation.viewmodels.ConversationViewModel
 import io.mockk.every
 import io.mockk.mockk
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-class ConversationScreenUITest {
+class ConversationOldScreenUITest {
     @get:Rule
     val rule = createAndroidComposeRule<ComponentActivity>()
 
@@ -41,8 +42,7 @@ class ConversationScreenUITest {
 
     @Before
     fun setUp() {
-        every { conversationViewModel.conversations } returns flowOf(conversationsUIFixture)
-        every { conversationViewModel.screenState } returns MutableStateFlow(ConversationScreenState.DEFAULT)
+        every { conversationViewModel.conversations } returns flowOf(PagingData.from(conversationsUIFixture))
     }
 
     @Test
@@ -52,8 +52,7 @@ class ConversationScreenUITest {
             ConversationScreen(
                 navController = navController,
                 conversationViewModel = conversationViewModel,
-                snackbarHostState = SnackbarHostState(),
-                updateSnackbarType = { }
+                snackbarHostState = SnackbarHostState()
             )
         }
 
@@ -69,7 +68,7 @@ class ConversationScreenUITest {
     @Test
     fun text_should_be_displayed_when_conversations_are_empty() {
         // Given
-        every { conversationViewModel.conversations } returns flowOf(emptyList())
+        every { conversationViewModel.conversations } returns flowOf(PagingData.empty())
 
         // When
         rule.setContent {
@@ -77,7 +76,6 @@ class ConversationScreenUITest {
                 navController = navController,
                 conversationViewModel = conversationViewModel,
                 snackbarHostState = SnackbarHostState(),
-                updateSnackbarType = { }
             )
         }
 
@@ -94,7 +92,6 @@ class ConversationScreenUITest {
                 navController = navController,
                 conversationViewModel = conversationViewModel,
                 snackbarHostState = SnackbarHostState(),
-                updateSnackbarType = { }
             )
         }
 
@@ -105,7 +102,8 @@ class ConversationScreenUITest {
     @Test
     fun empty_conversations_item_should_be_displayed_when_no_last_message() {
         // Given
-        every { conversationViewModel.conversations } returns flowOf(listOf(conversationUIFixture.copy(lastMessage = null)))
+        every { conversationViewModel.conversations } returns
+                flowOf(PagingData.from(listOf(conversationUIFixture.copy(lastMessage = null))))
 
         // When
         rule.setContent {
@@ -113,7 +111,6 @@ class ConversationScreenUITest {
                 navController = navController,
                 conversationViewModel = conversationViewModel,
                 snackbarHostState = SnackbarHostState(),
-                updateSnackbarType = { }
             )
         }
 
@@ -127,15 +124,14 @@ class ConversationScreenUITest {
     @Test
     fun read_conversations_item_should_be_displayed_when_last_message_is_read() {
         // Given
-        every { conversationViewModel.conversations } returns flowOf(listOf(conversationUIFixture))
+        every { conversationViewModel.conversations } returns flowOf(PagingData.from(listOf(conversationUIFixture)))
 
         // When
         rule.setContent {
             ConversationScreen(
                 navController = navController,
                 conversationViewModel = conversationViewModel,
-                snackbarHostState = SnackbarHostState(),
-                updateSnackbarType = { }
+                snackbarHostState = SnackbarHostState()
             )
         }
 
@@ -149,16 +145,16 @@ class ConversationScreenUITest {
     @Test
     fun unread_conversations_item_should_be_displayed_when_last_message_is_not_read_and_not_sent_by_interlocutor() {
         // Given
-        val lastMessage = messageFixture.copy(seen = false, senderId = userFixture2.id)
-        every { conversationViewModel.conversations } returns flowOf(listOf(conversationUIFixture.copy(lastMessage = lastMessage)))
+        val lastMessage = messageFixture.copy(seen = null, senderId = userFixture2.id)
+        every { conversationViewModel.conversations } returns
+                flowOf(PagingData.from(listOf(conversationUIFixture.copy(lastMessage = lastMessage))))
 
         // When
         rule.setContent {
             ConversationScreen(
                 navController = navController,
                 conversationViewModel = conversationViewModel,
-                snackbarHostState = SnackbarHostState(),
-                updateSnackbarType = { }
+                snackbarHostState = SnackbarHostState()
             )
         }
 
@@ -175,17 +171,16 @@ class ConversationScreenUITest {
         rule.setContent {
             navController = TestNavHostController(LocalContext.current)
             navController.navigatorProvider.addNavigator(ComposeNavigator())
-            NavHost(navController = navController, startDestination = Screen.CONVERSATION.route) {
-                composable(Screen.CONVERSATION.route) {
+            NavHost(navController = navController, startDestination = MessageScreenRoute.CONVERSATION) {
+                composable<MessageScreenRoute.CONVERSATION> {
                     ConversationScreen(
                         navController = navController,
                         conversationViewModel = conversationViewModel,
-                        snackbarHostState = SnackbarHostState(),
-                        updateSnackbarType = { }
+                        snackbarHostState = SnackbarHostState()
                     )
                 }
 
-                composable(Screen.CREATE_CONVERSATION.route) {
+                composable<MessageScreenRoute.CREATE_CONVERSATION> {
                     CreateConversationScreen(
                         navController = navController,
                         createConversationViewModel = mockk()
@@ -197,31 +192,30 @@ class ConversationScreenUITest {
         rule.onNodeWithTag(rule.activity.getString(R.string.conversation_screen_create_conversation_button_tag)).performClick()
 
         // Then
-        Assert.assertEquals(Screen.CREATE_CONVERSATION.route, navController.currentDestination?.route)
+        Assert.assertEquals(MessageScreenRoute.CREATE_CONVERSATION, navController.currentDestination?.route)
     }
 
     @Test
     fun navigate_to_chat_screen_when_conversation_item_is_clicked() {
         // Given
-        every { conversationViewModel.conversations } returns flowOf(listOf(conversationUIFixture))
+        every { conversationViewModel.conversations } returns flowOf(PagingData.from(listOf(conversationUIFixture)))
 
         // When
         rule.setContent {
             navController = TestNavHostController(LocalContext.current)
             navController.navigatorProvider.addNavigator(ComposeNavigator())
-            NavHost(navController = navController, startDestination = Screen.CONVERSATION.route) {
-                composable(Screen.CONVERSATION.route) {
+            NavHost(navController = navController, startDestination = MessageScreenRoute.CONVERSATION) {
+                composable<MessageScreenRoute.CONVERSATION> {
                     ConversationScreen(
                         navController = navController,
                         conversationViewModel = conversationViewModel,
-                        snackbarHostState = SnackbarHostState(),
-                        updateSnackbarType = { }
+                        snackbarHostState = SnackbarHostState()
                     )
                 }
 
-                composable(Screen.CHAT.route) {
+                composable<MessageScreenRoute.CHAT>{
                     ChatScreen(
-                        conversation = conversationUIFixture,
+                        conversation = conversationFixture,
                         navController = navController,
                         chatViewModel = mockk()
                     )
@@ -232,6 +226,6 @@ class ConversationScreenUITest {
         rule.onNodeWithTag(rule.activity.getString(R.string.conversation_screen_conversation_item_tag)).performClick()
 
         // Then
-        Assert.assertEquals(Screen.CHAT.route, navController.currentDestination?.route)
+        Assert.assertEquals(MessageScreenRoute.CHAT, navController.currentDestination?.route)
     }
 }

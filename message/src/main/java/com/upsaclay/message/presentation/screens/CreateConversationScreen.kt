@@ -23,7 +23,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
-import com.upsaclay.common.domain.entity.Screen
 import com.upsaclay.common.domain.entity.User
 import com.upsaclay.common.domain.usersFixture
 import com.upsaclay.common.presentation.components.LinearProgressBar
@@ -33,7 +32,7 @@ import com.upsaclay.common.presentation.theme.previewText
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.message.R
 import com.upsaclay.message.domain.entity.ConversationEvent
-import com.upsaclay.message.domain.usecase.ConvertConversationJsonUseCase
+import com.upsaclay.message.domain.entity.MessageScreen
 import com.upsaclay.message.presentation.components.UserItem
 import com.upsaclay.message.presentation.viewmodels.CreateConversationViewModel
 import kotlinx.coroutines.flow.collectLatest
@@ -79,12 +78,10 @@ fun CreateConversationScreen(
                             onClick = {
                                 scope.launch {
                                     val conversation = createConversationViewModel.getConversation(user.id)
-                                        ?.let {
-                                            ConvertConversationJsonUseCase(it)
-                                        } ?: createConversationViewModel.generateConversationJson(user)
+                                        ?: createConversationViewModel.generateConversation(user)
 
-                                    navController.navigate(Screen.CHAT.route + "?conversation=$conversation") {
-                                        popUpTo(Screen.CREATE_CONVERSATION.route) {
+                                    navController.navigate(MessageScreen.Chat(conversation).route) {
+                                        popUpTo(MessageScreen.CreateConversation.route) {
                                             inclusive = true
                                         }
                                     }

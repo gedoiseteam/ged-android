@@ -7,6 +7,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.navigation.testing.TestNavHostController
+import com.upsaclay.authentication.domain.entity.AuthenticationEvent
 import com.upsaclay.authentication.presentation.screens.EmailVerificationScreen
 import com.upsaclay.authentication.presentation.viewmodels.EmailVerificationViewModel
 import com.upsaclay.common.domain.userFixture
@@ -26,14 +27,14 @@ class EmailVerificationScreenUITest {
 
     @Before
     fun setUp() {
-        every { emailVerificationViewModel.screenState } returns MutableStateFlow(AuthenticationScreenState.DEFAULT)
+        every { emailVerificationViewModel.event } returns MutableStateFlow(AuthenticationEvent.Unauthenticated)
         every { emailVerificationViewModel.sendVerificationEmail() } returns Unit
     }
 
     @Test
     fun components_are_disabled_when_loading() {
         // Given
-        every { emailVerificationViewModel.screenState } returns MutableStateFlow(AuthenticationScreenState.LOADING)
+        every { emailVerificationViewModel.event } returns MutableStateFlow(AuthenticationEvent.Loading)
 
         // When
         rule.setContent {

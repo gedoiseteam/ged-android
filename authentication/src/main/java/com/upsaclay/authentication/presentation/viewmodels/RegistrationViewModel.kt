@@ -20,11 +20,11 @@ import com.upsaclay.common.domain.usecase.VerifyEmailFormatUseCase
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
+import okhttp3.internal.immutableListOf
 import java.io.IOException
 import java.net.ConnectException
 
 private const val MIN_PASSWORD_LENGTH = 8
-const val PARIS_SACLAY_DOMAIN = "@universite-paris-saclay.fr"
 
 class RegistrationViewModel(
     private val createUserUseCase: CreateUserUseCase,
@@ -32,7 +32,7 @@ class RegistrationViewModel(
     private val isUserExistUseCase: IsUserExistUseCase,
 ) : ViewModel() {
     private val userId = GenerateIdUseCase.asString()
-    private val _event = MutableSharedFlow<RegistrationEvent>(replay = 1, extraBufferCapacity = 1)
+    private val _event = MutableSharedFlow<RegistrationEvent>()
     val event: SharedFlow<RegistrationEvent> = _event
 
     var firstName by mutableStateOf("")
@@ -43,7 +43,7 @@ class RegistrationViewModel(
         private set
     var password by mutableStateOf("")
         private set
-    val schoolLevels = listOf("GED 1", "GED 2", "GED 3", "GED 4")
+    val schoolLevels = immutableListOf("GED 1", "GED 2", "GED 3", "GED 4")
     var schoolLevel by mutableStateOf(schoolLevels[0])
         private set
 
@@ -96,7 +96,7 @@ class RegistrationViewModel(
     }
 
     fun register() {
-        val email = email.trim() + PARIS_SACLAY_DOMAIN
+        val email = email.trim()
 
         viewModelScope.launch {
             _event.emit(RegistrationEvent.Loading)
@@ -126,7 +126,7 @@ class RegistrationViewModel(
 
     fun verifyNamesInputs(): Boolean {
         return if (firstName.isBlank() || lastName.isBlank()) {
-            _event.tryEmit(RegistrationEvent.Error(RegistrationErrorType.EMPTY_FIELDS_ERROR))
+            viewModelScope.launch { _event.emit(RegistrationEvent.Error(RegistrationErrorType.EMPTY_FIELDS_ERROR)) }
             false
         } else {
             firstName = firstName.trim().uppercaseFirstLetter()
@@ -140,12 +140,12 @@ class RegistrationViewModel(
     private fun verifyPassword(): Boolean {
         return when {
             password.isBlank() -> {
-                _event.tryEmit(RegistrationEvent.Error(RegistrationErrorType.EMPTY_FIELDS_ERROR))
+                viewModelScope.launch { _event.emit(RegistrationEvent.Error(RegistrationErrorType.EMPTY_FIELDS_ERROR)) }
                 false
             }
 
             password.length < MIN_PASSWORD_LENGTH -> {
-                _event.tryEmit(RegistrationEvent.Error(RegistrationErrorType.PASSWORD_LENGTH_ERROR))
+                viewModelScope.launch { _event.emit(RegistrationEvent.Error(RegistrationErrorType.PASSWORD_LENGTH_ERROR)) }
                 false
             }
 
@@ -156,12 +156,12 @@ class RegistrationViewModel(
     private fun verifyEmail(): Boolean {
         return when {
             email.isBlank() -> {
-                _event.tryEmit(RegistrationEvent.Error(RegistrationErrorType.EMPTY_FIELDS_ERROR))
+                viewModelScope.launch { _event.emit(RegistrationEvent.Error(RegistrationErrorType.EMPTY_FIELDS_ERROR)) }
                 false
             }
 
-            !VerifyEmailFormatUseCase(email.trim() + PARIS_SACLAY_DOMAIN) -> {
-                _event.tryEmit(RegistrationEvent.Error(RegistrationErrorType.EMAIL_FORMAT_ERROR))
+            !VerifyEmailFormatUseCase(email.trim()) -> {
+                viewModelScope.launch { _event.emit(RegistrationEvent.Error(RegistrationErrorType.EMAIL_FORMAT_ERROR)) }
                 false
             }
 

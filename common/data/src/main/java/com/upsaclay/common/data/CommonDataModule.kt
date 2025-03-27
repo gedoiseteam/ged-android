@@ -5,6 +5,8 @@ import com.upsaclay.common.data.local.UserLocalDataSource
 import com.upsaclay.common.data.remote.ImageRemoteDataSource
 import com.upsaclay.common.data.remote.UserRemoteDataSource
 import com.upsaclay.common.data.remote.api.ImageApi
+import com.upsaclay.common.data.remote.api.ImageApiImpl
+import com.upsaclay.common.data.remote.api.RetrofitImageApi
 import com.upsaclay.common.data.remote.api.UserFirestoreApi
 import com.upsaclay.common.data.remote.api.UserFirestoreApiImpl
 import com.upsaclay.common.data.remote.api.UserRetrofitApi
@@ -38,7 +40,7 @@ private val BACKGROUND_SCOPE = named("BackgroundScope")
 val commonDataModule = module {
     single<Retrofit>(qualifier = named(SERVER_1_RETROFIT_QUALIFIER)) {
         Retrofit.Builder()
-            .baseUrl(BuildConfig.SERVICE_1_BASE_URL)
+            .baseUrl("http://10.0.2.2:3000")
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
@@ -46,14 +48,14 @@ val commonDataModule = module {
 
     single<Retrofit>(qualifier = named(SERVER_2_RETROFIT_QUALIFIER)) {
         Retrofit.Builder()
-            .baseUrl(BuildConfig.SERVICE_2_BASE_URL)
+            .baseUrl("http://10.0.2.2:3000")
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
 
     single {
-        get<Retrofit>(qualifier = named(SERVER_1_RETROFIT_QUALIFIER)).create(ImageApi::class.java)
+        get<Retrofit>(qualifier = named(SERVER_1_RETROFIT_QUALIFIER)).create(RetrofitImageApi::class.java)
     }
 
     single {
@@ -75,6 +77,7 @@ val commonDataModule = module {
     singleOf(::DrawableRepositoryImpl) { bind<DrawableRepository>() }
     singleOf(::FileRepositoryImpl) { bind<FileRepository>() }
 
+    singleOf(::ImageApiImpl) { bind<ImageApi>() }
     singleOf(::ImageRepositoryImpl) { bind<ImageRepository>() }
     singleOf(::ImageRemoteDataSource)
 

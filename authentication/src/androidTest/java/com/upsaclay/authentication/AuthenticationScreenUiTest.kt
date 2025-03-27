@@ -10,11 +10,14 @@ import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.testing.TestNavHostController
+import com.upsaclay.authentication.domain.entity.AuthErrorType
+import com.upsaclay.authentication.domain.entity.AuthenticationEvent
+import com.upsaclay.authentication.domain.entity.AuthenticationScreen
 import com.upsaclay.authentication.presentation.screens.AuthenticationScreen
 import com.upsaclay.authentication.presentation.screens.FirstRegistrationScreen
 import com.upsaclay.authentication.presentation.viewmodels.AuthenticationViewModel
 import com.upsaclay.authentication.presentation.viewmodels.RegistrationViewModel
-import com.upsaclay.common.domain.entity.Screen
+import com.upsaclay.common.domain.entity.ErrorType
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -36,9 +39,8 @@ class AuthenticationScreenUiTest {
     fun setUp() {
         every { authenticationViewModel.email } returns "email"
         every { authenticationViewModel.password } returns "password"
-        every { authenticationViewModel.event } returns MutableStateFlow(AuthenticationScreenState.DEFAULT)
+        every { authenticationViewModel.event } returns MutableStateFlow(AuthenticationEvent.Unauthenticated)
         every { authenticationViewModel.login() } returns Unit
-        every { authenticationViewModel.resetScreenState() } returns Unit
         every { authenticationViewModel.verifyInputs() } returns true
         every { authenticationViewModel.resetEmail() } returns Unit
         every { authenticationViewModel.resetPassword() } returns Unit
@@ -50,15 +52,15 @@ class AuthenticationScreenUiTest {
         rule.setContent {
             navController = TestNavHostController(LocalContext.current)
             navController.navigatorProvider.addNavigator(ComposeNavigator())
-            NavHost(navController, startDestination = Screen.AUTHENTICATION.route) {
-                composable(Screen.AUTHENTICATION.route) {
+            NavHost(navController, startDestination = AuthenticationScreen.Authentication.route) {
+                composable(AuthenticationScreen.Authentication.route) {
                     AuthenticationScreen(
                         navController,
                         authenticationViewModel
                     )
                 }
 
-                composable(Screen.FIRST_REGISTRATION.route) {
+                composable(AuthenticationScreen.FirstRegistration.route) {
                     FirstRegistrationScreen(
                         navController,
                         registrationViewModel
@@ -69,7 +71,7 @@ class AuthenticationScreenUiTest {
         rule.onNodeWithTag(rule.activity.getString(R.string.authentication_screen_registration_button_tag)).performClick()
 
         // Then
-        Assert.assertEquals(Screen.FIRST_REGISTRATION.route, navController.currentDestination?.route)
+        Assert.assertEquals(AuthenticationScreen.FirstRegistration.route, navController.currentDestination?.route)
     }
 
     @Test
@@ -78,15 +80,15 @@ class AuthenticationScreenUiTest {
         rule.setContent {
             navController = TestNavHostController(LocalContext.current)
             navController.navigatorProvider.addNavigator(ComposeNavigator())
-            NavHost(navController, startDestination = Screen.AUTHENTICATION.route) {
-                composable(Screen.AUTHENTICATION.route) {
+            NavHost(navController, startDestination = AuthenticationScreen.Authentication.route) {
+                composable(AuthenticationScreen.Authentication.route) {
                     AuthenticationScreen(
                         navController,
                         authenticationViewModel
                     )
                 }
 
-                composable(Screen.FIRST_REGISTRATION.route) {
+                composable(AuthenticationScreen.FirstRegistration.route) {
                     FirstRegistrationScreen(
                         navController,
                         registrationViewModel
@@ -99,13 +101,12 @@ class AuthenticationScreenUiTest {
         // Then
         verify { authenticationViewModel.resetEmail() }
         verify { authenticationViewModel.resetPassword() }
-        verify { authenticationViewModel.resetScreenState() }
     }
 
     @Test
     fun display_verify_email_dialog_when_email_is_not_verified() {
         // Given
-        every { authenticationViewModel.event } returns MutableStateFlow(AuthenticationScreenState.EMAIL_NOT_VERIFIED)
+        every { authenticationViewModel.event } returns MutableStateFlow(AuthenticationEvent.EmailNotVerified)
 
         // When
         rule.setContent {
@@ -122,7 +123,7 @@ class AuthenticationScreenUiTest {
     @Test
     fun invalid_credentials_show_error_message() {
         // Given
-        every { authenticationViewModel.event } returns MutableStateFlow(AuthenticationScreenState.INVALID_CREDENTIALS_ERROR)
+        every { authenticationViewModel.event } returns MutableStateFlow(AuthenticationEvent.Error(AuthErrorType.INVALID_CREDENTIALS_ERROR))
 
         // When
         rule.setContent {
@@ -139,7 +140,7 @@ class AuthenticationScreenUiTest {
     @Test
     fun empty_fields_show_error_message() {
         // Given
-        every { authenticationViewModel.event } returns MutableStateFlow(AuthenticationScreenState.EMPTY_FIELDS_ERROR)
+        every { authenticationViewModel.event } returns MutableStateFlow(AuthenticationEvent.Error(AuthErrorType.EMPTY_FIELDS_ERROR))
 
         // When
         rule.setContent {
@@ -156,7 +157,7 @@ class AuthenticationScreenUiTest {
     @Test
     fun user_not_found_show_error_message() {
         // Given
-        every { authenticationViewModel.event } returns MutableStateFlow(AuthenticationScreenState.AUTH_USER_NOT_FOUND)
+        every { authenticationViewModel.event } returns MutableStateFlow(AuthenticationEvent.Error(AuthErrorType.AUTH_USER_NOT_FOUND))
 
         // When
         rule.setContent {
@@ -173,7 +174,7 @@ class AuthenticationScreenUiTest {
     @Test
     fun send_to_many_request_show_error_message() {
         // Given
-        every { authenticationViewModel.event } returns MutableStateFlow(AuthenticationScreenState.TOO_MANY_REQUESTS_ERROR)
+        every { authenticationViewModel.event } returns MutableStateFlow(AuthenticationEvent.Error(ErrorType.TooManyRequestsError))
 
         // When
         rule.setContent {

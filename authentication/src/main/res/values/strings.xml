@@ -21,7 +21,6 @@
     <string name="email_not_verified">Veuillez valider votre adresse e-mail avant de continuer.</string>
     <string name="email_not_verified_dialog_title">Adresse e-mail non vérifié</string>
     <string name="enter_email_password">Saisissez votre adresse e-mail et votre mot de passe</string>
-    <string name="enter_school_credentials">Saisissez vos identifiants universitaire</string>
     <string name="select_level_school">Sélectionnez votre niveau d\'étude</string>
     <string name="email_verification_title">Vérification de l\'e-mail</string>
     <string name="forward_verification_email">Renvoyer l\'e-mail</string>

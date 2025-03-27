@@ -20,6 +20,9 @@ internal class MessageRepositoryImpl(
     override fun getUnreadMessages(conversationId: Int): Flow<List<Message>> =
         messageLocalDataSource.getUnreadMessages(conversationId)
 
+    override fun getRemoteMessages(conversationId: Int): Flow<List<Message>> =
+        messageRemoteDataSource.listenMessages(conversationId)
+
     override suspend fun createMessage(message: Message) {
         messageLocalDataSource.insertMessage(message)
         messageRemoteDataSource.createMessage(message)
@@ -45,6 +48,10 @@ internal class MessageRepositoryImpl(
 
     override suspend fun listenRemoteMessages(conversationId: Int) {
         messageRemoteDataSource.listenMessages(conversationId)
-            .collect { messageLocalDataSource.upsertMessage(it) }
+            .collect { messages ->
+                messages.forEach {
+                    messageLocalDataSource.upsertMessage(it)
+                }
+            }
     }
 }

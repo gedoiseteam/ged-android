@@ -1,7 +1,7 @@
 package com.upsaclay.message.data.remote.api
 
 import com.google.firebase.Firebase
-import com.google.firebase.firestore.DocumentChange
+import com.google.firebase.firestore.MetadataChanges
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.Source
 import com.google.firebase.firestore.firestore
@@ -21,24 +21,24 @@ import kotlin.coroutines.suspendCoroutine
 internal class MessageApiImpl : MessageApi {
     private val conversationsCollection = Firebase.firestore.collection(CONVERSATIONS_TABLE_NAME)
 
-    override fun listenMessages(conversationId: Int): Flow<RemoteMessage> = callbackFlow {
+    override fun listenMessages(conversationId: Int): Flow<List<RemoteMessage>> = callbackFlow {
         val listener = conversationsCollection.document(conversationId.toString())
             .collection(MESSAGES_TABLE_NAME)
             .orderBy(MESSAGE_TIMESTAMP, Query.Direction.DESCENDING)
-            .addSnapshotListener { snapshot, error ->
+            .addSnapshotListener(MetadataChanges.INCLUDE) { snapshot, error ->
                 error?.let {
                     e("Error getting last messages", it)
                     return@addSnapshotListener
+
                 }
 
-                snapshot?.documentChanges?.forEach { change ->
-                    val message = change.document.toObject(RemoteMessage::class.java)
-                    when (change.type) {
-                        DocumentChange.Type.ADDED -> trySend(message)
-                        DocumentChange.Type.MODIFIED -> trySend(message)
-                        DocumentChange.Type.REMOVED -> return@forEach
+                val messages = snapshot?.documents
+                    ?.filterNot { it.metadata.isFromCache }
+                    ?.mapNotNull { document ->
+                        document.toObject(RemoteMessage::class.java)
                     }
-                }
+
+                messages?.let { trySend(it) }
             }
 
         awaitClose { listener.remove() }

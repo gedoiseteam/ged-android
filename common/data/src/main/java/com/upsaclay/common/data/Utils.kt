@@ -16,3 +16,18 @@ fun <T> formatHttpError(message: String, response: Response<T>): String {
         Body: $body
     """.trimIndent()
 }
+
+fun formatHttpError(message: String, response: okhttp3.Response): String {
+    val url = response.request.url.toString()
+    val method = response.request.method
+    val body =
+        response.body?.string()?.replace(Regex("<[^>]*>"), "")?.trim() ?: "No error body"
+
+    return """
+        Error request: $message
+        HTTP status: ${response.code}
+        URL: $url
+        Method: $method
+        Body: $body
+    """.trimIndent()
+}

@@ -9,11 +9,11 @@ import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.testing.TestNavHostController
-import com.upsaclay.common.domain.entity.Screen
 import com.upsaclay.common.domain.userFixture
 import com.upsaclay.common.domain.userFixture2
 import com.upsaclay.news.domain.announcementFixture
 import com.upsaclay.news.domain.entity.AnnouncementScreenState
+import com.upsaclay.news.domain.entity.NewsScreen
 import com.upsaclay.news.presentation.screens.EditAnnouncementScreen
 import com.upsaclay.news.presentation.screens.ReadAnnouncementScreen
 import com.upsaclay.news.presentation.viewmodels.ReadAnnouncementViewModel
@@ -107,15 +107,12 @@ class ReadAnnouncementScreenUITest {
 
     @Test
     fun clicking_edit_sheet_field_should_navigate_to_edit_screen() {
-        // Given
-        val route = Screen.EDIT_ANNOUNCEMENT.route + "?announcementId={announcementId}"
-
         // When
         rule.setContent {
             navController = TestNavHostController(LocalContext.current)
             navController.navigatorProvider.addNavigator(ComposeNavigator())
-            NavHost(navController = navController, startDestination = Screen.NEWS.route) {
-                composable(Screen.NEWS.route) {
+            NavHost(navController = navController, startDestination = NewsScreen.News.route) {
+                composable(NewsScreen.News.route) {
                     ReadAnnouncementScreen(
                         announcementId = announcementFixture.id,
                         navController = navController,
@@ -123,7 +120,7 @@ class ReadAnnouncementScreenUITest {
                     )
                 }
 
-                composable(route) {
+                composable(NewsScreen.EditAnnouncement.HARD_ROUTE) {
                     EditAnnouncementScreen(
                         announcementId = announcementFixture.id,
                         navController = navController,
@@ -137,7 +134,7 @@ class ReadAnnouncementScreenUITest {
         rule.onNodeWithTag(rule.activity.getString(R.string.read_screen_sheet_edit_field_tag)).performClick()
 
         // Then
-        Assert.assertEquals(route, navController.currentDestination?.route)
+        Assert.assertEquals(NewsScreen.EditAnnouncement.HARD_ROUTE, navController.currentDestination?.route)
     }
 
     @Test

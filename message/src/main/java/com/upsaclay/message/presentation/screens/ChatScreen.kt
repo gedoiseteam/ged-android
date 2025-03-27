@@ -18,7 +18,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -50,10 +49,11 @@ import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.message.R
 import com.upsaclay.message.domain.conversationUIFixture
 import com.upsaclay.message.domain.entity.ChatEvent
-import com.upsaclay.message.domain.entity.ConversationUI
+import com.upsaclay.message.domain.entity.Conversation
 import com.upsaclay.message.domain.entity.Message
 import com.upsaclay.message.domain.entity.MessageState
 import com.upsaclay.message.domain.messageFixture
+import com.upsaclay.message.domain.messagesFixture
 import com.upsaclay.message.presentation.components.ChatTopBar
 import com.upsaclay.message.presentation.components.MessageInput
 import com.upsaclay.message.presentation.components.NewMessageIndicator
@@ -67,12 +67,11 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 import java.time.Duration
-import java.time.Instant
 import java.time.LocalDateTime
 
 @Composable
 fun ChatScreen(
-    conversation: ConversationUI,
+    conversation: Conversation,
     navController: NavController,
     chatViewModel: ChatViewModel = koinViewModel<ChatViewModel>(
         parameters = { parametersOf(conversation) }
@@ -80,15 +79,12 @@ fun ChatScreen(
 ) {
     val messageItems = chatViewModel.messages.collectAsLazyPagingItems()
     val keyboardController = LocalSoftwareKeyboardController.current
-    var newMessageReceivedTimestamp by remember { mutableLongStateOf(0L) }
-    var newMessageSentTimestamp by remember { mutableLongStateOf(0L) }
+    var newMessage by remember { mutableStateOf<Message?>(null) }
 
     LaunchedEffect(Unit) {
         chatViewModel.event.collectLatest { event ->
             when (event) {
-                is ChatEvent.NewMessageReceived -> newMessageReceivedTimestamp = event.timestamp
-
-                is ChatEvent.NewMessageSent -> newMessageSentTimestamp = event.timestamp
+                is ChatEvent.NewMessage -> newMessage = event.message
             }
         }
     }
@@ -116,8 +112,7 @@ fun ChatScreen(
                 modifier = Modifier.weight(1f),
                 messageItems = messageItems,
                 interlocutor = conversation.interlocutor,
-                newMessageReceivedTimestamp = newMessageReceivedTimestamp,
-                newMessageSentTimestamp = newMessageSentTimestamp
+                newMessage = newMessage ?: messageItems.itemSnapshotList.lastOrNull()
             )
 
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
@@ -137,29 +132,19 @@ private fun MessageFeed(
     modifier: Modifier = Modifier,
     messageItems: LazyPagingItems<Message>,
     interlocutor: User,
-    newMessageReceivedTimestamp: Long,
-    newMessageSentTimestamp: Long
+    newMessage: Message?
 ) {
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
     var showNewMessageIndicator by remember { mutableStateOf(false) }
 
-    LaunchedEffect(newMessageReceivedTimestamp) {
+    LaunchedEffect(newMessage) {
         delay(50)
         when {
-            listState.firstVisibleItemIndex == 1 -> listState.animateScrollToItem(0)
-
-            listState.firstVisibleItemIndex > 1 -> showNewMessageIndicator = true
-        }
-    }
-
-    LaunchedEffect(newMessageSentTimestamp) {
-        delay(50)
-        if (
             listState.firstVisibleItemIndex == 1 &&
-            listState.layoutInfo.visibleItemsInfo.size < messageItems.itemCount
-        ) {
-            listState.animateScrollToItem(0)
+                    listState.layoutInfo.visibleItemsInfo.size < messageItems.itemCount -> listState.animateScrollToItem(0)
+
+            listState.firstVisibleItemIndex > 1 && newMessage?.senderId == interlocutor.id -> showNewMessageIndicator = true
         }
     }
 
@@ -259,16 +244,8 @@ private fun MessageFeed(
 }
 
 @Composable
-private fun messagePadding(
-    sameSender: Boolean,
-    sameTime: Boolean
-): Dp {
-    return if (sameSender && sameTime) {
-        2.dp
-    } else {
-        MaterialTheme.spacing.smallMedium
-    }
-}
+private fun messagePadding(sameSender: Boolean, sameTime: Boolean): Dp =
+    if (sameSender && sameTime) 2.dp else MaterialTheme.spacing.smallMedium
 
 /*
  =====================================================================
@@ -282,8 +259,7 @@ private fun ChatScreenPreview() {
     var text by remember { mutableStateOf("") }
     var messages by remember { mutableStateOf(listOf(messageFixture)) }
     var id by remember { mutableIntStateOf(10) }
-    var newMessageReceivedTimestamp by remember { mutableLongStateOf(0L) }
-    var newMessageSentTimestamp by remember { mutableLongStateOf(0L) }
+    var newMessage by remember { mutableStateOf<Message?>(null) }
 
     GedoiseTheme {
         Scaffold(
@@ -307,8 +283,7 @@ private fun ChatScreenPreview() {
                     modifier = Modifier.weight(1f),
                     messageItems = flowOf(PagingData.from(messages.sortedByDescending { it.date })).collectAsLazyPagingItems(),
                     interlocutor = conversationUIFixture.interlocutor,
-                    newMessageReceivedTimestamp = newMessageReceivedTimestamp,
-                    newMessageSentTimestamp = newMessageSentTimestamp
+                    newMessage = messageFixture,
                 )
 
                 Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
@@ -333,7 +308,7 @@ private fun ChatScreenPreview() {
                             )
                             sortedByDescending { it.date }
                         }
-                        newMessageSentTimestamp = Instant.now().toEpochMilli()
+                        newMessage = messagesFixture.first()
                         text = ""
                     }
                 )

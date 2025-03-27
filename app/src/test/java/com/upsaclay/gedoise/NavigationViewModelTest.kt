@@ -1,6 +1,5 @@
 package com.upsaclay.gedoise
 
-import com.upsaclay.authentication.domain.entity.AuthenticationEvent
 import com.upsaclay.authentication.domain.entity.AuthenticationState
 import com.upsaclay.authentication.domain.usecase.IsUserAuthenticatedUseCase
 import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
@@ -8,9 +7,9 @@ import com.upsaclay.common.domain.userFixture
 import com.upsaclay.gedoise.domain.usecase.ClearDataUseCase
 import com.upsaclay.gedoise.domain.usecase.StartListeningDataUseCase
 import com.upsaclay.gedoise.domain.usecase.StopListeningDataUseCase
-import com.upsaclay.gedoise.presentation.viewmodels.MainViewModel
-import com.upsaclay.message.domain.messagesFixture
-import com.upsaclay.message.domain.usecase.GetAllLastUnreadMessagesReceivedUseCase
+import com.upsaclay.gedoise.presentation.viewmodels.NavigationViewModel
+import com.upsaclay.message.domain.conversationsMessageFixture
+import com.upsaclay.message.domain.repository.UserConversationRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -19,7 +18,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.replay
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -29,15 +27,15 @@ import org.junit.Test
 import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class MainViewModelTest {
+class NavigationViewModelTest {
     private val isUserAuthenticatedUseCase: IsUserAuthenticatedUseCase = mockk()
     private val getCurrentUserUseCase: GetCurrentUserUseCase = mockk()
     private val startListeningDataUseCase: StartListeningDataUseCase = mockk()
     private val stopListeningDataUseCase: StopListeningDataUseCase = mockk()
     private val clearDataUseCase: ClearDataUseCase = mockk()
-    private val getAllLastUnreadMessagesReceivedUseCase: GetAllLastUnreadMessagesReceivedUseCase = mockk()
+    private val userConversationRepository: UserConversationRepository = mockk()
 
-    private lateinit var mainViewModel: MainViewModel
+    private lateinit var navigationViewModel: NavigationViewModel
     private val testDispatcher = UnconfinedTestDispatcher()
 
     @Before
@@ -46,7 +44,7 @@ class MainViewModelTest {
 
         every { getCurrentUserUseCase() } returns MutableStateFlow(userFixture)
         every { isUserAuthenticatedUseCase() } returns flowOf(true)
-        every { getAllLastUnreadMessagesReceivedUseCase(any()) } returns flowOf(messagesFixture)
+        every { userConversationRepository.conversationsWithLastMessage } returns flowOf(conversationsMessageFixture)
         coEvery { startListeningDataUseCase() } returns Unit
         coEvery { stopListeningDataUseCase() } returns Unit
         coEvery { clearDataUseCase() } returns Unit
@@ -58,17 +56,17 @@ class MainViewModelTest {
         every { isUserAuthenticatedUseCase() } returns flowOf()
 
         // When
-        mainViewModel = MainViewModel(
+        navigationViewModel = NavigationViewModel(
             isUserAuthenticatedUseCase = isUserAuthenticatedUseCase,
             getCurrentUserUseCase = getCurrentUserUseCase,
             startListeningDataUseCase = startListeningDataUseCase,
             stopListeningDataUseCase = stopListeningDataUseCase,
             clearDataUseCase = clearDataUseCase,
-            getAllLastUnreadMessagesReceivedUseCase = getAllLastUnreadMessagesReceivedUseCase
+            userConversationRepository = userConversationRepository
         )
 
         // Then
-        assertEquals(userFixture, mainViewModel.currentUser.value)
+        assertEquals(userFixture, navigationViewModel.currentUser.value)
     }
 
     @Test
@@ -77,17 +75,17 @@ class MainViewModelTest {
         every { isUserAuthenticatedUseCase() } returns flowOf(true)
 
         // When
-        mainViewModel = MainViewModel(
+        navigationViewModel = NavigationViewModel(
             isUserAuthenticatedUseCase = isUserAuthenticatedUseCase,
             getCurrentUserUseCase = getCurrentUserUseCase,
             startListeningDataUseCase = startListeningDataUseCase,
             stopListeningDataUseCase = stopListeningDataUseCase,
             clearDataUseCase = clearDataUseCase,
-            getAllLastUnreadMessagesReceivedUseCase = getAllLastUnreadMessagesReceivedUseCase
+            userConversationRepository = userConversationRepository
         )
 
         // Then
-        assertEquals(AuthenticationEvent.Authenticated, mainViewModel.event.replayCache.first())
+        assertEquals(AuthenticationState.AUTHENTICATED, navigationViewModel.authenticationState.value)
     }
 
     @Test
@@ -96,29 +94,29 @@ class MainViewModelTest {
         every { isUserAuthenticatedUseCase() } returns flowOf(false)
 
         // When
-        mainViewModel = MainViewModel(
+        navigationViewModel = NavigationViewModel(
             isUserAuthenticatedUseCase = isUserAuthenticatedUseCase,
             getCurrentUserUseCase = getCurrentUserUseCase,
             startListeningDataUseCase = startListeningDataUseCase,
             stopListeningDataUseCase = stopListeningDataUseCase,
             clearDataUseCase = clearDataUseCase,
-            getAllLastUnreadMessagesReceivedUseCase = getAllLastUnreadMessagesReceivedUseCase
+            userConversationRepository = userConversationRepository
         )
 
         // Then
-        assertEquals(AuthenticationEvent.Authenticated, mainViewModel.event.replayCache.first())
+        assertEquals(AuthenticationState.AUTHENTICATED, navigationViewModel.authenticationState.value)
     }
 
     @Test
     fun data_listening_should_start_when_user_is_authenticated() {
         // When
-        mainViewModel = MainViewModel(
+        navigationViewModel = NavigationViewModel(
             isUserAuthenticatedUseCase = isUserAuthenticatedUseCase,
             getCurrentUserUseCase = getCurrentUserUseCase,
             startListeningDataUseCase = startListeningDataUseCase,
             stopListeningDataUseCase = stopListeningDataUseCase,
             clearDataUseCase = clearDataUseCase,
-            getAllLastUnreadMessagesReceivedUseCase = getAllLastUnreadMessagesReceivedUseCase
+            userConversationRepository = userConversationRepository
         )
 
         // Then
@@ -131,13 +129,13 @@ class MainViewModelTest {
         every { isUserAuthenticatedUseCase() } returns flowOf(false)
 
         // When
-        mainViewModel = MainViewModel(
+        navigationViewModel = NavigationViewModel(
             isUserAuthenticatedUseCase = isUserAuthenticatedUseCase,
             getCurrentUserUseCase = getCurrentUserUseCase,
             startListeningDataUseCase = startListeningDataUseCase,
             stopListeningDataUseCase = stopListeningDataUseCase,
             clearDataUseCase = clearDataUseCase,
-            getAllLastUnreadMessagesReceivedUseCase = getAllLastUnreadMessagesReceivedUseCase
+            userConversationRepository = userConversationRepository
         )
 
         // Then
@@ -150,13 +148,13 @@ class MainViewModelTest {
         every { isUserAuthenticatedUseCase() } returns flowOf(false)
 
         // When
-        mainViewModel = MainViewModel(
+        navigationViewModel = NavigationViewModel(
             isUserAuthenticatedUseCase = isUserAuthenticatedUseCase,
             getCurrentUserUseCase = getCurrentUserUseCase,
             startListeningDataUseCase = startListeningDataUseCase,
             stopListeningDataUseCase = stopListeningDataUseCase,
             clearDataUseCase = clearDataUseCase,
-            getAllLastUnreadMessagesReceivedUseCase = getAllLastUnreadMessagesReceivedUseCase
+            userConversationRepository = userConversationRepository
         )
 
         advanceUntilIdle()

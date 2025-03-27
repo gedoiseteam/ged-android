@@ -10,10 +10,12 @@ import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.testing.TestNavHostController
+import com.upsaclay.authentication.domain.entity.AuthenticationScreen
+import com.upsaclay.authentication.domain.entity.RegistrationErrorType
+import com.upsaclay.authentication.domain.entity.RegistrationEvent
 import com.upsaclay.authentication.presentation.screens.FirstRegistrationScreen
 import com.upsaclay.authentication.presentation.screens.SecondRegistrationScreen
 import com.upsaclay.authentication.presentation.viewmodels.RegistrationViewModel
-import com.upsaclay.common.domain.entity.Screen
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,13 +39,11 @@ class FirstRegistrationScreenUITest {
         every { registrationViewModel.password } returns "password"
         every { registrationViewModel.schoolLevels } returns listOf("GED 1", "GED 2", "GED 3", "GED 4")
         every { registrationViewModel.schoolLevel } returns "GED 1"
-        every { registrationViewModel.screenState } returns MutableStateFlow(RegistrationScreenState.NOT_REGISTERED)
         every { registrationViewModel.resetFirstName() } returns Unit
         every { registrationViewModel.resetLastName() } returns Unit
         every { registrationViewModel.resetEmail() } returns Unit
         every { registrationViewModel.resetPassword() } returns Unit
         every { registrationViewModel.resetSchoolLevel() } returns Unit
-        every { registrationViewModel.resetScreenState() } returns Unit
         every { registrationViewModel.verifyNamesInputs() } returns true
         every { registrationViewModel.register() } returns Unit
     }
@@ -54,15 +54,15 @@ class FirstRegistrationScreenUITest {
         rule.setContent {
             navController = TestNavHostController(LocalContext.current)
             navController.navigatorProvider.addNavigator(ComposeNavigator())
-            NavHost(navController = navController, startDestination = Screen.FIRST_REGISTRATION.route) {
-                composable(Screen.FIRST_REGISTRATION.route) {
+            NavHost(navController = navController, startDestination = AuthenticationScreen.FirstRegistration.route) {
+                composable(AuthenticationScreen.FirstRegistration.route) {
                     FirstRegistrationScreen(
                         navController = navController,
                         registrationViewModel = registrationViewModel
                     )
                 }
 
-                composable(Screen.SECOND_REGISTRATION.route) {
+                composable(AuthenticationScreen.SecondRegistration.route) {
                     SecondRegistrationScreen(
                         navController = navController,
                         registrationViewModel = registrationViewModel
@@ -74,13 +74,13 @@ class FirstRegistrationScreenUITest {
         rule.onNodeWithTag(rule.activity.getString(R.string.registration_screen_next_button_tag)).performClick()
 
         // Then
-        Assert.assertEquals(Screen.SECOND_REGISTRATION.route, navController.currentDestination?.route)
+        Assert.assertEquals(AuthenticationScreen.SecondRegistration.route, navController.currentDestination?.route)
     }
 
     @Test
     fun empty_fields_show_error_message() {
         // Given
-        every { registrationViewModel.screenState } returns MutableStateFlow(RegistrationScreenState.EMPTY_FIELDS_ERROR)
+        every { registrationViewModel.event } returns MutableStateFlow(RegistrationEvent.Error(RegistrationErrorType.EMPTY_FIELDS_ERROR))
 
         // When
         rule.setContent {
