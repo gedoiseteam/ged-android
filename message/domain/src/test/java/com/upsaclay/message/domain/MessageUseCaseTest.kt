@@ -51,6 +51,7 @@ class MessageUseCaseTest {
         )
 
         coEvery { userConversationRepository.conversationsWithLastMessage } returns flowOf(conversationsMessageFixture)
+        coEvery { userConversationRepository.getConversations() } returns flowOf(conversationsFixture)
         coEvery { userConversationRepository.getConversation(any()) } returns conversationFixture
         coEvery { userConversationRepository.createConversation(any()) } returns Unit
         coEvery { userConversationRepository.updateConversation(any()) } returns Unit

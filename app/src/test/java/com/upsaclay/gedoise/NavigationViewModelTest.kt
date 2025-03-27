@@ -4,6 +4,7 @@ import com.upsaclay.authentication.domain.entity.AuthenticationState
 import com.upsaclay.authentication.domain.usecase.IsUserAuthenticatedUseCase
 import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
 import com.upsaclay.common.domain.userFixture
+import com.upsaclay.gedoise.data.ScreenRepository
 import com.upsaclay.gedoise.domain.usecase.ClearDataUseCase
 import com.upsaclay.gedoise.domain.usecase.StartListeningDataUseCase
 import com.upsaclay.gedoise.domain.usecase.StopListeningDataUseCase
@@ -34,6 +35,7 @@ class NavigationViewModelTest {
     private val stopListeningDataUseCase: StopListeningDataUseCase = mockk()
     private val clearDataUseCase: ClearDataUseCase = mockk()
     private val userConversationRepository: UserConversationRepository = mockk()
+    private val screenRepository: ScreenRepository = mockk()
 
     private lateinit var navigationViewModel: NavigationViewModel
     private val testDispatcher = UnconfinedTestDispatcher()
@@ -42,9 +44,11 @@ class NavigationViewModelTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
 
+        every { userConversationRepository.conversationsWithLastMessage } returns flowOf(conversationsMessageFixture)
+        every { screenRepository.currentScreen } returns null
+        every { screenRepository.setCurrentScreen(any()) } returns Unit
         every { getCurrentUserUseCase() } returns MutableStateFlow(userFixture)
         every { isUserAuthenticatedUseCase() } returns flowOf(true)
-        every { userConversationRepository.conversationsWithLastMessage } returns flowOf(conversationsMessageFixture)
         coEvery { startListeningDataUseCase() } returns Unit
         coEvery { stopListeningDataUseCase() } returns Unit
         coEvery { clearDataUseCase() } returns Unit
@@ -62,7 +66,8 @@ class NavigationViewModelTest {
             startListeningDataUseCase = startListeningDataUseCase,
             stopListeningDataUseCase = stopListeningDataUseCase,
             clearDataUseCase = clearDataUseCase,
-            userConversationRepository = userConversationRepository
+            userConversationRepository = userConversationRepository,
+            screenRepository = screenRepository
         )
 
         // Then
@@ -81,7 +86,8 @@ class NavigationViewModelTest {
             startListeningDataUseCase = startListeningDataUseCase,
             stopListeningDataUseCase = stopListeningDataUseCase,
             clearDataUseCase = clearDataUseCase,
-            userConversationRepository = userConversationRepository
+            userConversationRepository = userConversationRepository,
+            screenRepository = screenRepository
         )
 
         // Then
@@ -100,11 +106,12 @@ class NavigationViewModelTest {
             startListeningDataUseCase = startListeningDataUseCase,
             stopListeningDataUseCase = stopListeningDataUseCase,
             clearDataUseCase = clearDataUseCase,
-            userConversationRepository = userConversationRepository
+            userConversationRepository = userConversationRepository,
+            screenRepository = screenRepository
         )
 
         // Then
-        assertEquals(AuthenticationState.AUTHENTICATED, navigationViewModel.authenticationState.value)
+        assertEquals(AuthenticationState.UNAUTHENTICATED, navigationViewModel.authenticationState.value)
     }
 
     @Test
@@ -116,7 +123,8 @@ class NavigationViewModelTest {
             startListeningDataUseCase = startListeningDataUseCase,
             stopListeningDataUseCase = stopListeningDataUseCase,
             clearDataUseCase = clearDataUseCase,
-            userConversationRepository = userConversationRepository
+            userConversationRepository = userConversationRepository,
+            screenRepository = screenRepository
         )
 
         // Then
@@ -135,7 +143,8 @@ class NavigationViewModelTest {
             startListeningDataUseCase = startListeningDataUseCase,
             stopListeningDataUseCase = stopListeningDataUseCase,
             clearDataUseCase = clearDataUseCase,
-            userConversationRepository = userConversationRepository
+            userConversationRepository = userConversationRepository,
+            screenRepository = screenRepository
         )
 
         // Then
@@ -154,7 +163,8 @@ class NavigationViewModelTest {
             startListeningDataUseCase = startListeningDataUseCase,
             stopListeningDataUseCase = stopListeningDataUseCase,
             clearDataUseCase = clearDataUseCase,
-            userConversationRepository = userConversationRepository
+            userConversationRepository = userConversationRepository,
+            screenRepository = screenRepository
         )
 
         advanceUntilIdle()

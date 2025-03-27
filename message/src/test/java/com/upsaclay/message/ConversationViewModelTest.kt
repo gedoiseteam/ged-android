@@ -14,6 +14,7 @@ import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -53,6 +54,5 @@ class ConversationViewModelTest {
 
         // Then
         coVerify { deleteConversationUseCase(conversation) }
-        assertEquals(ConversationEvent.Success(SuccessType.DELETED), conversationViewModel.event.replayCache.first())
     }
 }

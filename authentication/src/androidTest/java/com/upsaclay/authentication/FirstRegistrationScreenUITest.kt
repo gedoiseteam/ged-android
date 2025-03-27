@@ -18,6 +18,7 @@ import com.upsaclay.authentication.presentation.screens.SecondRegistrationScreen
 import com.upsaclay.authentication.presentation.viewmodels.RegistrationViewModel
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Assert
 import org.junit.Before
@@ -39,6 +40,7 @@ class FirstRegistrationScreenUITest {
         every { registrationViewModel.password } returns "password"
         every { registrationViewModel.schoolLevels } returns listOf("GED 1", "GED 2", "GED 3", "GED 4")
         every { registrationViewModel.schoolLevel } returns "GED 1"
+        every { registrationViewModel.event } returns MutableSharedFlow()
         every { registrationViewModel.resetFirstName() } returns Unit
         every { registrationViewModel.resetLastName() } returns Unit
         every { registrationViewModel.resetEmail() } returns Unit

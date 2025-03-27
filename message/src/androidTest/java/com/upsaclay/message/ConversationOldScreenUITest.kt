@@ -19,7 +19,7 @@ import com.upsaclay.common.domain.userFixture2
 import com.upsaclay.message.domain.conversationFixture
 import com.upsaclay.message.domain.conversationUIFixture
 import com.upsaclay.message.domain.conversationsUIFixture
-import com.upsaclay.message.domain.entity.MessageScreenRoute
+import com.upsaclay.message.domain.entity.MessageScreen
 import com.upsaclay.message.domain.messageFixture
 import com.upsaclay.message.presentation.screens.ChatScreen
 import com.upsaclay.message.presentation.screens.ConversationScreen
@@ -27,6 +27,7 @@ import com.upsaclay.message.presentation.screens.CreateConversationScreen
 import com.upsaclay.message.presentation.viewmodels.ConversationViewModel
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flowOf
 import org.junit.Assert
 import org.junit.Before
@@ -43,6 +44,7 @@ class ConversationOldScreenUITest {
     @Before
     fun setUp() {
         every { conversationViewModel.conversations } returns flowOf(PagingData.from(conversationsUIFixture))
+        every { conversationViewModel.event } returns MutableSharedFlow()
     }
 
     @Test
@@ -171,8 +173,8 @@ class ConversationOldScreenUITest {
         rule.setContent {
             navController = TestNavHostController(LocalContext.current)
             navController.navigatorProvider.addNavigator(ComposeNavigator())
-            NavHost(navController = navController, startDestination = MessageScreenRoute.CONVERSATION) {
-                composable<MessageScreenRoute.CONVERSATION> {
+            NavHost(navController = navController, startDestination = MessageScreen.Conversation.route) {
+                composable(MessageScreen.Conversation.route) {
                     ConversationScreen(
                         navController = navController,
                         conversationViewModel = conversationViewModel,
@@ -180,7 +182,7 @@ class ConversationOldScreenUITest {
                     )
                 }
 
-                composable<MessageScreenRoute.CREATE_CONVERSATION> {
+                composable(MessageScreen.CreateConversation.route) {
                     CreateConversationScreen(
                         navController = navController,
                         createConversationViewModel = mockk()
@@ -192,7 +194,7 @@ class ConversationOldScreenUITest {
         rule.onNodeWithTag(rule.activity.getString(R.string.conversation_screen_create_conversation_button_tag)).performClick()
 
         // Then
-        Assert.assertEquals(MessageScreenRoute.CREATE_CONVERSATION, navController.currentDestination?.route)
+        Assert.assertEquals(MessageScreen.CreateConversation.route, navController.currentDestination?.route)
     }
 
     @Test
@@ -204,8 +206,8 @@ class ConversationOldScreenUITest {
         rule.setContent {
             navController = TestNavHostController(LocalContext.current)
             navController.navigatorProvider.addNavigator(ComposeNavigator())
-            NavHost(navController = navController, startDestination = MessageScreenRoute.CONVERSATION) {
-                composable<MessageScreenRoute.CONVERSATION> {
+            NavHost(navController = navController, startDestination = MessageScreen.Conversation.route) {
+                composable(MessageScreen.Conversation.route) {
                     ConversationScreen(
                         navController = navController,
                         conversationViewModel = conversationViewModel,
@@ -213,7 +215,7 @@ class ConversationOldScreenUITest {
                     )
                 }
 
-                composable<MessageScreenRoute.CHAT>{
+                composable(MessageScreen.Chat.HARD_ROUTE) {
                     ChatScreen(
                         conversation = conversationFixture,
                         navController = navController,
@@ -226,6 +228,6 @@ class ConversationOldScreenUITest {
         rule.onNodeWithTag(rule.activity.getString(R.string.conversation_screen_conversation_item_tag)).performClick()
 
         // Then
-        Assert.assertEquals(MessageScreenRoute.CHAT, navController.currentDestination?.route)
+        Assert.assertEquals(MessageScreen.Chat.HARD_ROUTE, navController.currentDestination?.route)
     }
 }

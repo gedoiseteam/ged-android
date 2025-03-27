@@ -21,6 +21,7 @@ import com.upsaclay.authentication.presentation.viewmodels.RegistrationViewModel
 import com.upsaclay.common.domain.userFixture
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Assert
 import org.junit.Before
@@ -50,6 +51,7 @@ class ThirdRegistrationScreenUITest {
         every { registrationViewModel.resetSchoolLevel() } returns Unit
         every { registrationViewModel.verifyNamesInputs() } returns true
         every { registrationViewModel.register() } returns Unit
+        every { emailVerificationViewModel.event } returns MutableSharedFlow()
         every { emailVerificationViewModel.sendVerificationEmail() } returns Unit
     }
 
