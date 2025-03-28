@@ -66,7 +66,7 @@ class AccountViewModelTest {
     }
 
     @Test
-    fun updateAccountScreenState_should_update_ScreenState() {
+    fun updateAccountScreenState_should_update_screen_state() {
         // Given
         val screenState = AccountScreenState.EDIT
 
@@ -105,15 +105,6 @@ class AccountViewModelTest {
         val uri = mockk<Uri>()
         accountViewModel.updateProfilePictureUri(uri)
 
-        // When
-        accountViewModel.deleteUserProfilePicture()
-
-        // Then
-        assertEquals(null, accountViewModel.profilePictureUri)
-    }
-
-    @Test
-    fun deleteUserProfilePicture_should_reset_profile_picture_uri_after_delete() = runTest {
         // When
         accountViewModel.deleteUserProfilePicture()
 

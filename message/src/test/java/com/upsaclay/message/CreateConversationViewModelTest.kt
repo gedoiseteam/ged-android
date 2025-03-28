@@ -51,7 +51,7 @@ class CreateConversationViewModelTest {
     }
 
     @Test
-    fun generate_conversation() {
+    fun generate_conversation_should_generate_new_conversation() {
         // Given
         val interlocutor = userFixture
         val state = ConversationState.NOT_CREATED
@@ -74,7 +74,7 @@ class CreateConversationViewModelTest {
     }
 
     @Test
-    fun getConversation_should_return_null_when_not_present() = runTest {
+    fun getConversation_should_return_null_when_no_interlocutor_found() = runTest {
         // Given
         val interlocutorId = "unknown"
         coEvery { userConversationRepository.getConversation(interlocutorId) } returns null

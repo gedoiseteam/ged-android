@@ -48,7 +48,7 @@ class ChatViewModelTest {
             conversation = conversationFixture,
             userRepository = userRepository,
             messageRepository = messageRepository,
-            createConversationUseCase = createConversationUseCase,
+            createConversationUseCase = createConversationUseCase
         )
     }
 

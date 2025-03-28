@@ -12,11 +12,11 @@ import kotlinx.coroutines.flow.map
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class GetNewConversationMessageUseCase(
-    private val conversationRepository: UserConversationRepository,
+    private val userConversationRepository: UserConversationRepository,
     private val messageRepository: MessageRepository
 ) {
     operator fun invoke(): Flow<List<ConversationMessage>> {
-        return conversationRepository.getConversations().flatMapLatest { conversations ->
+        return userConversationRepository.getConversations().flatMapLatest { conversations ->
             conversations.asFlow().flatMapLatest { conversation ->
                 messageRepository.getRemoteMessages(conversation.id)
                     .map { messages ->
