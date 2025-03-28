@@ -1,69 +1,69 @@
 package com.upsaclay.news.presentation.viewmodels
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.upsaclay.common.domain.entity.ErrorType
 import com.upsaclay.news.domain.entity.Announcement
-import com.upsaclay.news.domain.entity.AnnouncementScreenState
-import com.upsaclay.news.domain.usecase.GetAnnouncementUseCase
-import com.upsaclay.news.domain.usecase.UpdateAnnouncementUseCase
+import com.upsaclay.news.domain.entity.AnnouncementEvent
+import com.upsaclay.news.domain.repository.AnnouncementRepository
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.launch
 import java.net.ConnectException
 
 class EditAnnouncementViewModel(
     announcementId: String,
-    getAnnouncementUseCase: GetAnnouncementUseCase,
-    private val updateAnnouncementUseCase: UpdateAnnouncementUseCase
-) : ViewModel() {
-    private val _announcement = MutableStateFlow(getAnnouncementUseCase(announcementId))
-    private val _screenState = MutableStateFlow(AnnouncementScreenState.DEFAULT)
-    private val _isAnnouncementModified = MutableStateFlow(false)
-
+    private val announcementRepository: AnnouncementRepository
+): ViewModel() {
+    private val _announcement = MutableStateFlow(announcementRepository.getAnnouncement(announcementId))
     val announcement: StateFlow<Announcement?> = _announcement
-    val screenState: StateFlow<AnnouncementScreenState> = _screenState
+    private val _event = MutableSharedFlow<AnnouncementEvent>()
+    val event: SharedFlow<AnnouncementEvent> = _event
+    private val _isAnnouncementModified = MutableStateFlow(false)
     val isAnnouncementModified: StateFlow<Boolean> = _isAnnouncementModified
 
-    var title by mutableStateOf(announcement.value?.title ?: "")
-        private set
-    var content by mutableStateOf(announcement.value?.content ?: "")
-        private set
+    private val _title = MutableStateFlow(announcement.value?.title)
+    val title: StateFlow<String?> = _title
+    private val _content = MutableStateFlow(announcement.value?.content ?: "")
+    val content: StateFlow<String> = _content
+
+    init {
+        checkModifiedAnnouncement()
+    }
 
     fun updateTitle(title: String) {
-        this.title = title
-        verifyIsAnnouncementModified()
+        this._title.value = title
     }
 
     fun updateContent(content: String) {
-        this.content = content
-        verifyIsAnnouncementModified()
+        this._content.value = content
     }
 
     fun updateAnnouncement(announcement: Announcement) {
-        _screenState.value = AnnouncementScreenState.LOADING
         viewModelScope.launch {
+            _event.emit(AnnouncementEvent.Loading)
             try {
-                updateAnnouncementUseCase(announcement)
+                announcementRepository.updateAnnouncement(announcement)
                 this@EditAnnouncementViewModel._announcement.value = announcement
-                _screenState.value = AnnouncementScreenState.UPDATED
+                _event.emit(AnnouncementEvent.Updated)
             } catch (e: ConnectException) {
-                _screenState.value = AnnouncementScreenState.CONNECTION_ERROR
+                _event.emit(AnnouncementEvent.Error(ErrorType.NetworkError))
             } catch (e: Exception) {
-                _screenState.value = AnnouncementScreenState.ERROR
+                _event.emit(AnnouncementEvent.Error(ErrorType.UnknownError))
             }
         }
     }
 
-    fun resetScreenState() {
-        _screenState.value = AnnouncementScreenState.DEFAULT
-    }
-
-    private fun verifyIsAnnouncementModified() {
-        val isDifferentTitle = title.trim() != _announcement.value?.title
-        val isDifferentContent = content.trim() != _announcement.value?.content
-        _isAnnouncementModified.value = isDifferentTitle || isDifferentContent
+    private fun checkModifiedAnnouncement() {
+        combine(_title, _content) { title, content ->
+            val isDifferentTitle = title?.trim() != _announcement.value?.title
+            val isDifferentContent = content.trim() != _announcement.value?.content
+            _isAnnouncementModified.value = isDifferentTitle || isDifferentContent
+        }.launchIn(viewModelScope)
     }
 }

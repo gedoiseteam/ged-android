@@ -44,7 +44,7 @@ class FirebaseAuthenticationRepositoryImpl(
         }
     }
 
-    override suspend fun registerWithEmailAndPassword(email: String, password: String): String =
+    override suspend fun registerWithEmailAndPassword(email: String, password: String) {
         withContext(Dispatchers.IO) {
             try {
                 firebaseAuthenticationApi.signUpWithEmailAndPassword(email, password)
@@ -66,6 +66,7 @@ class FirebaseAuthenticationRepositoryImpl(
                 throw IOException()
             }
         }
+    }
 
     override suspend fun logout() {
         withContext(Dispatchers.IO) {

@@ -1,5 +1,6 @@
 package com.upsaclay.news.presentation.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,7 +14,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
@@ -46,20 +46,23 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.upsaclay.common.domain.entity.ErrorType
 import com.upsaclay.common.presentation.components.ClickableItem
 import com.upsaclay.common.presentation.components.LinearProgressBar
+import com.upsaclay.common.presentation.components.OverlayLinearLoadingScreen
 import com.upsaclay.common.presentation.components.SensibleActionDialog
 import com.upsaclay.common.presentation.components.SmallTopBarBack
+import com.upsaclay.common.presentation.components.TopLinearLoadingScreen
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.news.R
 import com.upsaclay.news.domain.announcementFixture
 import com.upsaclay.news.domain.entity.Announcement
-import com.upsaclay.news.domain.entity.AnnouncementScreenState
-import com.upsaclay.news.domain.entity.AnnouncementState
-import com.upsaclay.news.domain.entity.NewsScreen
+import com.upsaclay.news.domain.entity.AnnouncementEvent
+import com.upsaclay.news.domain.entity.NewsScreenRoute
 import com.upsaclay.news.presentation.components.AnnouncementHeader
 import com.upsaclay.news.presentation.viewmodels.ReadAnnouncementViewModel
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -77,14 +80,11 @@ fun ReadAnnouncementScreen(
     val context = LocalContext.current
     var showBottomSheet by remember { mutableStateOf(false) }
     var showDeleteAnnouncementDialog by remember { mutableStateOf(false) }
-    var isLoading by remember { mutableStateOf(false) }
+    var loading by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
-
     val snackbarHostState = remember { SnackbarHostState() }
-
     val user by readAnnouncementViewModel.currentUser.collectAsState()
-    val screenState by readAnnouncementViewModel.screenState.collectAsState()
     val announcement by readAnnouncementViewModel.announcement.collectAsState()
 
     val hideBottomSheet = {
@@ -101,36 +101,21 @@ fun ReadAnnouncementScreen(
         }
     }
 
-    val resetState = {
-        readAnnouncementViewModel.updateScreenState(AnnouncementScreenState.DEFAULT)
-    }
+    LaunchedEffect(Unit) {
+        readAnnouncementViewModel.event.collectLatest {
+            loading = it is AnnouncementEvent.Loading
+            when (it) {
+                is AnnouncementEvent.Deleted -> navController.popBackStack()
 
-    if (isLoading) {
-        LinearProgressBar(modifier = Modifier.fillMaxWidth())
-    }
+                is AnnouncementEvent.Error -> {
+                    when(it.type) {
+                        is ErrorType.NetworkError -> showSnackBar(context.getString(com.upsaclay.common.R.string.unknown_network_error))
+                        is ErrorType.UnknownError -> showSnackBar(context.getString(R.string.announcement_delete_error))
+                    }
+                }
 
-    LaunchedEffect(screenState) {
-        when (screenState) {
-            AnnouncementScreenState.DEFAULT -> isLoading = false
-
-            AnnouncementScreenState.DELETED -> {
-                isLoading = false
-                navController.popBackStack()
+                else -> Unit
             }
-
-            AnnouncementScreenState.LOADING -> isLoading = true
-
-            AnnouncementScreenState.CONNECTION_ERROR -> {
-                showSnackBar(context.getString(com.upsaclay.common.R.string.unknown_network_error))
-                resetState()
-            }
-
-            AnnouncementScreenState.ERROR -> {
-                showSnackBar(context.getString(R.string.announcement_delete_error))
-                resetState()
-            }
-
-            else -> {}
         }
     }
 
@@ -146,6 +131,10 @@ fun ReadAnnouncementScreen(
             },
             onCancel = { showDeleteAnnouncementDialog = false }
         )
+    }
+
+    if (loading) {
+        OverlayLinearLoadingScreen()
     }
 
     Scaffold(
@@ -214,44 +203,22 @@ fun ReadAnnouncementScreen(
                     onDismissRequest = { showBottomSheet = false },
                     sheetState = sheetState,
                 ) {
-                    if(announcement?.state == AnnouncementState.PUBLISHED) {
-                        ClickableItem(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .testTag(stringResource(id = R.string.read_screen_sheet_edit_field_tag)),
-                            text = { Text(text = stringResource(id = R.string.edit_announcement)) },
-                            icon = {
-                                Icon(
-                                    imageVector = Icons.Default.Edit,
-                                    contentDescription = null
-                                )
-                            },
-                            onClick = {
-                                navController.navigate(NewsScreen.EditAnnouncement(announcementId).route)
-                                hideBottomSheet()
-                            }
-                        )
-                    } else {
-                        ClickableItem(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .testTag(stringResource(id = R.string.read_screen_sheet_resent_field_tag)),
-                            text = { Text(text = stringResource(id = R.string.resend_announcement)) },
-                            icon = {
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Filled.Send,
-                                    contentDescription = null
-                                )
-                            },
-                            onClick = {
-                                announcement?.let {
-                                    readAnnouncementViewModel.recreateAnnouncement(it)
-                                    showSnackBar(context.getString(R.string.announcement_sent))
-                                } ?: showSnackBar(context.getString(com.upsaclay.common.R.string.occurred_error))
-                                hideBottomSheet()
-                            }
-                        )
-                    }
+                    ClickableItem(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(stringResource(id = R.string.read_screen_sheet_edit_field_tag)),
+                        text = { Text(text = stringResource(id = R.string.edit_announcement)) },
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = null
+                            )
+                        },
+                        onClick = {
+                            navController.navigate(NewsScreenRoute.EditAnnouncement(announcementId).route)
+                            hideBottomSheet()
+                        }
+                    )
 
                     ClickableItem(
                         modifier = Modifier

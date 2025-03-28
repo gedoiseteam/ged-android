@@ -1,13 +1,13 @@
 package com.upsaclay.gedoise.data
 
-import com.upsaclay.common.domain.entity.Screen
+import com.upsaclay.common.domain.entity.ScreenRoute
 
 class ScreenRepositoryImpl: ScreenRepository {
-    private var _currentScreen: Screen? = null
-    override val currentScreen: Screen?
-        get() = _currentScreen
+    private var _currentScreenRoute: ScreenRoute? = null
+    override val currentScreenRoute: ScreenRoute?
+        get() = _currentScreenRoute
 
-    override fun setCurrentScreen(screen: Screen?) {
-        _currentScreen = screen
+    override fun setCurrentScreen(screenRoute: ScreenRoute?) {
+        _currentScreenRoute = screenRoute
     }
 }

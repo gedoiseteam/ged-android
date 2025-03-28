@@ -2,32 +2,34 @@ package com.upsaclay.news.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.upsaclay.common.domain.entity.ErrorType
 import com.upsaclay.common.domain.entity.User
-import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
+import com.upsaclay.common.domain.repository.UserRepository
 import com.upsaclay.news.domain.entity.Announcement
-import com.upsaclay.news.domain.entity.AnnouncementScreenState
+import com.upsaclay.news.domain.entity.AnnouncementEvent
+import com.upsaclay.news.domain.repository.AnnouncementRepository
 import com.upsaclay.news.domain.usecase.DeleteAnnouncementUseCase
 import com.upsaclay.news.domain.usecase.GetAnnouncementFlowUseCase
-import com.upsaclay.news.domain.usecase.GetAnnouncementUseCase
 import com.upsaclay.news.domain.usecase.RecreateAnnouncementUseCase
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.net.ConnectException
 
 class ReadAnnouncementViewModel(
     announcementId: String,
-    getCurrentUserUseCase: GetCurrentUserUseCase,
-    getAnnouncementUseCase: GetAnnouncementUseCase,
     getAnnouncementFlowUseCase: GetAnnouncementFlowUseCase,
     private val deleteAnnouncementUseCase: DeleteAnnouncementUseCase,
-    private val recreateAnnouncementUseCase: RecreateAnnouncementUseCase
+    userRepository: UserRepository,
+    announcementRepository: AnnouncementRepository
 ) : ViewModel() {
-    private val _announcement = MutableStateFlow(getAnnouncementUseCase(announcementId))
-    private val _screenState = MutableStateFlow(AnnouncementScreenState.DEFAULT)
+    private val _announcement = MutableStateFlow(announcementRepository.getAnnouncement(announcementId))
     val announcement: StateFlow<Announcement?> = _announcement
-    val screenState: StateFlow<AnnouncementScreenState> = _screenState
-    val currentUser: StateFlow<User?> = getCurrentUserUseCase()
+    private val _event = MutableSharedFlow<AnnouncementEvent>()
+    val event: SharedFlow<AnnouncementEvent> = _event
+    val currentUser: StateFlow<User?> = userRepository.currentUser
 
     init {
         viewModelScope.launch {
@@ -44,22 +46,15 @@ class ReadAnnouncementViewModel(
 
         viewModelScope.launch {
             try {
+                _event.emit(AnnouncementEvent.Loading)
                 deleteAnnouncementUseCase(_announcement.value!!)
-                _screenState.value = AnnouncementScreenState.DELETED
+                _event.emit(AnnouncementEvent.Deleted)
             }
             catch (e: ConnectException) {
-                _screenState.value = AnnouncementScreenState.CONNECTION_ERROR
+                _event.emit(AnnouncementEvent.Error(ErrorType.NetworkError))
             } catch (e: Exception) {
-                _screenState.value = AnnouncementScreenState.ERROR
+                _event.emit(AnnouncementEvent.Error(ErrorType.UnknownError))
             }
         }
-    }
-
-    fun recreateAnnouncement(announcement: Announcement) {
-        recreateAnnouncementUseCase(announcement)
-    }
-
-    fun updateScreenState(screenState: AnnouncementScreenState) {
-        _screenState.value = screenState
     }
 }

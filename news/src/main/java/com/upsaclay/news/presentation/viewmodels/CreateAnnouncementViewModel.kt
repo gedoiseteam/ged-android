@@ -6,29 +6,24 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.upsaclay.common.domain.entity.User
+import com.upsaclay.common.domain.repository.UserRepository
 import com.upsaclay.common.domain.usecase.GenerateIdUseCase
-import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
 import com.upsaclay.news.domain.entity.Announcement
 import com.upsaclay.news.domain.entity.AnnouncementState
 import com.upsaclay.news.domain.usecase.CreateAnnouncementUseCase
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
 class CreateAnnouncementViewModel(
-    getCurrentUserUseCase: GetCurrentUserUseCase,
+    userRepository: UserRepository,
     private val createAnnouncementUseCase: CreateAnnouncementUseCase
 ) : ViewModel() {
-    private var currentUser: User? = null
+    private var currentUser: StateFlow<User?> = userRepository.currentUser
     var title: String by mutableStateOf("")
         private set
     var content: String by mutableStateOf("")
         private set
-
-    init {
-        viewModelScope.launch {
-            getCurrentUserUseCase().collect { currentUser = it }
-        }
-    }
 
     fun updateTitle(title: String) {
         this.title = title
@@ -39,7 +34,7 @@ class CreateAnnouncementViewModel(
     }
 
     fun createAnnouncement() {
-        if (currentUser == null) {
+        if (currentUser.value == null) {
             return
         }
 
@@ -48,7 +43,7 @@ class CreateAnnouncementViewModel(
             title = if (title.isBlank()) null else title.trim(),
             content = content.trim(),
             date = LocalDateTime.now(),
-            author = currentUser!!,
+            author = currentUser.value!!,
             state = AnnouncementState.SENDING
         )
 

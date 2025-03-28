@@ -30,7 +30,7 @@ import androidx.navigation.compose.rememberNavController
 import com.upsaclay.common.presentation.components.ProfilePicture
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.gedoise.R
-import com.upsaclay.gedoise.domain.entities.MainScreen
+import com.upsaclay.gedoise.domain.entities.MainScreenRoute
 import com.upsaclay.gedoise.presentation.NavigationItem
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -61,7 +61,7 @@ fun HomeTopBar(
         },
         actions = {
             IconButton(
-                onClick = { navController.navigate(MainScreen.Profile.route) },
+                onClick = { navController.navigate(MainScreenRoute.Profile.route) },
                 modifier = Modifier.clip(shape = CircleShape)
             ) {
                 ProfilePicture(url = profilePictureUrl)
@@ -97,13 +97,13 @@ fun MainBottomBar(
 
     NavigationBar {
         navigationItems.forEach { navigationItem ->
-            val selected = navigationItem.screen.route == currentRoute?.route
+            val selected = navigationItem.screenRoute.route == currentRoute?.route
             val iconRes = if (selected) navigationItem.filledIcon else navigationItem.outlinedIcon
 
             NavigationBarItem(
                 selected = selected,
                 onClick = {
-                    navController.navigate(navigationItem.screen.route) {
+                    navController.navigate(navigationItem.screenRoute.route) {
                         launchSingleTop = true
                     }
                 },

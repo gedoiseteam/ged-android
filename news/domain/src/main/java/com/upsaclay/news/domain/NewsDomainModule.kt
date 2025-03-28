@@ -4,11 +4,8 @@ import com.upsaclay.common.domain.e
 import com.upsaclay.news.domain.usecase.CreateAnnouncementUseCase
 import com.upsaclay.news.domain.usecase.DeleteAnnouncementUseCase
 import com.upsaclay.news.domain.usecase.GetAnnouncementFlowUseCase
-import com.upsaclay.news.domain.usecase.GetAnnouncementUseCase
-import com.upsaclay.news.domain.usecase.GetAnnouncementsUseCase
 import com.upsaclay.news.domain.usecase.RecreateAnnouncementUseCase
-import com.upsaclay.news.domain.usecase.RefreshAnnouncementsUseCase
-import com.upsaclay.news.domain.usecase.UpdateAnnouncementUseCase
+import com.upsaclay.news.domain.usecase.RefreshAnnouncementUseCase
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -38,22 +35,13 @@ val newsDomainModule = module {
         )
     }
 
-    single {
-        DeleteAnnouncementUseCase(
-            announcementRepository = get(),
-            scope = get(BACKGROUND_SCOPE)
-        )
-    }
-
+    singleOf(::DeleteAnnouncementUseCase)
+    singleOf(::RefreshAnnouncementUseCase)
     singleOf(::GetAnnouncementFlowUseCase)
-    singleOf(::GetAnnouncementsUseCase)
-    singleOf(::GetAnnouncementUseCase)
     single {
         RecreateAnnouncementUseCase(
             announcementRepository = get(),
             scope = get(BACKGROUND_SCOPE)
         )
     }
-    singleOf(::RefreshAnnouncementsUseCase)
-    singleOf(::UpdateAnnouncementUseCase)
 }

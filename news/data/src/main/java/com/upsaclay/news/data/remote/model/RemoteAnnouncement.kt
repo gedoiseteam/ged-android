@@ -36,6 +36,6 @@ internal data class RemoteAnnouncementWithUser(
     val userSchoolLevel: String,
     @SerializedName("USER_IS_MEMBER")
     val userIsMember: Int,
-    @SerializedName("USER_PROFILE_PICTURE_URL")
-    val profilePictureUrl: String?
+    @SerializedName("USER_PROFILE_PICTURE_FILE_NAME")
+    val profilePictureFileName: String?
 )

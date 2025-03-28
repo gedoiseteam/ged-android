@@ -24,12 +24,11 @@ import com.upsaclay.common.domain.repository.UserRepository
 import com.upsaclay.common.domain.usecase.ConvertDateUseCase
 import com.upsaclay.common.domain.usecase.GenerateIdUseCase
 import com.upsaclay.gedoise.data.ScreenRepository
-import com.upsaclay.gedoise.presentation.viewmodels.NavigationViewModel
 import com.upsaclay.message.domain.ConversationMapper
 import com.upsaclay.message.domain.entity.Conversation
 import com.upsaclay.message.domain.entity.ConversationMessage
 import com.upsaclay.message.domain.entity.Message
-import com.upsaclay.message.domain.entity.MessageScreen
+import com.upsaclay.message.domain.entity.MessageScreenRoute
 import com.upsaclay.message.domain.usecase.GetNewConversationMessageUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -77,7 +76,7 @@ class NotificationPresenter(
     }
 
     private fun isCurrentMessageScreen(conversationId: Int): Boolean {
-        val messageScreen = screenRepository.currentScreen as? MessageScreen.Chat
+        val messageScreen = screenRepository.currentScreenRoute as? MessageScreenRoute.Chat
         return messageScreen?.conversation?.id == conversationId
     }
 

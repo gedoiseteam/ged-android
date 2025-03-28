@@ -1,7 +1,7 @@
 package com.upsaclay.message
 
 import androidx.paging.PagingData
-import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
+import com.upsaclay.common.domain.repository.UserRepository
 import com.upsaclay.common.domain.userFixture
 import com.upsaclay.message.domain.conversationFixture
 import com.upsaclay.message.domain.entity.ConversationState
@@ -27,8 +27,8 @@ import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ChatViewModelTest {
-    private val getCurrentUserUseCase: GetCurrentUserUseCase = mockk()
     private val createConversationUseCase: CreateConversationUseCase = mockk()
+    private val userRepository: UserRepository = mockk()
     private val messageRepository: MessageRepository = mockk()
 
     private lateinit var chatViewModel: ChatViewModel
@@ -38,7 +38,7 @@ class ChatViewModelTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
 
-        every { getCurrentUserUseCase() } returns MutableStateFlow(userFixture)
+        every { userRepository.currentUser } returns MutableStateFlow(userFixture)
         every { messageRepository.getMessages(any()) } returns flowOf(PagingData.from(messagesFixture))
         every { messageRepository.getLastMessage(any()) } returns flowOf(messageFixture)
         coEvery { messageRepository.createMessage(any()) } returns Unit
@@ -46,7 +46,7 @@ class ChatViewModelTest {
 
         chatViewModel = ChatViewModel(
             conversation = conversationFixture,
-            getCurrentUserUseCase = getCurrentUserUseCase,
+            userRepository = userRepository,
             messageRepository = messageRepository,
             createConversationUseCase = createConversationUseCase,
         )
@@ -109,7 +109,7 @@ class ChatViewModelTest {
         val conversation = conversationFixture.copy(state = ConversationState.NOT_CREATED)
         chatViewModel = ChatViewModel(
             conversation = conversation,
-            getCurrentUserUseCase = getCurrentUserUseCase,
+            userRepository = userRepository,
             messageRepository = messageRepository,
             createConversationUseCase = createConversationUseCase,
         )
@@ -128,7 +128,7 @@ class ChatViewModelTest {
         val conversation = conversationFixture.copy(state = ConversationState.CREATED)
         chatViewModel = ChatViewModel(
             conversation = conversation,
-            getCurrentUserUseCase = getCurrentUserUseCase,
+            userRepository = userRepository,
             messageRepository = messageRepository,
             createConversationUseCase = createConversationUseCase,
         )
@@ -145,10 +145,10 @@ class ChatViewModelTest {
     @Test(expected = IllegalArgumentException::class)
     fun send_message_should_throw_exception_when_current_user_is_null() {
         // Given
-        every { getCurrentUserUseCase() } returns MutableStateFlow(null)
+        every { userRepository.currentUser } returns MutableStateFlow(null)
         chatViewModel = ChatViewModel(
             conversation = conversationFixture,
-            getCurrentUserUseCase = getCurrentUserUseCase,
+            userRepository = userRepository,
             messageRepository = messageRepository,
             createConversationUseCase = createConversationUseCase,
         )

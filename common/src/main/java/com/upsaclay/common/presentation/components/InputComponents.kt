@@ -74,7 +74,8 @@ fun TransparentTextField(
     placeholder: @Composable (() -> Unit),
     textStyle: TextStyle = TextStyle.Default,
     backgroundColor: Color = MaterialTheme.colorScheme.background,
-    padding: Dp = MaterialTheme.spacing.default
+    padding: Dp = MaterialTheme.spacing.default,
+    enabled: Boolean = true
 ) {
     val colors: TextFieldColors = TextFieldDefaults.colors()
 
@@ -82,6 +83,7 @@ fun TransparentTextField(
         modifier = modifier
             .background(backgroundColor)
             .padding(padding),
+        enabled = enabled,
         value = value,
         onValueChange = onValueChange,
         textStyle = textStyle.copy(color = MaterialTheme.colorScheme.onBackground),
@@ -120,7 +122,8 @@ fun TransparentFocusedTextField(
     backgroundColor: Color = MaterialTheme.colorScheme.background,
     padding: PaddingValues = PaddingValues(MaterialTheme.spacing.default),
     shape: Shape = TextFieldDefaults.shape,
-    displayKeyboard: Boolean = true
+    displayKeyboard: Boolean = true,
+    enabled: Boolean = true
 ) {
     val focusRequester = remember { FocusRequester() }
     val textFieldValue = remember {
@@ -153,6 +156,7 @@ fun TransparentFocusedTextField(
                 .background(backgroundColor)
                 .padding(padding)
         },
+        enabled = enabled,
         value = textFieldValue.value,
         onValueChange = { newValue ->
             textFieldValue.value = newValue

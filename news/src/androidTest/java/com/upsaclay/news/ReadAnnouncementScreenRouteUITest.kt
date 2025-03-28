@@ -12,8 +12,8 @@ import androidx.navigation.testing.TestNavHostController
 import com.upsaclay.common.domain.userFixture
 import com.upsaclay.common.domain.userFixture2
 import com.upsaclay.news.domain.announcementFixture
-import com.upsaclay.news.domain.entity.AnnouncementScreenState
-import com.upsaclay.news.domain.entity.NewsScreen
+import com.upsaclay.news.domain.entity.AnnouncementEvent
+import com.upsaclay.news.domain.entity.NewsScreenRoute
 import com.upsaclay.news.presentation.screens.EditAnnouncementScreen
 import com.upsaclay.news.presentation.screens.ReadAnnouncementScreen
 import com.upsaclay.news.presentation.viewmodels.ReadAnnouncementViewModel
@@ -25,7 +25,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-class ReadAnnouncementScreenUITest {
+class ReadAnnouncementScreenRouteUITest {
     @get:Rule
     val rule = createAndroidComposeRule<ComponentActivity>()
 
@@ -35,9 +35,7 @@ class ReadAnnouncementScreenUITest {
     @Before
     fun setUp() {
         every { readAnnouncementViewModel.announcement } returns MutableStateFlow(announcementFixture)
-        every { readAnnouncementViewModel.screenState } returns MutableStateFlow(AnnouncementScreenState.DEFAULT)
         every { readAnnouncementViewModel.currentUser } returns MutableStateFlow(userFixture)
-        every { readAnnouncementViewModel.updateScreenState(any()) } returns Unit
     }
 
     @Test
@@ -111,8 +109,8 @@ class ReadAnnouncementScreenUITest {
         rule.setContent {
             navController = TestNavHostController(LocalContext.current)
             navController.navigatorProvider.addNavigator(ComposeNavigator())
-            NavHost(navController = navController, startDestination = NewsScreen.News.route) {
-                composable(NewsScreen.News.route) {
+            NavHost(navController = navController, startDestination = NewsScreenRoute.News.route) {
+                composable(NewsScreenRoute.News.route) {
                     ReadAnnouncementScreen(
                         announcementId = announcementFixture.id,
                         navController = navController,
@@ -120,7 +118,7 @@ class ReadAnnouncementScreenUITest {
                     )
                 }
 
-                composable(NewsScreen.EditAnnouncement.HARD_ROUTE) {
+                composable(NewsScreenRoute.EditAnnouncement.HARD_ROUTE) {
                     EditAnnouncementScreen(
                         announcementId = announcementFixture.id,
                         navController = navController,
@@ -134,7 +132,7 @@ class ReadAnnouncementScreenUITest {
         rule.onNodeWithTag(rule.activity.getString(R.string.read_screen_sheet_edit_field_tag)).performClick()
 
         // Then
-        Assert.assertEquals(NewsScreen.EditAnnouncement.HARD_ROUTE, navController.currentDestination?.route)
+        Assert.assertEquals(NewsScreenRoute.EditAnnouncement.HARD_ROUTE, navController.currentDestination?.route)
     }
 
     @Test
@@ -153,23 +151,5 @@ class ReadAnnouncementScreenUITest {
 
         // Then
         rule.onNodeWithTag(rule.activity.getString(R.string.read_screen_delete_dialog_tag)).assertExists()
-    }
-
-    @Test
-    fun error_snackbar_should_displayed_when_delete_announcement_fails() {
-        // Given
-        every { readAnnouncementViewModel.screenState } returns MutableStateFlow(AnnouncementScreenState.ERROR)
-
-        // When
-        rule.setContent {
-            ReadAnnouncementScreen(
-                announcementId = announcementFixture.id,
-                navController = navController,
-                readAnnouncementViewModel = readAnnouncementViewModel
-            )
-        }
-
-        // Then
-        rule.onNodeWithTag(rule.activity.getString(R.string.read_screen_snackbar_tag)).assertExists()
     }
 }

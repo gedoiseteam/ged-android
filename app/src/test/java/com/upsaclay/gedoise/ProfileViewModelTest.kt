@@ -1,7 +1,7 @@
 package com.upsaclay.gedoise
 
-import com.upsaclay.authentication.domain.usecase.LogoutUseCase
-import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
+import com.upsaclay.authentication.domain.repository.AuthenticationRepository
+import com.upsaclay.common.domain.repository.UserRepository
 import com.upsaclay.common.domain.userFixture
 import com.upsaclay.gedoise.presentation.viewmodels.ProfileViewModel
 import io.mockk.coEvery
@@ -19,8 +19,8 @@ import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ProfileViewModelTest {
-    private val getCurrentUserUseCase: GetCurrentUserUseCase = mockk()
-    private val logoutUseCase: LogoutUseCase = mockk()
+    private val userRepository: UserRepository = mockk()
+    private val authenticationRepository: AuthenticationRepository = mockk()
 
     private lateinit var profileViewModel: ProfileViewModel
     private val testDispatcher = UnconfinedTestDispatcher()
@@ -29,24 +29,24 @@ class ProfileViewModelTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
 
-        every { getCurrentUserUseCase() } returns MutableStateFlow(userFixture)
-        coEvery { logoutUseCase() } returns Unit
+        every { userRepository.currentUser } returns MutableStateFlow(userFixture)
+        coEvery { authenticationRepository.logout() } returns Unit
 
         profileViewModel = ProfileViewModel(
-            getCurrentUserUseCase = getCurrentUserUseCase,
-            logoutUseCase = logoutUseCase
+            userRepository = userRepository,
+            authenticationRepository = authenticationRepository
         )
     }
 
     @Test
     fun default_values_are_correct() {
         // Given
-        every { getCurrentUserUseCase() } returns MutableStateFlow(null)
+        every { userRepository.currentUser } returns MutableStateFlow(null)
 
         // When
         profileViewModel = ProfileViewModel(
-            getCurrentUserUseCase = getCurrentUserUseCase,
-            logoutUseCase = logoutUseCase
+            userRepository = userRepository,
+            authenticationRepository = authenticationRepository
         )
 
         // Then
@@ -59,6 +59,6 @@ class ProfileViewModelTest {
         profileViewModel.logout()
 
         // Then
-        coVerify { logoutUseCase() }
+        coVerify { authenticationRepository.logout() }
     }
 }

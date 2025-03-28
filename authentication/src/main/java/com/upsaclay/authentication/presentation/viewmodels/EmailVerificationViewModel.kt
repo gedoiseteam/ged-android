@@ -6,9 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.upsaclay.authentication.domain.entity.AuthErrorType
 import com.upsaclay.authentication.domain.entity.AuthenticationEvent
 import com.upsaclay.authentication.domain.entity.exception.AuthUserNotFoundException
-import com.upsaclay.authentication.domain.usecase.IsEmailVerifiedUseCase
-import com.upsaclay.authentication.domain.usecase.SendVerificationEmailUseCase
-import com.upsaclay.authentication.domain.usecase.SetUserAuthenticatedUseCase
+import com.upsaclay.authentication.domain.repository.AuthenticationRepository
 import com.upsaclay.common.domain.entity.ErrorType
 import com.upsaclay.common.domain.entity.TooManyRequestException
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -17,9 +15,7 @@ import kotlinx.coroutines.launch
 
 class EmailVerificationViewModel(
     val email: String,
-    private val sendVerificationEmailUseCase: SendVerificationEmailUseCase,
-    private val isEmailVerifiedUseCase: IsEmailVerifiedUseCase,
-    private val setUserAuthenticatedUseCase: SetUserAuthenticatedUseCase,
+    private val authenticationRepository: AuthenticationRepository
 ) : ViewModel() {
     private val _event = MutableSharedFlow<AuthenticationEvent>(replay = 1)
     val event: SharedFlow<AuthenticationEvent> = _event
@@ -27,7 +23,7 @@ class EmailVerificationViewModel(
     fun sendVerificationEmail() {
         viewModelScope.launch {
             try {
-                sendVerificationEmailUseCase()
+                authenticationRepository.sendVerificationEmail()
             } catch (e: Exception) {
                 _event.emit(handleException(e))
             }
@@ -38,9 +34,9 @@ class EmailVerificationViewModel(
         viewModelScope.launch {
             _event.emit(AuthenticationEvent.Loading)
             try {
-                if (isEmailVerifiedUseCase()) {
+                if (authenticationRepository.isUserEmailVerified()) {
                     _event.emit(AuthenticationEvent.EmailVerified)
-                    setUserAuthenticatedUseCase(true)
+                    authenticationRepository.setAuthenticated(true)
                 } else {
                     _event.emit(AuthenticationEvent.EmailNotVerified)
                 }

@@ -15,8 +15,8 @@ import androidx.navigation.testing.TestNavHostController
 import com.upsaclay.common.domain.userFixture
 import com.upsaclay.news.domain.announcementFixture
 import com.upsaclay.news.domain.announcementsFixture
-import com.upsaclay.news.domain.entity.AnnouncementScreenState
-import com.upsaclay.news.domain.entity.NewsScreen
+import com.upsaclay.news.domain.entity.AnnouncementEvent
+import com.upsaclay.news.domain.entity.NewsScreenRoute
 import com.upsaclay.news.presentation.screens.CreateAnnouncementScreen
 import com.upsaclay.news.presentation.screens.NewsScreen
 import com.upsaclay.news.presentation.screens.ReadAnnouncementScreen
@@ -26,6 +26,7 @@ import com.upsaclay.news.presentation.viewmodels.ReadAnnouncementViewModel
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import org.junit.Assert
@@ -33,7 +34,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-class NewsScreenUITest {
+class NewsScreenRouteUITest {
     @get:Rule
     val rule = createAndroidComposeRule<ComponentActivity>()
 
@@ -46,10 +47,10 @@ class NewsScreenUITest {
     fun setUp() {
         every { newsViewModel.announcements } returns flowOf(announcementsFixture)
         every { newsViewModel.currentUser } returns MutableStateFlow(userFixture)
-        every { newsViewModel.isRefreshing } returns MutableStateFlow(false)
+        every { newsViewModel.refreshing } returns MutableStateFlow(false)
         every { readAnnouncementViewModel.announcement } returns MutableStateFlow(announcementFixture)
-        every { readAnnouncementViewModel.screenState } returns MutableStateFlow(AnnouncementScreenState.DEFAULT)
         every { readAnnouncementViewModel.currentUser } returns MutableStateFlow(userFixture)
+        every { readAnnouncementViewModel.event } returns MutableSharedFlow()
         every { readAnnouncementViewModel.deleteAnnouncement() } returns Unit
         every { createAnnouncementViewModel.title } returns ""
         every { createAnnouncementViewModel.content } returns ""
@@ -145,15 +146,15 @@ class NewsScreenUITest {
         rule.setContent {
             navController = TestNavHostController(LocalContext.current)
             navController.navigatorProvider.addNavigator(ComposeNavigator())
-            NavHost(navController = navController, startDestination = NewsScreen.News.route) {
-                (composable(NewsScreen.News.route) {
+            NavHost(navController = navController, startDestination = NewsScreenRoute.News.route) {
+                (composable(NewsScreenRoute.News.route) {
                     NewsScreen(
                         navController = navController,
                         newsViewModel = newsViewModel
                     )
                 })
 
-                composable(NewsScreen.ReadAnnouncement.HARD_ROUTE) {
+                composable(NewsScreenRoute.ReadAnnouncement.HARD_ROUTE) {
                     ReadAnnouncementScreen(
                         announcementId = announcementFixture.id,
                         navController = navController,
@@ -167,7 +168,7 @@ class NewsScreenUITest {
             .performClick()
 
         // Then
-        Assert.assertEquals(NewsScreen.ReadAnnouncement.HARD_ROUTE, navController.currentDestination?.route)
+        Assert.assertEquals(NewsScreenRoute.ReadAnnouncement.HARD_ROUTE, navController.currentDestination?.route)
         rule.onNodeWithTag(rule.activity.getString(R.string.read_screen_announcement_title_tag)).assertExists()
         rule.onNodeWithTag(rule.activity.getString(R.string.read_screen_announcement_content_tag)).assertExists()
         rule.onNodeWithTag(rule.activity.getString(R.string.read_screen_announcement_content_tag)).assert(hasText(announcementFixture.content))
@@ -199,15 +200,15 @@ class NewsScreenUITest {
         rule.setContent {
             navController = TestNavHostController(LocalContext.current)
             navController.navigatorProvider.addNavigator(ComposeNavigator())
-            NavHost(navController = navController, startDestination = NewsScreen.News.route) {
-                composable(NewsScreen.News.route) {
+            NavHost(navController = navController, startDestination = NewsScreenRoute.News.route) {
+                composable(NewsScreenRoute.News.route) {
                     NewsScreen(
                         navController = navController,
                         newsViewModel = newsViewModel
                     )
                 }
 
-                composable(NewsScreen.CreateAnnouncement.route) {
+                composable(NewsScreenRoute.CreateAnnouncement.route) {
                     CreateAnnouncementScreen(
                         navController = navController,
                         createAnnouncementViewModel = createAnnouncementViewModel
@@ -220,7 +221,7 @@ class NewsScreenUITest {
             .performClick()
 
         // Then
-        Assert.assertEquals(NewsScreen.CreateAnnouncement.route, navController.currentDestination?.route)
+        Assert.assertEquals(NewsScreenRoute.CreateAnnouncement.route, navController.currentDestination?.route)
     }
 
     @Test

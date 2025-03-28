@@ -6,62 +6,60 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.upsaclay.common.domain.entity.ErrorType
 import com.upsaclay.common.domain.entity.User
+import com.upsaclay.common.domain.repository.UserRepository
 import com.upsaclay.common.domain.usecase.DeleteProfilePictureUseCase
-import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
 import com.upsaclay.common.domain.usecase.UpdateProfilePictureUseCase
+import com.upsaclay.gedoise.domain.entities.AccountErrorType
+import com.upsaclay.gedoise.domain.entities.AccountEvent
 import com.upsaclay.gedoise.domain.entities.AccountScreenState
+import com.upsaclay.news.domain.entity.AnnouncementEvent
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class AccountViewModel(
     private val updateProfilePictureUseCase: UpdateProfilePictureUseCase,
     private val deleteProfilePictureUseCase: DeleteProfilePictureUseCase,
-    getCurrentUserUseCase: GetCurrentUserUseCase
+    userRepository: UserRepository
 ): ViewModel() {
     private val _screenState = MutableStateFlow(AccountScreenState.READ)
     val screenState: StateFlow<AccountScreenState> = _screenState
-    val currentUser: StateFlow<User?> = getCurrentUserUseCase()
+    private val _event = MutableSharedFlow<AccountEvent>()
+    val event: SharedFlow<AccountEvent> = _event
+    val currentUser: StateFlow<User?> = userRepository.currentUser
     var profilePictureUri by mutableStateOf<Uri?>(null)
         private set
 
-    fun updateProfilePictureUri(uri: Uri) {
-        profilePictureUri = uri
-    }
-
-    fun resetProfilePictureUri() {
-        profilePictureUri = null
-    }
-
     fun updateUserProfilePicture() {
-        _screenState.value = AccountScreenState.LOADING
-
         profilePictureUri?.let { uri ->
             viewModelScope.launch {
+                _event.emit(AccountEvent.Loading)
                 try {
                     updateProfilePictureUseCase(uri)
-                    _screenState.value = AccountScreenState.PROFILE_PICTURE_UPDATED
+                    _screenState.value = AccountScreenState.READ
                 } catch (e: Exception) {
-                    _screenState.value = AccountScreenState.PROFILE_PICTURE_UPDATE_ERROR
+                    _event.emit(AccountEvent.Error(AccountErrorType.PROFILE_PICTURE_UPDATE_ERROR))
                 }
-                resetProfilePictureUri()
             }
         }
     }
 
     fun deleteUserProfilePicture() {
-        _screenState.value = AccountScreenState.LOADING
-
         viewModelScope.launch {
+            _event.emit(AccountEvent.Loading)
             val (id, url) = currentUser.value?.id to currentUser.value?.profilePictureUrl
             try {
                 deleteProfilePictureUseCase(id!!, url!!)
-                _screenState.value = AccountScreenState.PROFILE_PICTURE_DELETED
+                resetProfilePictureUri()
+                _event.emit(AccountEvent.ProfilePictureDeleted)
+                _screenState.value = AccountScreenState.READ
             } catch (e: Exception) {
-                _screenState.value = AccountScreenState.PROFILE_PICTURE_UPDATE_ERROR
+                _event.emit(AccountEvent.Error(AccountErrorType.PROFILE_PICTURE_UPDATE_ERROR))
             }
-            resetProfilePictureUri()
         }
     }
 
@@ -71,5 +69,13 @@ class AccountViewModel(
 
     fun resetScreenState() {
         _screenState.value = AccountScreenState.READ
+    }
+
+    fun updateProfilePictureUri(uri: Uri) {
+        profilePictureUri = uri
+    }
+
+    fun resetProfilePictureUri() {
+        profilePictureUri = null
     }
 }

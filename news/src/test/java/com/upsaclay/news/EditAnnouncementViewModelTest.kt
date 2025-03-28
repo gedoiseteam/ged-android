@@ -1,9 +1,8 @@
 package com.upsaclay.news
 
 import com.upsaclay.news.domain.announcementFixture
-import com.upsaclay.news.domain.entity.AnnouncementScreenState
-import com.upsaclay.news.domain.usecase.GetAnnouncementUseCase
-import com.upsaclay.news.domain.usecase.UpdateAnnouncementUseCase
+import com.upsaclay.news.domain.entity.AnnouncementEvent
+import com.upsaclay.news.domain.repository.AnnouncementRepository
 import com.upsaclay.news.presentation.viewmodels.EditAnnouncementViewModel
 import io.mockk.coEvery
 import io.mockk.every
@@ -20,8 +19,7 @@ import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class EditAnnouncementViewModelTest {
-    private val getAnnouncementUseCase: GetAnnouncementUseCase = mockk()
-    private val updateAnnouncementUseCase: UpdateAnnouncementUseCase = mockk()
+    private val announcementRepository: AnnouncementRepository = mockk()
 
     private lateinit var editAnnouncementViewModel: EditAnnouncementViewModel
     private val testDispatcher = UnconfinedTestDispatcher()
@@ -32,23 +30,21 @@ class EditAnnouncementViewModelTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
 
-        every { getAnnouncementUseCase(announcementFixture.id) } returns announcementFixture
-        coEvery { updateAnnouncementUseCase(announcementFixture) } returns Unit
+        every { announcementRepository.getAnnouncement(announcementFixture.id) } returns announcementFixture
+        coEvery { announcementRepository.updateAnnouncement(announcementFixture) } returns Unit
 
         editAnnouncementViewModel = EditAnnouncementViewModel(
             announcementId = announcementFixture.id,
-            getAnnouncementUseCase = getAnnouncementUseCase,
-            updateAnnouncementUseCase = updateAnnouncementUseCase
+            announcementRepository = announcementRepository
         )
     }
 
     @Test
     fun default_values_are_correct() {
         assertEquals(announcementFixture, editAnnouncementViewModel.announcement.value)
-        assertEquals(AnnouncementScreenState.DEFAULT, editAnnouncementViewModel.screenState.value)
         assertEquals(false, editAnnouncementViewModel.isAnnouncementModified.value)
-        assertEquals(announcementFixture.title, editAnnouncementViewModel.title)
-        assertEquals(announcementFixture.content, editAnnouncementViewModel.content)
+        assertEquals(announcementFixture.title, editAnnouncementViewModel.title.value)
+        assertEquals(announcementFixture.content, editAnnouncementViewModel.content.value)
     }
 
     @Test
@@ -57,7 +53,7 @@ class EditAnnouncementViewModelTest {
         editAnnouncementViewModel.updateTitle(title)
 
         // Then
-        assertEquals(title, editAnnouncementViewModel.title)
+        assertEquals(title, editAnnouncementViewModel.title.value)
     }
 
     @Test
@@ -75,7 +71,7 @@ class EditAnnouncementViewModelTest {
         editAnnouncementViewModel.updateContent(content)
 
         // Then
-        assertEquals(content, editAnnouncementViewModel.content)
+        assertEquals(content, editAnnouncementViewModel.content.value)
     }
 
     @Test
@@ -89,46 +85,5 @@ class EditAnnouncementViewModelTest {
 
         // Then
         assertEquals(announcementFixture, editAnnouncementViewModel.announcement.value)
-    }
-
-    @Test
-    fun update_announcement_should_update_screen_state_to_UPDATED_when_success() = runTest {
-        // Given
-        editAnnouncementViewModel.updateTitle(title)
-        editAnnouncementViewModel.updateContent(content)
-
-        // When
-        editAnnouncementViewModel.updateAnnouncement(announcementFixture)
-
-        // Then
-        assertEquals(AnnouncementScreenState.UPDATED, editAnnouncementViewModel.screenState.value)
-    }
-
-    @Test
-    fun update_announcement_should_update_screen_state_to_CONNECTION_ERROR_when_connect_exception_is_thrown() = runTest {
-        // Given
-        editAnnouncementViewModel.updateTitle(title)
-        editAnnouncementViewModel.updateContent(content)
-        coEvery { updateAnnouncementUseCase(announcementFixture) } throws ConnectException()
-
-        // When
-        editAnnouncementViewModel.updateAnnouncement(announcementFixture)
-
-        // Then
-        assertEquals(AnnouncementScreenState.CONNECTION_ERROR, editAnnouncementViewModel.screenState.value)
-    }
-
-    @Test
-    fun update_announcement_should_update_screen_state_to_ERROR_when_unknown_exception_is_thrown() = runTest {
-        // Given
-        editAnnouncementViewModel.updateTitle(title)
-        editAnnouncementViewModel.updateContent(content)
-        coEvery { updateAnnouncementUseCase(announcementFixture) } throws Exception()
-
-        // When
-        editAnnouncementViewModel.updateAnnouncement(announcementFixture)
-
-        // Then
-        assertEquals(AnnouncementScreenState.ERROR, editAnnouncementViewModel.screenState.value)
     }
 }

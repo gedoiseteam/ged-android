@@ -12,7 +12,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.testing.TestNavHostController
 import com.upsaclay.authentication.domain.entity.AuthErrorType
 import com.upsaclay.authentication.domain.entity.AuthenticationEvent
-import com.upsaclay.authentication.domain.entity.AuthenticationScreen
+import com.upsaclay.authentication.domain.entity.AuthenticationScreenRoute
 import com.upsaclay.authentication.presentation.screens.AuthenticationScreen
 import com.upsaclay.authentication.presentation.screens.FirstRegistrationScreen
 import com.upsaclay.authentication.presentation.viewmodels.AuthenticationViewModel
@@ -27,7 +27,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-class AuthenticationScreenUiTest {
+class AuthenticationScreenRouteUiTest {
     @get:Rule
     val rule = createAndroidComposeRule<ComponentActivity>()
 
@@ -52,15 +52,15 @@ class AuthenticationScreenUiTest {
         rule.setContent {
             navController = TestNavHostController(LocalContext.current)
             navController.navigatorProvider.addNavigator(ComposeNavigator())
-            NavHost(navController, startDestination = AuthenticationScreen.Authentication.route) {
-                composable(AuthenticationScreen.Authentication.route) {
+            NavHost(navController, startDestination = AuthenticationScreenRoute.Authentication.route) {
+                composable(AuthenticationScreenRoute.Authentication.route) {
                     AuthenticationScreen(
                         navController,
                         authenticationViewModel
                     )
                 }
 
-                composable(AuthenticationScreen.FirstRegistration.route) {
+                composable(AuthenticationScreenRoute.FirstRegistration.route) {
                     FirstRegistrationScreen(
                         navController,
                         registrationViewModel
@@ -71,7 +71,7 @@ class AuthenticationScreenUiTest {
         rule.onNodeWithTag(rule.activity.getString(R.string.authentication_screen_registration_button_tag)).performClick()
 
         // Then
-        Assert.assertEquals(AuthenticationScreen.FirstRegistration.route, navController.currentDestination?.route)
+        Assert.assertEquals(AuthenticationScreenRoute.FirstRegistration.route, navController.currentDestination?.route)
     }
 
     @Test
@@ -80,15 +80,15 @@ class AuthenticationScreenUiTest {
         rule.setContent {
             navController = TestNavHostController(LocalContext.current)
             navController.navigatorProvider.addNavigator(ComposeNavigator())
-            NavHost(navController, startDestination = AuthenticationScreen.Authentication.route) {
-                composable(AuthenticationScreen.Authentication.route) {
+            NavHost(navController, startDestination = AuthenticationScreenRoute.Authentication.route) {
+                composable(AuthenticationScreenRoute.Authentication.route) {
                     AuthenticationScreen(
                         navController,
                         authenticationViewModel
                     )
                 }
 
-                composable(AuthenticationScreen.FirstRegistration.route) {
+                composable(AuthenticationScreenRoute.FirstRegistration.route) {
                     FirstRegistrationScreen(
                         navController,
                         registrationViewModel

@@ -7,16 +7,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 class DeleteAnnouncementUseCase(
-    private val announcementRepository: AnnouncementRepository,
-    private val scope: CoroutineScope
+    private val announcementRepository: AnnouncementRepository
 ) {
-    operator fun invoke(announcement: Announcement) {
-        scope.launch {
-            if (announcement.state == AnnouncementState.PUBLISHED) {
-                announcementRepository.deleteAnnouncement(announcement)
-            } else {
-                announcementRepository.deleteLocalAnnouncement(announcement)
-            }
+    suspend operator fun invoke(announcement: Announcement) {
+        if (announcement.state == AnnouncementState.PUBLISHED) {
+            announcementRepository.deleteAnnouncement(announcement)
+        } else {
+            announcementRepository.deleteLocalAnnouncement(announcement)
         }
     }
 }

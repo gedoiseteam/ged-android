@@ -4,15 +4,11 @@ import android.accounts.NetworkErrorException
 import com.upsaclay.authentication.domain.entity.AuthErrorType
 import com.upsaclay.authentication.domain.entity.AuthenticationEvent
 import com.upsaclay.authentication.domain.entity.exception.InvalidCredentialsException
-import com.upsaclay.authentication.domain.usecase.IsEmailVerifiedUseCase
-import com.upsaclay.authentication.domain.usecase.LoginUseCase
-import com.upsaclay.authentication.domain.usecase.SetUserAuthenticatedUseCase
+import com.upsaclay.authentication.domain.repository.AuthenticationRepository
 import com.upsaclay.authentication.presentation.viewmodels.AuthenticationViewModel
 import com.upsaclay.common.domain.entity.ErrorType
 import com.upsaclay.common.domain.entity.TooManyRequestException
-import com.upsaclay.common.domain.usecase.CreateUserUseCase
-import com.upsaclay.common.domain.usecase.GetUserUseCase
-import com.upsaclay.common.domain.usecase.SetCurrentUserUseCase
+import com.upsaclay.common.domain.repository.UserRepository
 import com.upsaclay.common.domain.userFixture
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -30,12 +26,8 @@ import kotlin.test.assertFalse
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class AuthenticationViewModelTest {
-    private val loginUseCase: LoginUseCase = mockk()
-    private val setUserAuthenticatedUseCase: SetUserAuthenticatedUseCase = mockk()
-    private val getUserUseCase: GetUserUseCase = mockk()
-    private val setCurrentUserUseCase: SetCurrentUserUseCase = mockk()
-    private val isEmailVerifiedUseCase: IsEmailVerifiedUseCase = mockk()
-    private val createUserUseCase: CreateUserUseCase = mockk()
+    private val authenticationRepository: AuthenticationRepository = mockk()
+    private val userRepository: UserRepository = mockk()
 
     private lateinit var authenticationViewModel: AuthenticationViewModel
     private val email = "email@example.com"
@@ -47,18 +39,15 @@ class AuthenticationViewModelTest {
         Dispatchers.setMain(testDispatcher)
 
         authenticationViewModel = AuthenticationViewModel(
-            loginUseCase = loginUseCase,
-            setUserAuthenticatedUseCase = setUserAuthenticatedUseCase,
-            getUserUseCase = getUserUseCase,
-            setCurrentUserUseCase = setCurrentUserUseCase,
-            isEmailVerifiedUseCase = isEmailVerifiedUseCase
+            authenticationRepository = authenticationRepository,
+            userRepository = userRepository
         )
 
-        coEvery { isEmailVerifiedUseCase() } returns true
-        coEvery { loginUseCase(any(), any()) } returns Unit
-        coEvery { setUserAuthenticatedUseCase(any()) } returns Unit
-        coEvery { getUserUseCase.withEmail(any()) } returns userFixture
-        coEvery { setCurrentUserUseCase(any()) } returns Unit
+        coEvery { authenticationRepository.isUserEmailVerified() } returns true
+        coEvery { authenticationRepository.loginWithEmailAndPassword(any(), any()) } returns Unit
+        coEvery { authenticationRepository.setAuthenticated(any()) } returns Unit
+        coEvery { userRepository.getUserWithEmail(any()) } returns userFixture
+        coEvery { userRepository.setCurrentUser(any()) } returns Unit
     }
 
     @Test
@@ -88,7 +77,7 @@ class AuthenticationViewModelTest {
     @Test
     fun login_should_reset_password_when_exception_is_thrown() = runTest {
         // Given
-        coEvery { loginUseCase(any(), any()) } throws Exception()
+        coEvery { authenticationRepository.loginWithEmailAndPassword(any(), any()) } throws Exception()
         authenticationViewModel.updatePassword(password)
         authenticationViewModel.updateEmail(email)
 
@@ -105,8 +94,8 @@ class AuthenticationViewModelTest {
         authenticationViewModel.login()
 
         // Then
-        coVerify { setCurrentUserUseCase(userFixture) }
-        coVerify { setUserAuthenticatedUseCase(true) }
+        coVerify { userRepository.setCurrentUser(userFixture) }
+        coVerify { authenticationRepository.setAuthenticated(true) }
     }
 
     @Test

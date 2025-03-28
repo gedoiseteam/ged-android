@@ -2,16 +2,16 @@ package com.upsaclay.gedoise.presentation
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import com.upsaclay.common.domain.entity.Screen
+import com.upsaclay.common.domain.entity.ScreenRoute
 import com.upsaclay.gedoise.R
-import com.upsaclay.message.domain.entity.MessageScreen
-import com.upsaclay.news.domain.entity.NewsScreen
+import com.upsaclay.message.domain.entity.MessageScreenRoute
+import com.upsaclay.news.domain.entity.NewsScreenRoute
 
 sealed class NavigationItem(
     open val badges: Int,
     open val hasNews: Boolean
 ) {
-    abstract val screen: Screen
+    abstract val screenRoute: ScreenRoute
     abstract val label: Int
     abstract val filledIcon: Int
     abstract val outlinedIcon: Int
@@ -21,7 +21,7 @@ sealed class NavigationItem(
         override val badges: Int = 0,
         override val hasNews: Boolean = false
     ): NavigationItem(badges, hasNews) {
-        override val screen: NewsScreen = NewsScreen.News
+        override val screenRoute: NewsScreenRoute = NewsScreenRoute.News
         @StringRes override val label: Int = R.string.home
         @DrawableRes override val filledIcon: Int = com.upsaclay.common.R.drawable.ic_fill_home
         @DrawableRes override val outlinedIcon: Int = com.upsaclay.common.R.drawable.ic_outline_home
@@ -32,7 +32,7 @@ sealed class NavigationItem(
         override val badges: Int = 0,
         override val hasNews: Boolean = false
     ): NavigationItem(badges, hasNews) {
-        override val screen: Screen = MessageScreen.Conversation
+        override val screenRoute: ScreenRoute = MessageScreenRoute.Conversation
         @StringRes override val label: Int = R.string.messages
         @DrawableRes override val filledIcon: Int = com.upsaclay.common.R.drawable.ic_fill_message
         @DrawableRes override val outlinedIcon: Int = com.upsaclay.common.R.drawable.ic_outline_message

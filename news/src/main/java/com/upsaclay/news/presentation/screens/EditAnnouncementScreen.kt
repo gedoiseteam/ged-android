@@ -30,16 +30,19 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
-import com.upsaclay.common.presentation.components.LinearProgressBar
+import com.upsaclay.common.domain.entity.ErrorType
+import com.upsaclay.common.presentation.components.OverlayLinearLoadingScreen
 import com.upsaclay.common.presentation.components.SmallTopBarAction
+import com.upsaclay.common.presentation.components.TopLinearLoadingScreen
 import com.upsaclay.common.presentation.components.TransparentFocusedTextField
 import com.upsaclay.common.presentation.components.TransparentTextField
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.news.R
 import com.upsaclay.news.domain.announcementFixture
-import com.upsaclay.news.domain.entity.AnnouncementScreenState
+import com.upsaclay.news.domain.entity.AnnouncementEvent
 import com.upsaclay.news.presentation.viewmodels.EditAnnouncementViewModel
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -56,10 +59,12 @@ fun EditAnnouncementScreen(
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
     val scope = rememberCoroutineScope()
-    var isLoading by remember { mutableStateOf(false) }
-    val state by editAnnouncementViewModel.screenState.collectAsState()
+    var loading by remember { mutableStateOf(true) }
+
     val isAnnouncementModified by editAnnouncementViewModel.isAnnouncementModified.collectAsState()
     val announcement by editAnnouncementViewModel.announcement.collectAsState()
+    val title by editAnnouncementViewModel.title.collectAsState()
+    val content by editAnnouncementViewModel.content.collectAsState()
 
     val snackbarHostState = remember { SnackbarHostState() }
     val showSnackBar = { message: String ->
@@ -68,41 +73,26 @@ fun EditAnnouncementScreen(
         }
     }
 
-    val resetScreenState = {
-        editAnnouncementViewModel.resetScreenState()
-    }
+    LaunchedEffect(Unit) {
+        editAnnouncementViewModel.event.collectLatest {
+            loading = it is AnnouncementEvent.Loading
+            when (it) {
+                is AnnouncementEvent.Updated -> navController.popBackStack()
 
-    LaunchedEffect(state) {
-        when (state) {
-            AnnouncementScreenState.UPDATED -> {
-                isLoading = false
-                focusManager.clearFocus()
-                navController.popBackStack()
+                is AnnouncementEvent.Error -> {
+                    when(it.type) {
+                        is ErrorType.NetworkError -> showSnackBar (context.getString(com.upsaclay.common.R.string.unknown_network_error))
+                        is ErrorType.UnknownError -> showSnackBar(context.getString(R.string.announcement_update_error))
+                    }
+                }
+
+                else -> Unit
             }
-
-            AnnouncementScreenState.LOADING -> {
-                keyboardController?.hide()
-                isLoading = true
-            }
-
-            AnnouncementScreenState.CONNECTION_ERROR -> {
-                isLoading = false
-                showSnackBar(context.getString(com.upsaclay.common.R.string.unknown_network_error))
-                resetScreenState()
-            }
-
-            AnnouncementScreenState.ERROR -> {
-                isLoading = false
-                showSnackBar(context.getString(R.string.announcement_update_error))
-                resetScreenState()
-            }
-
-            else -> {}
         }
     }
 
-    if (isLoading) {
-        LinearProgressBar(modifier = Modifier.fillMaxWidth())
+    if (loading) {
+        TopLinearLoadingScreen()
     }
 
     Scaffold(
@@ -114,19 +104,18 @@ fun EditAnnouncementScreen(
                     navController.popBackStack()
                 },
                 onActionClick = {
+                    keyboardController?.hide()
+                    focusManager.clearFocus()
                     announcement?.let {
                         editAnnouncementViewModel.updateAnnouncement(
                             it.copy(
-                                title = editAnnouncementViewModel.title,
-                                content = editAnnouncementViewModel.content
+                                title = title,
+                                content = content
                             )
                         )
-                    } ?: run {
-                        showSnackBar(context.getString(R.string.announcement_update_error))
-                        navController.popBackStack()
-                    }
+                    } ?: showSnackBar(context.getString(R.string.announcement_update_error))
                 },
-                isButtonEnable = editAnnouncementViewModel.content.isNotBlank() && isAnnouncementModified,
+                isButtonEnable = content.isNotBlank() && isAnnouncementModified && !loading,
                 buttonText = stringResource(id = com.upsaclay.common.R.string.save)
             )
         },
@@ -152,7 +141,7 @@ fun EditAnnouncementScreen(
             Column {
                 TransparentFocusedTextField(
                     modifier = Modifier.fillMaxWidth(),
-                    value = editAnnouncementViewModel.title,
+                    value = title ?: "",
                     placeholder = {
                         Text(
                             text = stringResource(id = R.string.title_field_entry),
@@ -163,14 +152,15 @@ fun EditAnnouncementScreen(
                     onValueChange = { editAnnouncementViewModel.updateTitle(it) },
                     textStyle = MaterialTheme.typography.titleMedium.copy(
                         fontSize = MaterialTheme.typography.titleMedium.fontSize * 1.2f
-                    )
+                    ),
+                    enabled = !loading
                 )
 
                 Spacer(modifier = Modifier.height(MaterialTheme.spacing.smallMedium))
 
                 TransparentTextField(
                     modifier = Modifier.fillMaxWidth(),
-                    value = editAnnouncementViewModel.content,
+                    value = content,
                     placeholder = {
                         Text(
                             text = stringResource(id = R.string.content_field_entry),
@@ -178,7 +168,8 @@ fun EditAnnouncementScreen(
                         )
                     },
                     onValueChange = { editAnnouncementViewModel.updateContent(it) },
-                    textStyle = MaterialTheme.typography.bodyLarge
+                    textStyle = MaterialTheme.typography.bodyLarge,
+                    enabled = !loading
                 )
             }
         }

@@ -9,7 +9,7 @@ interface AuthenticationRepository {
 
     suspend fun loginWithEmailAndPassword(email: String, password: String)
 
-    suspend fun registerWithEmailAndPassword(email: String, password: String): String
+    suspend fun registerWithEmailAndPassword(email: String, password: String)
 
     suspend fun logout()
 

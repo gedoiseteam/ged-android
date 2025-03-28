@@ -3,9 +3,8 @@ package com.upsaclay.message.presentation.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.upsaclay.common.domain.entity.User
+import com.upsaclay.common.domain.repository.UserRepository
 import com.upsaclay.common.domain.usecase.GenerateIdUseCase
-import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
-import com.upsaclay.common.domain.usecase.GetUsersUseCase
 import com.upsaclay.message.domain.entity.Conversation
 import com.upsaclay.message.domain.entity.ConversationEvent
 import com.upsaclay.message.domain.entity.ConversationState
@@ -18,15 +17,14 @@ import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
 class CreateConversationViewModel(
-    private val getUsersUseCase: GetUsersUseCase,
     private val userConversationRepository: UserConversationRepository,
-    getCurrentUserUseCase: GetCurrentUserUseCase
+    private val userRepository: UserRepository
 ) : ViewModel() {
     private val _event = MutableSharedFlow<ConversationEvent>()
     val event: Flow<ConversationEvent> = _event
     private val _users = MutableStateFlow<List<User>>(emptyList())
     val users: Flow<List<User>> = _users
-    private val currentUser: User? = getCurrentUserUseCase().value
+    private val currentUser: User? = userRepository.currentUser.value
 
     init {
         fetchUsers()
@@ -46,7 +44,7 @@ class CreateConversationViewModel(
     private fun fetchUsers() {
         viewModelScope.launch {
             _event.emit(ConversationEvent.Loading)
-            _users.value = getUsersUseCase().filterNot { it.id == currentUser?.id }
+            _users.value = userRepository.getUsers().filterNot { it.id == currentUser?.id }
             _event.emit(ConversationEvent.Success(SuccessType.LOADED))
         }
     }

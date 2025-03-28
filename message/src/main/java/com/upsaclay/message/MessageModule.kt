@@ -16,7 +16,7 @@ val messageModule = module {
     viewModel { (conversation: Conversation) ->
         ChatViewModel(
             conversation = conversation,
-            getCurrentUserUseCase = get(),
+            userRepository = get(),
             messageRepository = get(),
             createConversationUseCase = get()
         )

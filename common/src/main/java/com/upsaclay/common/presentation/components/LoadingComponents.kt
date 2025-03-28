@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -11,8 +12,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.zIndex
-import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
+import com.upsaclay.common.presentation.theme.overlay
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -20,8 +21,8 @@ fun OverlayCircularLoadingScreen(scale: Float = 2.5f) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(GedoiseColor.LittleTransparentWhite)
             .zIndex(1000f)
+            .background(MaterialTheme.colorScheme.overlay)
             .pointerInteropFilter { true }
     ) {
         CircularProgressBar(
@@ -38,6 +39,7 @@ fun OverlayLinearLoadingScreen() {
         modifier = Modifier
             .fillMaxSize()
             .zIndex(1000f)
+            .background(MaterialTheme.colorScheme.overlay)
             .pointerInteropFilter { true }
     ) {
         LinearProgressBar(

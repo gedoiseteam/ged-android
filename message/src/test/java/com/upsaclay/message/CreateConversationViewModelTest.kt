@@ -1,7 +1,6 @@
 package com.upsaclay.message
 
-import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
-import com.upsaclay.common.domain.usecase.GetUsersUseCase
+import com.upsaclay.common.domain.repository.UserRepository
 import com.upsaclay.common.domain.userFixture
 import com.upsaclay.common.domain.usersFixture
 import com.upsaclay.message.domain.conversationFixture
@@ -25,8 +24,7 @@ import kotlin.test.assertNull
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CreateConversationViewModelTest {
-    private val getUsersUseCase: GetUsersUseCase = mockk()
-    private val getCurrentUserUseCase: GetCurrentUserUseCase = mockk()
+    private val userRepository: UserRepository = mockk()
     private val userConversationRepository: UserConversationRepository = mockk()
 
     private lateinit var createConversationViewModel: CreateConversationViewModel
@@ -36,14 +34,13 @@ class CreateConversationViewModelTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
 
-        every { getCurrentUserUseCase() } returns MutableStateFlow(userFixture)
+        every { userRepository.currentUser } returns MutableStateFlow(userFixture)
         coEvery { userConversationRepository.getConversation(any()) } returns conversationFixture
-        coEvery { getUsersUseCase() } returns usersFixture
+        coEvery { userRepository.getUsers() } returns usersFixture
 
         createConversationViewModel = CreateConversationViewModel(
-            getUsersUseCase = getUsersUseCase,
             userConversationRepository = userConversationRepository,
-            getCurrentUserUseCase = getCurrentUserUseCase,
+            userRepository = userRepository
         )
     }
 

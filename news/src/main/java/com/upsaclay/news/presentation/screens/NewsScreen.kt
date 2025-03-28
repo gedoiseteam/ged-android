@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
@@ -44,9 +46,11 @@ import com.upsaclay.news.R
 import com.upsaclay.news.domain.announcementsFixture
 import com.upsaclay.news.domain.entity.Announcement
 import com.upsaclay.news.domain.entity.AnnouncementState
-import com.upsaclay.news.domain.entity.NewsScreen
+import com.upsaclay.news.domain.entity.NewsScreenRoute
 import com.upsaclay.news.presentation.components.AnnouncementItem
 import com.upsaclay.news.presentation.viewmodels.NewsViewModel
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -58,8 +62,8 @@ fun NewsScreen(
 ) {
     val announcements by newsViewModel.announcements.collectAsState(emptyList())
     val user by newsViewModel.currentUser.collectAsState()
-    val isRefreshing by newsViewModel.isRefreshing.collectAsState()
-    var showBottomSheet by remember { mutableStateOf(false) }
+    var refreshing by remember { mutableStateOf(false) }
+    var showDraftAnnouncementBottomSheet by remember { mutableStateOf(false) }
     var showDeleteAnnouncementDialog by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
@@ -68,13 +72,15 @@ fun NewsScreen(
     val hideBottomSheet = {
         scope.launch { sheetState.hide() }.invokeOnCompletion {
             if (!sheetState.isVisible) {
-                showBottomSheet = false
+                showDraftAnnouncementBottomSheet = false
             }
         }
     }
 
-    LaunchedEffect(Unit) {
-        newsViewModel.refreshAnnouncements()
+    LaunchedEffect(UInt) {
+        newsViewModel.refreshing.collect {
+            refreshing = it
+        }
     }
 
     if (showDeleteAnnouncementDialog) {
@@ -93,7 +99,7 @@ fun NewsScreen(
 
     PullToRefreshComponent(
         onRefresh = { newsViewModel.refreshAnnouncements() },
-        isRefreshing = isRefreshing
+        isRefreshing = refreshing
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -102,11 +108,11 @@ fun NewsScreen(
             RecentAnnouncementSection(
                 announcements = announcements,
                 onClickAnnouncement = {
-                    navController.navigate(NewsScreen.ReadAnnouncement(it.id).route)
+                    navController.navigate(NewsScreenRoute.ReadAnnouncement(it.id).route)
                 },
                 onClickNotSentAnnouncement = {
                     announcementClicked = it
-                    showBottomSheet = true
+                    showDraftAnnouncementBottomSheet = true
                 }
             )
         }
@@ -129,22 +135,28 @@ fun NewsScreen(
                             stringResource(id = R.string.new_announcement)
                         )
                     },
-                    onClick = { navController.navigate(NewsScreen.CreateAnnouncement.route) }
+                    onClick = { navController.navigate(NewsScreenRoute.CreateAnnouncement.route) }
                 )
             }
         }
     }
 
-    if (showBottomSheet) {
+    if (showDraftAnnouncementBottomSheet) {
         ModalBottomSheet(
             modifier = Modifier.testTag(stringResource(id = R.string.read_screen_bottom_sheet_tag)),
-            onDismissRequest = { showBottomSheet = false },
+            onDismissRequest = { showDraftAnnouncementBottomSheet = false },
             sheetState = sheetState,
         ) {
             ClickableItem(
                 modifier = Modifier
                     .fillMaxWidth(),
                 text = { Text(text = stringResource(id = R.string.resend_announcement)) },
+                icon = {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.Send,
+                        contentDescription = null
+                    )
+                },
                 onClick = {
                     announcementClicked?.let { newsViewModel.recreateAnnouncement(it) }
                     hideBottomSheet()
@@ -153,10 +165,19 @@ fun NewsScreen(
 
             ClickableItem(
                 modifier = Modifier.fillMaxWidth(),
-                text = { Text(
-                    text = stringResource(id = com.upsaclay.common.R.string.delete),
-                    color = MaterialTheme.colorScheme.error
-                ) },
+                text = {
+                    Text(
+                        text = stringResource(id = com.upsaclay.common.R.string.delete),
+                        color = MaterialTheme.colorScheme.error
+                    )
+                },
+                icon = {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        tint = MaterialTheme.colorScheme.error,
+                        contentDescription = null
+                    )
+                },
                 onClick = {
                     hideBottomSheet()
                     showDeleteAnnouncementDialog = true

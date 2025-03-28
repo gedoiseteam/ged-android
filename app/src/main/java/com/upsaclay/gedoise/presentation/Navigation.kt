@@ -20,7 +20,7 @@ import androidx.navigation.NavDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.upsaclay.authentication.domain.entity.AuthenticationScreen
+import com.upsaclay.authentication.domain.entity.AuthenticationScreenRoute
 import com.upsaclay.authentication.domain.entity.AuthenticationState
 import com.upsaclay.authentication.presentation.screens.AuthenticationScreen
 import com.upsaclay.authentication.presentation.screens.EmailVerificationScreen
@@ -28,10 +28,10 @@ import com.upsaclay.authentication.presentation.screens.FirstRegistrationScreen
 import com.upsaclay.authentication.presentation.screens.SecondRegistrationScreen
 import com.upsaclay.authentication.presentation.screens.ThirdRegistrationScreen
 import com.upsaclay.authentication.presentation.viewmodels.RegistrationViewModel
-import com.upsaclay.common.domain.entity.Screen
+import com.upsaclay.common.domain.entity.ScreenRoute
 import com.upsaclay.common.utils.showToast
 import com.upsaclay.gedoise.R
-import com.upsaclay.gedoise.domain.entities.MainScreen
+import com.upsaclay.gedoise.domain.entities.MainScreenRoute
 import com.upsaclay.gedoise.presentation.components.HomeTopBar
 import com.upsaclay.gedoise.presentation.components.MainBottomBar
 import com.upsaclay.gedoise.presentation.components.MainTopBar
@@ -40,11 +40,11 @@ import com.upsaclay.gedoise.presentation.screens.AccountScreen
 import com.upsaclay.gedoise.presentation.screens.ProfileScreen
 import com.upsaclay.gedoise.presentation.viewmodels.NavigationViewModel
 import com.upsaclay.message.domain.ConversationMapper
-import com.upsaclay.message.domain.entity.MessageScreen
+import com.upsaclay.message.domain.entity.MessageScreenRoute
 import com.upsaclay.message.presentation.screens.ChatScreen
 import com.upsaclay.message.presentation.screens.ConversationScreen
 import com.upsaclay.message.presentation.screens.CreateConversationScreen
-import com.upsaclay.news.domain.entity.NewsScreen
+import com.upsaclay.news.domain.entity.NewsScreenRoute
 import com.upsaclay.news.presentation.screens.CreateAnnouncementScreen
 import com.upsaclay.news.presentation.screens.EditAnnouncementScreen
 import com.upsaclay.news.presentation.screens.NewsScreen
@@ -69,9 +69,9 @@ fun Navigation(
     }.collectAsState(emptyList())
 
     val startDestination = when (authenticationState) {
-        AuthenticationState.WAITING -> MainScreen.Splash.route
-        AuthenticationState.AUTHENTICATED -> NewsScreen.News.route
-        else -> AuthenticationScreen.Authentication.route
+        AuthenticationState.WAITING -> MainScreenRoute.Splash.route
+        AuthenticationState.AUTHENTICATED -> NewsScreenRoute.News.route
+        else -> AuthenticationScreenRoute.Authentication.route
     }
     navController.addOnDestinationChangedListener { controller, destination, _ ->
         navigationViewModel.setCurrentScreen(getScreen(controller, destination))
@@ -89,43 +89,43 @@ fun Navigation(
         navController = navController,
         startDestination = startDestination
     ) {
-        composable(MainScreen.Splash.route) {
+        composable(MainScreenRoute.Splash.route) {
             SplashScreen()
         }
 
-        composable(AuthenticationScreen.Authentication.route) {
+        composable(AuthenticationScreenRoute.Authentication.route) {
             registrationViewModel.resetAllValues()
             AuthenticationScreen(navController = navController)
         }
 
-        composable(AuthenticationScreen.FirstRegistration.route) {
+        composable(AuthenticationScreenRoute.FirstRegistration.route) {
             FirstRegistrationScreen(
                 navController = navController,
                 registrationViewModel = registrationViewModel
             )
         }
 
-        composable(AuthenticationScreen.SecondRegistration.route) {
+        composable(AuthenticationScreenRoute.SecondRegistration.route) {
             SecondRegistrationScreen(
                 navController = navController,
                 registrationViewModel = registrationViewModel
             )
         }
 
-        composable(AuthenticationScreen.ThirdRegistration.route) {
+        composable(AuthenticationScreenRoute.ThirdRegistration.route) {
             ThirdRegistrationScreen(
                 navController = navController,
                 registrationViewModel = registrationViewModel
             )
         }
 
-        composable(AuthenticationScreen.EmailVerification.HARD_ROUTE) { backStackEntry ->
+        composable(AuthenticationScreenRoute.EmailVerification.HARD_ROUTE) { backStackEntry ->
             backStackEntry.arguments?.getString("email")?.let { email ->
                 EmailVerificationScreen(email = email, navController = navController)
             }
         }
 
-        composable(NewsScreen.News.route) {
+        composable(NewsScreenRoute.News.route) {
             MainNavigationBars(
                 navController = navController,
                 topBar = {
@@ -140,7 +140,7 @@ fun Navigation(
             }
         }
 
-        composable(NewsScreen.ReadAnnouncement.HARD_ROUTE) { backStackEntry ->
+        composable(NewsScreenRoute.ReadAnnouncement.HARD_ROUTE) { backStackEntry ->
             val announcementId = backStackEntry.arguments?.getString("announcementId")
 
             announcementId?.let {
@@ -151,11 +151,11 @@ fun Navigation(
             } ?: navController.popBackStack()
         }
 
-        composable(NewsScreen.CreateAnnouncement.route) {
+        composable(NewsScreenRoute.CreateAnnouncement.route) {
             CreateAnnouncementScreen(navController = navController)
         }
 
-        composable(NewsScreen.EditAnnouncement.HARD_ROUTE) { backStackEntry ->
+        composable(NewsScreenRoute.EditAnnouncement.HARD_ROUTE) { backStackEntry ->
             val announcementId = backStackEntry.arguments?.getString("announcementId")
 
             announcementId?.let {
@@ -166,7 +166,7 @@ fun Navigation(
             } ?: navController.popBackStack()
         }
 
-        composable(MessageScreen.Conversation.route) {
+        composable(MessageScreenRoute.Conversation.route) {
             val snackbarHostState = remember { SnackbarHostState() }
 
             MainNavigationBars(
@@ -182,18 +182,18 @@ fun Navigation(
             }
         }
 
-        composable(MessageScreen.CreateConversation.route) {
+        composable(MessageScreenRoute.CreateConversation.route) {
             CreateConversationScreen(navController = navController)
         }
 
-        composable(MessageScreen.Chat.HARD_ROUTE) { backStackEntry ->
+        composable(MessageScreenRoute.Chat.HARD_ROUTE) { backStackEntry ->
             backStackEntry.arguments?.getString("conversation")?.let {
                 ChatScreen(
                     conversation = ConversationMapper.fromJson(it),
                     navController = navController
                 )
             } ?: run {
-                navController.navigate(MessageScreen.Conversation.route)
+                navController.navigate(MessageScreenRoute.Conversation.route)
                 showToast(
                     context = LocalContext.current,
                     stringRes = com.upsaclay.common.R.string.occurred_error
@@ -201,11 +201,11 @@ fun Navigation(
             }
         }
 
-        composable(MainScreen.Profile.route) {
+        composable(MainScreenRoute.Profile.route) {
             ProfileScreen(navController = navController)
         }
 
-        composable(MainScreen.Account.route) {
+        composable(MainScreenRoute.Account.route) {
             AccountScreen(navController = navController)
         }
     }
@@ -240,12 +240,12 @@ private fun MainNavigationBars(
     }
 }
 
-private fun getScreen(controller: NavController, destination: NavDestination): Screen? {
+private fun getScreen(controller: NavController, destination: NavDestination): ScreenRoute? {
     return when(destination.route) {
-        MessageScreen.Chat.HARD_ROUTE -> {
+        MessageScreenRoute.Chat.HARD_ROUTE -> {
             controller.currentBackStackEntry?.arguments?.getString("conversation")?.let { announcementId ->
                 val conversation = ConversationMapper.fromJson(announcementId)
-                MessageScreen.Chat(conversation)
+                MessageScreenRoute.Chat(conversation)
             }
         }
 

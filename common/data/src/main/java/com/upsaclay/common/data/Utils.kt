@@ -9,7 +9,8 @@ fun <T> formatHttpError(message: String, response: Response<T>): String {
         response.errorBody()?.string()?.replace(Regex("<[^>]*>"), "")?.trim() ?: "No error body"
 
     return """
-        Error request: $message
+        ERROR SERVER RESPONSE
+        Request: $message
         HTTP status: ${response.code()}
         URL: $url
         Method: $method
@@ -24,7 +25,8 @@ fun formatHttpError(message: String, response: okhttp3.Response): String {
         response.body?.string()?.replace(Regex("<[^>]*>"), "")?.trim() ?: "No error body"
 
     return """
-        Error request: $message
+        ERROR SERVER RESPONSE
+        Request: $message
         HTTP status: ${response.code}
         URL: $url
         Method: $method

@@ -8,8 +8,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.upsaclay.common.domain.entity.User
+import com.upsaclay.common.domain.repository.UserRepository
 import com.upsaclay.common.domain.usecase.GenerateIdUseCase
-import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
 import com.upsaclay.message.domain.entity.ChatEvent
 import com.upsaclay.message.domain.entity.Conversation
 import com.upsaclay.message.domain.entity.ConversationState
@@ -30,13 +30,13 @@ import java.time.LocalDateTime
 
 class ChatViewModel(
     private var conversation: Conversation,
-    getCurrentUserUseCase: GetCurrentUserUseCase,
+    userRepository: UserRepository,
     private val messageRepository: MessageRepository,
     private val createConversationUseCase: CreateConversationUseCase
 ): ViewModel() {
     private val _event = MutableSharedFlow<ChatEvent>()
     val event: Flow<ChatEvent> = _event
-    private val currentUser: User? = getCurrentUserUseCase().value
+    private val currentUser: User? = userRepository.currentUser.value
     val messages: Flow<PagingData<Message>> = messageRepository.getMessages(conversation.id).cachedIn(viewModelScope)
     var textToSend: String by mutableStateOf("")
         private set

@@ -27,10 +27,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.upsaclay.authentication.R
-import com.upsaclay.authentication.domain.entity.AuthenticationScreen
+import com.upsaclay.authentication.domain.entity.AuthenticationScreenRoute
 import com.upsaclay.authentication.domain.entity.RegistrationErrorType
 import com.upsaclay.authentication.domain.entity.RegistrationEvent
-import com.upsaclay.authentication.presentation.components.RegistrationTopBar
+import com.upsaclay.authentication.presentation.components.RegistrationScaffold
 import com.upsaclay.authentication.presentation.viewmodels.RegistrationViewModel
 import com.upsaclay.common.presentation.components.ErrorText
 import com.upsaclay.common.presentation.components.OutlineTextField
@@ -56,7 +56,7 @@ fun FirstRegistrationScreen(
         }
     }
 
-    RegistrationTopBar(
+    RegistrationScaffold(
         navController = navController,
         onBackClick = {
             keyboardController?.hide()
@@ -112,7 +112,7 @@ fun FirstRegistrationScreen(
                 if (registrationViewModel.verifyNamesInputs()) {
                     focusManager.clearFocus()
                     keyboardController?.hide()
-                    navController.navigate(AuthenticationScreen.SecondRegistration.route)
+                    navController.navigate(AuthenticationScreenRoute.SecondRegistration.route)
                 }
             }
         )
@@ -134,7 +134,7 @@ private fun FirstRegistrationScreenPreview() {
     val focusManager = LocalFocusManager.current
 
     GedoiseTheme {
-        RegistrationTopBar(navController = rememberNavController()) {
+        RegistrationScaffold(navController = rememberNavController()) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()

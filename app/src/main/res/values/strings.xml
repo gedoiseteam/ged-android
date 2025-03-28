@@ -27,7 +27,6 @@
     <string name="logout_icon_description">Icône pour se déconnecter</string>
     <string name="check_icon_description">Accepter les changements</string>
 
-    <string name="delete_profile_picture">Supprimer photo de profil</string>
     <string name="new_profile_picture">Nouvelle photo de profil</string>
     <string name="profile_picture_updated">Photo de profil mise à jour</string>
     <string name="profile_picture_deleted">Photo de profil supprimé</string>

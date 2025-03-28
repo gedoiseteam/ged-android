@@ -13,10 +13,9 @@ import androidx.core.content.ContextCompat
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.gedoise.presentation.viewmodels.NavigationViewModel
 import com.upsaclay.message.domain.ConversationMapper
-import com.upsaclay.message.domain.entity.MessageScreen
+import com.upsaclay.message.domain.entity.MessageScreenRoute
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import org.koin.core.parameter.parametersOf
 
 @SuppressLint("MissingPermission")
 class MainActivity : ComponentActivity() {
@@ -59,7 +58,7 @@ class MainActivity : ComponentActivity() {
         super.onNewIntent(intent)
         intent.getStringExtra(CONVERSATION_ID_EXTRA)?.let {
             val conversation = ConversationMapper.fromJson(it)
-            navigationViewModel.navigateTo(MessageScreen.Chat(conversation))
+            navigationViewModel.navigateTo(MessageScreenRoute.Chat(conversation))
         }
     }
 }
