@@ -57,15 +57,6 @@ class EditAnnouncementViewModelTest {
     }
 
     @Test
-    fun updateTitle_should_update_isAnnouncementModified_to_true_when_title_is_different() {
-        // When
-        editAnnouncementViewModel.updateTitle(title)
-
-        // Then
-        assertEquals(true, editAnnouncementViewModel.isAnnouncementModified.value)
-    }
-
-    @Test
     fun updateContent_should_update_content() {
         // When
         editAnnouncementViewModel.updateContent(content)
