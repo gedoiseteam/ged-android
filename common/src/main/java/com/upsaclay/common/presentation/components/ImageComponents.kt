@@ -23,9 +23,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.upsaclay.common.R
-import com.upsaclay.common.presentation.theme.GedoiseColor
 import com.upsaclay.common.presentation.theme.GedoiseTheme
+import com.upsaclay.common.presentation.theme.profilePictureError
 import com.upsaclay.common.presentation.theme.spacing
+
 
 @Composable
 fun ProfilePictureWithIcon(
@@ -80,6 +81,7 @@ fun ProfilePicture(
     url: String?,
     onClick: (() -> Unit)? = null
 ) {
+    val color = MaterialTheme.colorScheme.profilePictureError
     AsyncImage(
         model = url ?: R.drawable.default_profile_picture,
         contentDescription = "",
@@ -94,8 +96,8 @@ fun ProfilePicture(
                 .size(100.dp * scale)
                 .clip(CircleShape)
         },
-        onLoading = { ColorPainter(GedoiseColor.ProfilePictureErrorLight) },
-        error = ColorPainter(GedoiseColor.ProfilePictureErrorLight)
+        onLoading = { ColorPainter(color) },
+        error = ColorPainter(color)
     )
 }
 
@@ -106,6 +108,7 @@ fun ProfilePicture(
     uri: Uri?,
     onClick: (() -> Unit)? = null
 ) {
+    val color = MaterialTheme.colorScheme.profilePictureError
     AsyncImage(
         model = uri ?: R.drawable.default_profile_picture,
         contentDescription = "",
@@ -120,7 +123,8 @@ fun ProfilePicture(
                 .size(100.dp * scale)
                 .clip(CircleShape)
         },
-        error = ColorPainter(GedoiseColor.ProfilePictureErrorLight)
+        onLoading = { ColorPainter(color) },
+        error = ColorPainter(color)
     )
 }
 
@@ -154,6 +158,7 @@ private fun ImageWithIcon(
     contentDescription: String,
     onClick: (() -> Unit)?
 ) {
+    val color = MaterialTheme.colorScheme.profilePictureError
     Box(modifier = modifier.size(100.dp * scale)) {
         AsyncImage(
             model = model,
@@ -171,7 +176,8 @@ private fun ImageWithIcon(
                     .size(100.dp * scale)
                     .clip(CircleShape)
             },
-            error = ColorPainter(GedoiseColor.ProfilePictureErrorLight)
+            onLoading = { ColorPainter(color) },
+            error = ColorPainter(color)
         )
 
         Box(
@@ -212,6 +218,7 @@ private fun ImageWithBubble(
     contentDescription: String,
     onClick: (() -> Unit)?
 ) {
+    val color = MaterialTheme.colorScheme.profilePictureError
     Box(modifier = modifier.size(100.dp * scale)) {
         AsyncImage(
             model = model,
@@ -229,7 +236,8 @@ private fun ImageWithBubble(
                     .size(100.dp * scale)
                     .clip(CircleShape)
             },
-            error = ColorPainter(GedoiseColor.ProfilePictureErrorLight)
+            onLoading = { ColorPainter(color) },
+            error = ColorPainter(color)
         )
 
         Box(
@@ -280,21 +288,6 @@ private fun ProfilePictureWithIconPreview() {
                 iconVector = Icons.Default.Edit,
                 contentDescription = "",
                 iconBackgroundColor = MaterialTheme.colorScheme.primary,
-                onClick = {}
-            )
-        }
-    }
-}
-
-@Preview
-@Composable
-private fun ProfilePictureWithBubblePreview() {
-    GedoiseTheme {
-        Box(Modifier.size(100.dp)) {
-            ProfilePictureWithBubble(
-                url = null,
-                bubbleBackgroundColor = GedoiseColor.OnlineColor,
-                contentDescription = "",
                 onClick = {}
             )
         }

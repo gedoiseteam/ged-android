@@ -31,7 +31,7 @@ import com.upsaclay.common.presentation.theme.spacing
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun RegistrationTopBar(
+internal fun RegistrationScaffold(
     navController: NavController,
     onBackClick: () -> Unit = { navController.popBackStack() },
     snackbarHostState: SnackbarHostState? = null,
@@ -95,6 +95,6 @@ internal fun RegistrationTopBar(
 @Composable
 internal fun RegistrationTopBarPreview() {
     GedoiseTheme {
-        RegistrationTopBar(navController = rememberNavController()) {}
+        RegistrationScaffold(navController = rememberNavController()) {}
     }
 }

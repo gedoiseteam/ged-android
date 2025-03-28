@@ -1,5 +1,5 @@
 package com.upsaclay.common.domain.entity
 
-interface Screen {
+interface ScreenRoute {
     val route: String
 }

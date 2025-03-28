@@ -1,6 +1,6 @@
 package com.upsaclay.news
 
-import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
+import com.upsaclay.common.domain.repository.UserRepository
 import com.upsaclay.common.domain.userFixture
 import com.upsaclay.news.domain.usecase.CreateAnnouncementUseCase
 import com.upsaclay.news.presentation.viewmodels.CreateAnnouncementViewModel
@@ -19,7 +19,7 @@ import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CreateAnnouncementViewModelTest {
-    private val getCurrentUserUseCase: GetCurrentUserUseCase = mockk()
+    private val userRepository: UserRepository = mockk()
     private val createAnnouncementUseCase: CreateAnnouncementUseCase = mockk()
 
     private lateinit var createAnnouncementViewModel: CreateAnnouncementViewModel
@@ -31,11 +31,11 @@ class CreateAnnouncementViewModelTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
 
-        every { getCurrentUserUseCase() } returns MutableStateFlow(userFixture)
+        every { userRepository.currentUser } returns MutableStateFlow(userFixture)
         coEvery { createAnnouncementUseCase(any()) } returns Unit
 
         createAnnouncementViewModel = CreateAnnouncementViewModel(
-            getCurrentUserUseCase = getCurrentUserUseCase,
+            userRepository = userRepository,
             createAnnouncementUseCase = createAnnouncementUseCase
         )
     }
@@ -76,9 +76,9 @@ class CreateAnnouncementViewModelTest {
     @Test
     fun createAnnouncement_should_not_create_announcement_when_user_is_null() {
         // Given
-        every { getCurrentUserUseCase() } returns MutableStateFlow(null)
+        every { userRepository.currentUser } returns MutableStateFlow(null)
         createAnnouncementViewModel = CreateAnnouncementViewModel(
-            getCurrentUserUseCase = getCurrentUserUseCase,
+            userRepository = userRepository,
             createAnnouncementUseCase = createAnnouncementUseCase
         )
 

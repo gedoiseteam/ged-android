@@ -22,8 +22,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.upsaclay.authentication.R
-import com.upsaclay.authentication.domain.entity.AuthenticationScreen
-import com.upsaclay.authentication.presentation.components.RegistrationTopBar
+import com.upsaclay.authentication.domain.entity.AuthenticationScreenRoute
+import com.upsaclay.authentication.presentation.components.RegistrationScaffold
 import com.upsaclay.authentication.presentation.viewmodels.RegistrationViewModel
 import com.upsaclay.common.presentation.components.PrimaryButton
 import com.upsaclay.common.presentation.components.SimpleDropDownMenu
@@ -39,7 +39,7 @@ fun SecondRegistrationScreen(
     var selectedItem by remember { mutableStateOf(registrationViewModel.schoolLevel) }
     var expanded by remember { mutableStateOf(false) }
 
-    RegistrationTopBar(navController = navController) {
+    RegistrationScaffold(navController = navController) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -75,7 +75,7 @@ fun SecondRegistrationScreen(
             text = stringResource(id = com.upsaclay.common.R.string.next),
             onClick = {
                 registrationViewModel.updateSchoolLevel(selectedItem)
-                navController.navigate(AuthenticationScreen.ThirdRegistration.route)
+                navController.navigate(AuthenticationScreenRoute.ThirdRegistration.route)
             }
         )
     }
@@ -95,7 +95,7 @@ private fun SecondRegistrationScreenPreview() {
     var expanded by remember { mutableStateOf(false) }
 
     GedoiseTheme {
-        RegistrationTopBar(navController = rememberNavController()) {
+        RegistrationScaffold(navController = rememberNavController()) {
             Column(
                 modifier = Modifier.fillMaxSize()
             ) {

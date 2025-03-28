@@ -3,11 +3,10 @@ package com.upsaclay.authentication
 import com.upsaclay.authentication.domain.entity.RegistrationErrorType
 import com.upsaclay.authentication.domain.entity.RegistrationEvent
 import com.upsaclay.authentication.domain.entity.exception.InvalidCredentialsException
-import com.upsaclay.authentication.domain.usecase.RegisterUseCase
+import com.upsaclay.authentication.domain.repository.AuthenticationRepository
 import com.upsaclay.authentication.presentation.viewmodels.RegistrationViewModel
 import com.upsaclay.common.domain.entity.ErrorType
-import com.upsaclay.common.domain.usecase.CreateUserUseCase
-import com.upsaclay.common.domain.usecase.IsUserExistUseCase
+import com.upsaclay.common.domain.repository.UserRepository
 import com.upsaclay.common.domain.userFixture
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -23,9 +22,8 @@ import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class RegistrationViewModelTest {
-    private val createUserUseCase: CreateUserUseCase = mockk()
-    private val registerUseCase: RegisterUseCase = mockk()
-    private val isUserExistUseCase: IsUserExistUseCase = mockk()
+    private val authenticationRepository: AuthenticationRepository = mockk()
+    private val userRepository: UserRepository = mockk()
 
     private lateinit var registrationViewModel: RegistrationViewModel
     private val testDispatcher = UnconfinedTestDispatcher()
@@ -40,14 +38,13 @@ class RegistrationViewModelTest {
         Dispatchers.setMain(testDispatcher)
 
         registrationViewModel = RegistrationViewModel(
-            createUserUseCase = createUserUseCase,
-            registerUseCase = registerUseCase,
-            isUserExistUseCase = isUserExistUseCase
+            authenticationRepository = authenticationRepository,
+            userRepository = userRepository
         )
 
-        coEvery { registerUseCase(any(), any()) } returns userFixture.id
-        coEvery { createUserUseCase(any()) } returns Unit
-        coEvery { isUserExistUseCase(any()) } returns false
+        coEvery { authenticationRepository.registerWithEmailAndPassword(any(), any()) } returns Unit
+        coEvery { userRepository.createUser(any()) } returns Unit
+        coEvery {userRepository.isUserExist(any()) } returns false
     }
 
     @Test
@@ -179,7 +176,7 @@ class RegistrationViewModelTest {
         registrationViewModel.register()
 
         // Then
-        coVerify { registerUseCase(email, password) }
+        coVerify { authenticationRepository.registerWithEmailAndPassword(email, password) }
     }
 
     @Test
@@ -188,7 +185,7 @@ class RegistrationViewModelTest {
         registrationViewModel.register()
 
         // Then
-        coVerify { createUserUseCase(any()) }
+        coVerify { userRepository.createUser(any()) }
     }
 
     @Test

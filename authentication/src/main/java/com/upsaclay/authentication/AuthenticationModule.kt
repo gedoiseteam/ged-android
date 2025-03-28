@@ -13,9 +13,7 @@ val authenticationModule = module {
     viewModel { (email: String) ->
         EmailVerificationViewModel(
             email = email,
-            sendVerificationEmailUseCase = get(),
-            isEmailVerifiedUseCase = get(),
-            setUserAuthenticatedUseCase = get()
+            authenticationRepository = get()
         )
     }
 }

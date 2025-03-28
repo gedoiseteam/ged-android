@@ -11,7 +11,7 @@ import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.testing.TestNavHostController
-import com.upsaclay.authentication.domain.entity.AuthenticationScreen
+import com.upsaclay.authentication.domain.entity.AuthenticationScreenRoute
 import com.upsaclay.authentication.domain.entity.RegistrationErrorType
 import com.upsaclay.authentication.domain.entity.RegistrationEvent
 import com.upsaclay.authentication.presentation.screens.EmailVerificationScreen
@@ -28,7 +28,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-class ThirdRegistrationScreenUITest {
+class ThirdRegistrationScreenRouteUITest {
     @get:Rule
     val rule = createAndroidComposeRule<ComponentActivity>()
 
@@ -64,15 +64,15 @@ class ThirdRegistrationScreenUITest {
         rule.setContent {
             navController = TestNavHostController(LocalContext.current)
             navController.navigatorProvider.addNavigator(ComposeNavigator())
-            NavHost(navController = navController, startDestination = AuthenticationScreen.ThirdRegistration.route) {
-                composable(AuthenticationScreen.ThirdRegistration.route) {
+            NavHost(navController = navController, startDestination = AuthenticationScreenRoute.ThirdRegistration.route) {
+                composable(AuthenticationScreenRoute.ThirdRegistration.route) {
                     ThirdRegistrationScreen(
                         navController = navController,
                         registrationViewModel = registrationViewModel
                     )
                 }
 
-                composable(AuthenticationScreen.EmailVerification.HARD_ROUTE){
+                composable(AuthenticationScreenRoute.EmailVerification.HARD_ROUTE){
                     EmailVerificationScreen(
                         email = userFixture.email,
                         navController = navController,
@@ -83,7 +83,7 @@ class ThirdRegistrationScreenUITest {
         }
 
         // Then
-        Assert.assertEquals(AuthenticationScreen.EmailVerification.HARD_ROUTE, navController.currentDestination?.route)
+        Assert.assertEquals(AuthenticationScreenRoute.EmailVerification.HARD_ROUTE, navController.currentDestination?.route)
     }
 
     @Test

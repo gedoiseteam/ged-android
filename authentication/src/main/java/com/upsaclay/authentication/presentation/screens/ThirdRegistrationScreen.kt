@@ -30,11 +30,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.upsaclay.authentication.R
-import com.upsaclay.authentication.domain.entity.AuthenticationScreen
+import com.upsaclay.authentication.domain.entity.AuthenticationScreenRoute
 import com.upsaclay.authentication.domain.entity.RegistrationErrorType
 import com.upsaclay.authentication.domain.entity.RegistrationEvent
 import com.upsaclay.authentication.presentation.components.OutlinePasswordTextField
-import com.upsaclay.authentication.presentation.components.RegistrationTopBar
+import com.upsaclay.authentication.presentation.components.RegistrationScaffold
 import com.upsaclay.authentication.presentation.viewmodels.RegistrationViewModel
 import com.upsaclay.common.domain.entity.ErrorType
 import com.upsaclay.common.presentation.components.ErrorText
@@ -70,7 +70,7 @@ fun ThirdRegistrationScreen(
             loading = event is RegistrationEvent.Loading
             when (event) {
                 RegistrationEvent.Registered ->
-                    navController.navigate(AuthenticationScreen.EmailVerification(registrationViewModel.email).route)
+                    navController.navigate(AuthenticationScreenRoute.EmailVerification(registrationViewModel.email).route)
 
                 is RegistrationEvent.Error -> {
                     errorMessage = when (event.type) {
@@ -101,7 +101,7 @@ fun ThirdRegistrationScreen(
         TopLinearLoadingScreen()
     }
 
-    RegistrationTopBar(
+    RegistrationScaffold(
         navController = navController,
         onBackClick = {
             keyboardController?.hide()
@@ -193,7 +193,7 @@ private fun ThirdRegistrationScreenPreview() {
             TopLinearLoadingScreen()
         }
 
-        RegistrationTopBar(navController = rememberNavController()) {
+        RegistrationScaffold(navController = rememberNavController()) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()

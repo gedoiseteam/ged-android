@@ -37,7 +37,7 @@ internal class AuthenticationRepositoryImpl(
         firebaseAuthenticationRepository.loginWithEmailAndPassword(email, password)
     }
 
-    override suspend fun registerWithEmailAndPassword(email: String, password: String): String {
+    override suspend fun registerWithEmailAndPassword(email: String, password: String) {
         return firebaseAuthenticationRepository.registerWithEmailAndPassword(email, password)
     }
 

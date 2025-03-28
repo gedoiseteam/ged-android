@@ -1,5 +1,6 @@
 package com.upsaclay.authentication.presentation.screens
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -203,7 +204,7 @@ fun EmailVerificationScreen(
  =====================================================================
  */
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun EmailVerificationScreenPreview() {
     var isLoading by remember { mutableStateOf(false) }

@@ -9,13 +9,10 @@ import androidx.lifecycle.viewModelScope
 import com.upsaclay.authentication.domain.entity.AuthErrorType
 import com.upsaclay.authentication.domain.entity.AuthenticationEvent
 import com.upsaclay.authentication.domain.entity.exception.InvalidCredentialsException
-import com.upsaclay.authentication.domain.usecase.IsEmailVerifiedUseCase
-import com.upsaclay.authentication.domain.usecase.LoginUseCase
-import com.upsaclay.authentication.domain.usecase.SetUserAuthenticatedUseCase
+import com.upsaclay.authentication.domain.repository.AuthenticationRepository
 import com.upsaclay.common.domain.entity.ErrorType
 import com.upsaclay.common.domain.entity.TooManyRequestException
-import com.upsaclay.common.domain.usecase.GetUserUseCase
-import com.upsaclay.common.domain.usecase.SetCurrentUserUseCase
+import com.upsaclay.common.domain.repository.UserRepository
 import com.upsaclay.common.domain.usecase.VerifyEmailFormatUseCase
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -23,11 +20,8 @@ import kotlinx.coroutines.launch
 import java.io.IOException
 
 class AuthenticationViewModel(
-    private val loginUseCase: LoginUseCase,
-    private val setUserAuthenticatedUseCase: SetUserAuthenticatedUseCase,
-    private val getUserUseCase: GetUserUseCase,
-    private val setCurrentUserUseCase: SetCurrentUserUseCase,
-    private val isEmailVerifiedUseCase: IsEmailVerifiedUseCase
+    private val authenticationRepository: AuthenticationRepository,
+    private val userRepository: UserRepository
 ): ViewModel() {
     private val _event = MutableSharedFlow<AuthenticationEvent>()
     val event: SharedFlow<AuthenticationEvent> = _event
@@ -49,12 +43,12 @@ class AuthenticationViewModel(
             _event.emit(AuthenticationEvent.Loading)
 
             try {
-                loginUseCase(email, password)
+                authenticationRepository.loginWithEmailAndPassword(email, password)
 
-                getUserUseCase.withEmail(email)?.let {
-                    setCurrentUserUseCase(it)
-                    if (isEmailVerifiedUseCase()) {
-                        setUserAuthenticatedUseCase(true)
+                userRepository.getUserWithEmail(email)?.let {
+                    userRepository.setCurrentUser(it)
+                    if (authenticationRepository.isUserEmailVerified()) {
+                        authenticationRepository.setAuthenticated(true)
                     } else {
                         _event.emit(AuthenticationEvent.EmailNotVerified)
                     }

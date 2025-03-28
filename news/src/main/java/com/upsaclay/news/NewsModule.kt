@@ -14,18 +14,16 @@ val newsModule = module {
     viewModel { (announcementId: String) ->
         ReadAnnouncementViewModel(
             announcementId = announcementId,
-            getCurrentUserUseCase = get(),
-            getAnnouncementUseCase = get(),
             getAnnouncementFlowUseCase = get(),
             deleteAnnouncementUseCase = get(),
-            recreateAnnouncementUseCase = get()
+            userRepository = get(),
+            announcementRepository = get()
         )
     }
     viewModel { (announcementId: String) ->
         EditAnnouncementViewModel(
             announcementId = announcementId,
-            getAnnouncementUseCase = get(),
-            updateAnnouncementUseCase = get()
+            announcementRepository = get()
         )
     }
 }

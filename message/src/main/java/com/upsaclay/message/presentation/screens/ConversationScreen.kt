@@ -62,7 +62,7 @@ import com.upsaclay.message.domain.ConversationMapper
 import com.upsaclay.message.domain.conversationsUIFixture
 import com.upsaclay.message.domain.entity.ConversationEvent
 import com.upsaclay.message.domain.entity.ConversationUI
-import com.upsaclay.message.domain.entity.MessageScreen
+import com.upsaclay.message.domain.entity.MessageScreenRoute
 import com.upsaclay.message.domain.entity.SuccessType
 import com.upsaclay.message.presentation.components.ConversationItem
 import com.upsaclay.message.presentation.viewmodels.ConversationViewModel
@@ -143,14 +143,14 @@ fun ConversationScreen(
     Box(modifier = Modifier.fillMaxSize()) {
         if (conversationItems.itemCount == 0) {
             StartConversation(
-                onCreateClick = { navController.navigate(MessageScreen.CreateConversation.route) }
+                onCreateClick = { navController.navigate(MessageScreenRoute.CreateConversation.route) }
             )
         } else {
             ConversationFeed(
                 conversationItems = conversationItems,
                 onClick = {
                     val conversation = ConversationMapper.toConversation(it)
-                    navController.navigate(MessageScreen.Chat(conversation).route)
+                    navController.navigate(MessageScreenRoute.Chat(conversation).route)
                 },
                 onLongClick = {
                     conversationClicked = it
@@ -163,7 +163,7 @@ fun ConversationScreen(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .testTag(stringResource(id = R.string.conversation_screen_create_conversation_button_tag)),
-            onClick = { navController.navigate(MessageScreen.CreateConversation.route) },
+            onClick = { navController.navigate(MessageScreenRoute.CreateConversation.route) },
         )
 
         if (showBottomSheet) {

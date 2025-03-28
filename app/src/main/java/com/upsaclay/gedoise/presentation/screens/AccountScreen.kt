@@ -5,6 +5,11 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,6 +27,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -44,15 +50,19 @@ import com.upsaclay.common.presentation.components.ProfilePictureWithIcon
 import com.upsaclay.common.presentation.components.SensibleActionDialog
 import com.upsaclay.common.presentation.components.SmallTopBarAction
 import com.upsaclay.common.presentation.components.SmallTopBarBack
+import com.upsaclay.common.presentation.components.TopLinearLoadingScreen
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.gedoise.R
+import com.upsaclay.gedoise.domain.entities.AccountErrorType
+import com.upsaclay.gedoise.domain.entities.AccountEvent
 import com.upsaclay.gedoise.domain.entities.AccountInfo
 import com.upsaclay.gedoise.domain.entities.AccountScreenState
 import com.upsaclay.gedoise.presentation.components.AccountInfoItem
 import com.upsaclay.gedoise.presentation.components.AccountModelBottomSheet
 import com.upsaclay.gedoise.presentation.components.AccountTopBar
 import com.upsaclay.gedoise.presentation.viewmodels.AccountViewModel
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -67,10 +77,9 @@ fun AccountScreen(
     val scope = rememberCoroutineScope()
     val screenState by accountViewModel.screenState.collectAsState()
     val user by accountViewModel.currentUser.collectAsState()
-
+    var loading by remember { mutableStateOf(false) }
     var showBottomSheet by remember { mutableStateOf(false) }
     var showDeleteProfilePictureDialog by remember { mutableStateOf(false) }
-    var showLoadingDialog by remember { mutableStateOf(false) }
 
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -102,28 +111,29 @@ fun AccountScreen(
         }
     )
 
-    when (screenState) {
-        AccountScreenState.PROFILE_PICTURE_UPDATED -> {
-            showLoadingDialog = false
-            showSnackBar(context.getString(R.string.profile_picture_updated))
-            resetScreenState()
+    LaunchedEffect(Unit) {
+        accountViewModel.event.collectLatest {
+            loading = it is AccountEvent.Loading
+            when(it) {
+                is AccountEvent.ProfilePictureDeleted -> {
+                    showSnackBar(context.getString(R.string.profile_picture_updated))
+                    resetScreenState()
+                }
+
+                is AccountEvent.ProfilePictureUpdated -> {
+                    showSnackBar(context.getString(R.string.profile_picture_updated))
+                    resetScreenState()
+                }
+
+                is AccountEvent.Error -> {
+                    when (it.type) {
+                        AccountErrorType.PROFILE_PICTURE_UPDATE_ERROR -> showSnackBar(context.getString(R.string.error_updating_profile_picture))
+                    }
+                }
+
+                else -> Unit
+            }
         }
-
-        AccountScreenState.PROFILE_PICTURE_DELETED -> {
-            showLoadingDialog = false
-            showSnackBar(context.getString(R.string.profile_picture_updated))
-            resetScreenState()
-        }
-
-        AccountScreenState.PROFILE_PICTURE_UPDATE_ERROR -> {
-            showLoadingDialog = false
-            showSnackBar(context.getString(R.string.error_updating_profile_picture))
-            resetScreenState()
-        }
-
-        AccountScreenState.LOADING -> showLoadingDialog = true
-
-        else -> {}
     }
 
     if (showDeleteProfilePictureDialog) {
@@ -140,8 +150,8 @@ fun AccountScreen(
         )
     }
 
-    if (showLoadingDialog) {
-        LoadingDialog()
+    if (loading) {
+        TopLinearLoadingScreen()
     }
 
     val accountInfos: List<AccountInfo> = listOf(
@@ -205,9 +215,7 @@ fun AccountScreen(
                     profilePictureUrl = user?.profilePictureUrl,
                     onClick = {
                         if (screenState == AccountScreenState.EDIT) {
-                            singlePhotoPickerLauncher.launch(
-                                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                            )
+                            singlePhotoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
                         } else {
                             showBottomSheet = true
                         }
@@ -253,30 +261,44 @@ private fun ProfilePictureSection(
 ) {
     val scaleImage = 1.8f
 
-    profilePictureUri?.let { uri ->
-        if (isEdited) {
-            ProfilePicture(
-                modifier = modifier,
-                uri = uri,
-                scale = scaleImage,
-                onClick = onClick
-            )
-        } else {
-            ProfilePicture(
-                modifier = modifier,
-                uri = uri,
-                scale = scaleImage,
-                onClick = onClick
+    AnimatedContent(
+        targetState = profilePictureUri,
+        transitionSpec = {
+            ContentTransform(
+                targetContentEnter = fadeIn(),
+                initialContentExit = fadeOut()
             )
         }
-    } ?: run {
-        ProfilePictureWithIcon(
-            modifier = modifier,
-            url = profilePictureUrl,
-            iconVector = Icons.Default.Edit,
-            scale = scaleImage,
-            onClick = onClick
-        )
+    ) { uri ->
+        when(uri) {
+            null -> {
+                ProfilePictureWithIcon(
+                    modifier = modifier,
+                    url = profilePictureUrl,
+                    iconVector = Icons.Default.Edit,
+                    scale = scaleImage,
+                    onClick = onClick
+                )
+            }
+
+            else -> {
+                if (isEdited) {
+                    ProfilePicture(
+                        modifier = modifier,
+                        uri = uri,
+                        scale = scaleImage,
+                        onClick = onClick
+                    )
+                } else {
+                    ProfilePicture(
+                        modifier = modifier,
+                        uri = uri,
+                        scale = scaleImage,
+                        onClick = onClick
+                    )
+                }
+            }
+        }
     }
 }
 

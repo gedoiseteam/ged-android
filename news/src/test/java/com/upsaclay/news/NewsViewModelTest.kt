@@ -1,12 +1,12 @@
 package com.upsaclay.news
 
-import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
+import com.upsaclay.common.domain.repository.UserRepository
 import com.upsaclay.common.domain.userFixture
 import com.upsaclay.news.domain.announcementsFixture
+import com.upsaclay.news.domain.repository.AnnouncementRepository
 import com.upsaclay.news.domain.usecase.DeleteAnnouncementUseCase
-import com.upsaclay.news.domain.usecase.GetAnnouncementsUseCase
 import com.upsaclay.news.domain.usecase.RecreateAnnouncementUseCase
-import com.upsaclay.news.domain.usecase.RefreshAnnouncementsUseCase
+import com.upsaclay.news.domain.usecase.RefreshAnnouncementUseCase
 import com.upsaclay.news.presentation.viewmodels.NewsViewModel
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -26,11 +26,12 @@ import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class NewsViewModelTest {
-    private val getAnnouncementsUseCase: GetAnnouncementsUseCase = mockk()
-    private val getCurrentUserUseCase: GetCurrentUserUseCase = mockk()
-    private val refreshAnnouncementsUseCase: RefreshAnnouncementsUseCase = mockk()
     private val recreateAnnouncementUseCase: RecreateAnnouncementUseCase = mockk()
     private val deleteAnnouncementUseCase: DeleteAnnouncementUseCase = mockk()
+    private val refreshAnnouncementUseCase: RefreshAnnouncementUseCase = mockk()
+
+    private val userRepository: UserRepository = mockk()
+    private val announcementRepository: AnnouncementRepository = mockk()
 
     private lateinit var newsViewModel: NewsViewModel
     private val testDispatcher = UnconfinedTestDispatcher()
@@ -39,23 +40,22 @@ class NewsViewModelTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
 
-        every { getAnnouncementsUseCase() } returns flowOf(announcementsFixture)
-        every { getCurrentUserUseCase() } returns MutableStateFlow(userFixture)
-        coEvery { refreshAnnouncementsUseCase() } returns Unit
+        every { announcementRepository.announcements } returns flowOf(announcementsFixture)
+        every { userRepository.currentUser } returns MutableStateFlow(userFixture)
+        coEvery { refreshAnnouncementUseCase() } returns Unit
 
         newsViewModel = NewsViewModel(
-            getAnnouncementsUseCase = getAnnouncementsUseCase,
-            getCurrentUserUseCase = getCurrentUserUseCase,
-            refreshAnnouncementsUseCase = refreshAnnouncementsUseCase,
             recreateAnnouncementUseCase = recreateAnnouncementUseCase,
-            deleteAnnouncementUseCase = deleteAnnouncementUseCase
+            deleteAnnouncementUseCase = deleteAnnouncementUseCase,
+            refreshAnnouncementUseCase = refreshAnnouncementUseCase,
+            userRepository = userRepository,
+            announcementRepository = announcementRepository
         )
     }
 
     @Test
     fun default_values_are_correct() = runTest {
         assertEquals(userFixture, newsViewModel.currentUser.value)
-        assertEquals(false, newsViewModel.isRefreshing.value)
     }
 
     @Test
@@ -83,7 +83,6 @@ class NewsViewModelTest {
         newsViewModel.refreshAnnouncements()
 
         // Then
-        coVerify { refreshAnnouncementsUseCase() }
-        assertEquals(false, newsViewModel.isRefreshing.value)
+        coVerify { refreshAnnouncementUseCase() }
     }
 }

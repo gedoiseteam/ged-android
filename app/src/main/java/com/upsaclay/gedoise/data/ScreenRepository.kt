@@ -1,9 +1,9 @@
 package com.upsaclay.gedoise.data
 
-import com.upsaclay.common.domain.entity.Screen
+import com.upsaclay.common.domain.entity.ScreenRoute
 
 interface ScreenRepository {
-    val currentScreen: Screen?
+    val currentScreenRoute: ScreenRoute?
 
-    fun setCurrentScreen(screen: Screen?)
+    fun setCurrentScreen(screenRoute: ScreenRoute?)
 }

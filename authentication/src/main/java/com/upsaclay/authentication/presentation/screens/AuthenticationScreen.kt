@@ -52,7 +52,7 @@ import androidx.navigation.NavController
 import com.upsaclay.authentication.R
 import com.upsaclay.authentication.domain.entity.AuthErrorType
 import com.upsaclay.authentication.domain.entity.AuthenticationEvent
-import com.upsaclay.authentication.domain.entity.AuthenticationScreen
+import com.upsaclay.authentication.domain.entity.AuthenticationScreenRoute
 import com.upsaclay.authentication.presentation.components.LoginButton
 import com.upsaclay.authentication.presentation.components.OutlinePasswordTextField
 import com.upsaclay.authentication.presentation.viewmodels.AuthenticationViewModel
@@ -124,7 +124,7 @@ fun AuthenticationScreen(
             onConfirm = {
                 authenticationViewModel.resetEmail()
                 authenticationViewModel.resetPassword()
-                navController.navigate(AuthenticationScreen.EmailVerification(authenticationViewModel.email).route) {
+                navController.navigate(AuthenticationScreenRoute.EmailVerification(authenticationViewModel.email).route) {
                     popUpTo(navController.graph.id) { inclusive = true }
                 }
             },
@@ -199,7 +199,7 @@ fun AuthenticationScreen(
                         authenticationViewModel.resetPassword()
                         keyboardController?.hide()
                         focusManager.clearFocus()
-                        navController.navigate(AuthenticationScreen.FirstRegistration.route)
+                        navController.navigate(AuthenticationScreenRoute.FirstRegistration.route)
                     }
                 )
             }

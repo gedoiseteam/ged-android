@@ -10,7 +10,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.testing.TestNavHostController
 import com.upsaclay.common.domain.userFixture
-import com.upsaclay.gedoise.domain.entities.MainScreen
+import com.upsaclay.gedoise.domain.entities.MainScreenRoute
 import com.upsaclay.gedoise.presentation.screens.AccountScreen
 import com.upsaclay.gedoise.presentation.screens.ProfileScreen
 import com.upsaclay.gedoise.presentation.viewmodels.ProfileViewModel
@@ -22,7 +22,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-class ProfileScreenUITest {
+class ProfileScreenRouteUITest {
     @get:Rule
     val rule = createAndroidComposeRule<ComponentActivity>()
 
@@ -59,15 +59,15 @@ class ProfileScreenUITest {
             navController = TestNavHostController(LocalContext.current)
             navController.navigatorProvider.addNavigator(ComposeNavigator())
 
-            NavHost(navController = navController, startDestination = MainScreen.Profile.route) {
-                composable(MainScreen.Profile.route) {
+            NavHost(navController = navController, startDestination = MainScreenRoute.Profile.route) {
+                composable(MainScreenRoute.Profile.route) {
                     ProfileScreen(
                         navController = navController,
                         profileViewModel = profileViewModel
                     )
                 }
 
-                composable(MainScreen.Account.route) {
+                composable(MainScreenRoute.Account.route) {
                     AccountScreen(
                         navController = navController
                     )
@@ -78,6 +78,6 @@ class ProfileScreenUITest {
         rule.onNodeWithTag(rule.activity.getString(R.string.profile_screen_account_info_button_tag)).performClick()
 
         // Then
-        Assert.assertEquals(MainScreen.Account.route, navController.currentDestination?.route)
+        Assert.assertEquals(MainScreenRoute.Account.route, navController.currentDestination?.route)
     }
 }

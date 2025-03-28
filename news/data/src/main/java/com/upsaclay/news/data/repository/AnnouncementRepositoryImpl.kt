@@ -1,5 +1,6 @@
 package com.upsaclay.news.data.repository
 
+import com.upsaclay.common.domain.i
 import com.upsaclay.news.data.local.AnnouncementLocalDataSource
 import com.upsaclay.news.data.remote.AnnouncementRemoteDataSource
 import com.upsaclay.news.domain.entity.Announcement
@@ -22,6 +23,10 @@ internal class AnnouncementRepositoryImpl(
             announcementLocalDataSource.getAnnouncements().collect {
                 _announcements.value = it
             }
+        }
+
+        scope.launch {
+            refreshAnnouncements()
         }
     }
 

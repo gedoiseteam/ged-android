@@ -32,7 +32,7 @@ import com.upsaclay.common.presentation.theme.previewText
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.message.R
 import com.upsaclay.message.domain.entity.ConversationEvent
-import com.upsaclay.message.domain.entity.MessageScreen
+import com.upsaclay.message.domain.entity.MessageScreenRoute
 import com.upsaclay.message.presentation.components.UserItem
 import com.upsaclay.message.presentation.viewmodels.CreateConversationViewModel
 import kotlinx.coroutines.flow.collectLatest
@@ -80,8 +80,8 @@ fun CreateConversationScreen(
                                     val conversation = createConversationViewModel.getConversation(user.id)
                                         ?: createConversationViewModel.generateConversation(user)
 
-                                    navController.navigate(MessageScreen.Chat(conversation).route) {
-                                        popUpTo(MessageScreen.CreateConversation.route) {
+                                    navController.navigate(MessageScreenRoute.Chat(conversation).route) {
+                                        popUpTo(MessageScreenRoute.CreateConversation.route) {
                                             inclusive = true
                                         }
                                     }

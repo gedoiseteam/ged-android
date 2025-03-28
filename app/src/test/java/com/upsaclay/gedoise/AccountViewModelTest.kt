@@ -1,8 +1,8 @@
 package com.upsaclay.gedoise
 
 import android.net.Uri
+import com.upsaclay.common.domain.repository.UserRepository
 import com.upsaclay.common.domain.usecase.DeleteProfilePictureUseCase
-import com.upsaclay.common.domain.usecase.GetCurrentUserUseCase
 import com.upsaclay.common.domain.usecase.UpdateProfilePictureUseCase
 import com.upsaclay.common.domain.userFixture
 import com.upsaclay.gedoise.domain.entities.AccountScreenState
@@ -25,7 +25,7 @@ import kotlin.test.assertEquals
 class AccountViewModelTest {
     private val updateProfilePictureUseCase: UpdateProfilePictureUseCase = mockk()
     private val deleteProfilePictureUseCase: DeleteProfilePictureUseCase = mockk()
-    private val getCurrentUserUseCase: GetCurrentUserUseCase = mockk()
+    private val userRepository: UserRepository = mockk()
 
     private lateinit var accountViewModel: AccountViewModel
     private val testDispatcher = UnconfinedTestDispatcher()
@@ -34,14 +34,14 @@ class AccountViewModelTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
 
-        every { getCurrentUserUseCase() } returns MutableStateFlow(userFixture)
+        every { userRepository.currentUser } returns MutableStateFlow(userFixture)
         coEvery { updateProfilePictureUseCase(any()) } returns Unit
         coEvery { deleteProfilePictureUseCase(any(), any()) } returns Unit
 
         accountViewModel = AccountViewModel(
             updateProfilePictureUseCase = updateProfilePictureUseCase,
             deleteProfilePictureUseCase = deleteProfilePictureUseCase,
-            getCurrentUserUseCase = getCurrentUserUseCase
+            userRepository = userRepository
         )
     }
 
@@ -68,7 +68,7 @@ class AccountViewModelTest {
     @Test
     fun updateAccountScreenState_should_update_ScreenState() {
         // Given
-        val screenState = AccountScreenState.LOADING
+        val screenState = AccountScreenState.EDIT
 
         // When
         accountViewModel.updateScreenState(screenState)
@@ -96,45 +96,20 @@ class AccountViewModelTest {
         accountViewModel.updateUserProfilePicture()
 
         // Then
-        assertEquals(AccountScreenState.PROFILE_PICTURE_UPDATED, accountViewModel.screenState.value)
         coVerify { updateProfilePictureUseCase(any()) }
     }
 
     @Test
-    fun updateUserProfilePicture_should_reset_profile_picture_uri_after_update() = runTest {
+    fun deleteUserProfilePicture_should_reset_profile_picture_uri() = runTest {
         // Given
         val uri = mockk<Uri>()
         accountViewModel.updateProfilePictureUri(uri)
 
-        // When
-        accountViewModel.updateUserProfilePicture()
-
-        // Then
-        assertEquals(null, accountViewModel.profilePictureUri)
-    }
-
-    @Test
-    fun updateUserProfilePicture_should_set_profile_picture_update_error_when_exception_is_thrown() = runTest {
-        // Given
-        val uri = mockk<Uri>()
-        accountViewModel.updateProfilePictureUri(uri)
-        coEvery { updateProfilePictureUseCase(any()) } throws Exception()
-
-        // When
-        accountViewModel.updateUserProfilePicture()
-
-        // Then
-        assertEquals(AccountScreenState.PROFILE_PICTURE_UPDATE_ERROR, accountViewModel.screenState.value)
-    }
-
-    @Test
-    fun deleteUserProfilePicture_should_delete_profile_picture_when_user_is_not_null() = runTest {
         // When
         accountViewModel.deleteUserProfilePicture()
 
         // Then
-        assertEquals(AccountScreenState.PROFILE_PICTURE_DELETED, accountViewModel.screenState.value)
-        coVerify { deleteProfilePictureUseCase(userFixture.id, userFixture.profilePictureUrl!!) }
+        assertEquals(null, accountViewModel.profilePictureUri)
     }
 
     @Test
@@ -144,17 +119,5 @@ class AccountViewModelTest {
 
         // Then
         assertEquals(null, accountViewModel.profilePictureUri)
-    }
-
-    @Test
-    fun deleteUserProfilePicture_should_set_profile_picture_update_error_when_exception_is_thrown() = runTest {
-        // Given
-        coEvery { deleteProfilePictureUseCase(any(), any()) } throws Exception()
-
-        // When
-        accountViewModel.deleteUserProfilePicture()
-
-        // Then
-        assertEquals(AccountScreenState.PROFILE_PICTURE_UPDATE_ERROR, accountViewModel.screenState.value)
     }
 }

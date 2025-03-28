@@ -9,7 +9,7 @@ import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.testing.TestNavHostController
-import com.upsaclay.authentication.domain.entity.AuthenticationScreen
+import com.upsaclay.authentication.domain.entity.AuthenticationScreenRoute
 import com.upsaclay.authentication.presentation.screens.SecondRegistrationScreen
 import com.upsaclay.authentication.presentation.screens.ThirdRegistrationScreen
 import com.upsaclay.authentication.presentation.viewmodels.RegistrationViewModel
@@ -20,7 +20,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-class SecondRegistrationScreenUITest {
+class SecondRegistrationScreenRouteUITest {
     @get:Rule
     val rule = createAndroidComposeRule<ComponentActivity>()
 
@@ -51,15 +51,15 @@ class SecondRegistrationScreenUITest {
         rule.setContent {
             navController = TestNavHostController(LocalContext.current)
             navController.navigatorProvider.addNavigator(ComposeNavigator())
-            NavHost(navController = navController, startDestination = AuthenticationScreen.SecondRegistration.route) {
-                composable(AuthenticationScreen.SecondRegistration.route) {
+            NavHost(navController = navController, startDestination = AuthenticationScreenRoute.SecondRegistration.route) {
+                composable(AuthenticationScreenRoute.SecondRegistration.route) {
                     SecondRegistrationScreen(
                         navController = navController,
                         registrationViewModel = registrationViewModel
                     )
                 }
 
-                composable(AuthenticationScreen.ThirdRegistration.route) {
+                composable(AuthenticationScreenRoute.ThirdRegistration.route) {
                     ThirdRegistrationScreen(
                         navController = navController,
                         registrationViewModel = registrationViewModel
@@ -71,6 +71,6 @@ class SecondRegistrationScreenUITest {
         rule.onNodeWithTag(rule.activity.getString(R.string.registration_screen_next_button_tag)).performClick()
 
         // Then
-        Assert.assertEquals(AuthenticationScreen.ThirdRegistration.route, navController.currentDestination?.route)
+        Assert.assertEquals(AuthenticationScreenRoute.ThirdRegistration.route, navController.currentDestination?.route)
     }
 }

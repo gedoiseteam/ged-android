@@ -9,13 +9,12 @@ import androidx.lifecycle.viewModelScope
 import com.upsaclay.authentication.domain.entity.RegistrationErrorType
 import com.upsaclay.authentication.domain.entity.RegistrationEvent
 import com.upsaclay.authentication.domain.entity.exception.InvalidCredentialsException
-import com.upsaclay.authentication.domain.usecase.RegisterUseCase
+import com.upsaclay.authentication.domain.repository.AuthenticationRepository
 import com.upsaclay.common.domain.entity.ErrorType
 import com.upsaclay.common.domain.entity.User
 import com.upsaclay.common.domain.extensions.uppercaseFirstLetter
-import com.upsaclay.common.domain.usecase.CreateUserUseCase
+import com.upsaclay.common.domain.repository.UserRepository
 import com.upsaclay.common.domain.usecase.GenerateIdUseCase
-import com.upsaclay.common.domain.usecase.IsUserExistUseCase
 import com.upsaclay.common.domain.usecase.VerifyEmailFormatUseCase
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -27,9 +26,8 @@ import java.net.ConnectException
 private const val MIN_PASSWORD_LENGTH = 8
 
 class RegistrationViewModel(
-    private val createUserUseCase: CreateUserUseCase,
-    private val registerUseCase: RegisterUseCase,
-    private val isUserExistUseCase: IsUserExistUseCase,
+    private val authenticationRepository: AuthenticationRepository,
+    private val userRepository: UserRepository
 ) : ViewModel() {
     private val userId = GenerateIdUseCase.asString()
     private val _event = MutableSharedFlow<RegistrationEvent>()
@@ -102,7 +100,7 @@ class RegistrationViewModel(
             _event.emit(RegistrationEvent.Loading)
 
             try {
-                if (isUserExistUseCase(email)) {
+                if (userRepository.isUserExist(email)) {
                     _event.emit(RegistrationEvent.Error(RegistrationErrorType.USER_ALREADY_EXISTS))
                     return@launch
                 }
@@ -115,8 +113,8 @@ class RegistrationViewModel(
                     schoolLevel = schoolLevel
                 )
 
-                createUserUseCase(user)
-                registerUseCase(email, password)
+                userRepository.createUser(user)
+                authenticationRepository.registerWithEmailAndPassword(email, password)
                 _event.emit(RegistrationEvent.Registered)
             } catch (e: Exception) {
                 _event.emit(handleException(e))

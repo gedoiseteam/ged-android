@@ -11,7 +11,6 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
-import com.upsaclay.common.presentation.theme.GedoiseColor.PrimaryVariant
 
 private val lightColorScheme = lightColorScheme(
     primary = primaryLight,
@@ -27,8 +26,8 @@ private val lightColorScheme = lightColorScheme(
     onSurfaceVariant = onSurfaceVariantLight,
     inverseSurface = inverseSurfaceLight,
     inverseOnSurface = inverseOnSurfaceLight,
-    secondaryContainer = PrimaryVariant,
-    surfaceContainerHigh = PrimaryVariant,
+    secondaryContainer = secondaryContainerLight,
+    surfaceContainerHigh = surfaceContainerHighLight,
     outline = outlineLight,
     outlineVariant = outlineVariantLight
 )
@@ -38,14 +37,14 @@ private val darkColorScheme = darkColorScheme(
     onPrimary = onPrimaryDark,
     secondaryContainer = secondaryContainerDark,
     onSecondaryContainer = onSecondaryContainerDark,
+    background = backgroundDark,
+    onBackground = onBackgroundDark,
     surface = surfaceDark,
     onSurface = onSurfaceDark,
     surfaceVariant = surfaceVariantDark,
     onSurfaceVariant = onSurfaceVariantDark,
     inverseSurface = inverseSurfaceDark,
     inverseOnSurface = inverseOnSurfaceDark,
-    background = backgroundDark,
-    onBackground = onBackgroundDark,
     error = errorDark,
     outline = outlineDark,
     outlineVariant = outlineVariantDark

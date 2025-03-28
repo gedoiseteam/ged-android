@@ -12,16 +12,18 @@ internal val darkGray = Color(0xFF3C3C3C)
 
 internal val primaryLight = Color(0xFF67708A)
 internal val secondaryLight = Color(0xFF0B86FF)
+internal val secondaryContainerLight = Color(0xFFDEE7F8)
 internal val tertiaryLight = Color(0xFF009688)
+internal val backgroundLight = Color(0xFFFFFFFF)
+internal val onBackgroundLight = black
 internal val errorLight = Color(0xFFED5245)
 internal val surfaceLight = Color(0xFFFBFCFF)
-internal val surfaceVariantLight = Color(0xFFE0E4EC)
 internal val onSurfaceVariantLight = Color(0xFF4F4F4F)
 internal val inverseSurfaceLight = Color(0xFF303133)
 internal val inverseOnSurfaceLight = Color(0xFFEFF1F4)
 internal val onSurfaceLight = Color(0xFF1B1D1F)
-internal val backgroundLight = Color(0xFFFFFFFF)
-internal val onBackgroundLight = black
+internal val surfaceContainerHighLight = Color(0xFFE7E9EC)
+internal val surfaceVariantLight = Color(0xFFE0E4EC)
 internal val outlineLight = Color(0xFF74777E)
 internal val outlineVariantLight = Color(0xFFC4C8D0)
 
@@ -41,17 +43,6 @@ internal val onBackgroundDark = white
 internal val outlineDark = Color(0xFF8F9299)
 internal val outlineVariantDark = Color(0xFFC4C8D0)
 
-val ColorScheme.chatInputBackground: Color
-    @Composable
-    get() = if(isSystemInDarkTheme()) Color(0xFF323232) else Color(0xFFEEEEEE)
-
-val ColorScheme.chatInputForeground: Color
-    @Composable
-    get() = if(isSystemInDarkTheme()) Color(0xFF929298) else Color(0xFF646464)
-
-val ColorScheme.previewText: Color
-    @Composable
-    get() = if(isSystemInDarkTheme()) Color(0xFFA1A4B0) else Color(0xFF6F7181)
 
 val ColorScheme.black: Color
     @Composable
@@ -69,9 +60,22 @@ val ColorScheme.darkGray: Color
     @Composable
     get() = com.upsaclay.common.presentation.theme.darkGray
 
-object GedoiseColor {
-    val LittleTransparentWhite = Color(0x66FFFFFF)
-    val PrimaryVariant = Color(0xFFDBE0E9)
-    val ProfilePictureErrorLight = Color(0xFFEBEDEE)
-    val OnlineColor = Color(0xFF4ACB1B)
-}
+val ColorScheme.chatInputBackground: Color
+    @Composable
+    get() = if(isSystemInDarkTheme()) Color(0xFF323232) else Color(0xFFEEEEEE)
+
+val ColorScheme.chatInputForeground: Color
+    @Composable
+    get() = if(isSystemInDarkTheme()) Color(0xFF929298) else Color(0xFF646464)
+
+val ColorScheme.previewText: Color
+    @Composable
+    get() = if(isSystemInDarkTheme()) Color(0xFFA1A4B0) else Color(0xFF6F7181)
+
+val ColorScheme.overlay: Color
+    @Composable
+    get() = if (isSystemInDarkTheme()) Color(0x66141414) else Color(0x66FFFFFF)
+
+val ColorScheme.profilePictureError: Color
+    @Composable
+    get() = if (isSystemInDarkTheme()) Color(0xFF323232) else Color(0xFFE6E6E6)

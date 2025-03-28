@@ -65,7 +65,7 @@ internal fun AccountModelBottomSheet(
                     .testTag(stringResource(id = R.string.account_screen_delete_profile_picture_button_tag)),
                 text = {
                     Text(
-                        text = stringResource(id = R.string.delete_profile_picture),
+                        text = stringResource(id = com.upsaclay.common.R.string.delete),
                         color = MaterialTheme.colorScheme.error
                     )
                 },
