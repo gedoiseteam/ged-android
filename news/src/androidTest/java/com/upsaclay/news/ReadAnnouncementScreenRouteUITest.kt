@@ -19,6 +19,7 @@ import com.upsaclay.news.presentation.screens.ReadAnnouncementScreen
 import com.upsaclay.news.presentation.viewmodels.ReadAnnouncementViewModel
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Assert
 import org.junit.Before
@@ -36,6 +37,7 @@ class ReadAnnouncementScreenRouteUITest {
     fun setUp() {
         every { readAnnouncementViewModel.announcement } returns MutableStateFlow(announcementFixture)
         every { readAnnouncementViewModel.currentUser } returns MutableStateFlow(userFixture)
+        every { readAnnouncementViewModel.event } returns MutableSharedFlow()
     }
 
     @Test

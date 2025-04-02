@@ -4,7 +4,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.upsaclay.common.domain.entity.User
 import com.upsaclay.common.domain.repository.UserRepository
 import com.upsaclay.common.domain.usecase.GenerateIdUseCase
@@ -12,7 +11,6 @@ import com.upsaclay.news.domain.entity.Announcement
 import com.upsaclay.news.domain.entity.AnnouncementState
 import com.upsaclay.news.domain.usecase.CreateAnnouncementUseCase
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
 class CreateAnnouncementViewModel(

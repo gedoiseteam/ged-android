@@ -3,8 +3,6 @@ package com.upsaclay.message
 import androidx.paging.PagingData
 import com.upsaclay.message.domain.conversationUIFixture
 import com.upsaclay.message.domain.conversationsUIFixture
-import com.upsaclay.message.domain.entity.ConversationEvent
-import com.upsaclay.message.domain.entity.SuccessType
 import com.upsaclay.message.domain.usecase.DeleteConversationUseCase
 import com.upsaclay.message.domain.usecase.GetPagedConversationsUIUseCase
 import com.upsaclay.message.presentation.viewmodels.ConversationViewModel
@@ -14,14 +12,12 @@ import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.Before
 import org.junit.Test
-import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ConversationViewModelTest {

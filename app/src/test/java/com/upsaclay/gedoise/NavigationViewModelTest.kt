@@ -1,9 +1,9 @@
 package com.upsaclay.gedoise
 
-import com.upsaclay.authentication.domain.entity.AuthenticationState
 import com.upsaclay.authentication.domain.repository.AuthenticationRepository
 import com.upsaclay.common.domain.repository.UserRepository
 import com.upsaclay.common.domain.userFixture
+import com.upsaclay.common.domain.usersFixture
 import com.upsaclay.gedoise.data.ScreenRepository
 import com.upsaclay.gedoise.domain.usecase.ClearDataUseCase
 import com.upsaclay.gedoise.domain.usecase.StartListeningDataUseCase
@@ -49,6 +49,10 @@ class NavigationViewModelTest {
         every { screenRepository.setCurrentScreen(any()) } returns Unit
         every { userRepository.currentUser } returns MutableStateFlow(userFixture)
         every { authenticationRepository.isAuthenticated } returns flowOf(true)
+        coEvery { userRepository.getCurrentUserFromLocal() } returns userFixture
+        coEvery { userRepository.getUsers() } returns usersFixture
+        coEvery { userRepository.getUser(any()) } returns userFixture
+        coEvery { userRepository.setCurrentUser(any()) } returns Unit
         coEvery { startListeningDataUseCase() } returns Unit
         coEvery { stopListeningDataUseCase() } returns Unit
         coEvery { clearDataUseCase() } returns Unit
@@ -72,46 +76,6 @@ class NavigationViewModelTest {
 
         // Then
         assertEquals(userFixture, navigationViewModel.currentUser.value)
-    }
-
-    @Test
-    fun authentication_state_should_be_AUTHENTICATED_when_user_is_authenticated() {
-        // Given
-        every { authenticationRepository.isAuthenticated } returns flowOf(true)
-
-        // When
-        navigationViewModel = NavigationViewModel(
-            userRepository = userRepository,
-            startListeningDataUseCase = startListeningDataUseCase,
-            stopListeningDataUseCase = stopListeningDataUseCase,
-            clearDataUseCase = clearDataUseCase,
-            userConversationRepository = userConversationRepository,
-            screenRepository = screenRepository,
-            authenticationRepository = authenticationRepository
-        )
-
-        // Then
-        assertEquals(AuthenticationState.AUTHENTICATED, navigationViewModel.authenticationState.value)
-    }
-
-    @Test
-    fun authentication_state_should_be_UNAUTHENTICATED_when_user_is_not_authenticated() {
-        // Given
-        every { authenticationRepository.isAuthenticated } returns flowOf(false)
-
-        // When
-        navigationViewModel = NavigationViewModel(
-            userRepository = userRepository,
-            startListeningDataUseCase = startListeningDataUseCase,
-            stopListeningDataUseCase = stopListeningDataUseCase,
-            clearDataUseCase = clearDataUseCase,
-            userConversationRepository = userConversationRepository,
-            screenRepository = screenRepository,
-            authenticationRepository = authenticationRepository
-        )
-
-        // Then
-        assertEquals(AuthenticationState.UNAUTHENTICATED, navigationViewModel.authenticationState.value)
     }
 
     @Test

@@ -11,9 +11,13 @@ interface UserRepository {
 
     suspend fun getUser(userId: String): User?
 
+    suspend fun getCurrentUserFromLocal(): User?
+
     suspend fun getUserFlow(userId: String): Flow<User>
 
     suspend fun getUserWithEmail(userEmail: String): User?
+
+    suspend fun getFilteredUsers(userName: String): List<User>
 
     suspend fun createUser(user: User)
 

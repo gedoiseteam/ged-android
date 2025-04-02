@@ -7,24 +7,28 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ContentTransform
-import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -40,6 +44,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -50,8 +55,9 @@ import com.upsaclay.common.presentation.components.ProfilePictureWithIcon
 import com.upsaclay.common.presentation.components.SensibleActionDialog
 import com.upsaclay.common.presentation.components.SmallTopBarAction
 import com.upsaclay.common.presentation.components.SmallTopBarBack
-import com.upsaclay.common.presentation.components.TopLinearLoadingScreen
 import com.upsaclay.common.presentation.theme.GedoiseTheme
+import com.upsaclay.common.presentation.theme.gold
+import com.upsaclay.common.presentation.theme.previewText
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.gedoise.R
 import com.upsaclay.gedoise.domain.entities.AccountErrorType
@@ -151,7 +157,7 @@ fun AccountScreen(
     }
 
     if (loading) {
-        TopLinearLoadingScreen()
+        LoadingDialog()
     }
 
     val accountInfos: List<AccountInfo> = listOf(
@@ -221,6 +227,30 @@ fun AccountScreen(
                         }
                     }
                 )
+
+                if (user?.isMember == true) {
+                    Row(
+                        modifier = Modifier
+                            .align(Alignment.Start)
+                            .testTag(stringResource(id = R.string.account_screen_member_tag)),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.extraSmall)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.member),
+                            color = MaterialTheme.colorScheme.previewText,
+                            fontWeight = FontWeight.SemiBold,
+                            style = MaterialTheme.typography.labelLarge
+                        )
+
+                        Icon(
+                            imageVector = Icons.Default.Star,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.gold,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                }
 
                 accountInfos.forEach { accountInfo ->
                     AccountInfoItem(
@@ -308,13 +338,14 @@ private fun ProfilePictureSection(
  =====================================================================
  */
 
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
 @Composable
 private fun AccountScreenPreview() {
     val scaleImage = 1.8f
     val sizeImage = 100.dp * scaleImage
     val hasPictureChanged = false
     val isEdited = false
+    val isMember = true
 
     val accountInfos: List<AccountInfo> = listOf(
         AccountInfo(
@@ -355,7 +386,7 @@ private fun AccountScreenPreview() {
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxSize()
                     .padding(
                         top = it.calculateTopPadding(),
                         start = MaterialTheme.spacing.medium,
@@ -385,6 +416,30 @@ private fun AccountScreenPreview() {
                         modifier = Modifier.fillMaxWidth(),
                         accountInfo = accountInfo
                     )
+                }
+                
+                if (isMember) {
+                    Row(
+                        modifier = Modifier
+                            .align(Alignment.Start)
+                            .testTag(stringResource(id = R.string.account_screen_member_tag)),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.extraSmall)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.member),
+                            color = MaterialTheme.colorScheme.previewText,
+                            fontWeight = FontWeight.SemiBold,
+                            style = MaterialTheme.typography.labelLarge
+                        )
+
+                        Icon(
+                            imageVector = Icons.Default.Star,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.gold,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
                 }
             }
         }

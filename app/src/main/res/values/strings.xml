@@ -21,6 +21,8 @@
     <string name="logout">Se déconnecter</string>
     <string name="disconnection">Déconnexion...</string>
 
+    <string name="member">Membre</string>
+
     <string name="account_icon_description">Icône pour accéder à la page de compte</string>
     <string name="support_icon_description">Icône pour accéder à la page de support</string>
     <string name="settings_icon_description">Icône pour accéder à la page de paramètres</string>
@@ -42,4 +44,5 @@
     <string name="account_screen_delete_profile_picture_dialog_tag">Account screen delete profile picture button tag</string>
     <string name="account_screen_profile_picture_tag">Account screen profile picture tag</string>
     <string name="account_screen_snackbar_tag">Account screen snackbar tag</string>
+    <string name="account_screen_member_tag">Account screen member user text tag</string>
 </resources>

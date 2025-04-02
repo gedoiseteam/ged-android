@@ -24,6 +24,7 @@ internal object MessageField {
     const val MESSAGE_ID = "message_id"
     const val CONVERSATION_ID = "conversation_id"
     const val SENDER_ID = "sender_id"
+    const val RECIPIENT_ID = "recipient_id"
     const val CONTENT = "text"
     const val MESSAGE_TIMESTAMP = "message_timestamp"
     const val MESSAGE_STATE = "message_state"

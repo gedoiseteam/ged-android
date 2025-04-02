@@ -1,6 +1,5 @@
 package com.upsaclay.news.presentation.screens
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -48,11 +47,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.upsaclay.common.domain.entity.ErrorType
 import com.upsaclay.common.presentation.components.ClickableItem
-import com.upsaclay.common.presentation.components.LinearProgressBar
 import com.upsaclay.common.presentation.components.OverlayLinearLoadingScreen
 import com.upsaclay.common.presentation.components.SensibleActionDialog
 import com.upsaclay.common.presentation.components.SmallTopBarBack
-import com.upsaclay.common.presentation.components.TopLinearLoadingScreen
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.news.R
@@ -174,9 +171,11 @@ fun ReadAnnouncementScreen(
                         onEditClick = { showBottomSheet = true }
                     )
                 }
+            } else {
+                announcement?.let { AnnouncementHeader(announcement = it) }
             }
 
-            Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
 
             announcement?.title?.let {
                 Text(
@@ -337,7 +336,7 @@ private fun EditableAnnouncementScreenPreview() {
                 onEditClick = {}
             )
 
-            Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
 
             announcement.title?.let {
                 Text(

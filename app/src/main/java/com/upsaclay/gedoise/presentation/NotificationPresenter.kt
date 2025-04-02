@@ -35,6 +35,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 
 private const val MESSAGE_CHANNEL_ID = "message_channel_id"
@@ -72,7 +73,7 @@ class NotificationPresenter(
             intent = intent
         )
 
-        notificationManager.notify(GenerateIdUseCase.asInt(), notification)
+        notificationManager.notify(message.id, notification)
     }
 
     private fun isCurrentMessageScreen(conversationId: Int): Boolean {
@@ -93,8 +94,9 @@ class NotificationPresenter(
     }
 
     private fun listenNewMessages() {
-        GlobalScope.launch(Dispatchers.IO) {
+        GlobalScope.launch(Dispatchers.Main) {
             getNewConversationMessageUseCase()
+                .filter { it.isNotEmpty() }
                 .distinctUntilChanged()
                 .collectLatest { conversationsMessage ->
                     conversationsMessage
@@ -133,7 +135,12 @@ class NotificationPresenter(
             addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
         }
 
-        return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+        return PendingIntent.getActivity(
+            context,
+            GenerateIdUseCase.asInt(),
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
     }
 
     private fun buildPerson(interlocutor: User, icon: IconCompat): Person {
@@ -165,7 +172,7 @@ class NotificationPresenter(
         val notificationBuilder = NotificationCompat.Builder(context, MESSAGE_CHANNEL_ID)
             .setContentTitle(interlocutor.fullName)
             .setContentText(message.content)
-            .setSmallIcon(com.upsaclay.common.R.drawable.ged_logo_empty_white_)
+            .setSmallIcon(com.upsaclay.common.R.drawable.ic_stat_name)
             .setGroup(conversationId.toString())
             .setSortKey(messageKey)
             .setCategory(NotificationCompat.CATEGORY_MESSAGE)

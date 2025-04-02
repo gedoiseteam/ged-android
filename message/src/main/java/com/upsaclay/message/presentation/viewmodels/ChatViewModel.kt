@@ -10,6 +10,7 @@ import androidx.paging.cachedIn
 import com.upsaclay.common.domain.entity.User
 import com.upsaclay.common.domain.repository.UserRepository
 import com.upsaclay.common.domain.usecase.GenerateIdUseCase
+import com.upsaclay.common.domain.userFixture2
 import com.upsaclay.message.domain.entity.ChatEvent
 import com.upsaclay.message.domain.entity.Conversation
 import com.upsaclay.message.domain.entity.ConversationState
@@ -58,6 +59,7 @@ class ChatViewModel(
             id = GenerateIdUseCase.asInt(),
             conversationId = conversation.id,
             senderId = currentUser.id,
+            recipientId = userFixture2.id,
             content = textToSend,
             date = LocalDateTime.now(),
             state = MessageState.LOADING

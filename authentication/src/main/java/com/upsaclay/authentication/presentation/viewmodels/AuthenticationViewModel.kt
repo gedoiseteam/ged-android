@@ -47,11 +47,7 @@ class AuthenticationViewModel(
 
                 userRepository.getUserWithEmail(email)?.let {
                     userRepository.setCurrentUser(it)
-                    if (authenticationRepository.isUserEmailVerified()) {
-                        authenticationRepository.setAuthenticated(true)
-                    } else {
-                        _event.emit(AuthenticationEvent.EmailNotVerified)
-                    }
+                    authenticationRepository.setAuthenticated(true)
                 } ?: run {
                     _event.emit(AuthenticationEvent.Error(AuthErrorType.AUTH_USER_NOT_FOUND))
                     resetPassword()

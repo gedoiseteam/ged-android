@@ -5,6 +5,7 @@ import java.time.LocalDateTime
 data class Message(
     val id: Int,
     val senderId: String,
+    val recipientId: String,
     val conversationId: Int,
     val content: String,
     val date: LocalDateTime,

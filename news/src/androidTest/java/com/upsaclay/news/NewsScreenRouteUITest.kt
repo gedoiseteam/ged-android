@@ -15,9 +15,7 @@ import androidx.navigation.testing.TestNavHostController
 import com.upsaclay.common.domain.userFixture
 import com.upsaclay.news.domain.announcementFixture
 import com.upsaclay.news.domain.announcementsFixture
-import com.upsaclay.news.domain.entity.AnnouncementEvent
 import com.upsaclay.news.domain.entity.NewsScreenRoute
-import com.upsaclay.news.presentation.screens.CreateAnnouncementScreen
 import com.upsaclay.news.presentation.screens.NewsScreen
 import com.upsaclay.news.presentation.screens.ReadAnnouncementScreen
 import com.upsaclay.news.presentation.viewmodels.CreateAnnouncementViewModel
@@ -46,7 +44,6 @@ class NewsScreenRouteUITest {
     @Before
     fun setUp() {
         every { newsViewModel.announcements } returns flowOf(announcementsFixture)
-        every { newsViewModel.currentUser } returns MutableStateFlow(userFixture)
         every { newsViewModel.refreshing } returns MutableStateFlow(false)
         every { readAnnouncementViewModel.announcement } returns MutableStateFlow(announcementFixture)
         every { readAnnouncementViewModel.currentUser } returns MutableStateFlow(userFixture)
@@ -172,72 +169,5 @@ class NewsScreenRouteUITest {
         rule.onNodeWithTag(rule.activity.getString(R.string.read_screen_announcement_title_tag)).assertExists()
         rule.onNodeWithTag(rule.activity.getString(R.string.read_screen_announcement_content_tag)).assertExists()
         rule.onNodeWithTag(rule.activity.getString(R.string.read_screen_announcement_content_tag)).assert(hasText(announcementFixture.content))
-    }
-
-    @Test
-    fun create_announcement_button_should_be_displayed_when_user_is_member() {
-        // Given
-        every { newsViewModel.currentUser } returns MutableStateFlow(userFixture.copy(isMember = true))
-
-        // When
-        rule.setContent {
-            NewsScreen(
-                navController = navController,
-                newsViewModel = newsViewModel
-            )
-        }
-
-        // Then
-        rule.onNodeWithTag(rule.activity.getString(R.string.news_screen_create_announcement_button_tag)).assertExists()
-    }
-
-    @Test
-    fun clicking_create_announcement_button_navigate_to_create_announcement_screen() {
-        // Given
-        every { newsViewModel.currentUser } returns MutableStateFlow(userFixture.copy(isMember = true))
-
-        // When
-        rule.setContent {
-            navController = TestNavHostController(LocalContext.current)
-            navController.navigatorProvider.addNavigator(ComposeNavigator())
-            NavHost(navController = navController, startDestination = NewsScreenRoute.News.route) {
-                composable(NewsScreenRoute.News.route) {
-                    NewsScreen(
-                        navController = navController,
-                        newsViewModel = newsViewModel
-                    )
-                }
-
-                composable(NewsScreenRoute.CreateAnnouncement.route) {
-                    CreateAnnouncementScreen(
-                        navController = navController,
-                        createAnnouncementViewModel = createAnnouncementViewModel
-                    )
-                }
-            }
-        }
-
-        rule.onNodeWithTag(rule.activity.getString(R.string.news_screen_create_announcement_button_tag))
-            .performClick()
-
-        // Then
-        Assert.assertEquals(NewsScreenRoute.CreateAnnouncement.route, navController.currentDestination?.route)
-    }
-
-    @Test
-    fun create_announcement_button_should_not_be_displayed_when_user_is_member() {
-        // Given
-        every { newsViewModel.currentUser } returns MutableStateFlow(userFixture.copy(isMember = false))
-
-        // When
-        rule.setContent {
-            NewsScreen(
-                navController = navController,
-                newsViewModel = newsViewModel
-            )
-        }
-
-        // Then
-        rule.onNodeWithTag(rule.activity.getString(R.string.news_screen_create_announcement_button_tag)).assertDoesNotExist()
     }
 }

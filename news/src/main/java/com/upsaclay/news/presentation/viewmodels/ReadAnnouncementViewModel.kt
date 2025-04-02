@@ -10,7 +10,6 @@ import com.upsaclay.news.domain.entity.AnnouncementEvent
 import com.upsaclay.news.domain.repository.AnnouncementRepository
 import com.upsaclay.news.domain.usecase.DeleteAnnouncementUseCase
 import com.upsaclay.news.domain.usecase.GetAnnouncementFlowUseCase
-import com.upsaclay.news.domain.usecase.RecreateAnnouncementUseCase
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow

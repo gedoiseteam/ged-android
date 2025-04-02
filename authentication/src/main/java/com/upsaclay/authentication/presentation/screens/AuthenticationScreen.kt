@@ -59,7 +59,6 @@ import com.upsaclay.authentication.presentation.viewmodels.AuthenticationViewMod
 import com.upsaclay.common.domain.entity.ErrorType
 import com.upsaclay.common.presentation.components.ErrorText
 import com.upsaclay.common.presentation.components.OutlineTextField
-import com.upsaclay.common.presentation.components.SimpleDialog
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
 import kotlinx.coroutines.flow.collectLatest
@@ -76,7 +75,6 @@ fun AuthenticationScreen(
     val focusManager = LocalFocusManager.current
     val scrollState = rememberScrollState()
     val scope = rememberCoroutineScope()
-    var showVerifyEmailDialog by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
     var loading by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
@@ -88,7 +86,6 @@ fun AuthenticationScreen(
 
     LaunchedEffect(Unit) {
         authenticationViewModel.event.collectLatest { event ->
-            showVerifyEmailDialog = event == AuthenticationEvent.EmailNotVerified
             loading = event == AuthenticationEvent.Loading
 
             when (event) {
@@ -113,26 +110,6 @@ fun AuthenticationScreen(
                 else -> {}
             }
         }
-    }
-
-    if (showVerifyEmailDialog) {
-        SimpleDialog(
-            modifier = Modifier.testTag(stringResource(id = R.string.authentication_screen_verify_email_dialog_tag)),
-            title = stringResource(id = R.string.email_not_verified_dialog_title),
-            text = stringResource(id = R.string.email_not_verified),
-            confirmText = stringResource(id = com.upsaclay.common.R.string.keep_going),
-            onConfirm = {
-                authenticationViewModel.resetEmail()
-                authenticationViewModel.resetPassword()
-                navController.navigate(AuthenticationScreenRoute.EmailVerification(authenticationViewModel.email).route) {
-                    popUpTo(navController.graph.id) { inclusive = true }
-                }
-            },
-            onCancel = {
-                authenticationViewModel.resetPassword()
-                showVerifyEmailDialog = false
-            }
-        )
     }
 
     Scaffold(
@@ -314,7 +291,7 @@ private fun InputsSection(
  =====================================================================
  */
 
-@Preview(showBackground = true, widthDp = 360, heightDp = 740, uiMode = Configuration.UI_MODE_NIGHT_NO)
+@Preview(widthDp = 360, heightDp = 740, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun AuthenticationScreenPreview() {
     var isLoading by remember { mutableStateOf(false) }

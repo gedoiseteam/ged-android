@@ -2,7 +2,7 @@ package com.upsaclay.gedoise.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.upsaclay.authentication.domain.entity.AuthenticationState
+import com.upsaclay.authentication.domain.entity.AuthenticationScreenRoute
 import com.upsaclay.authentication.domain.repository.AuthenticationRepository
 import com.upsaclay.common.domain.entity.ScreenRoute
 import com.upsaclay.common.domain.entity.User
@@ -14,11 +14,13 @@ import com.upsaclay.gedoise.domain.usecase.StopListeningDataUseCase
 import com.upsaclay.gedoise.presentation.NavigationItem
 import com.upsaclay.message.domain.entity.MessageScreenRoute
 import com.upsaclay.message.domain.repository.UserConversationRepository
+import com.upsaclay.news.domain.entity.NewsScreenRoute
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
@@ -26,19 +28,16 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class NavigationViewModel(
+    private val userRepository: UserRepository,
+    private val userConversationRepository: UserConversationRepository,
+    private val screenRepository: ScreenRepository,
+    private val authenticationRepository: AuthenticationRepository,
     private val startListeningDataUseCase: StartListeningDataUseCase,
     private val stopListeningDataUseCase: StopListeningDataUseCase,
     private val clearDataUseCase: ClearDataUseCase,
-    userRepository: UserRepository,
-    private val userConversationRepository: UserConversationRepository,
-    private val screenRepository: ScreenRepository,
-    private val authenticationRepository: AuthenticationRepository
 ): ViewModel() {
-    private val _authenticationState = MutableStateFlow(AuthenticationState.WAITING)
-    val authenticationState: StateFlow<AuthenticationState> = _authenticationState
-
-    private val _routeToNavigate = MutableSharedFlow<String>()
-    val routeToNavigate: Flow<String> = _routeToNavigate
+    private val _routeToNavigate = MutableSharedFlow<ScreenRoute>(replay = 1)
+    val routeToNavigate: Flow<String> = _routeToNavigate.map { it.route }
 
     private val _homeNavigationItem = MutableStateFlow(NavigationItem.Home())
     val homeNavigationItem: Flow<NavigationItem> = _homeNavigationItem
@@ -51,11 +50,12 @@ class NavigationViewModel(
     init {
         listenAuthenticationState()
         updateMessageNavigationItemBadges()
+        verifyCurrentUser()
     }
 
     fun navigateTo(screenRoute: ScreenRoute) {
         val route = when(screenRoute) {
-            is MessageScreenRoute.Chat -> MessageScreenRoute.Chat(screenRoute.conversation).route
+            is MessageScreenRoute.Chat -> MessageScreenRoute.Chat(screenRoute.conversation)
             else -> return
         }
         viewModelScope.launch {
@@ -68,19 +68,21 @@ class NavigationViewModel(
     }
 
     private fun listenAuthenticationState() {
-        authenticationRepository.isAuthenticated
-            .filterNotNull()
-            .map {
-                if (it) {
-                    startListeningDataUseCase()
-                    _authenticationState.value = AuthenticationState.AUTHENTICATED
-                } else {
-                    stopListeningDataUseCase()
-                    _authenticationState.value = AuthenticationState.UNAUTHENTICATED
-                    delay(2000)
-                    clearDataUseCase()
+        viewModelScope.launch {
+            authenticationRepository.isAuthenticated
+                .filterNotNull()
+                .collectLatest {
+                    if (it) {
+                        startListeningDataUseCase()
+                        _routeToNavigate.emit(NewsScreenRoute.News)
+                    } else {
+                        stopListeningDataUseCase()
+                        _routeToNavigate.emit(AuthenticationScreenRoute.Authentication)
+                        delay(2000)
+                        clearDataUseCase()
+                    }
                 }
-            }.launchIn(viewModelScope)
+        }
     }
 
     private fun updateMessageNavigationItemBadges() {
@@ -98,5 +100,18 @@ class NavigationViewModel(
                         _messageNavigationItem.value = NavigationItem.Message(badges = messages.size)
                     }
             }.launchIn(viewModelScope)
+    }
+
+    private fun verifyCurrentUser() {
+        viewModelScope.launch {
+            userRepository.getCurrentUserFromLocal()?.let { currentUser ->
+                userRepository.getUser(currentUser.id)?.let {
+                    userRepository.setCurrentUser(it)
+                } ?: run {
+                    authenticationRepository.logout()
+                    userRepository.deleteCurrentUser()
+                }
+            }
+        }
     }
 }

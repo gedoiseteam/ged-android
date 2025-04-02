@@ -2,7 +2,6 @@ package com.upsaclay.gedoise
 
 import android.net.Uri
 import androidx.activity.ComponentActivity
-import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick

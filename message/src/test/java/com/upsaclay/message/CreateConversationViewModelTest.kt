@@ -6,6 +6,7 @@ import com.upsaclay.common.domain.usersFixture
 import com.upsaclay.message.domain.conversationFixture
 import com.upsaclay.message.domain.entity.ConversationState
 import com.upsaclay.message.domain.repository.UserConversationRepository
+import com.upsaclay.message.domain.usecase.GetFilteredUserUseCase
 import com.upsaclay.message.presentation.viewmodels.CreateConversationViewModel
 import io.mockk.coEvery
 import io.mockk.every
@@ -26,6 +27,7 @@ import kotlin.test.assertNull
 class CreateConversationViewModelTest {
     private val userRepository: UserRepository = mockk()
     private val userConversationRepository: UserConversationRepository = mockk()
+    private val getFilteredUserUseCase: GetFilteredUserUseCase = mockk()
 
     private lateinit var createConversationViewModel: CreateConversationViewModel
     private val testDispatcher = UnconfinedTestDispatcher()
@@ -35,12 +37,14 @@ class CreateConversationViewModelTest {
         Dispatchers.setMain(testDispatcher)
 
         every { userRepository.currentUser } returns MutableStateFlow(userFixture)
+        coEvery { getFilteredUserUseCase(any()) } returns usersFixture
         coEvery { userConversationRepository.getConversation(any()) } returns conversationFixture
         coEvery { userRepository.getUsers() } returns usersFixture
 
         createConversationViewModel = CreateConversationViewModel(
             userConversationRepository = userConversationRepository,
-            userRepository = userRepository
+            userRepository = userRepository,
+            getFilteredUserUseCase = getFilteredUserUseCase
         )
     }
 

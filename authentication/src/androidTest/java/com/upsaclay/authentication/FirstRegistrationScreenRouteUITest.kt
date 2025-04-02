@@ -15,7 +15,8 @@ import com.upsaclay.authentication.domain.entity.RegistrationErrorType
 import com.upsaclay.authentication.domain.entity.RegistrationEvent
 import com.upsaclay.authentication.presentation.screens.FirstRegistrationScreen
 import com.upsaclay.authentication.presentation.screens.SecondRegistrationScreen
-import com.upsaclay.authentication.presentation.viewmodels.RegistrationViewModel
+import com.upsaclay.authentication.presentation.viewmodels.FirstRegistrationViewModel
+import com.upsaclay.authentication.presentation.viewmodels.SecondRegistrationViewModel
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -30,24 +31,19 @@ class FirstRegistrationScreenRouteUITest {
     val rule = createAndroidComposeRule<ComponentActivity>()
 
     private var navController: TestNavHostController = mockk()
-    private val registrationViewModel: RegistrationViewModel = mockk()
+    private val firstRegistrationViewModel: FirstRegistrationViewModel = mockk()
+    private val secondRegistrationViewModel: SecondRegistrationViewModel = mockk()
+
+    private val firstName = "firstName"
+    private val lastName = "lastName"
 
     @Before
     fun setUp() {
-        every { registrationViewModel.firstName } returns "firstName"
-        every { registrationViewModel.lastName } returns "lastName"
-        every { registrationViewModel.email } returns "email"
-        every { registrationViewModel.password } returns "password"
-        every { registrationViewModel.schoolLevels } returns listOf("GED 1", "GED 2", "GED 3", "GED 4")
-        every { registrationViewModel.schoolLevel } returns "GED 1"
-        every { registrationViewModel.event } returns MutableSharedFlow()
-        every { registrationViewModel.resetFirstName() } returns Unit
-        every { registrationViewModel.resetLastName() } returns Unit
-        every { registrationViewModel.resetEmail() } returns Unit
-        every { registrationViewModel.resetPassword() } returns Unit
-        every { registrationViewModel.resetSchoolLevel() } returns Unit
-        every { registrationViewModel.verifyNamesInputs() } returns true
-        every { registrationViewModel.register() } returns Unit
+        every { firstRegistrationViewModel.firstName } returns MutableStateFlow(firstName)
+        every { firstRegistrationViewModel.lastName } returns MutableStateFlow(lastName)
+        every { firstRegistrationViewModel.event } returns MutableSharedFlow()
+        every { firstRegistrationViewModel.verifyNamesInputs() } returns true
+        every { firstRegistrationViewModel.correctNamesInputs() } returns Unit
     }
 
     @Test
@@ -60,14 +56,16 @@ class FirstRegistrationScreenRouteUITest {
                 composable(AuthenticationScreenRoute.FirstRegistration.route) {
                     FirstRegistrationScreen(
                         navController = navController,
-                        registrationViewModel = registrationViewModel
+                        firstRegistrationViewModel = firstRegistrationViewModel
                     )
                 }
 
-                composable(AuthenticationScreenRoute.SecondRegistration.route) {
+                composable(AuthenticationScreenRoute.SecondRegistration.HARD_ROUTE) {
                     SecondRegistrationScreen(
+                        firstName = firstName,
+                        lastName = lastName,
                         navController = navController,
-                        registrationViewModel = registrationViewModel
+                        secondRegistrationViewModel = secondRegistrationViewModel
                     )
                 }
             }
@@ -76,19 +74,19 @@ class FirstRegistrationScreenRouteUITest {
         rule.onNodeWithTag(rule.activity.getString(R.string.registration_screen_next_button_tag)).performClick()
 
         // Then
-        Assert.assertEquals(AuthenticationScreenRoute.SecondRegistration.route, navController.currentDestination?.route)
+        Assert.assertEquals(AuthenticationScreenRoute.SecondRegistration.HARD_ROUTE, navController.currentDestination?.route)
     }
 
     @Test
     fun empty_fields_show_error_message() {
         // Given
-        every { registrationViewModel.event } returns MutableStateFlow(RegistrationEvent.Error(RegistrationErrorType.EMPTY_FIELDS_ERROR))
+        every { firstRegistrationViewModel.event } returns MutableStateFlow(RegistrationEvent.Error(RegistrationErrorType.EMPTY_FIELDS_ERROR))
 
         // When
         rule.setContent {
             FirstRegistrationScreen(
                 navController = navController,
-                registrationViewModel = registrationViewModel
+                firstRegistrationViewModel = firstRegistrationViewModel
             )
         }
 

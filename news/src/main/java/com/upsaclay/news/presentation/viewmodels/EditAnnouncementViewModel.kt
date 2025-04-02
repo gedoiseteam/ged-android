@@ -6,7 +6,6 @@ import com.upsaclay.common.domain.entity.ErrorType
 import com.upsaclay.news.domain.entity.Announcement
 import com.upsaclay.news.domain.entity.AnnouncementEvent
 import com.upsaclay.news.domain.repository.AnnouncementRepository
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow

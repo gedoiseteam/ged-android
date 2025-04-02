@@ -1,37 +1,42 @@
 package com.upsaclay.common.data.remote
 
 import com.google.firebase.firestore.PropertyName
+import com.upsaclay.common.data.UserField
 
 internal data class FirestoreUser(
-    @get:PropertyName("user_id")
-    @set:PropertyName("user_id")
+    @get:PropertyName(UserField.Remote.USER_ID)
+    @set:PropertyName(UserField.Remote.USER_ID)
     var userId: String = "",
 
-    @get:PropertyName("first_name")
-    @set:PropertyName("first_name")
+    @get:PropertyName(UserField.Remote.FIRST_NAME)
+    @set:PropertyName(UserField.Remote.FIRST_NAME)
     var firstName: String = "",
 
-    @get:PropertyName("last_name")
-    @set:PropertyName("last_name")
+    @get:PropertyName(UserField.Remote.LAST_NAME)
+    @set:PropertyName(UserField.Remote.LAST_NAME)
     var lastName: String = "",
 
-    @get:PropertyName("email")
-    @set:PropertyName("email")
+    @get:PropertyName(UserField.Remote.FULL_NAME)
+    @set:PropertyName(UserField.Remote.FULL_NAME)
+    var fullName: String = "",
+
+    @get:PropertyName(UserField.Remote.EMAIL)
+    @set:PropertyName(UserField.Remote.EMAIL)
     var email: String = "",
 
-    @get:PropertyName("school_level")
-    @set:PropertyName("school_level")
+    @get:PropertyName(UserField.Remote.SCHOOL_LEVEL)
+    @set:PropertyName(UserField.Remote.SCHOOL_LEVEL)
     var schoolLevel: String = "",
 
-    @get:PropertyName("is_member")
-    @set:PropertyName("is_member")
+    @get:PropertyName(UserField.Remote.IS_MEMBER)
+    @set:PropertyName(UserField.Remote.IS_MEMBER)
     var isMember: Boolean = false,
 
-    @get:PropertyName("profile_picture_file_name")
-    @set:PropertyName("profile_picture_file_name")
+    @get:PropertyName(UserField.Remote.PROFILE_PICTURE_FILE_NAME)
+    @set:PropertyName(UserField.Remote.PROFILE_PICTURE_FILE_NAME)
     var profilePictureFileName: String? = null,
 
-    @get:PropertyName("is_online")
-    @set:PropertyName("is_online")
-    var isOnline: Boolean = false
+    @get:PropertyName(UserField.Remote.IS_ONLINE)
+    @set:PropertyName(UserField.Remote.IS_ONLINE)
+    var isOnline: Boolean = false,
 )

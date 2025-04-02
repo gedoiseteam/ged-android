@@ -11,47 +11,33 @@ import com.upsaclay.authentication.domain.entity.RegistrationEvent
 import com.upsaclay.authentication.domain.entity.exception.InvalidCredentialsException
 import com.upsaclay.authentication.domain.repository.AuthenticationRepository
 import com.upsaclay.common.domain.entity.ErrorType
+import com.upsaclay.common.domain.entity.ForbiddenException
 import com.upsaclay.common.domain.entity.User
-import com.upsaclay.common.domain.extensions.uppercaseFirstLetter
 import com.upsaclay.common.domain.repository.UserRepository
 import com.upsaclay.common.domain.usecase.GenerateIdUseCase
 import com.upsaclay.common.domain.usecase.VerifyEmailFormatUseCase
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
-import okhttp3.internal.immutableListOf
 import java.io.IOException
 import java.net.ConnectException
 
 private const val MIN_PASSWORD_LENGTH = 8
 
-class RegistrationViewModel(
+class ThirdRegistrationViewModel(
+    private val firstName: String,
+    private val lastName: String,
+    private val schoolLevel: String,
     private val authenticationRepository: AuthenticationRepository,
     private val userRepository: UserRepository
-) : ViewModel() {
-    private val userId = GenerateIdUseCase.asString()
+): ViewModel() {
     private val _event = MutableSharedFlow<RegistrationEvent>()
     val event: SharedFlow<RegistrationEvent> = _event
 
-    var firstName by mutableStateOf("")
-        private set
-    var lastName by mutableStateOf("")
-        private set
     var email by mutableStateOf("")
         private set
     var password by mutableStateOf("")
         private set
-    val schoolLevels = immutableListOf("GED 1", "GED 2", "GED 3", "GED 4")
-    var schoolLevel by mutableStateOf(schoolLevels[0])
-        private set
-
-    fun updateFirstName(firstName: String) {
-        this.firstName = firstName
-    }
-
-    fun updateLastName(lastName: String) {
-        this.lastName = lastName
-    }
 
     fun updateEmail(email: String) {
         this.email = email
@@ -59,38 +45,6 @@ class RegistrationViewModel(
 
     fun updatePassword(password: String) {
         this.password = password
-    }
-
-    fun updateSchoolLevel(schoolLevel: String) {
-        this.schoolLevel = schoolLevel
-    }
-
-    fun resetFirstName() {
-        firstName = ""
-    }
-
-    fun resetLastName() {
-        lastName = ""
-    }
-
-    fun resetEmail() {
-        email = ""
-    }
-
-    fun resetPassword() {
-        password = ""
-    }
-
-    fun resetSchoolLevel() {
-        schoolLevel = schoolLevels[0]
-    }
-
-    fun resetAllValues() {
-        resetFirstName()
-        resetLastName()
-        resetEmail()
-        resetPassword()
-        resetSchoolLevel()
     }
 
     fun register() {
@@ -106,7 +60,7 @@ class RegistrationViewModel(
                 }
 
                 val user = User(
-                    id = userId,
+                    id = GenerateIdUseCase.asString(),
                     firstName = firstName,
                     lastName = lastName,
                     email = email,
@@ -115,21 +69,11 @@ class RegistrationViewModel(
 
                 userRepository.createUser(user)
                 authenticationRepository.registerWithEmailAndPassword(email, password)
+                authenticationRepository.setAuthenticated(true)
                 _event.emit(RegistrationEvent.Registered)
             } catch (e: Exception) {
                 _event.emit(handleException(e))
             }
-        }
-    }
-
-    fun verifyNamesInputs(): Boolean {
-        return if (firstName.isBlank() || lastName.isBlank()) {
-            viewModelScope.launch { _event.emit(RegistrationEvent.Error(RegistrationErrorType.EMPTY_FIELDS_ERROR)) }
-            false
-        } else {
-            firstName = firstName.trim().uppercaseFirstLetter()
-            lastName = lastName.trim().uppercaseFirstLetter()
-            true
         }
     }
 
@@ -174,6 +118,8 @@ class RegistrationViewModel(
             is NetworkErrorException -> RegistrationEvent.Error(ErrorType.NetworkError)
 
             is ConnectException -> RegistrationEvent.Error(ErrorType.ServerConnectError)
+
+            is ForbiddenException -> RegistrationEvent.Error(RegistrationErrorType.USER_NOT_WHITE_LISTED_ERROR)
 
             is IOException -> RegistrationEvent.Error(RegistrationErrorType.USER_CREATION_ERROR)
 

@@ -6,7 +6,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.upsaclay.common.domain.entity.ErrorType
 import com.upsaclay.common.domain.entity.User
 import com.upsaclay.common.domain.repository.UserRepository
 import com.upsaclay.common.domain.usecase.DeleteProfilePictureUseCase
@@ -14,7 +13,6 @@ import com.upsaclay.common.domain.usecase.UpdateProfilePictureUseCase
 import com.upsaclay.gedoise.domain.entities.AccountErrorType
 import com.upsaclay.gedoise.domain.entities.AccountEvent
 import com.upsaclay.gedoise.domain.entities.AccountScreenState
-import com.upsaclay.news.domain.entity.AnnouncementEvent
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -40,6 +38,7 @@ class AccountViewModel(
                 _event.emit(AccountEvent.Loading)
                 try {
                     updateProfilePictureUseCase(uri)
+                    _event.emit(AccountEvent.ProfilePictureUpdated)
                     _screenState.value = AccountScreenState.READ
                 } catch (e: Exception) {
                     _event.emit(AccountEvent.Error(AccountErrorType.PROFILE_PICTURE_UPDATE_ERROR))

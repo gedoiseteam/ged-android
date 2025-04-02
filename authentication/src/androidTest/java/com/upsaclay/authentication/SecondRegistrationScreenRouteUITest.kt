@@ -12,9 +12,11 @@ import androidx.navigation.testing.TestNavHostController
 import com.upsaclay.authentication.domain.entity.AuthenticationScreenRoute
 import com.upsaclay.authentication.presentation.screens.SecondRegistrationScreen
 import com.upsaclay.authentication.presentation.screens.ThirdRegistrationScreen
-import com.upsaclay.authentication.presentation.viewmodels.RegistrationViewModel
+import com.upsaclay.authentication.presentation.viewmodels.SecondRegistrationViewModel
+import com.upsaclay.authentication.presentation.viewmodels.ThirdRegistrationViewModel
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
@@ -25,24 +27,18 @@ class SecondRegistrationScreenRouteUITest {
     val rule = createAndroidComposeRule<ComponentActivity>()
 
     private var navController: TestNavHostController = mockk()
-    private val registrationViewModel: RegistrationViewModel = mockk()
+    private val secondRegistrationViewModel: SecondRegistrationViewModel = mockk()
+    private val thirdRegistrationViewModel: ThirdRegistrationViewModel = mockk()
+
+    private val firstName = "firstName"
+    private val lastName = "lastName"
+    private val schoolLevel = "schoolLevel"
 
     @Before
     fun setUp() {
-        every { registrationViewModel.firstName } returns "firstName"
-        every { registrationViewModel.lastName } returns "lastName"
-        every { registrationViewModel.email } returns "email"
-        every { registrationViewModel.password } returns "password"
-        every { registrationViewModel.schoolLevels } returns listOf("GED 1", "GED 2", "GED 3", "GED 4")
-        every { registrationViewModel.schoolLevel } returns "GED 1"
-        every { registrationViewModel.resetFirstName() } returns Unit
-        every { registrationViewModel.resetLastName() } returns Unit
-        every { registrationViewModel.resetEmail() } returns Unit
-        every { registrationViewModel.resetPassword() } returns Unit
-        every { registrationViewModel.resetSchoolLevel() } returns Unit
-        every { registrationViewModel.verifyNamesInputs() } returns true
-        every { registrationViewModel.register() } returns Unit
-        every { registrationViewModel.updateSchoolLevel(any()) } returns Unit
+        every { secondRegistrationViewModel.schoolLevels } returns listOf("GED 1", "GED 2", "GED 3", "GED 4")
+        every { secondRegistrationViewModel.schoolLevel } returns MutableStateFlow(schoolLevel)
+        every { secondRegistrationViewModel.updateSchoolLevel(any()) } returns Unit
     }
 
     @Test
@@ -51,18 +47,23 @@ class SecondRegistrationScreenRouteUITest {
         rule.setContent {
             navController = TestNavHostController(LocalContext.current)
             navController.navigatorProvider.addNavigator(ComposeNavigator())
-            NavHost(navController = navController, startDestination = AuthenticationScreenRoute.SecondRegistration.route) {
-                composable(AuthenticationScreenRoute.SecondRegistration.route) {
+            NavHost(navController = navController, startDestination = AuthenticationScreenRoute.SecondRegistration.HARD_ROUTE) {
+                composable(AuthenticationScreenRoute.SecondRegistration.HARD_ROUTE) {
                     SecondRegistrationScreen(
+                        firstName = firstName,
+                        lastName = lastName,
                         navController = navController,
-                        registrationViewModel = registrationViewModel
+                        secondRegistrationViewModel = secondRegistrationViewModel
                     )
                 }
 
-                composable(AuthenticationScreenRoute.ThirdRegistration.route) {
+                composable(AuthenticationScreenRoute.ThirdRegistration.HARD_ROUTE) {
                     ThirdRegistrationScreen(
+                        firstName = firstName,
+                        lastName = lastName,
+                        schoolLevel = schoolLevel,
                         navController = navController,
-                        registrationViewModel = registrationViewModel
+                        thirdRegistrationViewModel = thirdRegistrationViewModel
                     )
                 }
             }
@@ -71,6 +72,6 @@ class SecondRegistrationScreenRouteUITest {
         rule.onNodeWithTag(rule.activity.getString(R.string.registration_screen_next_button_tag)).performClick()
 
         // Then
-        Assert.assertEquals(AuthenticationScreenRoute.ThirdRegistration.route, navController.currentDestination?.route)
+        Assert.assertEquals(AuthenticationScreenRoute.ThirdRegistration.HARD_ROUTE, navController.currentDestination?.route)
     }
 }

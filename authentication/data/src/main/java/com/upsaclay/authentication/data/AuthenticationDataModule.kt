@@ -7,8 +7,6 @@ import com.upsaclay.authentication.data.remote.FirebaseAuthenticationApiImpl
 import com.upsaclay.authentication.data.repository.AuthenticationRepositoryImpl
 import com.upsaclay.authentication.data.repository.firebase.FirebaseAuthenticationRepository
 import com.upsaclay.authentication.data.repository.firebase.FirebaseAuthenticationRepositoryImpl
-import com.upsaclay.authentication.data.repository.parissaclay.ParisSaclayAuthenticationRepository
-import com.upsaclay.authentication.data.repository.parissaclay.ParisSaclayAuthenticationRepositoryImpl
 import com.upsaclay.authentication.domain.repository.AuthenticationRepository
 import com.upsaclay.common.domain.e
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -52,11 +50,9 @@ val authenticationDataModule = module {
 
     singleOf(::FirebaseAuthenticationRepositoryImpl) { bind<FirebaseAuthenticationRepository>() }
     singleOf(::FirebaseAuthenticationApiImpl) { bind<FirebaseAuthenticationApi>() }
-    singleOf(::ParisSaclayAuthenticationRepositoryImpl) { bind<ParisSaclayAuthenticationRepository>() }
 
     single<AuthenticationRepository> {
         AuthenticationRepositoryImpl(
-            parisSaclayAuthenticationRepository = get(),
             firebaseAuthenticationRepository = get(),
             authenticationLocalDataSource = get(),
             scope = get(BACKGROUND_SCOPE)

@@ -11,6 +11,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,7 +32,8 @@ import com.upsaclay.authentication.domain.entity.AuthenticationScreenRoute
 import com.upsaclay.authentication.domain.entity.RegistrationErrorType
 import com.upsaclay.authentication.domain.entity.RegistrationEvent
 import com.upsaclay.authentication.presentation.components.RegistrationScaffold
-import com.upsaclay.authentication.presentation.viewmodels.RegistrationViewModel
+import com.upsaclay.authentication.presentation.viewmodels.FirstRegistrationViewModel
+import com.upsaclay.common.domain.extensions.uppercaseFirstLetter
 import com.upsaclay.common.presentation.components.ErrorText
 import com.upsaclay.common.presentation.components.OutlineTextField
 import com.upsaclay.common.presentation.components.PrimaryButton
@@ -43,14 +45,16 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun FirstRegistrationScreen(
     navController: NavController,
-    registrationViewModel: RegistrationViewModel = koinViewModel()
+    firstRegistrationViewModel: FirstRegistrationViewModel = koinViewModel()
 ) {
     var emptyFields by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
+    val firstName by firstRegistrationViewModel.firstName.collectAsState()
+    val lastName by firstRegistrationViewModel.lastName.collectAsState()
 
     LaunchedEffect(Unit) {
-        registrationViewModel.event.collectLatest { event ->
+        firstRegistrationViewModel.event.collectLatest { event ->
             emptyFields = event is RegistrationEvent.Error &&
                     event.type == RegistrationErrorType.EMPTY_FIELDS_ERROR
         }
@@ -79,18 +83,18 @@ fun FirstRegistrationScreen(
 
             OutlineTextField(
                 modifier = Modifier.fillMaxWidth(),
-                value = registrationViewModel.firstName,
+                value = firstName,
                 label = stringResource(com.upsaclay.common.R.string.first_name),
-                onValueChange = registrationViewModel::updateFirstName,
+                onValueChange = firstRegistrationViewModel::updateFirstName,
                 keyboardOptions = KeyboardOptions(KeyboardCapitalization.Sentences),
                 isError = emptyFields
             )
 
             OutlineTextField(
                 modifier = Modifier.fillMaxWidth(),
-                value = registrationViewModel.lastName,
+                value = lastName,
                 label = stringResource(com.upsaclay.common.R.string.last_name),
-                onValueChange = registrationViewModel::updateLastName,
+                onValueChange = firstRegistrationViewModel::updateLastName,
                 keyboardOptions = KeyboardOptions(KeyboardCapitalization.Sentences),
                 isError = emptyFields
             )
@@ -109,10 +113,16 @@ fun FirstRegistrationScreen(
                 .testTag(stringResource(R.string.registration_screen_next_button_tag)),
             text = stringResource(id = com.upsaclay.common.R.string.next),
             onClick = {
-                if (registrationViewModel.verifyNamesInputs()) {
+                if (firstRegistrationViewModel.verifyNamesInputs()) {
+                    firstRegistrationViewModel.correctNamesInputs()
                     focusManager.clearFocus()
                     keyboardController?.hide()
-                    navController.navigate(AuthenticationScreenRoute.SecondRegistration.route)
+                    navController.navigate(
+                        AuthenticationScreenRoute.SecondRegistration(
+                            firstName = firstName.trim().uppercaseFirstLetter(),
+                            lastName = lastName.trim().uppercaseFirstLetter()
+                        ).route
+                    )
                 }
             }
         )

@@ -1,29 +1,19 @@
 package com.upsaclay.authentication
 
 import androidx.activity.ComponentActivity
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.isNotEnabled
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
-import androidx.navigation.compose.ComposeNavigator
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.testing.TestNavHostController
-import com.upsaclay.authentication.domain.entity.AuthenticationScreenRoute
 import com.upsaclay.authentication.domain.entity.RegistrationErrorType
 import com.upsaclay.authentication.domain.entity.RegistrationEvent
-import com.upsaclay.authentication.presentation.screens.EmailVerificationScreen
 import com.upsaclay.authentication.presentation.screens.ThirdRegistrationScreen
-import com.upsaclay.authentication.presentation.viewmodels.EmailVerificationViewModel
-import com.upsaclay.authentication.presentation.viewmodels.RegistrationViewModel
-import com.upsaclay.common.domain.userFixture
+import com.upsaclay.authentication.presentation.viewmodels.ThirdRegistrationViewModel
 import io.mockk.every
 import io.mockk.mockk
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -33,69 +23,32 @@ class ThirdRegistrationScreenRouteUITest {
     val rule = createAndroidComposeRule<ComponentActivity>()
 
     private var navController: TestNavHostController = mockk()
-    private val registrationViewModel: RegistrationViewModel = mockk()
-    private val emailVerificationViewModel: EmailVerificationViewModel = mockk()
+    private val thirdRegistrationViewModel: ThirdRegistrationViewModel = mockk()
+
+    private val firstName = "firstName"
+    private val lastName = "lastName"
+    private val schoolLevel = "schoolLevel"
 
     @Before
     fun setUp() {
-        every { registrationViewModel.firstName } returns "firstName"
-        every { registrationViewModel.lastName } returns "lastName"
-        every { registrationViewModel.email } returns "email"
-        every { registrationViewModel.password } returns "password"
-        every { registrationViewModel.schoolLevels } returns listOf("GED 1", "GED 2", "GED 3", "GED 4")
-        every { registrationViewModel.schoolLevel } returns "GED 1"
-        every { registrationViewModel.resetFirstName() } returns Unit
-        every { registrationViewModel.resetLastName() } returns Unit
-        every { registrationViewModel.resetEmail() } returns Unit
-        every { registrationViewModel.resetPassword() } returns Unit
-        every { registrationViewModel.resetSchoolLevel() } returns Unit
-        every { registrationViewModel.verifyNamesInputs() } returns true
-        every { registrationViewModel.register() } returns Unit
-        every { emailVerificationViewModel.event } returns MutableSharedFlow()
-        every { emailVerificationViewModel.sendVerificationEmail() } returns Unit
-    }
-
-    @Test
-    fun navigate_to_email_verification_screen_when_user_is_registered() {
-        // Given
-        every { registrationViewModel.event } returns MutableStateFlow(RegistrationEvent.Registered)
-
-        // When
-        rule.setContent {
-            navController = TestNavHostController(LocalContext.current)
-            navController.navigatorProvider.addNavigator(ComposeNavigator())
-            NavHost(navController = navController, startDestination = AuthenticationScreenRoute.ThirdRegistration.route) {
-                composable(AuthenticationScreenRoute.ThirdRegistration.route) {
-                    ThirdRegistrationScreen(
-                        navController = navController,
-                        registrationViewModel = registrationViewModel
-                    )
-                }
-
-                composable(AuthenticationScreenRoute.EmailVerification.HARD_ROUTE){
-                    EmailVerificationScreen(
-                        email = userFixture.email,
-                        navController = navController,
-                        emailVerificationViewModel = emailVerificationViewModel
-                    )
-                }
-            }
-        }
-
-        // Then
-        Assert.assertEquals(AuthenticationScreenRoute.EmailVerification.HARD_ROUTE, navController.currentDestination?.route)
+        every { thirdRegistrationViewModel.email } returns "email"
+        every { thirdRegistrationViewModel.password } returns "password"
+        every { thirdRegistrationViewModel.register() } returns Unit
     }
 
     @Test
     fun components_are_disabled_when_loading() {
         // Given
-        every { registrationViewModel.event } returns MutableStateFlow(RegistrationEvent.Loading)
+        every { thirdRegistrationViewModel.event } returns MutableStateFlow(RegistrationEvent.Loading)
 
         // When
         rule.setContent {
             ThirdRegistrationScreen(
+                firstName = firstName,
+                lastName = lastName,
+                schoolLevel = schoolLevel,
                 navController = navController,
-                registrationViewModel = registrationViewModel
+                thirdRegistrationViewModel = thirdRegistrationViewModel
             )
         }
 
@@ -108,13 +61,16 @@ class ThirdRegistrationScreenRouteUITest {
     @Test
     fun empty_fields_show_error_message() {
         // Given
-        every { registrationViewModel.event } returns MutableStateFlow(RegistrationEvent.Error(RegistrationErrorType.EMPTY_FIELDS_ERROR))
+        every { thirdRegistrationViewModel.event } returns MutableStateFlow(RegistrationEvent.Error(RegistrationErrorType.EMPTY_FIELDS_ERROR))
 
         // When
         rule.setContent {
             ThirdRegistrationScreen(
+                firstName = firstName,
+                lastName = lastName,
+                schoolLevel = schoolLevel,
                 navController = navController,
-                registrationViewModel = registrationViewModel
+                thirdRegistrationViewModel = thirdRegistrationViewModel
             )
         }
 
@@ -125,13 +81,16 @@ class ThirdRegistrationScreenRouteUITest {
     @Test
     fun invalid_email_format_show_error_message() {
         // Given
-        every { registrationViewModel.event } returns MutableStateFlow(RegistrationEvent.Error(RegistrationErrorType.EMAIL_FORMAT_ERROR))
+        every { thirdRegistrationViewModel.event } returns MutableStateFlow(RegistrationEvent.Error(RegistrationErrorType.EMAIL_FORMAT_ERROR))
 
         // When
         rule.setContent {
             ThirdRegistrationScreen(
+                firstName = firstName,
+                lastName = lastName,
+                schoolLevel = schoolLevel,
                 navController = navController,
-                registrationViewModel = registrationViewModel
+                thirdRegistrationViewModel = thirdRegistrationViewModel
             )
         }
 
@@ -142,13 +101,16 @@ class ThirdRegistrationScreenRouteUITest {
     @Test
     fun invalid_password_length_show_error_message() {
         // Given
-        every { registrationViewModel.event } returns MutableStateFlow(RegistrationEvent.Error(RegistrationErrorType.PASSWORD_LENGTH_ERROR))
+        every { thirdRegistrationViewModel.event } returns MutableStateFlow(RegistrationEvent.Error(RegistrationErrorType.PASSWORD_LENGTH_ERROR))
 
         // When
         rule.setContent {
             ThirdRegistrationScreen(
+                firstName = firstName,
+                lastName = lastName,
+                schoolLevel = schoolLevel,
                 navController = navController,
-                registrationViewModel = registrationViewModel
+                thirdRegistrationViewModel = thirdRegistrationViewModel
             )
         }
 
@@ -159,13 +121,16 @@ class ThirdRegistrationScreenRouteUITest {
     @Test
     fun email_already_exist_show_error_message() {
         // Given
-        every { registrationViewModel.event } returns MutableStateFlow(RegistrationEvent.Error(RegistrationErrorType.USER_ALREADY_EXISTS))
+        every { thirdRegistrationViewModel.event } returns MutableStateFlow(RegistrationEvent.Error(RegistrationErrorType.USER_ALREADY_EXISTS))
 
         // When
         rule.setContent {
             ThirdRegistrationScreen(
+                firstName = firstName,
+                lastName = lastName,
+                schoolLevel = schoolLevel,
                 navController = navController,
-                registrationViewModel = registrationViewModel
+                thirdRegistrationViewModel = thirdRegistrationViewModel
             )
         }
 
@@ -176,13 +141,16 @@ class ThirdRegistrationScreenRouteUITest {
     @Test
     fun unrecognized_paris_saclay_account_show_error_message() {
         // Given
-        every { registrationViewModel.event } returns MutableStateFlow(RegistrationEvent.Error(RegistrationErrorType.UNRECOGNIZED_ACCOUNT))
+        every { thirdRegistrationViewModel.event } returns MutableStateFlow(RegistrationEvent.Error(RegistrationErrorType.UNRECOGNIZED_ACCOUNT))
 
         // When
         rule.setContent {
             ThirdRegistrationScreen(
+                firstName = firstName,
+                lastName = lastName,
+                schoolLevel = schoolLevel,
                 navController = navController,
-                registrationViewModel = registrationViewModel
+                thirdRegistrationViewModel = thirdRegistrationViewModel
             )
         }
 

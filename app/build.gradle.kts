@@ -65,6 +65,7 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.paging.common.android)
     implementation(libs.androidx.paging.runtime.ktx)
+    implementation(libs.firebase.messaging.ktx)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.room.paging)

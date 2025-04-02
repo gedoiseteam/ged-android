@@ -12,6 +12,8 @@ internal interface UserFirestoreApi {
 
     suspend fun getUsers(): List<FirestoreUser>
 
+    suspend fun getFilteredUsers(query: String): List<FirestoreUser>
+
     suspend fun createUser(firestoreUser: FirestoreUser)
 
     suspend fun updateProfilePictureFileName(userId: String, fileName: String?)

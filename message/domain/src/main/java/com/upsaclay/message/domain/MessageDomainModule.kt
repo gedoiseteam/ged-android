@@ -3,6 +3,7 @@ package com.upsaclay.message.domain
 import com.upsaclay.common.domain.e
 import com.upsaclay.message.domain.usecase.CreateConversationUseCase
 import com.upsaclay.message.domain.usecase.DeleteConversationUseCase
+import com.upsaclay.message.domain.usecase.GetFilteredUserUseCase
 import com.upsaclay.message.domain.usecase.GetPagedConversationsUIUseCase
 import com.upsaclay.message.domain.usecase.ListenRemoteConversationsUseCase
 import com.upsaclay.message.domain.usecase.ListenRemoteMessagesUseCase
@@ -21,7 +22,7 @@ val messageDomainModule = module {
         CoroutineScope(
     SupervisorJob() +
             Dispatchers.IO +
-            CoroutineExceptionHandler { coroutineContext, throwable ->
+            CoroutineExceptionHandler { _, throwable ->
                 e("Uncaught error in backgroundScope", throwable)
             }
         )
@@ -30,6 +31,7 @@ val messageDomainModule = module {
     singleOf(::CreateConversationUseCase)
     singleOf(::DeleteConversationUseCase)
     singleOf(::GetPagedConversationsUIUseCase)
+    singleOf(::GetFilteredUserUseCase)
 
     single {
         ListenRemoteConversationsUseCase(

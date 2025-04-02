@@ -31,7 +31,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import com.upsaclay.common.domain.entity.ErrorType
-import com.upsaclay.common.presentation.components.OverlayLinearLoadingScreen
 import com.upsaclay.common.presentation.components.SmallTopBarAction
 import com.upsaclay.common.presentation.components.TopLinearLoadingScreen
 import com.upsaclay.common.presentation.components.TransparentFocusedTextField
@@ -59,7 +58,7 @@ fun EditAnnouncementScreen(
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
     val scope = rememberCoroutineScope()
-    var loading by remember { mutableStateOf(true) }
+    var loading by remember { mutableStateOf(false) }
 
     val isAnnouncementModified by editAnnouncementViewModel.isAnnouncementModified.collectAsState()
     val announcement by editAnnouncementViewModel.announcement.collectAsState()

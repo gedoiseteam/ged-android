@@ -40,7 +40,7 @@ private val BACKGROUND_SCOPE = named("BackgroundScope")
 val commonDataModule = module {
     single<Retrofit>(qualifier = named(SERVER_1_RETROFIT_QUALIFIER)) {
         Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:3000")
+            .baseUrl(BuildConfig.SERVICE_1_BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
@@ -48,14 +48,16 @@ val commonDataModule = module {
 
     single<Retrofit>(qualifier = named(SERVER_2_RETROFIT_QUALIFIER)) {
         Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:3000")
+            .baseUrl(BuildConfig.SERVICE_2_BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
 
     single {
-        get<Retrofit>(qualifier = named(SERVER_1_RETROFIT_QUALIFIER)).create(RetrofitImageApi::class.java)
+        get<Retrofit>(
+            qualifier = named(SERVER_1_RETROFIT_QUALIFIER)
+        ).create(RetrofitImageApi::class.java)
     }
 
     single {

@@ -11,8 +11,10 @@ internal val lightGray = Color(0xFFCCCCCC)
 internal val darkGray = Color(0xFF3C3C3C)
 
 internal val primaryLight = Color(0xFF67708A)
+internal val primaryContainerLight = Color(0xFFDDE0E7)
+internal val onPrimaryContainerLight = Color(0xFF45474D)
 internal val secondaryLight = Color(0xFF0B86FF)
-internal val secondaryContainerLight = Color(0xFFDEE7F8)
+internal val secondaryContainerLight = Color(0xFFDCE0E8)
 internal val tertiaryLight = Color(0xFF009688)
 internal val backgroundLight = Color(0xFFFFFFFF)
 internal val onBackgroundLight = black
@@ -28,6 +30,8 @@ internal val outlineLight = Color(0xFF74777E)
 internal val outlineVariantLight = Color(0xFFC4C8D0)
 
 internal val primaryDark = Color(0xFF67708A)
+internal val primaryContainerDark = Color(0xFF444958)
+internal val onPrimaryContainerDark = Color(0xFFE3E3E3)
 internal val onPrimaryDark = Color(0xFF0E1B34)
 internal val errorDark = Color(0xFFD64A4C)
 internal val surfaceDark = Color(0xFF1B1C1F)
@@ -60,6 +64,11 @@ val ColorScheme.darkGray: Color
     @Composable
     get() = com.upsaclay.common.presentation.theme.darkGray
 
+val ColorScheme.gold: Color
+    @Composable
+    get() = Color(0xFFB98129)
+
+
 val ColorScheme.chatInputBackground: Color
     @Composable
     get() = if(isSystemInDarkTheme()) Color(0xFF323232) else Color(0xFFEEEEEE)
@@ -67,6 +76,10 @@ val ColorScheme.chatInputBackground: Color
 val ColorScheme.chatInputForeground: Color
     @Composable
     get() = if(isSystemInDarkTheme()) Color(0xFF929298) else Color(0xFF646464)
+
+val ColorScheme.cursor: Color
+    @Composable
+    get() = if (isSystemInDarkTheme()) white else black
 
 val ColorScheme.previewText: Color
     @Composable

@@ -2,7 +2,6 @@ package com.upsaclay.authentication.data.repository
 
 import com.upsaclay.authentication.data.local.AuthenticationLocalDataSource
 import com.upsaclay.authentication.data.repository.firebase.FirebaseAuthenticationRepository
-import com.upsaclay.authentication.data.repository.parissaclay.ParisSaclayAuthenticationRepository
 import com.upsaclay.authentication.domain.repository.AuthenticationRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -10,7 +9,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 internal class AuthenticationRepositoryImpl(
-    private val parisSaclayAuthenticationRepository: ParisSaclayAuthenticationRepository,
     private val firebaseAuthenticationRepository: FirebaseAuthenticationRepository,
     private val authenticationLocalDataSource: AuthenticationLocalDataSource,
     private val scope: CoroutineScope
@@ -29,10 +27,6 @@ internal class AuthenticationRepositoryImpl(
         }
     }
 
-    override suspend fun loginWithParisSaclay(email: String, password: String, hash: String) {
-        parisSaclayAuthenticationRepository.loginWithParisSaclay(email, password, hash)
-    }
-
     override suspend fun loginWithEmailAndPassword(email: String, password: String) {
         firebaseAuthenticationRepository.loginWithEmailAndPassword(email, password)
     }
@@ -45,12 +39,6 @@ internal class AuthenticationRepositoryImpl(
         scope.launch { firebaseAuthenticationRepository.logout() }
         setAuthenticated(false)
     }
-
-    override suspend fun sendVerificationEmail() {
-        firebaseAuthenticationRepository.sendVerificationEmail()
-    }
-
-    override suspend fun isUserEmailVerified(): Boolean = firebaseAuthenticationRepository.isUserEmailVerified()
 
     override suspend fun setAuthenticated(isAuthenticated: Boolean) {
         authenticationLocalDataSource.setAuthenticationState(isAuthenticated)

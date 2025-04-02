@@ -8,7 +8,6 @@ import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.compose.NavHost
@@ -34,7 +33,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-class ConversationOldScreenRouteUITest {
+class ConversationScreenRouteUITest {
     @get:Rule
     val rule = createAndroidComposeRule<ComponentActivity>()
 
@@ -65,40 +64,6 @@ class ConversationOldScreenRouteUITest {
                     get(i).assert(hasText(conversationsUIFixture[i].interlocutor.fullName))
                 }
             }
-    }
-
-    @Test
-    fun text_should_be_displayed_when_conversations_are_empty() {
-        // Given
-        every { conversationViewModel.conversations } returns flowOf(PagingData.empty())
-
-        // When
-        rule.setContent {
-            ConversationScreen(
-                navController = navController,
-                conversationViewModel = conversationViewModel,
-                snackbarHostState = SnackbarHostState(),
-            )
-        }
-
-        // Then
-        rule.onNodeWithText(rule.activity.getString(R.string.no_conversation)).assertExists()
-        rule.onNodeWithText(rule.activity.getString(R.string.new_conversation)).assertExists()
-    }
-
-    @Test
-    fun create_conversations_button_should_be_displayed() {
-        // When
-        rule.setContent {
-            ConversationScreen(
-                navController = navController,
-                conversationViewModel = conversationViewModel,
-                snackbarHostState = SnackbarHostState(),
-            )
-        }
-
-        // Then
-        rule.onNodeWithTag(rule.activity.getString(R.string.conversation_screen_create_conversation_button_tag)).assertExists()
     }
 
     @Test
@@ -165,36 +130,6 @@ class ConversationOldScreenRouteUITest {
             rule.activity.getString(R.string.conversation_screen_unread_conversation_item_tag),
             useUnmergedTree = true
         ).assertExists()
-    }
-
-    @Test
-    fun navigate_to_create_conversation_screen_when_create_conversation_button_is_clicked() {
-        // When
-        rule.setContent {
-            navController = TestNavHostController(LocalContext.current)
-            navController.navigatorProvider.addNavigator(ComposeNavigator())
-            NavHost(navController = navController, startDestination = MessageScreenRoute.Conversation.route) {
-                composable(MessageScreenRoute.Conversation.route) {
-                    ConversationScreen(
-                        navController = navController,
-                        conversationViewModel = conversationViewModel,
-                        snackbarHostState = SnackbarHostState()
-                    )
-                }
-
-                composable(MessageScreenRoute.CreateConversation.route) {
-                    CreateConversationScreen(
-                        navController = navController,
-                        createConversationViewModel = mockk()
-                    )
-                }
-            }
-        }
-
-        rule.onNodeWithTag(rule.activity.getString(R.string.conversation_screen_create_conversation_button_tag)).performClick()
-
-        // Then
-        Assert.assertEquals(MessageScreenRoute.CreateConversation.route, navController.currentDestination?.route)
     }
 
     @Test

@@ -1,6 +1,5 @@
 package com.upsaclay.authentication.data.remote
 
-import android.security.keystore.UserNotAuthenticatedException
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.auth

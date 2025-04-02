@@ -3,11 +3,9 @@ package com.upsaclay.news
 import com.upsaclay.common.domain.repository.UserRepository
 import com.upsaclay.common.domain.userFixture
 import com.upsaclay.news.domain.announcementFixture
-import com.upsaclay.news.domain.entity.AnnouncementEvent
 import com.upsaclay.news.domain.repository.AnnouncementRepository
 import com.upsaclay.news.domain.usecase.DeleteAnnouncementUseCase
 import com.upsaclay.news.domain.usecase.GetAnnouncementFlowUseCase
-import com.upsaclay.news.domain.usecase.RecreateAnnouncementUseCase
 import com.upsaclay.news.presentation.viewmodels.ReadAnnouncementViewModel
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -21,7 +19,6 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.setMain
 import org.junit.Before
 import org.junit.Test
-import java.net.ConnectException
 import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)

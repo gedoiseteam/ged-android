@@ -57,6 +57,7 @@ import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.black
 import com.upsaclay.common.presentation.theme.chatInputBackground
 import com.upsaclay.common.presentation.theme.chatInputForeground
+import com.upsaclay.common.presentation.theme.cursor
 import com.upsaclay.common.presentation.theme.lightGray
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.common.presentation.theme.white
@@ -205,7 +206,6 @@ fun MessageInput(
     onSendClick: () -> Unit
 ) {
     val interactionSource = remember { MutableInteractionSource() }
-    val textColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.white else MaterialTheme.colorScheme.black
 
     Row(
         modifier = modifier
@@ -221,8 +221,8 @@ fun MessageInput(
             value = value,
             onValueChange = onValueChange,
             keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
-            cursorBrush = SolidColor(textColor),
-            textStyle = TextStyle(color = textColor)
+            cursorBrush = SolidColor(MaterialTheme.colorScheme.cursor),
+            textStyle = TextStyle(color = MaterialTheme.colorScheme.cursor)
         ) { innerTextField ->
             TextFieldDefaults.DecorationBox(
                 value = value,
@@ -241,7 +241,7 @@ fun MessageInput(
                     unfocusedContainerColor = MaterialTheme.colorScheme.chatInputBackground,
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
-                    cursorColor = textColor
+                    cursorColor = MaterialTheme.colorScheme.cursor
                 ),
                 visualTransformation = VisualTransformation.None,
                 interactionSource = interactionSource,

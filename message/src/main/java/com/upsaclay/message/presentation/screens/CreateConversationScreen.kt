@@ -1,7 +1,10 @@
 package com.upsaclay.message.presentation.screens
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -18,6 +21,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -25,7 +29,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import com.upsaclay.common.domain.entity.User
 import com.upsaclay.common.domain.usersFixture
-import com.upsaclay.common.presentation.components.LinearProgressBar
+import com.upsaclay.common.presentation.components.CircularProgressBar
+import com.upsaclay.common.presentation.components.SimpleSearchBar
 import com.upsaclay.common.presentation.components.SmallTopBarBack
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.previewText
@@ -47,6 +52,7 @@ fun CreateConversationScreen(
     val users by createConversationViewModel.users.collectAsState(emptyList())
     val scope = rememberCoroutineScope()
     var loading by remember { mutableStateOf(true) }
+    val searchedUser by createConversationViewModel.query.collectAsState("")
 
     LaunchedEffect(Unit) {
         createConversationViewModel.event.collectLatest { event ->
@@ -63,41 +69,58 @@ fun CreateConversationScreen(
         }
     ) { contentPadding ->
         Column(
-            modifier = Modifier
-                .padding(top = contentPadding.calculateTopPadding())
+            modifier = Modifier.padding(top = contentPadding.calculateTopPadding()),
+            verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small)
         ) {
-            if (loading) {
-                LinearProgressBar(modifier = Modifier.fillMaxWidth())
-            }
+            SimpleSearchBar(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = MaterialTheme.spacing.medium),
+                placeholder = stringResource(id = com.upsaclay.common.R.string.search),
+                value = searchedUser,
+                onValueChange = { createConversationViewModel.updateSearchedUser(it) }
+            )
 
-            LazyColumn {
-                if (users.isNotEmpty()) {
-                    items(users) { user ->
-                        UserItem(
-                            user = user,
-                            onClick = {
-                                scope.launch {
-                                    val conversation = createConversationViewModel.getConversation(user.id)
-                                        ?: createConversationViewModel.generateConversation(user)
+            Box(modifier = Modifier.fillMaxSize()) {
+                if (loading) {
+                    CircularProgressBar(
+                        modifier = Modifier.align(Alignment.Center),
+                        scale = 1.5f
+                    )
+                }
 
-                                    navController.navigate(MessageScreenRoute.Chat(conversation).route) {
-                                        popUpTo(MessageScreenRoute.CreateConversation.route) {
-                                            inclusive = true
+                LazyColumn {
+                    if (users.isNotEmpty()) {
+                        items(users) { user ->
+                            UserItem(
+                                user = user,
+                                onClick = {
+                                    scope.launch {
+                                        val conversation =
+                                            createConversationViewModel.getConversation(user.id)
+                                                ?: createConversationViewModel.generateConversation(
+                                                    user
+                                                )
+
+                                        navController.navigate(MessageScreenRoute.Chat(conversation).route) {
+                                            popUpTo(MessageScreenRoute.CreateConversation.route) {
+                                                inclusive = true
+                                            }
                                         }
                                     }
                                 }
-                            }
-                        )
-                    }
-                } else {
-                    item {
-                        Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))
-                        Text(
-                            modifier = Modifier.fillMaxWidth(),
-                            text = stringResource(id = com.upsaclay.common.R.string.no_user_found),
-                            textAlign = TextAlign.Center,
-                            color = MaterialTheme.colorScheme.previewText
-                        )
+                            )
+                        }
+                    } else {
+                        item {
+                            Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))
+                            Text(
+                                modifier = Modifier.fillMaxWidth(),
+                                text = stringResource(id = com.upsaclay.common.R.string.no_user_found),
+                                textAlign = TextAlign.Center,
+                                color = MaterialTheme.colorScheme.previewText
+                            )
+                        }
                     }
                 }
             }
@@ -128,28 +151,43 @@ private fun CreateConversationScreenPreview() {
         ) { innerPadding ->
             Column(
                 modifier = Modifier.padding(top = innerPadding.calculateTopPadding()),
+                verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small)
             ) {
-                if (loading) {
-                    LinearProgressBar(modifier = Modifier.fillMaxWidth())
-                }
+                SimpleSearchBar(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = MaterialTheme.spacing.medium),
+                    placeholder = stringResource(id = com.upsaclay.common.R.string.search),
+                    value = "",
+                    onValueChange = { }
+                )
 
-                LazyColumn {
-                    if (users.isNotEmpty()) {
-                        items(users) { user ->
-                            UserItem(
-                                user = user,
-                                onClick = { }
-                            )
-                        }
-                    } else {
-                        item {
-                            Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))
-                            Text(
-                                modifier = Modifier.fillMaxWidth(),
-                                text = stringResource(id = com.upsaclay.common.R.string.no_user_found),
-                                textAlign = TextAlign.Center,
-                                color = MaterialTheme.colorScheme.previewText
-                            )
+                Box(modifier = Modifier.fillMaxSize()) {
+                    if (loading) {
+                        CircularProgressBar(
+                            modifier = Modifier.align(Alignment.Center),
+                            scale = 1.5f
+                        )
+                    }
+
+                    LazyColumn {
+                        if (users.isNotEmpty()) {
+                            items(users) { user ->
+                                UserItem(
+                                    user = user,
+                                    onClick = { }
+                                )
+                            }
+                        } else {
+                            item {
+                                Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))
+                                Text(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    text = stringResource(id = com.upsaclay.common.R.string.no_user_found),
+                                    textAlign = TextAlign.Center,
+                                    color = MaterialTheme.colorScheme.previewText
+                                )
+                            }
                         }
                     }
                 }

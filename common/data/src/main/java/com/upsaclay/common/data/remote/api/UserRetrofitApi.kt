@@ -1,6 +1,6 @@
 package com.upsaclay.common.data.remote.api
 
-import com.upsaclay.common.data.entity.UserDTO
+import com.upsaclay.common.data.local.UserLocal
 import com.upsaclay.common.domain.entity.ServerResponse.EmptyResponse
 import retrofit2.Response
 import retrofit2.http.Body
@@ -15,14 +15,14 @@ import retrofit2.http.Path
 internal interface UserRetrofitApi {
 
     @GET("users/{id}")
-    suspend fun getUser(@Path("id") userId: String): Response<UserDTO>
+    suspend fun getUser(@Path("id") userId: String): Response<UserLocal>
 
     @FormUrlEncoded
     @POST("users/get-user-with-email")
-    suspend fun getUserWithEmail(@Field("USER_EMAIL") userEmail: String): Response<UserDTO>
+    suspend fun getUserWithEmail(@Field("USER_EMAIL") userEmail: String): Response<UserLocal>
 
     @POST("users/create")
-    suspend fun createUser(@Body user: UserDTO): Response<Unit>
+    suspend fun createUser(@Body user: UserLocal): Response<Unit>
 
     @FormUrlEncoded
     @PUT("users/profile-picture-file-name")

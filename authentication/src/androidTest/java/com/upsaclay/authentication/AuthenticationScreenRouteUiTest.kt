@@ -16,7 +16,7 @@ import com.upsaclay.authentication.domain.entity.AuthenticationScreenRoute
 import com.upsaclay.authentication.presentation.screens.AuthenticationScreen
 import com.upsaclay.authentication.presentation.screens.FirstRegistrationScreen
 import com.upsaclay.authentication.presentation.viewmodels.AuthenticationViewModel
-import com.upsaclay.authentication.presentation.viewmodels.RegistrationViewModel
+import com.upsaclay.authentication.presentation.viewmodels.FirstRegistrationViewModel
 import com.upsaclay.common.domain.entity.ErrorType
 import io.mockk.every
 import io.mockk.mockk
@@ -33,7 +33,7 @@ class AuthenticationScreenRouteUiTest {
 
     private var navController: TestNavHostController = mockk()
     private val authenticationViewModel: AuthenticationViewModel = mockk()
-    private val registrationViewModel: RegistrationViewModel = mockk()
+    private val firstRegistrationViewModel: FirstRegistrationViewModel = mockk()
 
     @Before
     fun setUp() {
@@ -63,7 +63,7 @@ class AuthenticationScreenRouteUiTest {
                 composable(AuthenticationScreenRoute.FirstRegistration.route) {
                     FirstRegistrationScreen(
                         navController,
-                        registrationViewModel
+                        firstRegistrationViewModel
                     )
                 }
             }
@@ -91,7 +91,7 @@ class AuthenticationScreenRouteUiTest {
                 composable(AuthenticationScreenRoute.FirstRegistration.route) {
                     FirstRegistrationScreen(
                         navController,
-                        registrationViewModel
+                        firstRegistrationViewModel
                     )
                 }
             }
@@ -101,23 +101,6 @@ class AuthenticationScreenRouteUiTest {
         // Then
         verify { authenticationViewModel.resetEmail() }
         verify { authenticationViewModel.resetPassword() }
-    }
-
-    @Test
-    fun display_verify_email_dialog_when_email_is_not_verified() {
-        // Given
-        every { authenticationViewModel.event } returns MutableStateFlow(AuthenticationEvent.EmailNotVerified)
-
-        // When
-        rule.setContent {
-            AuthenticationScreen(
-                navController,
-                authenticationViewModel
-            )
-        }
-
-        // Then
-        rule.onNodeWithTag(rule.activity.getString(R.string.authentication_screen_verify_email_dialog_tag)).assertExists()
     }
 
     @Test

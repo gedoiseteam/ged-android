@@ -8,20 +8,22 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 
 internal class UserLocalDataSource(private val userDataStore: UserDataStore) {
-    fun getCurrentUserFlow(): Flow<User> = userDataStore.getCurrentUser().filterNotNull().map(UserMapper::toDomain)
+    fun getCurrentUserFlow(): Flow<User> = userDataStore.getCurrentUserFlow().filterNotNull().map(UserMapper::toDomain)
+
+    suspend fun getCurrentUser(): User? = userDataStore.getCurrentUser()?.let(UserMapper::toDomain)
 
     suspend fun setCurrentUser(user: User) {
         userDataStore.storeCurrentUser(UserMapper.toDTO(user))
     }
 
     suspend fun updateProfilePictureUrl(url: String) {
-        userDataStore.getCurrentUser().firstOrNull()?.let { userDTO ->
+        userDataStore.getCurrentUserFlow().firstOrNull()?.let { userDTO ->
             userDataStore.storeCurrentUser(userDTO.copy(userProfilePictureFileName = url))
         }
     }
 
     suspend fun deleteProfilePictureUrl() {
-        userDataStore.getCurrentUser().firstOrNull()?.let { userDTO ->
+        userDataStore.getCurrentUserFlow().firstOrNull()?.let { userDTO ->
             userDataStore.storeCurrentUser(userDTO.copy(userProfilePictureFileName = null))
         }
     }

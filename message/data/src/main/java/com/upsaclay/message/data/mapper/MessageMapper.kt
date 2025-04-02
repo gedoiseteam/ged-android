@@ -15,6 +15,7 @@ internal object MessageMapper {
     fun toDomain(remoteMessage: RemoteMessage) = Message(
         id = remoteMessage.messageId,
         senderId = remoteMessage.senderId,
+        recipientId = remoteMessage.recipientId,
         conversationId = remoteMessage.conversationId,
         content = remoteMessage.content,
         date = ConvertDateUseCase.toLocalDateTime(remoteMessage.timestamp.toInstant()),
@@ -25,6 +26,7 @@ internal object MessageMapper {
     fun toDomain(localMessage: LocalMessage) = Message(
         id = localMessage.messageId,
         senderId = localMessage.senderId,
+        recipientId = localMessage.recipientId,
         conversationId = localMessage.conversationId,
         content = localMessage.content,
         date = Instant.ofEpochMilli(localMessage.messageTimestamp).atZone(ZoneOffset.UTC).toLocalDateTime(),
@@ -40,6 +42,7 @@ internal object MessageMapper {
     fun toLocal(message: Message) = LocalMessage(
         messageId = message.id,
         senderId = message.senderId,
+        recipientId = message.recipientId,
         conversationId = message.conversationId,
         content = message.content,
         messageTimestamp = message.date.toInstant(ZoneOffset.UTC).toEpochMilli(),
@@ -52,6 +55,7 @@ internal object MessageMapper {
         messageId = message.id,
         conversationId = message.conversationId,
         senderId = message.senderId,
+        recipientId = message.recipientId,
         content = message.content,
         timestamp = Timestamp(message.date.atZone(ZoneOffset.UTC).toInstant()),
         seen = message.seen?.let { RemoteSeen(it.value, Timestamp(it.time.atZone(ZoneOffset.UTC).toInstant())) }

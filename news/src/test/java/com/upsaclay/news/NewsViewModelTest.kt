@@ -50,14 +50,8 @@ class NewsViewModelTest {
             recreateAnnouncementUseCase = recreateAnnouncementUseCase,
             deleteAnnouncementUseCase = deleteAnnouncementUseCase,
             refreshAnnouncementUseCase = refreshAnnouncementUseCase,
-            userRepository = userRepository,
             announcementRepository = announcementRepository
         )
-    }
-
-    @Test
-    fun default_values_are_correct() = runTest {
-        assertEquals(userFixture, newsViewModel.currentUser.value)
     }
 
     @Test

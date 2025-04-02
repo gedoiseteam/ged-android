@@ -7,8 +7,6 @@ sealed class AuthenticationEvent {
     data object Authenticated: AuthenticationEvent()
     data object Loading: AuthenticationEvent()
     data class Error(val type: ErrorType): AuthenticationEvent()
-    data object EmailVerified: AuthenticationEvent()
-    data object EmailNotVerified: AuthenticationEvent()
 }
 
 enum class AuthErrorType: ErrorType {

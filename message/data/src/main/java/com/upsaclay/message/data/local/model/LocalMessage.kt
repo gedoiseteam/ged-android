@@ -13,6 +13,8 @@ data class LocalMessage(
     val messageId: Int,
     @ColumnInfo(name = MessageField.SENDER_ID)
     val senderId: String,
+    @ColumnInfo(name = MessageField.RECIPIENT_ID)
+    val recipientId: String,
     @ColumnInfo(name = MessageField.CONVERSATION_ID)
     val conversationId: Int,
     @ColumnInfo(name = MessageField.CONTENT)

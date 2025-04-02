@@ -42,6 +42,7 @@ import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
 import com.upsaclay.common.domain.entity.User
 import com.upsaclay.common.domain.usecase.FormatLocalDateTimeUseCase
+import com.upsaclay.common.domain.userFixture2
 import com.upsaclay.common.presentation.components.CircularProgressBar
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.previewText
@@ -203,9 +204,14 @@ private fun MessageFeed(
                     }
 
                     if (firstMessage || !sameDay) {
+                        val topPadding = if (firstMessage)
+                            MaterialTheme.spacing.default
+                        else
+                            MaterialTheme.spacing.mediumLarge
+
                         Text(
                             modifier = Modifier
-                                .padding(vertical = MaterialTheme.spacing.mediumLarge)
+                                .padding(top = topPadding, bottom = MaterialTheme.spacing.mediumLarge)
                                 .fillMaxWidth(),
                             text = FormatLocalDateTimeUseCase.formatDayMonthYear(message.date),
                             style = MaterialTheme.typography.bodySmall,
@@ -301,6 +307,7 @@ private fun ChatScreenPreview() {
                                     id = id,
                                     conversationId = 1,
                                     senderId = "senderId",
+                                    recipientId = userFixture2.id,
                                     content = text,
                                     date = LocalDateTime.now(),
                                     state = MessageState.SENT

@@ -24,6 +24,7 @@ data class LocalConversationMessage(
 
     @ColumnInfo(name = MessageField.MESSAGE_ID) val messageId: Int?,
     @ColumnInfo(name = MessageField.SENDER_ID) val senderId: String?,
+    @ColumnInfo(name = MessageField.RECIPIENT_ID) val recipientId: String?,
     @ColumnInfo(name = MessageField.CONTENT) val content: String?,
     @ColumnInfo(name = MessageField.MESSAGE_TIMESTAMP) val messageTimestamp: Long?,
     @ColumnInfo(name = MessageField.Local.SEEN_VALUE) val seenValue: Boolean?,

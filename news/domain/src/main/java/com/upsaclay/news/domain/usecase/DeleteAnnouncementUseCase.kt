@@ -3,8 +3,6 @@ package com.upsaclay.news.domain.usecase
 import com.upsaclay.news.domain.entity.Announcement
 import com.upsaclay.news.domain.entity.AnnouncementState
 import com.upsaclay.news.domain.repository.AnnouncementRepository
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 class DeleteAnnouncementUseCase(
     private val announcementRepository: AnnouncementRepository

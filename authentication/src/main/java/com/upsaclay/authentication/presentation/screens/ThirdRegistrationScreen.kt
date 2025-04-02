@@ -30,12 +30,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.upsaclay.authentication.R
-import com.upsaclay.authentication.domain.entity.AuthenticationScreenRoute
 import com.upsaclay.authentication.domain.entity.RegistrationErrorType
 import com.upsaclay.authentication.domain.entity.RegistrationEvent
 import com.upsaclay.authentication.presentation.components.OutlinePasswordTextField
 import com.upsaclay.authentication.presentation.components.RegistrationScaffold
-import com.upsaclay.authentication.presentation.viewmodels.RegistrationViewModel
+import com.upsaclay.authentication.presentation.viewmodels.ThirdRegistrationViewModel
 import com.upsaclay.common.domain.entity.ErrorType
 import com.upsaclay.common.presentation.components.ErrorText
 import com.upsaclay.common.presentation.components.OutlineTextField
@@ -46,11 +45,17 @@ import com.upsaclay.common.presentation.theme.spacing
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun ThirdRegistrationScreen(
+    firstName: String,
+    lastName: String,
+    schoolLevel: String,
     navController: NavController,
-    registrationViewModel: RegistrationViewModel = koinViewModel()
+    thirdRegistrationViewModel: ThirdRegistrationViewModel = koinViewModel(
+        parameters = { parametersOf(firstName, lastName, schoolLevel) }
+    )
 ) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -65,13 +70,10 @@ fun ThirdRegistrationScreen(
         }
     }
 
-    LaunchedEffect(registrationViewModel.event) {
-        registrationViewModel.event.collectLatest { event ->
+    LaunchedEffect(thirdRegistrationViewModel.event) {
+        thirdRegistrationViewModel.event.collectLatest { event ->
             loading = event is RegistrationEvent.Loading
             when (event) {
-                RegistrationEvent.Registered ->
-                    navController.navigate(AuthenticationScreenRoute.EmailVerification(registrationViewModel.email).route)
-
                 is RegistrationEvent.Error -> {
                     errorMessage = when (event.type) {
                         RegistrationErrorType.UNRECOGNIZED_ACCOUNT -> context.getString(R.string.unrecognized_account)
@@ -79,6 +81,7 @@ fun ThirdRegistrationScreen(
                         RegistrationErrorType.EMAIL_FORMAT_ERROR -> context.getString(R.string.error_incorrect_email_format)
                         RegistrationErrorType.PASSWORD_LENGTH_ERROR -> context.getString(R.string.error_password_length)
                         RegistrationErrorType.USER_ALREADY_EXISTS -> context.getString(R.string.email_already_associated)
+                        RegistrationErrorType.USER_NOT_WHITE_LISTED_ERROR -> context.getString(R.string.user_not_white_listed)
                         RegistrationErrorType.USER_CREATION_ERROR -> context.getString(R.string.user_creation_error)
                         else -> ""
                     }
@@ -128,10 +131,10 @@ fun ThirdRegistrationScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .testTag(stringResource(R.string.registration_screen_email_input_tag)),
-                value = registrationViewModel.email,
+                value = thirdRegistrationViewModel.email,
                 isError = errorMessage.isNotBlank(),
                 enabled = !loading,
-                onValueChange = { registrationViewModel.updateEmail(it) },
+                onValueChange = { thirdRegistrationViewModel.updateEmail(it) },
                 label = stringResource(com.upsaclay.common.R.string.email)
             )
 
@@ -141,10 +144,10 @@ fun ThirdRegistrationScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .testTag(stringResource(R.string.registration_screen_password_input_tag)),
-                text = registrationViewModel.password,
+                text = thirdRegistrationViewModel.password,
                 isError = errorMessage.isNotBlank(),
                 isEnable = !loading,
-                onValueChange = { registrationViewModel.updatePassword(it) }
+                onValueChange = { thirdRegistrationViewModel.updatePassword(it) }
             )
 
             if (errorMessage.isNotBlank()) {
@@ -164,8 +167,8 @@ fun ThirdRegistrationScreen(
             isEnable = !loading,
             text = stringResource(id = com.upsaclay.common.R.string.next),
             onClick = {
-                if (registrationViewModel.validateCredentialInputs()) {
-                    registrationViewModel.register()
+                if (thirdRegistrationViewModel.validateCredentialInputs()) {
+                    thirdRegistrationViewModel.register()
                 }
             }
         )

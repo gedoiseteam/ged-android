@@ -1,7 +1,6 @@
 package com.upsaclay.news.data
 
 import com.upsaclay.common.domain.UrlUtils.formatProfilePictureUrl
-import com.upsaclay.common.domain.UrlUtils.getFileNameFromUrl
 import com.upsaclay.common.domain.entity.User
 import com.upsaclay.common.domain.usecase.ConvertDateUseCase
 import com.upsaclay.news.data.local.model.LocalAnnouncement

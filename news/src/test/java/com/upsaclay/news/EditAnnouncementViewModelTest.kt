@@ -1,7 +1,6 @@
 package com.upsaclay.news
 
 import com.upsaclay.news.domain.announcementFixture
-import com.upsaclay.news.domain.entity.AnnouncementEvent
 import com.upsaclay.news.domain.repository.AnnouncementRepository
 import com.upsaclay.news.presentation.viewmodels.EditAnnouncementViewModel
 import io.mockk.coEvery
@@ -14,7 +13,6 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.Before
 import org.junit.Test
-import java.net.ConnectException
 import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)

@@ -1,13 +1,7 @@
 package com.upsaclay.authentication
 
-import android.accounts.NetworkErrorException
-import com.upsaclay.authentication.domain.entity.AuthErrorType
-import com.upsaclay.authentication.domain.entity.AuthenticationEvent
-import com.upsaclay.authentication.domain.entity.exception.InvalidCredentialsException
 import com.upsaclay.authentication.domain.repository.AuthenticationRepository
 import com.upsaclay.authentication.presentation.viewmodels.AuthenticationViewModel
-import com.upsaclay.common.domain.entity.ErrorType
-import com.upsaclay.common.domain.entity.TooManyRequestException
 import com.upsaclay.common.domain.repository.UserRepository
 import com.upsaclay.common.domain.userFixture
 import io.mockk.coEvery
@@ -20,7 +14,6 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.Before
 import org.junit.Test
-import java.io.IOException
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 
@@ -43,7 +36,6 @@ class AuthenticationViewModelTest {
             userRepository = userRepository
         )
 
-        coEvery { authenticationRepository.isUserEmailVerified() } returns true
         coEvery { authenticationRepository.loginWithEmailAndPassword(any(), any()) } returns Unit
         coEvery { authenticationRepository.setAuthenticated(any()) } returns Unit
         coEvery { userRepository.getUserWithEmail(any()) } returns userFixture

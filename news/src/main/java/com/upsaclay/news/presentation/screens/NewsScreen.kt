@@ -3,6 +3,7 @@ package com.upsaclay.news.presentation.screens
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -49,8 +50,6 @@ import com.upsaclay.news.domain.entity.AnnouncementState
 import com.upsaclay.news.domain.entity.NewsScreenRoute
 import com.upsaclay.news.presentation.components.AnnouncementItem
 import com.upsaclay.news.presentation.viewmodels.NewsViewModel
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -61,7 +60,6 @@ fun NewsScreen(
     newsViewModel: NewsViewModel = koinViewModel()
 ) {
     val announcements by newsViewModel.announcements.collectAsState(emptyList())
-    val user by newsViewModel.currentUser.collectAsState()
     var refreshing by remember { mutableStateOf(false) }
     var showDraftAnnouncementBottomSheet by remember { mutableStateOf(false) }
     var showDeleteAnnouncementDialog by remember { mutableStateOf(false) }
@@ -102,7 +100,6 @@ fun NewsScreen(
         isRefreshing = refreshing
     ) {
         Column(
-            modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.smallMedium)
         ) {
             RecentAnnouncementSection(
@@ -115,29 +112,6 @@ fun NewsScreen(
                     showDraftAnnouncementBottomSheet = true
                 }
             )
-        }
-
-        if (user?.isMember == true) {
-            Box(
-                modifier = Modifier
-                    .padding(MaterialTheme.spacing.medium)
-                    .fillMaxSize()
-            ) {
-                ExtendedFloatingActionButton(
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .testTag(stringResource(id = R.string.news_screen_create_announcement_button_tag)),
-                    text = { Text(text = stringResource(id = R.string.new_announcement)) },
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    icon = {
-                        Icon(
-                            Icons.Filled.Edit,
-                            stringResource(id = R.string.new_announcement)
-                        )
-                    },
-                    onClick = { navController.navigate(NewsScreenRoute.CreateAnnouncement.route) }
-                )
-            }
         }
     }
 
@@ -191,6 +165,7 @@ fun NewsScreen(
 
 @Composable
 private fun RecentAnnouncementSection(
+    modifier: Modifier = Modifier,
     announcements: List<Announcement>,
     onClickAnnouncement: (Announcement) -> Unit,
     onClickNotSentAnnouncement: (Announcement) -> Unit
@@ -206,6 +181,7 @@ private fun RecentAnnouncementSection(
     )
 
     LazyColumn(
+        modifier = modifier,
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

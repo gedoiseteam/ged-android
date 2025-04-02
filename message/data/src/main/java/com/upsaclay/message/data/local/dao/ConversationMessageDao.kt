@@ -24,6 +24,7 @@ import com.upsaclay.message.data.model.MessageField.Local.SEEN_VALUE
 import com.upsaclay.message.data.model.MessageField.MESSAGE_ID
 import com.upsaclay.message.data.model.MessageField.MESSAGE_STATE
 import com.upsaclay.message.data.model.MessageField.MESSAGE_TIMESTAMP
+import com.upsaclay.message.data.model.MessageField.RECIPIENT_ID
 import com.upsaclay.message.data.model.MessageField.SENDER_ID
 import kotlinx.coroutines.flow.Flow
 
@@ -43,6 +44,7 @@ interface ConversationMessageDao {
            C.$CONVERSATION_STATE, 
            M.$MESSAGE_ID, 
            M.$SENDER_ID,
+           M.$RECIPIENT_ID,
            M.$CONTENT,
            M.$MESSAGE_TIMESTAMP,
            M.$SEEN_VALUE, 
@@ -75,6 +77,7 @@ interface ConversationMessageDao {
            C.$CONVERSATION_STATE, 
            M.$MESSAGE_ID, 
            M.$SENDER_ID,
+           M.$RECIPIENT_ID,
            M.$CONTENT,
            M.$MESSAGE_TIMESTAMP,
            M.$SEEN_VALUE, 

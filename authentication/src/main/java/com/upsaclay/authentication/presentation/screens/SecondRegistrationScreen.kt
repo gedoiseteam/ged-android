@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,7 +25,7 @@ import androidx.navigation.compose.rememberNavController
 import com.upsaclay.authentication.R
 import com.upsaclay.authentication.domain.entity.AuthenticationScreenRoute
 import com.upsaclay.authentication.presentation.components.RegistrationScaffold
-import com.upsaclay.authentication.presentation.viewmodels.RegistrationViewModel
+import com.upsaclay.authentication.presentation.viewmodels.SecondRegistrationViewModel
 import com.upsaclay.common.presentation.components.PrimaryButton
 import com.upsaclay.common.presentation.components.SimpleDropDownMenu
 import com.upsaclay.common.presentation.theme.GedoiseTheme
@@ -33,10 +34,12 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun SecondRegistrationScreen(
+    firstName: String,
+    lastName: String,
     navController: NavController,
-    registrationViewModel: RegistrationViewModel = koinViewModel()
+    secondRegistrationViewModel: SecondRegistrationViewModel = koinViewModel()
 ) {
-    var selectedItem by remember { mutableStateOf(registrationViewModel.schoolLevel) }
+    val schoolLevel by secondRegistrationViewModel.schoolLevel.collectAsState()
     var expanded by remember { mutableStateOf(false) }
 
     RegistrationScaffold(navController = navController) {
@@ -55,10 +58,10 @@ fun SecondRegistrationScreen(
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
 
             SimpleDropDownMenu(
-                items = registrationViewModel.schoolLevels,
-                selectedItem = selectedItem,
+                items = secondRegistrationViewModel.schoolLevels,
+                selectedItem = schoolLevel,
                 onItemClicked = { item ->
-                    selectedItem = item
+                    secondRegistrationViewModel.updateSchoolLevel(item)
                     expanded = false
                 },
                 expanded = expanded,
@@ -74,8 +77,13 @@ fun SecondRegistrationScreen(
                 .testTag(stringResource(id = R.string.registration_screen_next_button_tag)),
             text = stringResource(id = com.upsaclay.common.R.string.next),
             onClick = {
-                registrationViewModel.updateSchoolLevel(selectedItem)
-                navController.navigate(AuthenticationScreenRoute.ThirdRegistration.route)
+                navController.navigate(
+                    AuthenticationScreenRoute.ThirdRegistration(
+                        firstName = firstName,
+                        lastName = lastName,
+                        schoolLevel = schoolLevel
+                    ).route
+                )
             }
         )
     }

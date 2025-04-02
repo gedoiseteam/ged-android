@@ -10,13 +10,13 @@
     <string name="delete">Supprimer</string>
     <string name="save">Enregistrer</string>
     <string name="accept">Accepter</string>
-    <string name="keep_going">Continuer</string>
     <string name="cancel">Annuler</string>
     <string name="modify">Modifier</string>
     <string name="publish">Publier</string>
     <string name="discard">Abandonner</string>
     <string name="deletion">Supression...</string>
     <string name="loading">Chargement...</string>
+    <string name="search">Rechercher</string>
     <string name="arrow_back_icon_description">Retour en arrière</string>
     <string name="ged_logo_description">Logo de l\'université de La Grande École du Droit</string>
     <string name="profile_picture_description">Photo de profil de l\'utilisateur</string>

@@ -14,6 +14,7 @@ import java.time.LocalDateTime
 val messageFixture = Message(
     id = 1,
     senderId = userFixture.id,
+    recipientId = userFixture2.id,
     conversationId = 1,
     content = "Salut, bien et toi ? Oui bien sûr.",
     date = LocalDateTime.of(2024, 7, 20, 10, 0),
@@ -24,6 +25,7 @@ val messageFixture = Message(
 val messageFixture2 = Message(
     id = 2,
     senderId = userFixture2.id,
+    recipientId = userFixture2.id,
     conversationId = 1,
     content = "Salut ça va ? Cela fait longtemps que j'attend de te parler. Pourrait-on se voir ?",
     date = LocalDateTime.now(),

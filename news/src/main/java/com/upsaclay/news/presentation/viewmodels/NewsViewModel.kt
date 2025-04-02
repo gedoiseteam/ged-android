@@ -2,9 +2,6 @@ package com.upsaclay.news.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.upsaclay.common.domain.d
-import com.upsaclay.common.domain.entity.User
-import com.upsaclay.common.domain.repository.UserRepository
 import com.upsaclay.news.domain.entity.Announcement
 import com.upsaclay.news.domain.repository.AnnouncementRepository
 import com.upsaclay.news.domain.usecase.DeleteAnnouncementUseCase
@@ -14,7 +11,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -22,7 +18,6 @@ class NewsViewModel(
     private val recreateAnnouncementUseCase: RecreateAnnouncementUseCase,
     private val deleteAnnouncementUseCase: DeleteAnnouncementUseCase,
     private val refreshAnnouncementUseCase: RefreshAnnouncementUseCase,
-    userRepository: UserRepository,
     announcementRepository: AnnouncementRepository
 ) : ViewModel() {
     val announcements: Flow<List<Announcement>> = announcementRepository.announcements
@@ -36,7 +31,6 @@ class NewsViewModel(
                     )
                 }
         }
-    val currentUser: StateFlow<User?> = userRepository.currentUser
     private val _refreshing = MutableSharedFlow<Boolean>()
     val refreshing: SharedFlow<Boolean> = _refreshing
 

@@ -2,24 +2,17 @@ package com.upsaclay.news
 
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assert
-import androidx.compose.ui.test.isEnabled
 import androidx.compose.ui.test.isNotEnabled
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.navigation.testing.TestNavHostController
-import com.upsaclay.common.domain.e
 import com.upsaclay.news.domain.announcementFixture
-import com.upsaclay.news.domain.entity.AnnouncementEvent
 import com.upsaclay.news.presentation.screens.EditAnnouncementScreen
 import com.upsaclay.news.presentation.viewmodels.EditAnnouncementViewModel
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test

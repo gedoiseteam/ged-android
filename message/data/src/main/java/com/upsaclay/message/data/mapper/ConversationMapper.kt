@@ -4,6 +4,7 @@ import com.google.firebase.Timestamp
 import com.upsaclay.common.domain.UrlUtils
 import com.upsaclay.common.domain.entity.User
 import com.upsaclay.common.domain.usecase.ConvertDateUseCase
+import com.upsaclay.common.domain.userFixture2
 import com.upsaclay.message.data.local.model.LocalConversation
 import com.upsaclay.message.data.local.model.LocalConversationMessage
 import com.upsaclay.message.data.local.model.LocalMessage
@@ -78,6 +79,7 @@ internal object ConversationMapper {
         lastMessage = if(
             localConversationMessage.messageId == null ||
             localConversationMessage.senderId == null ||
+            localConversationMessage.recipientId == null ||
             localConversationMessage.content == null ||
             localConversationMessage.messageTimestamp == null ||
             localConversationMessage.messageState == null
@@ -86,6 +88,7 @@ internal object ConversationMapper {
                 messageId = localConversationMessage.messageId,
                 conversationId = localConversationMessage.conversationId,
                 senderId = localConversationMessage.senderId,
+                recipientId = localConversationMessage.recipientId,
                 content = localConversationMessage.content,
                 messageTimestamp = localConversationMessage.messageTimestamp,
                 seenValue = localConversationMessage.seenValue,

@@ -5,6 +5,7 @@ import com.upsaclay.common.data.formatHttpError
 import com.upsaclay.common.data.remote.api.UserFirestoreApi
 import com.upsaclay.common.data.remote.api.UserRetrofitApi
 import com.upsaclay.common.domain.e
+import com.upsaclay.common.domain.entity.ForbiddenException
 import com.upsaclay.common.domain.entity.InternalServerException
 import com.upsaclay.common.domain.entity.User
 import kotlinx.coroutines.Dispatchers
@@ -14,6 +15,7 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.IOException
+import java.net.HttpURLConnection
 
 internal class UserRemoteDataSource(
     private val userRetrofitApi: UserRetrofitApi,
@@ -35,6 +37,10 @@ internal class UserRemoteDataSource(
 
     suspend fun getUsers(): List<User> = withContext(Dispatchers.IO) {
         userFirestoreApi.getUsers().map(UserMapper::toDomain)
+    }
+
+    suspend fun getFilteredUsers(userName: String): List<User> = withContext(Dispatchers.IO) {
+        userFirestoreApi.getFilteredUsers(userName).map(UserMapper::toDomain)
     }
 
     suspend fun createUser(user: User) {
@@ -80,6 +86,9 @@ internal class UserRemoteDataSource(
         val response = userRetrofitApi.createUser(UserMapper.toDTO(user))
         if (!response.isSuccessful) {
             val errorMessage = formatHttpError("Error creating user with Oracle", response)
+            if (response.code() == HttpURLConnection.HTTP_FORBIDDEN) {
+                throw ForbiddenException(errorMessage)
+            }
             throw InternalServerException(errorMessage)
         }
     }

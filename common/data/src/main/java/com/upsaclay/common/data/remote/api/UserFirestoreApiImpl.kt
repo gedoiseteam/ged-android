@@ -2,8 +2,8 @@ package com.upsaclay.common.data.remote.api
 
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
+import com.upsaclay.common.data.UserField
 import com.upsaclay.common.data.remote.FirestoreUser
-import com.upsaclay.common.data.remote.UserFieldsRemote
 import com.upsaclay.common.domain.e
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -45,7 +45,7 @@ internal class UserFirestoreApiImpl : UserFirestoreApi {
     }
 
     override suspend fun getUserWithEmail(userEmail: String): FirestoreUser? = suspendCoroutine { continuation ->
-        usersCollection.whereEqualTo(UserFieldsRemote.EMAIL, userEmail).get()
+        usersCollection.whereEqualTo(UserField.Remote.EMAIL, userEmail).get()
             .addOnSuccessListener { snapshot ->
                 val user = snapshot.documents.firstOrNull()?.toObject(FirestoreUser::class.java)
                 continuation.resume(user)
@@ -57,7 +57,9 @@ internal class UserFirestoreApiImpl : UserFirestoreApi {
     }
 
     override suspend fun getUsers(): List<FirestoreUser> = suspendCoroutine { continuation ->
-        usersCollection.get()
+        usersCollection
+            .limit(30)
+            .get()
             .addOnSuccessListener { snapshot ->
                 val users = snapshot?.documents?.mapNotNull {
                     it.toObject(FirestoreUser::class.java)
@@ -69,6 +71,25 @@ internal class UserFirestoreApiImpl : UserFirestoreApi {
                 e("Error getting firestore users", e)
                 continuation.resume(emptyList())
             }
+    }
+
+    override suspend fun getFilteredUsers(query: String): List<FirestoreUser> = suspendCoroutine {
+           usersCollection
+               .whereGreaterThanOrEqualTo(UserField.Remote.FULL_NAME, query)
+               .whereLessThanOrEqualTo(UserField.Remote.FULL_NAME, query + "\uf8ff")
+               .limit(30)
+               .get()
+                .addOnSuccessListener { snapshot ->
+                     val users = snapshot?.documents?.mapNotNull {
+                          it.toObject(FirestoreUser::class.java)
+                     } ?: emptyList()
+
+                     it.resume(users)
+                }
+                .addOnFailureListener { e ->
+                     e("Error getting firestore users", e)
+                     it.resume(emptyList())
+                }
     }
 
     override suspend fun createUser(firestoreUser: FirestoreUser) {
@@ -83,7 +104,7 @@ internal class UserFirestoreApiImpl : UserFirestoreApi {
     override suspend fun updateProfilePictureFileName(userId: String, fileName: String?) {
         suspendCoroutine { continuation ->
             usersCollection.document(userId)
-                .update(UserFieldsRemote.PROFILE_PICTURE_FILE_NAME, fileName)
+                .update(UserField.Remote.PROFILE_PICTURE_FILE_NAME, fileName)
                 .addOnSuccessListener { continuation.resume(Unit) }
                 .addOnFailureListener { e ->
                     e("Error update firestore user pofile picture", e)
@@ -93,7 +114,7 @@ internal class UserFirestoreApiImpl : UserFirestoreApi {
     }
 
     override suspend fun isUserExist(email: String): Boolean = suspendCoroutine { continuation ->
-        usersCollection.whereEqualTo(UserFieldsRemote.EMAIL, email).get()
+        usersCollection.whereEqualTo(UserField.Remote.EMAIL, email).get()
             .addOnSuccessListener { continuation.resume(!it.isEmpty) }
             .addOnFailureListener { continuation.resumeWithException(it) }
     }
