@@ -8,12 +8,14 @@ import com.upsaclay.authentication.data.authenticationDataModule
 import com.upsaclay.authentication.domain.authenticationDomainModule
 import com.upsaclay.common.data.commonDataModule
 import com.upsaclay.common.domain.commonDomainModule
+import com.upsaclay.gedoise.domain.usecase.TokenUseCase
 import com.upsaclay.message.data.messageDataModule
 import com.upsaclay.message.domain.messageDomainModule
 import com.upsaclay.message.messageModule
 import com.upsaclay.news.data.newsDataModule
 import com.upsaclay.news.domain.newsDomainModule
 import com.upsaclay.news.newsModule
+import org.koin.android.ext.android.get
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -44,6 +46,8 @@ class GedoiseApplication : Application() {
                 )
             )
         }
+
+        get<TokenUseCase>().listenEvents()
         plant(Timber.DebugTree())
     }
 }

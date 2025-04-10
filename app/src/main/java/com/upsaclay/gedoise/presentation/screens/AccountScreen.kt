@@ -48,6 +48,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.upsaclay.gedoise.domain.entities.AccountErrorType
+import com.upsaclay.gedoise.domain.entities.AccountEvent
+import com.upsaclay.gedoise.domain.entities.AccountInfo
+import com.upsaclay.gedoise.domain.entities.AccountScreenState
 import com.upsaclay.common.domain.userFixture
 import com.upsaclay.common.presentation.components.LoadingDialog
 import com.upsaclay.common.presentation.components.ProfilePicture
@@ -60,10 +64,6 @@ import com.upsaclay.common.presentation.theme.gold
 import com.upsaclay.common.presentation.theme.previewText
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.gedoise.R
-import com.upsaclay.gedoise.domain.entities.AccountErrorType
-import com.upsaclay.gedoise.domain.entities.AccountEvent
-import com.upsaclay.gedoise.domain.entities.AccountInfo
-import com.upsaclay.gedoise.domain.entities.AccountScreenState
 import com.upsaclay.gedoise.presentation.components.AccountInfoItem
 import com.upsaclay.gedoise.presentation.components.AccountModelBottomSheet
 import com.upsaclay.gedoise.presentation.components.AccountTopBar

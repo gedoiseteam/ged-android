@@ -41,8 +41,6 @@ dependencies {
     implementation(libs.koin)
     implementation(libs.koin.core)
     implementation(libs.androidx.room.ktx)
-    implementation(libs.okhttp)
-    implementation(platform(libs.okhttp.bom))
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
     implementation(libs.jakewharton.timber)

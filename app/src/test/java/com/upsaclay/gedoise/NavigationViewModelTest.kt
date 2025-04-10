@@ -4,7 +4,7 @@ import com.upsaclay.authentication.domain.repository.AuthenticationRepository
 import com.upsaclay.common.domain.repository.UserRepository
 import com.upsaclay.common.domain.userFixture
 import com.upsaclay.common.domain.usersFixture
-import com.upsaclay.gedoise.data.ScreenRepository
+import com.upsaclay.gedoise.domain.repository.ScreenRepository
 import com.upsaclay.gedoise.domain.usecase.ClearDataUseCase
 import com.upsaclay.gedoise.domain.usecase.StartListeningDataUseCase
 import com.upsaclay.gedoise.domain.usecase.StopListeningDataUseCase
@@ -46,10 +46,10 @@ class NavigationViewModelTest {
 
         every { userConversationRepository.conversationsWithLastMessage } returns flowOf(conversationsMessageFixture)
         every { screenRepository.currentScreenRoute } returns null
-        every { screenRepository.setCurrentScreen(any()) } returns Unit
+        every { screenRepository.setCurrentScreenRoute(any()) } returns Unit
         every { userRepository.currentUser } returns MutableStateFlow(userFixture)
         every { authenticationRepository.isAuthenticated } returns flowOf(true)
-        coEvery { userRepository.getCurrentUserFromLocal() } returns userFixture
+        coEvery { userRepository.getCurrentUser() } returns userFixture
         coEvery { userRepository.getUsers() } returns usersFixture
         coEvery { userRepository.getUser(any()) } returns userFixture
         coEvery { userRepository.setCurrentUser(any()) } returns Unit

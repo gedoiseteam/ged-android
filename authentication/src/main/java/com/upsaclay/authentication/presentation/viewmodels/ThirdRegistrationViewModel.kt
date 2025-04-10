@@ -13,6 +13,7 @@ import com.upsaclay.authentication.domain.repository.AuthenticationRepository
 import com.upsaclay.common.domain.entity.ErrorType
 import com.upsaclay.common.domain.entity.ForbiddenException
 import com.upsaclay.common.domain.entity.User
+import com.upsaclay.common.domain.entity.UserAlreadyExist
 import com.upsaclay.common.domain.repository.UserRepository
 import com.upsaclay.common.domain.usecase.GenerateIdUseCase
 import com.upsaclay.common.domain.usecase.VerifyEmailFormatUseCase
@@ -120,6 +121,8 @@ class ThirdRegistrationViewModel(
             is ConnectException -> RegistrationEvent.Error(ErrorType.ServerConnectError)
 
             is ForbiddenException -> RegistrationEvent.Error(RegistrationErrorType.USER_NOT_WHITE_LISTED_ERROR)
+
+            is UserAlreadyExist -> RegistrationEvent.Error(RegistrationErrorType.USER_ALREADY_EXISTS)
 
             is IOException -> RegistrationEvent.Error(RegistrationErrorType.USER_CREATION_ERROR)
 

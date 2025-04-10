@@ -3,12 +3,14 @@ package com.upsaclay.common.data.repository
 import android.accounts.NetworkErrorException
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.FirebaseTooManyRequestsException
+import com.upsaclay.common.data.DataIntegrityViolationException
 import com.upsaclay.common.data.local.UserLocalDataSource
 import com.upsaclay.common.data.remote.UserRemoteDataSource
 import com.upsaclay.common.domain.e
 import com.upsaclay.common.domain.entity.ForbiddenException
 import com.upsaclay.common.domain.entity.TooManyRequestException
 import com.upsaclay.common.domain.entity.User
+import com.upsaclay.common.domain.entity.UserAlreadyExist
 import com.upsaclay.common.domain.repository.UserRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -39,7 +41,7 @@ internal class UserRepositoryImpl(
 
     override suspend fun getUser(userId: String): User? = userRemoteDataSource.getUser(userId)
 
-    override suspend fun getCurrentUserFromLocal(): User? = userLocalDataSource.getCurrentUser()
+    override suspend fun getCurrentUser(): User? = userLocalDataSource.getCurrentUser()
 
     override suspend fun getUserFlow(userId: String): Flow<User> = userRemoteDataSource.getUserFlow(userId)
 
@@ -63,6 +65,9 @@ internal class UserRepositoryImpl(
         } catch (e: ForbiddenException) {
             e("Error to create user with Oracle: ${e.message}", e)
             throw ForbiddenException()
+        } catch (e: DataIntegrityViolationException) {
+            e("Error to create user with Oracle: ${e.message}", e)
+            throw UserAlreadyExist()
         } catch (e: Exception) {
             e("Error creating user: ${e.message}", e)
             throw IOException()

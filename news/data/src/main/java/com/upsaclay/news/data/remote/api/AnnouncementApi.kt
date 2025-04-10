@@ -1,6 +1,6 @@
 package com.upsaclay.news.data.remote.api
 
-import com.upsaclay.common.domain.entity.ServerResponse.EmptyResponse
+import com.upsaclay.common.data.remote.ServerResponse
 import com.upsaclay.news.data.remote.model.RemoteAnnouncement
 import com.upsaclay.news.data.remote.model.RemoteAnnouncementWithUser
 import retrofit2.Response
@@ -15,11 +15,11 @@ internal interface AnnouncementApi {
     suspend fun getAnnouncements(): Response<List<RemoteAnnouncementWithUser>>
 
     @POST("announcements/create")
-    suspend fun createAnnouncement(@Body remoteAnnouncement: RemoteAnnouncement): Response<EmptyResponse>
+    suspend fun createAnnouncement(@Body remoteAnnouncement: RemoteAnnouncement): Response<ServerResponse>
 
     @DELETE("announcements/{id}")
-    suspend fun deleteAnnouncement(@Path("id") id: String): Response<EmptyResponse>
+    suspend fun deleteAnnouncement(@Path("id") id: String): Response<ServerResponse>
 
     @POST("announcements/update")
-    suspend fun updateAnnouncement(@Body remoteAnnouncement: RemoteAnnouncement): Response<EmptyResponse>
+    suspend fun updateAnnouncement(@Body remoteAnnouncement: RemoteAnnouncement): Response<ServerResponse>
 }

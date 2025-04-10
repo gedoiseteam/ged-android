@@ -1,4 +1,4 @@
-package com.upsaclay.authentication.data.remote
+package com.upsaclay.authentication.data.api
 
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuthInvalidUserException

@@ -1,4 +1,4 @@
-package com.upsaclay.authentication.data.remote
+package com.upsaclay.authentication.data.api
 
 interface FirebaseAuthenticationApi {
     suspend fun signInWithEmailAndPassword(email: String, password: String)
