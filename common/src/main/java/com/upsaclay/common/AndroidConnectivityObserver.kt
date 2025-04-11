@@ -1,5 +1,6 @@
 package com.upsaclay.common
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.ConnectivityManager.NetworkCallback
@@ -10,6 +11,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 
+@SuppressLint("MissingPermission")
 class AndroidConnectivityObserver(context: Context): ConnectivityObserver {
     private val connectivityManager = context.getSystemService<ConnectivityManager>()
 
