@@ -7,7 +7,8 @@ import com.upsaclay.authentication.domain.repository.AuthenticationRepository
 import com.upsaclay.common.domain.entity.ScreenRoute
 import com.upsaclay.common.domain.entity.User
 import com.upsaclay.common.domain.repository.UserRepository
-import com.upsaclay.gedoise.data.ScreenRepository
+import com.upsaclay.gedoise.domain.entities.MainScreenRoute
+import com.upsaclay.gedoise.domain.repository.ScreenRepository
 import com.upsaclay.gedoise.domain.usecase.ClearDataUseCase
 import com.upsaclay.gedoise.domain.usecase.StartListeningDataUseCase
 import com.upsaclay.gedoise.domain.usecase.StopListeningDataUseCase
@@ -17,7 +18,6 @@ import com.upsaclay.message.domain.repository.UserConversationRepository
 import com.upsaclay.news.domain.entity.NewsScreenRoute
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -36,8 +36,8 @@ class NavigationViewModel(
     private val stopListeningDataUseCase: StopListeningDataUseCase,
     private val clearDataUseCase: ClearDataUseCase,
 ): ViewModel() {
-    private val _routeToNavigate = MutableSharedFlow<ScreenRoute>(replay = 1)
-    val routeToNavigate: Flow<String> = _routeToNavigate.map { it.route }
+    private val _routeToNavigate = MutableStateFlow<ScreenRoute>(MainScreenRoute.Splash)
+    val routeToNavigate: Flow<ScreenRoute> = _routeToNavigate
 
     private val _homeNavigationItem = MutableStateFlow(NavigationItem.Home())
     val homeNavigationItem: Flow<NavigationItem> = _homeNavigationItem
@@ -48,7 +48,7 @@ class NavigationViewModel(
     val currentUser: StateFlow<User?> = userRepository.currentUser
 
     init {
-        listenAuthenticationState()
+        watchAuthenticationState()
         updateMessageNavigationItemBadges()
         verifyCurrentUser()
     }
@@ -64,10 +64,10 @@ class NavigationViewModel(
     }
 
     fun setCurrentScreen(screenRoute: ScreenRoute?) {
-        screenRepository.setCurrentScreen(screenRoute)
+        screenRepository.setCurrentScreenRoute(screenRoute)
     }
 
-    private fun listenAuthenticationState() {
+    private fun watchAuthenticationState() {
         viewModelScope.launch {
             authenticationRepository.isAuthenticated
                 .filterNotNull()
@@ -104,7 +104,7 @@ class NavigationViewModel(
 
     private fun verifyCurrentUser() {
         viewModelScope.launch {
-            userRepository.getCurrentUserFromLocal()?.let { currentUser ->
+            userRepository.getCurrentUser()?.let { currentUser ->
                 userRepository.getUser(currentUser.id)?.let {
                     userRepository.setCurrentUser(it)
                 } ?: run {

@@ -2,11 +2,11 @@ package com.upsaclay.common.data.remote
 
 import com.upsaclay.common.data.UserMapper
 import com.upsaclay.common.data.formatHttpError
+import com.upsaclay.common.data.parseOracleException
 import com.upsaclay.common.data.remote.api.UserFirestoreApi
 import com.upsaclay.common.data.remote.api.UserRetrofitApi
 import com.upsaclay.common.domain.e
 import com.upsaclay.common.domain.entity.ForbiddenException
-import com.upsaclay.common.domain.entity.InternalServerException
 import com.upsaclay.common.domain.entity.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -89,7 +89,7 @@ internal class UserRemoteDataSource(
             if (response.code() == HttpURLConnection.HTTP_FORBIDDEN) {
                 throw ForbiddenException(errorMessage)
             }
-            throw InternalServerException(errorMessage)
+            throw parseOracleException(response.body())
         }
     }
 

@@ -66,7 +66,6 @@ class CreateConversationViewModel(
 
     private fun getFilteredUsers() {
         viewModelScope.launch {
-            _event.emit(ConversationEvent.Loading)
             _query
                 .filter {
                    if (it.isBlank()) {
@@ -78,6 +77,7 @@ class CreateConversationViewModel(
                     }
                 }
                 .collectLatest { query ->
+                    _event.emit(ConversationEvent.Loading)
                     delay(500)
                     getFilteredUserUseCase(query)
                         .filterNot { it.id == currentUser?.id }

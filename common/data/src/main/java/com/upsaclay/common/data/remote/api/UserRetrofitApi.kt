@@ -1,7 +1,7 @@
 package com.upsaclay.common.data.remote.api
 
 import com.upsaclay.common.data.local.UserLocal
-import com.upsaclay.common.domain.entity.ServerResponse.EmptyResponse
+import com.upsaclay.common.data.remote.ServerResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -22,15 +22,15 @@ internal interface UserRetrofitApi {
     suspend fun getUserWithEmail(@Field("USER_EMAIL") userEmail: String): Response<UserLocal>
 
     @POST("users/create")
-    suspend fun createUser(@Body user: UserLocal): Response<Unit>
+    suspend fun createUser(@Body user: UserLocal): Response<ServerResponse>
 
     @FormUrlEncoded
     @PUT("users/profile-picture-file-name")
     suspend fun updateProfilePictureFileName(
         @Field("USER_ID") userId: String,
         @Field("USER_PROFILE_PICTURE_FILE_NAME") userProfilePictureFileName: String
-    ): Response<EmptyResponse>
+    ): Response<ServerResponse>
 
     @DELETE("users/profile-picture-file-name/{userId}")
-    suspend fun deleteProfilePictureFileName(@Path("userId") userId: String): Response<EmptyResponse>
+    suspend fun deleteProfilePictureFileName(@Path("userId") userId: String): Response<ServerResponse>
 }

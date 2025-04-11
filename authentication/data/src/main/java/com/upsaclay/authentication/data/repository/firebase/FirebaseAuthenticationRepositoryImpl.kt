@@ -5,7 +5,7 @@ import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
-import com.upsaclay.authentication.data.remote.FirebaseAuthenticationApi
+import com.upsaclay.authentication.data.api.FirebaseAuthenticationApi
 import com.upsaclay.authentication.domain.entity.exception.AuthErrorCode
 import com.upsaclay.authentication.domain.entity.exception.AuthUserNotFoundException
 import com.upsaclay.authentication.domain.entity.exception.InvalidCredentialsException

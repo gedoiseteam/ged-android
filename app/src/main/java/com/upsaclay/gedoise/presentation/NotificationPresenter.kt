@@ -23,7 +23,7 @@ import com.upsaclay.common.domain.repository.ImageRepository
 import com.upsaclay.common.domain.repository.UserRepository
 import com.upsaclay.common.domain.usecase.ConvertDateUseCase
 import com.upsaclay.common.domain.usecase.GenerateIdUseCase
-import com.upsaclay.gedoise.data.ScreenRepository
+import com.upsaclay.gedoise.domain.repository.ScreenRepository
 import com.upsaclay.message.domain.ConversationMapper
 import com.upsaclay.message.domain.entity.Conversation
 import com.upsaclay.message.domain.entity.ConversationMessage
@@ -56,7 +56,7 @@ class NotificationPresenter(
         listenNewMessages()
     }
 
-    private suspend fun showMessageNotification(conversationMessage: ConversationMessage) {
+    suspend fun showMessageNotification(conversationMessage: ConversationMessage) {
         if (isCurrentMessageScreen(conversationMessage.conversation.id)) return
         val message = conversationMessage.lastMessage ?: return
 

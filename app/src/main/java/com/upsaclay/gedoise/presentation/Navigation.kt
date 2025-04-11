@@ -77,7 +77,7 @@ fun Navigation(
 
     LaunchedEffect(Unit) {
         navigationViewModel.routeToNavigate.collectLatest {
-            navController.navigate(it) {
+            navController.navigate(it.route) {
                 launchSingleTop = true
             }
         }

@@ -84,8 +84,7 @@ fun CreateConversationScreen(
             Box(modifier = Modifier.fillMaxSize()) {
                 if (loading) {
                     CircularProgressBar(
-                        modifier = Modifier.align(Alignment.Center),
-                        scale = 1.5f
+                        modifier = Modifier.align(Alignment.Center)
                     )
                 }
 

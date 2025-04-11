@@ -11,7 +11,7 @@ interface UserRepository {
 
     suspend fun getUser(userId: String): User?
 
-    suspend fun getCurrentUserFromLocal(): User?
+    suspend fun getCurrentUser(): User?
 
     suspend fun getUserFlow(userId: String): Flow<User>
 

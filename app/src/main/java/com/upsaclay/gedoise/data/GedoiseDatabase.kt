@@ -21,7 +21,7 @@ import com.upsaclay.news.data.local.model.LocalAnnouncement
     version = 1,
     exportSchema = false
 )
-internal abstract class GedoiseDatabase : RoomDatabase() {
+abstract class GedoiseDatabase : RoomDatabase() {
     abstract fun announcementDao(): AnnouncementDao
     abstract fun conversationDao(): ConversationDao
     abstract fun messageDao(): MessageDao
