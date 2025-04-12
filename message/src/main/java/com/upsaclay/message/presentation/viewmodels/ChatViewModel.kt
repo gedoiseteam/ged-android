@@ -19,6 +19,7 @@ import com.upsaclay.message.domain.entity.MessageState
 import com.upsaclay.message.domain.entity.Seen
 import com.upsaclay.message.domain.repository.MessageRepository
 import com.upsaclay.message.domain.usecase.CreateConversationUseCase
+import com.upsaclay.message.domain.usecase.SendMessageUseCase
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -33,6 +34,7 @@ class ChatViewModel(
     private var conversation: Conversation,
     userRepository: UserRepository,
     private val messageRepository: MessageRepository,
+    private val sendMessageUseCase: SendMessageUseCase,
     private val createConversationUseCase: CreateConversationUseCase
 ): ViewModel() {
     private val _event = MutableSharedFlow<ChatEvent>()
@@ -71,8 +73,7 @@ class ChatViewModel(
                     createConversationUseCase(conversation)
                     conversation = conversation.copy(state = ConversationState.CREATED)
                 }
-
-                messageRepository.createMessage(message)
+                sendMessageUseCase(message)
             } catch (e: Exception) {
                 messageRepository.updateMessage(message.copy(state = MessageState.ERROR))
             }

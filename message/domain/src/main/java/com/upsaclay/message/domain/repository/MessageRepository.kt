@@ -13,7 +13,7 @@ interface MessageRepository {
 
     fun getRemoteMessages(conversationId: Int): Flow<List<Message>>
 
-    suspend fun createMessage(message: Message)
+    suspend fun addMessage(message: Message)
 
     suspend fun updateMessage(message: Message)
 

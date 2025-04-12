@@ -3,8 +3,7 @@ package com.upsaclay.gedoise.domain.usecase
 import com.upsaclay.authentication.domain.repository.AuthenticationRepository
 import com.upsaclay.common.domain.e
 import com.upsaclay.common.domain.ConnectivityObserver
-import com.upsaclay.gedoise.domain.entities.FcmToken
-import com.upsaclay.gedoise.domain.repository.CredentialsRepository
+import com.upsaclay.common.domain.entity.FcmToken
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine

@@ -1,6 +1,7 @@
 package com.upsaclay.message.data.mapper
 
 import com.google.firebase.Timestamp
+import com.google.firebase.messaging.RemoteMessage
 import com.upsaclay.common.domain.UrlUtils
 import com.upsaclay.common.domain.entity.User
 import com.upsaclay.common.domain.usecase.ConvertDateUseCase
@@ -12,6 +13,8 @@ import com.upsaclay.message.data.remote.model.RemoteConversation
 import com.upsaclay.message.domain.entity.Conversation
 import com.upsaclay.message.domain.entity.ConversationMessage
 import com.upsaclay.message.domain.entity.ConversationState
+import com.upsaclay.message.domain.entity.Message
+import com.upsaclay.message.domain.entity.MessageState
 
 internal object ConversationMapper {
     fun toLocal(conversation: Conversation) = LocalConversation(

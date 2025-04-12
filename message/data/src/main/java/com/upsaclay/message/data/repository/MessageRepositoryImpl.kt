@@ -23,7 +23,7 @@ internal class MessageRepositoryImpl(
     override fun getRemoteMessages(conversationId: Int): Flow<List<Message>> =
         messageRemoteDataSource.listenMessages(conversationId)
 
-    override suspend fun createMessage(message: Message) {
+    override suspend fun addMessage(message: Message) {
         messageLocalDataSource.insertMessage(message)
         messageRemoteDataSource.createMessage(message)
     }

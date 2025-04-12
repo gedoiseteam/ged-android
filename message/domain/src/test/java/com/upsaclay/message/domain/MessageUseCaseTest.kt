@@ -67,7 +67,7 @@ class MessageUseCaseTest {
         coEvery { userConversationRepository.deleteLocalConversations() } returns Unit
         coEvery { userConversationRepository.listenRemoteConversations() } returns Unit
         coEvery { messageRepository.listenRemoteMessages(any()) } returns Unit
-        coEvery { messageRepository.createMessage(any()) } returns Unit
+        coEvery { messageRepository.addMessage(any()) } returns Unit
         coEvery { messageRepository.updateMessage(any()) } returns Unit
         coEvery { messageRepository.upsertMessage(any()) } returns Unit
         coEvery { messageRepository.deleteLocalMessages() } returns Unit

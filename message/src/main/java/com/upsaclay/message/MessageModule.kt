@@ -18,6 +18,7 @@ val messageModule = module {
             conversation = conversation,
             userRepository = get(),
             messageRepository = get(),
+            sendMessageUseCase = get(),
             createConversationUseCase = get()
         )
     }

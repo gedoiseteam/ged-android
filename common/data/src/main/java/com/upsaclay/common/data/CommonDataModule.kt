@@ -4,6 +4,7 @@ import com.upsaclay.common.data.local.UserDataStore
 import com.upsaclay.common.data.local.UserLocalDataSource
 import com.upsaclay.common.data.remote.ImageRemoteDataSource
 import com.upsaclay.common.data.remote.UserRemoteDataSource
+import com.upsaclay.common.data.remote.api.FCMApi
 import com.upsaclay.common.data.remote.api.ImageApi
 import com.upsaclay.common.data.remote.api.ImageApiImpl
 import com.upsaclay.common.data.remote.api.RetrofitImageApi
@@ -11,11 +12,13 @@ import com.upsaclay.common.data.remote.api.UserFirestoreApi
 import com.upsaclay.common.data.remote.api.UserFirestoreApiImpl
 import com.upsaclay.common.data.remote.api.UserRetrofitApi
 import com.upsaclay.common.data.repository.DrawableRepositoryImpl
+import com.upsaclay.common.data.repository.FCMRepositoryImpl
 import com.upsaclay.common.data.repository.FileRepositoryImpl
 import com.upsaclay.common.data.repository.ImageRepositoryImpl
 import com.upsaclay.common.data.repository.UserRepositoryImpl
 import com.upsaclay.common.domain.e
 import com.upsaclay.common.domain.repository.DrawableRepository
+import com.upsaclay.common.domain.repository.FCMRepository
 import com.upsaclay.common.domain.repository.FileRepository
 import com.upsaclay.common.domain.repository.ImageRepository
 import com.upsaclay.common.domain.repository.UserRepository
@@ -66,6 +69,12 @@ val commonDataModule = module {
         ).create(UserRetrofitApi::class.java)
     }
 
+    single {
+        get<Retrofit>(
+            qualifier = named(SERVER_1_RETROFIT_QUALIFIER)
+        ).create(FCMApi::class.java)
+    }
+
     single<CoroutineScope>(BACKGROUND_SCOPE) {
         CoroutineScope(
     SupervisorJob() +
@@ -94,4 +103,6 @@ val commonDataModule = module {
     singleOf(::UserLocalDataSource)
     singleOf(::UserDataStore)
     singleOf(::UserFirestoreApiImpl) { bind<UserFirestoreApi>() }
+
+    singleOf(::FCMRepositoryImpl) { bind<FCMRepository>() }
 }

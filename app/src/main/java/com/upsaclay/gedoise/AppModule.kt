@@ -5,13 +5,11 @@ import com.upsaclay.common.AndroidConnectivityObserver
 import com.upsaclay.common.data.SERVER_1_RETROFIT_QUALIFIER
 import com.upsaclay.common.domain.e
 import com.upsaclay.gedoise.data.GedoiseDatabase
-import com.upsaclay.gedoise.data.api.CredentialsApi
-import com.upsaclay.gedoise.data.local.CredentialsDataStore
-import com.upsaclay.gedoise.data.local.CredentialsLocalDataSource
-import com.upsaclay.gedoise.data.repository.CredentialsRepositoryImpl
+import com.upsaclay.common.data.remote.api.FCMApi
+import com.upsaclay.common.data.local.FCMDataStore
+import com.upsaclay.common.data.local.FCMLocalDataSource
 import com.upsaclay.gedoise.data.repository.ScreenRepositoryImpl
 import com.upsaclay.common.domain.ConnectivityObserver
-import com.upsaclay.gedoise.domain.repository.CredentialsRepository
 import com.upsaclay.gedoise.domain.repository.ScreenRepository
 import com.upsaclay.gedoise.domain.usecase.ClearDataUseCase
 import com.upsaclay.gedoise.domain.usecase.StartListeningDataUseCase
@@ -57,7 +55,7 @@ val appModule = module {
 
     single {
         get<Retrofit>(qualifier = named(SERVER_1_RETROFIT_QUALIFIER))
-            .create(CredentialsApi::class.java)
+            .create(FCMApi::class.java)
     }
 
     single { get<GedoiseDatabase>().announcementDao() }
@@ -77,8 +75,8 @@ val appModule = module {
 
     singleOf(::ScreenRepositoryImpl) { bind<ScreenRepository>() }
     singleOf(::CredentialsRepositoryImpl) { bind<CredentialsRepository>() }
-    singleOf(::CredentialsLocalDataSource)
-    singleOf(::CredentialsDataStore)
+    singleOf(::FCMLocalDataSource)
+    singleOf(::FCMDataStore)
     single {
         TokenUseCase(
             credentialsRepository = get(),

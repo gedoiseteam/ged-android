@@ -41,7 +41,7 @@ class ChatViewModelTest {
         every { userRepository.currentUser } returns MutableStateFlow(userFixture)
         every { messageRepository.getMessages(any()) } returns flowOf(PagingData.from(messagesFixture))
         every { messageRepository.getLastMessage(any()) } returns flowOf(messageFixture)
-        coEvery { messageRepository.createMessage(any()) } returns Unit
+        coEvery { messageRepository.addMessage(any()) } returns Unit
         coEvery { createConversationUseCase(any()) } returns Unit
 
         chatViewModel = ChatViewModel(
@@ -79,7 +79,7 @@ class ChatViewModelTest {
         chatViewModel.sendMessage()
 
         // Then
-        coVerify { messageRepository.createMessage(any()) }
+        coVerify { messageRepository.addMessage(any()) }
     }
 
     @Test
@@ -88,7 +88,7 @@ class ChatViewModelTest {
         chatViewModel.sendMessage()
 
         // Then
-        coVerify(exactly = 0) { messageRepository.createMessage(any()) }
+        coVerify(exactly = 0) { messageRepository.addMessage(any()) }
     }
 
     @Test
@@ -139,7 +139,7 @@ class ChatViewModelTest {
 
         // Then
         coVerify(exactly = 0) { createConversationUseCase(conversation) }
-        coVerify { messageRepository.createMessage(any()) }
+        coVerify { messageRepository.addMessage(any()) }
     }
 
     @Test(expected = IllegalArgumentException::class)

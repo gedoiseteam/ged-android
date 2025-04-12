@@ -7,6 +7,7 @@ import com.upsaclay.message.domain.usecase.GetFilteredUserUseCase
 import com.upsaclay.message.domain.usecase.GetPagedConversationsUIUseCase
 import com.upsaclay.message.domain.usecase.ListenRemoteConversationsUseCase
 import com.upsaclay.message.domain.usecase.ListenRemoteMessagesUseCase
+import com.upsaclay.message.domain.usecase.SendMessageUseCase
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -32,6 +33,7 @@ val messageDomainModule = module {
     singleOf(::DeleteConversationUseCase)
     singleOf(::GetPagedConversationsUIUseCase)
     singleOf(::GetFilteredUserUseCase)
+    singleOf(::SendMessageUseCase)
 
     single {
         ListenRemoteConversationsUseCase(
