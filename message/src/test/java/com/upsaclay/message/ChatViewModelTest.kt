@@ -59,7 +59,7 @@ class ChatViewModelTest {
     @Test
     fun default_values_are_correct() = runTest {
         // Then
-        assertEquals("", chatViewModel.text)
+        assertEquals("", chatViewModel.text.value)
     }
 
     @Test
@@ -71,7 +71,7 @@ class ChatViewModelTest {
         chatViewModel.updateTextToSend(text)
 
         // Then
-        assertEquals(text, chatViewModel.text)
+        assertEquals(text, chatViewModel.text.value)
     }
 
     @Test
@@ -104,7 +104,7 @@ class ChatViewModelTest {
         chatViewModel.sendMessage()
 
         // Then
-        assertEquals("", chatViewModel.text)
+        assertEquals("", chatViewModel.text.value)
     }
 
     @Test

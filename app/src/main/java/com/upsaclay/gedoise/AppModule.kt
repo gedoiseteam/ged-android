@@ -2,7 +2,7 @@ package com.upsaclay.gedoise
 
 import androidx.room.Room
 import com.upsaclay.common.AndroidConnectivityObserver
-import com.upsaclay.common.data.SERVER_1_RETROFIT_QUALIFIER
+import com.upsaclay.common.data.GED_SERVER_QUALIFIER
 import com.upsaclay.common.domain.e
 import com.upsaclay.gedoise.data.GedoiseDatabase
 import com.upsaclay.common.data.remote.api.FCMApi
@@ -55,7 +55,7 @@ val appModule = module {
     }
 
     single {
-        get<Retrofit>(qualifier = named(SERVER_1_RETROFIT_QUALIFIER))
+        get<Retrofit>(GED_SERVER_QUALIFIER)
             .create(FCMApi::class.java)
     }
 

@@ -37,6 +37,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.upsaclay.common.domain.entity.User
 import com.upsaclay.common.domain.usecase.FormatLocalDateTimeUseCase
+import com.upsaclay.common.domain.userFixture
 import com.upsaclay.common.domain.userFixture2
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.previewText
@@ -228,7 +229,7 @@ private fun messagePadding(sameSender: Boolean, sameTime: Boolean): Dp =
 @Composable
 private fun ChatScreenPreview() {
     var text by remember { mutableStateOf("") }
-    var messages by remember { mutableStateOf(listOf(messageFixture)) }
+    var messages by remember { mutableStateOf(messagesFixture.sortedByDescending { it.date }) }
     var id by remember { mutableIntStateOf(10) }
     var newMessage by remember { mutableStateOf<Message?>(null) }
 
@@ -271,15 +272,14 @@ private fun ChatScreenPreview() {
                                 Message(
                                     id = id,
                                     conversationId = 1,
-                                    senderId = "senderId",
+                                    senderId = userFixture.id,
                                     recipientId = userFixture2.id,
                                     content = text,
                                     date = LocalDateTime.now(),
                                     state = MessageState.SENT
                                 )
                             )
-                            sortedByDescending { it.date }
-                        }
+                        }.sortedByDescending { it.date }
                         newMessage = messagesFixture.first()
                         text = ""
                     }

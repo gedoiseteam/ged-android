@@ -33,6 +33,7 @@ internal class MessageApiImpl : MessageApi {
                 }
 
                 val messages = snapshot?.documents
+                    ?.filterNot { it.metadata.isFromCache || it.metadata.hasPendingWrites() }
                     ?.mapNotNull { document ->
                         document.toObject(RemoteMessage::class.java)
                     }

@@ -44,13 +44,16 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.upsaclay.common.domain.usecase.FormatLocalDateTimeUseCase
 import com.upsaclay.common.presentation.components.ProfilePicture
 import com.upsaclay.common.presentation.theme.GedoiseTheme
@@ -73,56 +76,53 @@ fun SentMessageItem(
     message: Message,
     showSeen: Boolean = false
 ) {
-    val dateTimeTextColor = if (isSystemInDarkTheme())
-        Color(0xFFBEBEBE)
-    else
-        Color(0xFFC8C8C8)
+    val dateTimeTextColor = if (isSystemInDarkTheme()) Color.LightGray else Color(0xFFC8C8C8)
 
     Column(
         horizontalAlignment = Alignment.End
     ) {
-        Box {
-            Row(
-                modifier = modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End,
-                verticalAlignment = Alignment.Bottom
+        Row(
+            modifier = modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.Bottom
+        ) {
+            Spacer(modifier = Modifier.fillMaxWidth(0.2f))
+
+            MessageText(
+                text = message.content,
+                textColor = Color.White,
+                date = message.date,
+                backgroundColor = MaterialTheme.colorScheme.primary,
+                dateTimeTextColor = dateTimeTextColor
+            )
+
+            val iconColor = if (isSystemInDarkTheme()) Color.Gray else Color.LightGray
+
+            AnimatedVisibility(
+                visible = message.state == MessageState.LOADING
             ) {
-                Spacer(modifier = Modifier.fillMaxWidth(0.2f))
-
-                MessageText(
-                    text = message.content,
-                    textColor = Color.White,
-                    date = message.date,
-                    backgroundColor = MaterialTheme.colorScheme.primary,
-                    dateTimeTextColor = dateTimeTextColor
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.Send,
+                    contentDescription = stringResource(id = R.string.send_message_icon_description),
+                    tint = iconColor,
+                    modifier = Modifier
+                        .padding(start = MaterialTheme.spacing.small)
+                        .size(20.dp)
                 )
-
-                val iconColor =
-                    if (isSystemInDarkTheme()) Color.Gray else MaterialTheme.colorScheme.lightGray
-                AnimatedVisibility(
-                    visible = message.state == MessageState.LOADING
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.Send,
-                        contentDescription = stringResource(id = R.string.send_message_icon_description),
-                        tint = iconColor,
-                        modifier = Modifier
-                            .padding(start = MaterialTheme.spacing.small)
-                            .size(20.dp)
-                    )
-                }
             }
         }
 
         if (showSeen) {
+            val seenColor = if (isSystemInDarkTheme()) Color.Gray else Color.DarkGray
+
             Text(
                 modifier = Modifier.padding(
                     top = MaterialTheme.spacing.extraSmall,
                     end = MaterialTheme.spacing.smallMedium
                 ),
                 text = stringResource(id = R.string.message_seen),
-                style = MaterialTheme.typography.labelSmall,
-                color = Color.Gray
+                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Light),
+                color = seenColor
             )
         }
     }
@@ -171,7 +171,7 @@ private fun MessageText(
 ) {
     FlowRow(
         modifier = modifier
-            .clip(RoundedCornerShape(MaterialTheme.spacing.large))
+            .clip(RoundedCornerShape(MaterialTheme.spacing.medium))
             .background(backgroundColor)
             .padding(
                 vertical = MaterialTheme.spacing.small,
@@ -319,7 +319,10 @@ private val longtext = "Bonjour, j'espère que vous allez bien. " +
         "Par exemple, en ce qui concerne la gestion des priorités, il serait peut-être utile de revoir nos méthodes " +
         "afin d'être sûrs que nous concentrons nos efforts sur les éléments les plus importants."
 
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
+@Preview(
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_NO
+)
 @Composable
 private fun SentMessageItemPreview() {
     GedoiseTheme {

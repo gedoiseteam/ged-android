@@ -1,20 +1,11 @@
-import java.util.Properties
 
 plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.jetbrainsKotlinAndroid)
 }
 
-val localProperties = Properties()
-val localPropertiesFile = rootProject.file("local.properties")
-if (localPropertiesFile.exists()) {
-    localPropertiesFile.inputStream().use { stream ->
-        localProperties.load(stream)
-    }
-}
-
-val gedoiseVm1BaseUrl = project.findProperty("GEDOISE_VM_1_BASE_URL") as String
-val gedoiseVm2BaseUrl = project.findProperty("GEDOISE_VM_2_BASE_URL") as String
+val GED_SERVER_URL: String by project
+val LOCAL_SERVER_URL: String by project
 
 android {
     namespace = "com.upsaclay.common.data"
@@ -30,14 +21,8 @@ android {
         debug {
             buildConfigField(
                 "String",
-                "SERVICE_1_BASE_URL",
-                "\"${localProperties.getProperty("LOCAL_SERVER_BASE_URL")}\"",
-            )
-
-            buildConfigField(
-                "String",
-                "SERVICE_2_BASE_URL",
-                "\"${localProperties.getProperty("LOCAL_SERVER_BASE_URL")}\"",
+                "SERVER_URL",
+                "\"$LOCAL_SERVER_URL\"",
             )
         }
 
@@ -50,14 +35,8 @@ android {
 
             buildConfigField(
                 "String",
-                "SERVICE_1_BASE_URL",
-                "\"$gedoiseVm1BaseUrl\"",
-            )
-
-            buildConfigField(
-                "String",
-                "SERVICE_2_BASE_URL",
-                "\"$gedoiseVm2BaseUrl\"",
+                "SERVER_URL",
+                "\"$GED_SERVER_URL\"",
             )
         }
     }

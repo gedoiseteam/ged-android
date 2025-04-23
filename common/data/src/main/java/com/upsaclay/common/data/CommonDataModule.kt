@@ -36,45 +36,33 @@ import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-const val SERVER_1_RETROFIT_QUALIFIER = "server_1_qualifier"
-const val SERVER_2_RETROFIT_QUALIFIER = "server_2_qualifier"
+val GED_SERVER_QUALIFIER = named("server_qualifier")
 
 private val okHttpClient = OkHttpClient.Builder().build()
 private val BACKGROUND_SCOPE = named("BackgroundScope")
 
 val commonDataModule = module {
-    single<Retrofit>(qualifier = named(SERVER_1_RETROFIT_QUALIFIER)) {
+    single<Retrofit>(GED_SERVER_QUALIFIER) {
         Retrofit.Builder()
-            .baseUrl("http://192.168.2.183:3000")
-            .client(okHttpClient)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-    }
-
-    single<Retrofit>(qualifier = named(SERVER_2_RETROFIT_QUALIFIER)) {
-        Retrofit.Builder()
-            .baseUrl(BuildConfig.SERVICE_2_BASE_URL)
+            .baseUrl(BuildConfig.SERVER_URL)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
 
     single {
-        get<Retrofit>(
-            qualifier = named(SERVER_1_RETROFIT_QUALIFIER)
-        ).create(RetrofitImageApi::class.java)
+        get<Retrofit>(GED_SERVER_QUALIFIER)
+            .create(RetrofitImageApi::class.java)
     }
 
     single {
-        get<Retrofit>(
-            qualifier = named(SERVER_1_RETROFIT_QUALIFIER)
-        ).create(UserRetrofitApi::class.java)
+        get<Retrofit>(GED_SERVER_QUALIFIER)
+            .create(UserRetrofitApi::class.java)
     }
 
     single {
-        get<Retrofit>(
-            qualifier = named(SERVER_1_RETROFIT_QUALIFIER)
-        ).create(FCMApi::class.java)
+        get<Retrofit>(GED_SERVER_QUALIFIER)
+            .create(FCMApi::class.java)
     }
 
     single<CoroutineScope>(BACKGROUND_SCOPE) {

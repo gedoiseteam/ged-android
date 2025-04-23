@@ -42,7 +42,7 @@ class ConversationScreenRouteUITest {
 
     @Before
     fun setUp() {
-        every { conversationViewModel.conversations } returns flowOf(PagingData.from(conversationsUIFixture))
+        every { conversationViewModel.conversations } returns flowOf(conversationsUIFixture)
         every { conversationViewModel.event } returns MutableSharedFlow()
     }
 
@@ -67,31 +67,9 @@ class ConversationScreenRouteUITest {
     }
 
     @Test
-    fun empty_conversations_item_should_be_displayed_when_no_last_message() {
-        // Given
-        every { conversationViewModel.conversations } returns
-                flowOf(PagingData.from(listOf(conversationUIFixture.copy(lastMessage = null))))
-
-        // When
-        rule.setContent {
-            ConversationScreen(
-                navController = navController,
-                conversationViewModel = conversationViewModel,
-                snackbarHostState = SnackbarHostState(),
-            )
-        }
-
-        // Then
-        rule.onNodeWithTag(
-            rule.activity.getString(R.string.conversation_screen_empty_conversation_item_tag),
-            useUnmergedTree = true
-        ).assertExists()
-    }
-
-    @Test
     fun read_conversations_item_should_be_displayed_when_last_message_is_read() {
         // Given
-        every { conversationViewModel.conversations } returns flowOf(PagingData.from(listOf(conversationUIFixture)))
+        every { conversationViewModel.conversations } returns flowOf(listOf(conversationUIFixture))
 
         // When
         rule.setContent {
@@ -114,7 +92,7 @@ class ConversationScreenRouteUITest {
         // Given
         val lastMessage = messageFixture.copy(seen = null, senderId = userFixture2.id)
         every { conversationViewModel.conversations } returns
-                flowOf(PagingData.from(listOf(conversationUIFixture.copy(lastMessage = lastMessage))))
+                flowOf(listOf(conversationUIFixture.copy(lastMessage = lastMessage)))
 
         // When
         rule.setContent {
@@ -135,7 +113,7 @@ class ConversationScreenRouteUITest {
     @Test
     fun navigate_to_chat_screen_when_conversation_item_is_clicked() {
         // Given
-        every { conversationViewModel.conversations } returns flowOf(PagingData.from(listOf(conversationUIFixture)))
+        every { conversationViewModel.conversations } returns flowOf(listOf(conversationUIFixture))
 
         // When
         rule.setContent {
