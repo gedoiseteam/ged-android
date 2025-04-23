@@ -44,7 +44,7 @@ class NavigationViewModelTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
 
-        every { userConversationRepository.conversationsWithLastMessage } returns flowOf(conversationsMessageFixture)
+        every { userConversationRepository.conversationsMessage } returns flowOf(conversationsMessageFixture)
         every { screenRepository.currentScreenRoute } returns null
         every { screenRepository.setCurrentScreenRoute(any()) } returns Unit
         every { userRepository.currentUser } returns MutableStateFlow(userFixture)
@@ -66,9 +66,6 @@ class NavigationViewModelTest {
         // When
         navigationViewModel = NavigationViewModel(
             userRepository = userRepository,
-            startListeningDataUseCase = startListeningDataUseCase,
-            stopListeningDataUseCase = stopListeningDataUseCase,
-            clearDataUseCase = clearDataUseCase,
             userConversationRepository = userConversationRepository,
             screenRepository = screenRepository,
             authenticationRepository = authenticationRepository
@@ -81,11 +78,8 @@ class NavigationViewModelTest {
     @Test
     fun data_listening_should_start_when_user_is_authenticated() {
         // When
-        navigationViewModel = NavigationViewModel(
+         navigationViewModel = NavigationViewModel(
             userRepository = userRepository,
-            startListeningDataUseCase = startListeningDataUseCase,
-            stopListeningDataUseCase = stopListeningDataUseCase,
-            clearDataUseCase = clearDataUseCase,
             userConversationRepository = userConversationRepository,
             screenRepository = screenRepository,
             authenticationRepository = authenticationRepository
@@ -101,11 +95,8 @@ class NavigationViewModelTest {
         every { authenticationRepository.isAuthenticated } returns flowOf(false)
 
         // When
-        navigationViewModel = NavigationViewModel(
+         navigationViewModel = NavigationViewModel(
             userRepository = userRepository,
-            startListeningDataUseCase = startListeningDataUseCase,
-            stopListeningDataUseCase = stopListeningDataUseCase,
-            clearDataUseCase = clearDataUseCase,
             userConversationRepository = userConversationRepository,
             screenRepository = screenRepository,
             authenticationRepository = authenticationRepository
@@ -121,11 +112,8 @@ class NavigationViewModelTest {
         every { authenticationRepository.isAuthenticated } returns flowOf(false)
 
         // When
-        navigationViewModel = NavigationViewModel(
+         navigationViewModel = NavigationViewModel(
             userRepository = userRepository,
-            startListeningDataUseCase = startListeningDataUseCase,
-            stopListeningDataUseCase = stopListeningDataUseCase,
-            clearDataUseCase = clearDataUseCase,
             userConversationRepository = userConversationRepository,
             screenRepository = screenRepository,
             authenticationRepository = authenticationRepository

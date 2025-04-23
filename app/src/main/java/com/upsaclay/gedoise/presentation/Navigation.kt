@@ -64,6 +64,7 @@ fun Navigation(
 ) {
     val navController = rememberNavController()
     val currentUser by navigationViewModel.currentUser.collectAsState()
+    val startDestination by navigationViewModel.startDestinationScreenRoute.collectAsState()
     val navigationItems by combine(
         navigationViewModel.homeNavigationItem,
         navigationViewModel.messageNavigationItem
@@ -72,11 +73,11 @@ fun Navigation(
     }.collectAsState(emptyList())
 
     navController.addOnDestinationChangedListener { controller, destination, _ ->
-        navigationViewModel.setCurrentScreen(getScreen(controller, destination))
+        navigationViewModel.storeCurrentScreen(getScreen(controller, destination))
     }
 
     LaunchedEffect(Unit) {
-        navigationViewModel.routeToNavigate.collectLatest {
+        navigationViewModel.screenRouteToNavigate.collect {
             navController.navigate(it.route) {
                 launchSingleTop = true
             }
@@ -85,7 +86,7 @@ fun Navigation(
 
     NavHost(
         navController = navController,
-        startDestination = MainScreenRoute.Splash.route
+        startDestination = startDestination.route
     ) {
         composable(MainScreenRoute.Splash.route) {
             SplashScreen()
@@ -222,10 +223,12 @@ fun Navigation(
 
         composable(MessageScreenRoute.Chat.HARD_ROUTE) { backStackEntry ->
             backStackEntry.arguments?.getString("conversation")?.let {
-                ChatScreen(
-                    conversation = ConversationMapper.fromJson(it),
-                    navController = navController
-                )
+                ConversationMapper.conversationFromJson(it)?.let { conversation ->
+                    ChatScreen(
+                        conversation = conversation,
+                        navController = navController
+                    )
+                }
             } ?: run {
                 navController.navigate(MessageScreenRoute.Conversation.route)
                 showToast(
@@ -280,8 +283,9 @@ private fun getScreen(controller: NavController, destination: NavDestination): S
     return when(destination.route) {
         MessageScreenRoute.Chat.HARD_ROUTE -> {
             controller.currentBackStackEntry?.arguments?.getString("conversation")?.let { announcementId ->
-                val conversation = ConversationMapper.fromJson(announcementId)
-                MessageScreenRoute.Chat(conversation)
+                ConversationMapper.conversationFromJson(announcementId)?.let { conversation ->
+                    MessageScreenRoute.Chat(conversation)
+                }
             }
         }
 

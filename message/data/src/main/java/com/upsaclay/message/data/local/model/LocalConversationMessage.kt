@@ -22,13 +22,13 @@ data class LocalConversationMessage(
     @ColumnInfo(name = ConversationField.CREATED_AT) val createdAt: Long,
     @ColumnInfo(name = ConversationField.CONVERSATION_STATE) val conversationState: String,
 
-    @ColumnInfo(name = MessageField.MESSAGE_ID) val messageId: Int?,
-    @ColumnInfo(name = MessageField.SENDER_ID) val senderId: String?,
-    @ColumnInfo(name = MessageField.RECIPIENT_ID) val recipientId: String?,
-    @ColumnInfo(name = MessageField.CONTENT) val content: String?,
-    @ColumnInfo(name = MessageField.MESSAGE_TIMESTAMP) val messageTimestamp: Long?,
+    @ColumnInfo(name = MessageField.MESSAGE_ID) val messageId: Int,
+    @ColumnInfo(name = MessageField.SENDER_ID) val senderId: String,
+    @ColumnInfo(name = MessageField.RECIPIENT_ID) val recipientId: String,
+    @ColumnInfo(name = MessageField.CONTENT) val content: String,
+    @ColumnInfo(name = MessageField.MESSAGE_TIMESTAMP) val messageTimestamp: Long,
     @ColumnInfo(name = MessageField.Local.SEEN_VALUE) val seenValue: Boolean?,
     @ColumnInfo(name = MessageField.Local.SEEN_TIMESTAMP) val seenTimestamp: Long?,
-    @ColumnInfo(name = MessageField.MESSAGE_STATE) val messageState: String?
+    @ColumnInfo(name = MessageField.MESSAGE_STATE) val messageState: String
 )
 

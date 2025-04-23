@@ -2,6 +2,7 @@ package com.upsaclay.common.data
 
 import com.upsaclay.common.data.local.UserDataStore
 import com.upsaclay.common.data.local.UserLocalDataSource
+import com.upsaclay.common.data.remote.FCMNotificationSenderImpl
 import com.upsaclay.common.data.remote.ImageRemoteDataSource
 import com.upsaclay.common.data.remote.UserRemoteDataSource
 import com.upsaclay.common.data.remote.api.FCMApi
@@ -12,13 +13,14 @@ import com.upsaclay.common.data.remote.api.UserFirestoreApi
 import com.upsaclay.common.data.remote.api.UserFirestoreApiImpl
 import com.upsaclay.common.data.remote.api.UserRetrofitApi
 import com.upsaclay.common.data.repository.DrawableRepositoryImpl
-import com.upsaclay.common.data.repository.FCMRepositoryImpl
+import com.upsaclay.common.data.repository.CredentialsRepositoryImpl
 import com.upsaclay.common.data.repository.FileRepositoryImpl
 import com.upsaclay.common.data.repository.ImageRepositoryImpl
 import com.upsaclay.common.data.repository.UserRepositoryImpl
+import com.upsaclay.common.domain.FCMNotificationSender
 import com.upsaclay.common.domain.e
 import com.upsaclay.common.domain.repository.DrawableRepository
-import com.upsaclay.common.domain.repository.FCMRepository
+import com.upsaclay.common.domain.repository.CredentialsRepository
 import com.upsaclay.common.domain.repository.FileRepository
 import com.upsaclay.common.domain.repository.ImageRepository
 import com.upsaclay.common.domain.repository.UserRepository
@@ -43,7 +45,7 @@ private val BACKGROUND_SCOPE = named("BackgroundScope")
 val commonDataModule = module {
     single<Retrofit>(qualifier = named(SERVER_1_RETROFIT_QUALIFIER)) {
         Retrofit.Builder()
-            .baseUrl(BuildConfig.SERVICE_1_BASE_URL)
+            .baseUrl("http://192.168.2.183:3000")
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
@@ -104,5 +106,6 @@ val commonDataModule = module {
     singleOf(::UserDataStore)
     singleOf(::UserFirestoreApiImpl) { bind<UserFirestoreApi>() }
 
-    singleOf(::FCMRepositoryImpl) { bind<FCMRepository>() }
+    singleOf(::CredentialsRepositoryImpl) { bind<CredentialsRepository>() }
+    singleOf(::FCMNotificationSenderImpl) { bind<FCMNotificationSender>() }
 }

@@ -18,7 +18,7 @@ class ChatScreenRouteUITest {
 
     @Before
     fun setUp() {
-        every { chatViewModel.textToSend } returns ""
+        every { chatViewModel.text } returns ""
         every { chatViewModel.sendMessage() } returns Unit
     }
 }

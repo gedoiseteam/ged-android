@@ -2,15 +2,10 @@ package com.upsaclay.message.domain
 
 import com.google.gson.GsonBuilder
 import com.upsaclay.common.domain.LocalDateTimeSerializer
-import com.upsaclay.common.domain.UrlUtils
-import com.upsaclay.common.domain.entity.User
-import com.upsaclay.common.domain.usecase.ConvertDateUseCase
 import com.upsaclay.message.domain.entity.Conversation
 import com.upsaclay.message.domain.entity.ConversationMessage
-import com.upsaclay.message.domain.entity.ConversationState
 import com.upsaclay.message.domain.entity.ConversationUI
 import com.upsaclay.message.domain.entity.Message
-import com.upsaclay.message.domain.entity.MessageState
 import java.time.LocalDateTime
 
 object ConversationMapper {
@@ -21,13 +16,13 @@ object ConversationMapper {
         state = conversationUI.state
     )
 
-    fun toConversationUI(conversation: Conversation, message: Message?): ConversationUI {
+    fun toConversationUI(conversationMessage: ConversationMessage): ConversationUI {
         return ConversationUI(
-            id = conversation.id,
-            interlocutor = conversation.interlocutor,
-            lastMessage = message,
-            createdAt = conversation.createdAt,
-            state = conversation.state
+            id = conversationMessage.conversation.id,
+            interlocutor = conversationMessage.conversation.interlocutor,
+            lastMessage = conversationMessage.lastMessage,
+            createdAt = conversationMessage.conversation.createdAt,
+            state = conversationMessage.conversation.state
         )
     }
 
@@ -45,68 +40,28 @@ object ConversationMapper {
             .toJson(conversation)
     }
 
-    fun fromJson(conversationJson: String): Conversation {
+    fun toJson(conversationMessage: ConversationMessage): String {
         return GsonBuilder()
             .registerTypeAdapter(LocalDateTime::class.java, LocalDateTimeSerializer)
             .create()
-            .fromJson(conversationJson, Conversation::class.java)
+            .toJson(conversationMessage)
     }
 
-    fun toFcmFormat(conversation: Conversation, message: Message): Map<String, String> {
-        return mutableMapOf(
-            "conversationId" to conversation.id.toString(),
-            "interlocutorId" to conversation.interlocutor.id,
-            "interlocutorFirstName" to conversation.interlocutor.firstName,
-            "interlocutorLastName" to conversation.interlocutor.lastName,
-            "interlocutorEmail" to conversation.interlocutor.email,
-            "interlocutorSchoolLevel" to conversation.interlocutor.schoolLevel,
-            "interlocutorIsMember" to conversation.interlocutor.isMember.toString(),
-            "conversationCreatedAt" to conversation.createdAt.toString(),
-            "messageId" to message.id.toString(),
-            "senderId" to message.senderId,
-            "recipientId" to message.recipientId,
-            "messageContent" to message.content,
-            "messageDate" to message.date.toString()
-        ).apply {
-            UrlUtils.getFileNameFromUrl(conversation.interlocutor.profilePictureUrl)?.let {
-                put("interlocutorProfilePictureFileName", it)
-            }
-        }
+    fun conversationFromJson(conversationJson: String): Conversation? {
+        return runCatching {
+            GsonBuilder()
+                .registerTypeAdapter(LocalDateTime::class.java, LocalDateTimeSerializer)
+                .create()
+                .fromJson(conversationJson, Conversation::class.java)
+        }.getOrNull()
     }
 
-    fun fromFcmFormat(data: Map<String, String>): ConversationMessage {
-        val interlocutor = User(
-            id = data["interlocutorId"] ?: "",
-            firstName = data["interlocutorFirstName"] ?: "",
-            lastName = data["interlocutorLastName"] ?: "",
-            email = data["interlocutorEmail"] ?: "",
-            schoolLevel = data["interlocutorSchoolLevel"] ?: "",
-            isMember = data["interlocutorIsMember"]?.toBoolean() ?: false,
-            profilePictureUrl = data["interlocutorProfilePictureFileName"]?.let { UrlUtils.formatProfilePictureUrl(it) }
-        )
-
-        val conversation = Conversation(
-            id = data["conversationId"]?.toInt() ?: 0,
-            interlocutor = interlocutor,
-            createdAt = ConvertDateUseCase.toLocalDateTime(
-                data["conversationCreatedAt"]?.toLongOrNull() ?: 0L
-            ),
-            state = ConversationState.CREATED
-        )
-
-        val message = Message(
-            id = data["messageId"]?.toInt() ?: 0,
-            senderId = data["senderId"] ?: "",
-            recipientId = data["recipientId"] ?: "",
-            conversationId = conversation.id,
-            content = data["messageContent"] ?: "",
-            date = ConvertDateUseCase.toLocalDateTime(
-                data["messageDate"]?.toLongOrNull() ?: 0L
-            ),
-            seen = null,
-            state = MessageState.SENT
-        )
-
-        return ConversationMessage(conversation, message)
+    fun conversationMessageFromJson(conversationMessageJson: String): ConversationMessage? {
+        return runCatching {
+            GsonBuilder()
+                .registerTypeAdapter(LocalDateTime::class.java, LocalDateTimeSerializer)
+                .create()
+                .fromJson(conversationMessageJson, ConversationMessage::class.java)
+        }.getOrNull()
     }
 }

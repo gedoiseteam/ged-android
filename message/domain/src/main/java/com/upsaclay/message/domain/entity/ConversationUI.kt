@@ -6,7 +6,7 @@ import java.time.LocalDateTime
 data class ConversationUI(
     val id: Int,
     val interlocutor: User,
-    val lastMessage: Message?,
+    val lastMessage: Message,
     val createdAt: LocalDateTime,
     val state: ConversationState
 )

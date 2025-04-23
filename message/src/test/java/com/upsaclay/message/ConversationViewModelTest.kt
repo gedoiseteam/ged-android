@@ -4,7 +4,6 @@ import androidx.paging.PagingData
 import com.upsaclay.message.domain.conversationUIFixture
 import com.upsaclay.message.domain.conversationsUIFixture
 import com.upsaclay.message.domain.usecase.DeleteConversationUseCase
-import com.upsaclay.message.domain.usecase.GetPagedConversationsUIUseCase
 import com.upsaclay.message.presentation.viewmodels.ConversationViewModel
 import io.mockk.coEvery
 import io.mockk.coVerify

@@ -14,9 +14,10 @@ import com.upsaclay.gedoise.domain.repository.ScreenRepository
 import com.upsaclay.gedoise.domain.usecase.ClearDataUseCase
 import com.upsaclay.gedoise.domain.usecase.StartListeningDataUseCase
 import com.upsaclay.gedoise.domain.usecase.StopListeningDataUseCase
-import com.upsaclay.gedoise.domain.usecase.TokenUseCase
+import com.upsaclay.gedoise.domain.usecase.FCMTokenUseCase
 import com.upsaclay.gedoise.presentation.NotificationPresenter
 import com.upsaclay.gedoise.presentation.viewmodels.AccountViewModel
+import com.upsaclay.gedoise.presentation.viewmodels.MainViewModel
 import com.upsaclay.gedoise.presentation.viewmodels.NavigationViewModel
 import com.upsaclay.gedoise.presentation.viewmodels.ProfileViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -68,17 +69,18 @@ val appModule = module {
     viewModelOf(::NavigationViewModel)
     viewModelOf(::ProfileViewModel)
     viewModelOf(::AccountViewModel)
+    viewModelOf(::MainViewModel)
 
     singleOf(::ClearDataUseCase)
     singleOf(::StartListeningDataUseCase)
     singleOf(::StopListeningDataUseCase)
 
     singleOf(::ScreenRepositoryImpl) { bind<ScreenRepository>() }
-    singleOf(::CredentialsRepositoryImpl) { bind<CredentialsRepository>() }
     singleOf(::FCMLocalDataSource)
     singleOf(::FCMDataStore)
     single {
-        TokenUseCase(
+        FCMTokenUseCase(
+            userRepository = get(),
             credentialsRepository = get(),
             authenticationRepository = get(),
             connectivityObserver = get(),

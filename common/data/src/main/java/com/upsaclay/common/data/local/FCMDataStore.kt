@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.upsaclay.common.data.getGsonFlowValue
+import com.upsaclay.common.data.getGsonValue
 import com.upsaclay.common.data.setGsonValue
 import com.upsaclay.common.domain.entity.FcmToken
 import kotlinx.coroutines.flow.Flow
@@ -16,7 +17,7 @@ class FCMDataStore(context: Context) {
     private val store = context.dataStore
     private val fcmTokenKey = stringPreferencesKey("fcmTokenKey")
 
-    fun getFcmToken(): Flow<FcmToken?> = store.getGsonFlowValue(fcmTokenKey)
+    suspend fun getFcmToken(): FcmToken? = store.getGsonValue(fcmTokenKey)
 
     suspend fun storeFcmToken(fcmToken: FcmToken) {
         store.setGsonValue(fcmTokenKey, fcmToken)

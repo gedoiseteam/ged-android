@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 class FCMLocalDataSource(
     private val fcmDataStore: FCMDataStore
 ) {
-    fun getUnsentFcmToken(): Flow<FcmToken?> = fcmDataStore.getFcmToken()
+    suspend fun getUnsentFcmToken(): FcmToken? = fcmDataStore.getFcmToken()
 
     suspend fun storeUnsentFcmToken(fcmToken: FcmToken) {
         fcmDataStore.storeFcmToken(fcmToken)

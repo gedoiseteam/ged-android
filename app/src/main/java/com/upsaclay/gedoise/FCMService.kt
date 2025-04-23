@@ -2,20 +2,12 @@ package com.upsaclay.gedoise
 
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import com.upsaclay.common.domain.UrlUtils.formatProfilePictureUrl
-import com.upsaclay.common.domain.e
-import com.upsaclay.common.domain.entity.User
+import com.upsaclay.common.domain.entity.FCMDataType
 import com.upsaclay.common.domain.repository.UserRepository
-import com.upsaclay.common.domain.usecase.ConvertDateUseCase
 import com.upsaclay.common.domain.entity.FcmToken
-import com.upsaclay.common.domain.repository.FCMRepository
+import com.upsaclay.gedoise.domain.usecase.FCMTokenUseCase
 import com.upsaclay.gedoise.presentation.NotificationPresenter
 import com.upsaclay.message.domain.ConversationMapper
-import com.upsaclay.message.domain.entity.Conversation
-import com.upsaclay.message.domain.entity.ConversationMessage
-import com.upsaclay.message.domain.entity.ConversationState
-import com.upsaclay.message.domain.entity.Message
-import com.upsaclay.message.domain.entity.MessageState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
@@ -27,7 +19,7 @@ import org.koin.android.ext.android.inject
 class FCMService: FirebaseMessagingService() {
     private var job: Job? = null
     private val notificationPresenter: NotificationPresenter by inject<NotificationPresenter>()
-    private val fcmRepository: FCMRepository by inject<FCMRepository>()
+    private val fcmTokenUseCase: FCMTokenUseCase by inject<FCMTokenUseCase>()
     private val userRepository: UserRepository by inject<UserRepository>()
     private val scope = GlobalScope
 
@@ -35,25 +27,28 @@ class FCMService: FirebaseMessagingService() {
         super.onNewToken(tokenValue)
         job?.cancel()
         job = scope.launch(Dispatchers.IO) {
-            val user = userRepository.currentUser.filterNotNull().first()
-            val fcmToken = FcmToken(user.id, tokenValue)
-
-            runCatching {
-                fcmRepository.sendFcmToken(fcmToken)
-                fcmRepository.removeUnsentFcmToken()
+            userRepository.currentUser.value?.let {
+                fcmTokenUseCase.sendFcmToken(FcmToken(it.id, tokenValue))
+            } ?: run {
+                fcmTokenUseCase.storeToken(FcmToken(null, tokenValue))
             }
-                .onFailure {
-                    e("Error sending FCM token", it)
-                    fcmRepository.storeUnsentFcmToken(fcmToken)
-                }
         }
     }
-
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
         scope.launch(Dispatchers.Main) {
-            notificationPresenter.showMessageNotification(ConversationMapper.fromFcmFormat(remoteMessage.data))
+           when(remoteMessage.data["type"]) {
+               FCMDataType.MESSAGE.toString() -> handleNotification(remoteMessage)
+           }
+        }
+    }
+
+    private suspend fun handleNotification(remoteMessage: RemoteMessage) {
+        remoteMessage.data["value"]?.let { value ->
+            ConversationMapper.conversationMessageFromJson(value)?.let { conversationMessage ->
+                notificationPresenter.showMessageNotification(conversationMessage)
+            }
         }
     }
 }

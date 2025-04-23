@@ -74,7 +74,6 @@ android {
 }
 
 dependencies {
-
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.crashlytics)
@@ -88,7 +87,6 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
     implementation(libs.jakewharton.timber)
-    implementation(libs.gson)
 
     testImplementation(libs.junit)
 

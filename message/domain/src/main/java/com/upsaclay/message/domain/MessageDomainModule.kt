@@ -4,7 +4,6 @@ import com.upsaclay.common.domain.e
 import com.upsaclay.message.domain.usecase.CreateConversationUseCase
 import com.upsaclay.message.domain.usecase.DeleteConversationUseCase
 import com.upsaclay.message.domain.usecase.GetFilteredUserUseCase
-import com.upsaclay.message.domain.usecase.GetPagedConversationsUIUseCase
 import com.upsaclay.message.domain.usecase.ListenRemoteConversationsUseCase
 import com.upsaclay.message.domain.usecase.ListenRemoteMessagesUseCase
 import com.upsaclay.message.domain.usecase.SendMessageUseCase
@@ -31,7 +30,6 @@ val messageDomainModule = module {
 
     singleOf(::CreateConversationUseCase)
     singleOf(::DeleteConversationUseCase)
-    singleOf(::GetPagedConversationsUIUseCase)
     singleOf(::GetFilteredUserUseCase)
     singleOf(::SendMessageUseCase)
 

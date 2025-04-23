@@ -286,6 +286,7 @@ fun NewMessageIndicator(
                     elevation = 2.dp,
                     shape = ShapeDefaults.Small
                 )
+                .clickable { onClick() }
         ) {
             Text(
                 text = stringResource(id = R.string.new_message),
@@ -294,7 +295,6 @@ fun NewMessageIndicator(
                 modifier = Modifier
                     .clip(ShapeDefaults.Small)
                     .background(Color.White)
-                    .clickable { onClick() }
                     .padding(horizontal = MaterialTheme.spacing.large)
                     .padding(vertical = MaterialTheme.spacing.smallMedium)
             )

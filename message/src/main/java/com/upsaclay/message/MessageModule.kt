@@ -1,7 +1,6 @@
 package com.upsaclay.message
 
 import com.upsaclay.message.domain.entity.Conversation
-import com.upsaclay.message.domain.usecase.GetNewConversationMessageUseCase
 import com.upsaclay.message.presentation.viewmodels.ChatViewModel
 import com.upsaclay.message.presentation.viewmodels.ConversationViewModel
 import com.upsaclay.message.presentation.viewmodels.CreateConversationViewModel
@@ -19,9 +18,8 @@ val messageModule = module {
             userRepository = get(),
             messageRepository = get(),
             sendMessageUseCase = get(),
-            createConversationUseCase = get()
+            createConversationUseCase = get(),
+            notificationUseCase = get()
         )
     }
-
-    singleOf(::GetNewConversationMessageUseCase)
 }

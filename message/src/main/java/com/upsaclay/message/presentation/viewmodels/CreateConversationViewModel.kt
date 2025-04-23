@@ -49,7 +49,8 @@ class CreateConversationViewModel(
         )
     }
 
-    suspend fun getConversation(interlocutorId: String): Conversation? = userConversationRepository.getConversation(interlocutorId)
+    suspend fun getConversation(interlocutorId: String): Conversation? =
+        userConversationRepository.getConversationFromLocal(interlocutorId)
 
     fun updateSearchedUser(userName: String) {
         _query.value = userName

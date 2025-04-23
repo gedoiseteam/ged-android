@@ -18,15 +18,7 @@ interface MessageDao {
         WHERE ${MessageField.CONVERSATION_ID} = :conversationId 
         ORDER BY ${MessageField.MESSAGE_TIMESTAMP} DESC
     """)
-    fun getPagedMessages(conversationId: Int): PagingSource<Int, LocalMessage>
-
-    @Query("""
-       SELECT * FROM $MESSAGES_TABLE_NAME 
-       WHERE ${MessageField.CONVERSATION_ID} = :conversationId
-       ORDER BY ${MessageField.MESSAGE_TIMESTAMP} DESC
-       LIMIT 1
-    """)
-    fun getLastMessage(conversationId: Int): Flow<LocalMessage?>
+    fun getMessages(conversationId: Int): Flow<List<LocalMessage>>
 
     @Query("""
         SELECT * FROM $MESSAGES_TABLE_NAME

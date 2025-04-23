@@ -228,6 +228,13 @@ fun AccountScreen(
                     }
                 )
 
+                accountInfos.forEach { accountInfo ->
+                    AccountInfoItem(
+                        modifier = Modifier.fillMaxWidth(),
+                        accountInfo = accountInfo
+                    )
+                }
+
                 if (user?.isMember == true) {
                     Row(
                         modifier = Modifier
@@ -250,13 +257,6 @@ fun AccountScreen(
                             modifier = Modifier.size(20.dp)
                         )
                     }
-                }
-
-                accountInfos.forEach { accountInfo ->
-                    AccountInfoItem(
-                        modifier = Modifier.fillMaxWidth(),
-                        accountInfo = accountInfo
-                    )
                 }
 
                 if (showBottomSheet) {

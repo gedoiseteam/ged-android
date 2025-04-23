@@ -9,15 +9,12 @@ import retrofit2.http.POST
 interface FCMApi {
     @FormUrlEncoded
     @POST("fcm/addToken")
-    suspend fun addFcmToken(
+    suspend fun addToken(
         @Field("userId") userId: String,
         @Field("token") value: String
     ): Response<ServerResponse>
 
     @FormUrlEncoded
     @POST("fcm/sendNotification")
-    suspend fun sendNotification(
-        @Field("recipientId") recipientId: String,
-        @Field("data") data: String
-    ): Response<ServerResponse>
+    suspend fun sendNotification(@Field("fcmMessage") fcmMessage: String): Response<ServerResponse>
 }

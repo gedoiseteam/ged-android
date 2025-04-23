@@ -32,7 +32,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.gson)
     implementation(libs.jakewharton.timber)
     implementation(libs.kotlinx.coroutines.core)
