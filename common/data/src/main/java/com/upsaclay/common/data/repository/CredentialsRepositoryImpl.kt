@@ -4,12 +4,11 @@ import com.upsaclay.common.data.formatHttpError
 import com.upsaclay.common.data.local.FCMLocalDataSource
 import com.upsaclay.common.data.remote.api.FCMApi
 import com.upsaclay.common.domain.d
+import com.upsaclay.common.domain.e
 import com.upsaclay.common.domain.entity.FcmToken
 import com.upsaclay.common.domain.repository.CredentialsRepository
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
-import timber.log.Timber.Forest.e
 import java.io.IOException
 
 class CredentialsRepositoryImpl(
