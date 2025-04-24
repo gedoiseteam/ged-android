@@ -24,12 +24,18 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ShapeDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -280,23 +286,21 @@ fun NewMessageIndicator(
             .padding(vertical = MaterialTheme.spacing.smallMedium),
         Arrangement.Center
     ) {
-        Box(
-            modifier = Modifier
-                .shadow(
-                    elevation = 2.dp,
-                    shape = ShapeDefaults.Small
-                )
-                .clickable { onClick() }
+        Surface(
+            modifier = Modifier.clickable { onClick() },
+            shadowElevation = 2.dp,
+            shape = ShapeDefaults.Small,
+            color = Color.White
         ) {
             Text(
+                modifier = Modifier
+                    .padding(
+                        horizontal = MaterialTheme.spacing.large,
+                        vertical = MaterialTheme.spacing.smallMedium
+                    ),
                 text = stringResource(id = R.string.new_message),
                 style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.black,
-                modifier = Modifier
-                    .clip(ShapeDefaults.Small)
-                    .background(Color.White)
-                    .padding(horizontal = MaterialTheme.spacing.large)
-                    .padding(vertical = MaterialTheme.spacing.smallMedium)
+                color = MaterialTheme.colorScheme.black
             )
         }
     }

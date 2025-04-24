@@ -7,7 +7,6 @@ import com.upsaclay.common.domain.entity.UserNotFoundException
 import com.upsaclay.common.domain.repository.UserRepository
 import com.upsaclay.common.domain.usecase.GenerateIdUseCase
 import com.upsaclay.common.domain.usecase.NotificationUseCase
-import com.upsaclay.common.domain.userFixture2
 import com.upsaclay.message.domain.entity.ChatEvent
 import com.upsaclay.message.domain.entity.Conversation
 import com.upsaclay.message.domain.entity.ConversationState
@@ -24,7 +23,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
@@ -36,17 +40,20 @@ class ChatViewModel(
     private val createConversationUseCase: CreateConversationUseCase,
     private val notificationUseCase: NotificationUseCase
 ): ViewModel() {
-    private val _event = MutableSharedFlow<ChatEvent>()
-    val event: Flow<ChatEvent> = _event
     private val currentUser: User? = userRepository.currentUser.value
     val messages: Flow<List<Message>> = messageRepository.getMessages(conversation.id)
+    val newMessage: Flow<ChatEvent.NewMessage> = messages
+        .distinctUntilChanged()
+        .mapNotNull { it.firstOrNull() }
+        .filter { it.senderId != currentUser?.id }
+        .map { ChatEvent.NewMessage(it) }
+
     private val _text = MutableStateFlow("")
     val text: StateFlow<String> = _text
 
     init {
         clearChatNotifications()
         seeMessage()
-        listenLastMessage()
     }
 
     fun updateTextToSend(text: String) {
@@ -89,19 +96,6 @@ class ChatViewModel(
                     messages
                         .filter { it.senderId != currentUser?.id }
                         .map { messageRepository.updateMessage(it.copy(seen = Seen())) }
-                }
-        }
-    }
-
-    private fun listenLastMessage() {
-        viewModelScope.launch {
-            messages
-                .distinctUntilChanged()
-                .collectLatest {
-                    val lastMessage = it.lastOrNull()
-                    if (lastMessage != null && lastMessage.senderId != currentUser?.id) {
-                        _event.emit(ChatEvent.NewMessage(lastMessage))
-                    }
                 }
         }
     }

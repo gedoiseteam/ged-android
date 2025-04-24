@@ -44,7 +44,6 @@ import com.upsaclay.common.presentation.theme.previewText
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.message.R
 import com.upsaclay.message.domain.conversationUIFixture
-import com.upsaclay.message.domain.entity.ChatEvent
 import com.upsaclay.message.domain.entity.Conversation
 import com.upsaclay.message.domain.entity.Message
 import com.upsaclay.message.domain.entity.MessageState
@@ -56,7 +55,6 @@ import com.upsaclay.message.presentation.components.NewMessageIndicator
 import com.upsaclay.message.presentation.components.ReceiveMessageItem
 import com.upsaclay.message.presentation.components.SentMessageItem
 import com.upsaclay.message.presentation.viewmodels.ChatViewModel
-import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -73,9 +71,7 @@ fun ChatScreen(
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val messages by chatViewModel.messages.collectAsState(emptyList())
-    val newMessage by chatViewModel.event
-        .mapNotNull { (it as? ChatEvent.NewMessage)?.message }
-        .collectAsState(null)
+    val newMessageEvent by chatViewModel.newMessage.collectAsState(null)
     val text by chatViewModel.text.collectAsState()
 
     Scaffold(
@@ -101,7 +97,7 @@ fun ChatScreen(
                 modifier = Modifier.weight(1f),
                 messages = messages,
                 interlocutor = conversation.interlocutor,
-                newMessage = newMessage
+                newMessage = newMessageEvent?.message
             )
 
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
@@ -231,7 +227,7 @@ private fun ChatScreenPreview() {
     var text by remember { mutableStateOf("") }
     var messages by remember { mutableStateOf(messagesFixture.sortedByDescending { it.date }) }
     var id by remember { mutableIntStateOf(10) }
-    var newMessage by remember { mutableStateOf<Message?>(null) }
+    var newMessage by remember { mutableStateOf<Message?>(messageFixture) }
 
     GedoiseTheme {
         Scaffold(
