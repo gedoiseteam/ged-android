@@ -18,24 +18,21 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.Person
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.drawable.IconCompat
+import com.upsaclay.common.R
+import com.upsaclay.common.domain.entity.SystemEvents
 import com.upsaclay.common.domain.entity.User
 import com.upsaclay.common.domain.repository.ImageRepository
-import com.upsaclay.common.domain.repository.UserRepository
 import com.upsaclay.common.domain.usecase.ConvertDateUseCase
 import com.upsaclay.common.domain.usecase.GenerateIdUseCase
+import com.upsaclay.common.domain.usecase.SystemEventsUseCase
 import com.upsaclay.gedoise.domain.repository.ScreenRepository
 import com.upsaclay.message.domain.ConversationMapper
 import com.upsaclay.message.domain.entity.Conversation
 import com.upsaclay.message.domain.entity.ConversationMessage
 import com.upsaclay.message.domain.entity.Message
 import com.upsaclay.message.domain.entity.MessageScreenRoute
-import com.upsaclay.message.domain.usecase.GetNewConversationMessageUseCase
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 
 private const val MESSAGE_CHANNEL_ID = "message_channel_id"
@@ -43,23 +40,25 @@ private const val MESSAGE_CHANNEL_ID = "message_channel_id"
 @SuppressLint("MissingPermission")
 class NotificationPresenter(
     private val context: Context,
-    private val userRepository: UserRepository,
     private val imageRepository: ImageRepository,
-    private val getNewConversationMessageUseCase: GetNewConversationMessageUseCase,
-    private val screenRepository: ScreenRepository
+    private val screenRepository: ScreenRepository,
+    private val systemEventsUseCase: SystemEventsUseCase
 ) {
     private val notificationManager = NotificationManagerCompat.from(context)
-    val currentUser: StateFlow<User?> = userRepository.currentUser
+    private val scope = CoroutineScope(Dispatchers.Main)
 
     fun start() {
+        listenSystemEvents()
         createMessageNotificationChannel()
-        listenNewMessages()
     }
 
     suspend fun showMessageNotification(conversationMessage: ConversationMessage) {
-        if (isCurrentMessageScreen(conversationMessage.conversation.id)) return
-        val message = conversationMessage.lastMessage ?: return
-
+        if (isCurrentMessageScreen(conversationMessage.conversation.id) ||
+            !notificationManager.areNotificationsEnabled()
+        ) {
+            return
+        }
+        val message = conversationMessage.lastMessage
         val interlocutor = conversationMessage.conversation.interlocutor
         val intent = makeConversationIntent(conversationMessage.conversation)
         val userIcon = createUserIcon(interlocutor.profilePictureUrl)
@@ -74,6 +73,24 @@ class NotificationPresenter(
         )
 
         notificationManager.notify(message.id, notification)
+    }
+
+    private fun listenSystemEvents() {
+        scope.launch {
+            systemEventsUseCase.systemEvents.collect { event ->
+                when (event) {
+                    is SystemEvents.ClearNotifications -> clearNotifications(event.notificationGroupId)
+                }
+            }
+        }
+    }
+
+    private fun clearNotifications(conversationId: String) {
+        notificationManager.activeNotifications.filter {
+            it.groupKey == conversationId
+        }.forEach {
+            notificationManager.cancel(it.id)
+        }
     }
 
     private fun isCurrentMessageScreen(conversationId: Int): Boolean {
@@ -91,22 +108,6 @@ class NotificationPresenter(
         }
 
         notificationManager.createNotificationChannel(channel)
-    }
-
-    private fun listenNewMessages() {
-        GlobalScope.launch(Dispatchers.Main) {
-            getNewConversationMessageUseCase()
-                .filter { it.isNotEmpty() }
-                .distinctUntilChanged()
-                .collectLatest { conversationsMessage ->
-                    conversationsMessage
-                        .filter {
-                            it.lastMessage?.isSeen() == false &&
-                                    it.lastMessage?.senderId != currentUser.value?.id
-                        }
-                        .forEach { showMessageNotification(it) }
-                }
-        }
     }
 
     private fun getCircledBitmap(bitmap: Bitmap): Bitmap {
@@ -157,7 +158,7 @@ class NotificationPresenter(
 
         return profilePicture?.let {
             IconCompat.createWithBitmap(getCircledBitmap(it))
-        } ?: IconCompat.createWithResource(context, com.upsaclay.common.R.drawable.default_profile_picture)
+        } ?: IconCompat.createWithResource(context, R.drawable.default_profile_picture)
     }
 
     private fun buildMessageNotification(
@@ -172,7 +173,7 @@ class NotificationPresenter(
         val notificationBuilder = NotificationCompat.Builder(context, MESSAGE_CHANNEL_ID)
             .setContentTitle(interlocutor.fullName)
             .setContentText(message.content)
-            .setSmallIcon(com.upsaclay.common.R.drawable.ic_stat_name)
+            .setSmallIcon(R.drawable.ic_notification)
             .setGroup(conversationId.toString())
             .setSortKey(messageKey)
             .setCategory(NotificationCompat.CATEGORY_MESSAGE)

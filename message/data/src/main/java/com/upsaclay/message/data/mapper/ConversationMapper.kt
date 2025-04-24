@@ -1,10 +1,10 @@
 package com.upsaclay.message.data.mapper
 
 import com.google.firebase.Timestamp
+import com.google.gson.GsonBuilder
 import com.upsaclay.common.domain.UrlUtils
 import com.upsaclay.common.domain.entity.User
 import com.upsaclay.common.domain.usecase.ConvertDateUseCase
-import com.upsaclay.common.domain.userFixture2
 import com.upsaclay.message.data.local.model.LocalConversation
 import com.upsaclay.message.data.local.model.LocalConversationMessage
 import com.upsaclay.message.data.local.model.LocalMessage
@@ -12,6 +12,8 @@ import com.upsaclay.message.data.remote.model.RemoteConversation
 import com.upsaclay.message.domain.entity.Conversation
 import com.upsaclay.message.domain.entity.ConversationMessage
 import com.upsaclay.message.domain.entity.ConversationState
+import com.upsaclay.message.domain.entity.Message
+import com.upsaclay.message.domain.entity.MessageState
 
 internal object ConversationMapper {
     fun toLocal(conversation: Conversation) = LocalConversation(
@@ -76,14 +78,7 @@ internal object ConversationMapper {
                 state = localConversationMessage.conversationState
             )
         ),
-        lastMessage = if(
-            localConversationMessage.messageId == null ||
-            localConversationMessage.senderId == null ||
-            localConversationMessage.recipientId == null ||
-            localConversationMessage.content == null ||
-            localConversationMessage.messageTimestamp == null ||
-            localConversationMessage.messageState == null
-        ) null else MessageMapper.toDomain(
+        lastMessage = MessageMapper.toDomain(
             LocalMessage(
                 messageId = localConversationMessage.messageId,
                 conversationId = localConversationMessage.conversationId,

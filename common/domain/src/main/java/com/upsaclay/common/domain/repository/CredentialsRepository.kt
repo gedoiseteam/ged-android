@@ -1,10 +1,10 @@
-package com.upsaclay.gedoise.domain.repository
+package com.upsaclay.common.domain.repository
 
-import com.upsaclay.gedoise.domain.entities.FcmToken
+import com.upsaclay.common.domain.entity.FcmToken
 import kotlinx.coroutines.flow.Flow
 
 interface CredentialsRepository {
-    val fcmToken: Flow<FcmToken?>
+    suspend fun getUnsentFcmToken(): FcmToken?
 
     suspend fun sendFcmToken(token: FcmToken)
 

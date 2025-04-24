@@ -1,4 +1,4 @@
-package com.upsaclay.gedoise.data.local
+package com.upsaclay.common.data.local
 
 import android.content.Context
 import androidx.datastore.core.DataStore
@@ -9,15 +9,15 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.upsaclay.common.data.getGsonFlowValue
 import com.upsaclay.common.data.getGsonValue
 import com.upsaclay.common.data.setGsonValue
-import com.upsaclay.gedoise.domain.entities.FcmToken
+import com.upsaclay.common.domain.entity.FcmToken
 import kotlinx.coroutines.flow.Flow
 
-class CredentialsDataStore(context: Context) {
+class FCMDataStore(context: Context) {
     private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "credentials")
     private val store = context.dataStore
     private val fcmTokenKey = stringPreferencesKey("fcmTokenKey")
 
-    fun getFcmToken(): Flow<FcmToken?> = store.getGsonFlowValue(fcmTokenKey)
+    suspend fun getFcmToken(): FcmToken? = store.getGsonValue(fcmTokenKey)
 
     suspend fun storeFcmToken(fcmToken: FcmToken) {
         store.setGsonValue(fcmTokenKey, fcmToken)

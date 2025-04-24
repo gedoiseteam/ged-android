@@ -49,33 +49,32 @@ fun ConversationItem(
     onClick: () -> Unit,
     onLongClick: () -> Unit
 ) {
-    val elapsedTimeValue = conversation.lastMessage?.let { lastMessage ->
-        when (val elapsedTime = GetElapsedTimeUseCase.fromLocalDateTime(lastMessage.date)) {
-            is ElapsedTime.Now -> stringResource(id = com.upsaclay.common.R.string.now)
+    val message = conversation.lastMessage
+    val elapsedTimeValue = when (val elapsedTime = GetElapsedTimeUseCase.fromLocalDateTime(message.date)) {
+        is ElapsedTime.Now -> stringResource(id = com.upsaclay.common.R.string.now)
 
-            is ElapsedTime.Minute -> stringResource(
-                com.upsaclay.common.R.string.minute_ago_short,
-                elapsedTime.value
-            )
+        is ElapsedTime.Minute -> stringResource(
+            com.upsaclay.common.R.string.minute_ago_short,
+            elapsedTime.value
+        )
 
-            is ElapsedTime.Hour -> stringResource(
-                com.upsaclay.common.R.string.hour_ago_short,
-                elapsedTime.value
-            )
+        is ElapsedTime.Hour -> stringResource(
+            com.upsaclay.common.R.string.hour_ago_short,
+            elapsedTime.value
+        )
 
-            is ElapsedTime.Day -> stringResource(
-                com.upsaclay.common.R.string.day_ago_short,
-                elapsedTime.value
-            )
+        is ElapsedTime.Day -> stringResource(
+            com.upsaclay.common.R.string.day_ago_short,
+            elapsedTime.value
+        )
 
-            is ElapsedTime.Week -> stringResource(
-                com.upsaclay.common.R.string.week_ago_short,
-                elapsedTime.value
-            )
+        is ElapsedTime.Week -> stringResource(
+            com.upsaclay.common.R.string.week_ago_short,
+            elapsedTime.value
+        )
 
-            is ElapsedTime.Later -> FormatLocalDateTimeUseCase.formatDayMonthYear(elapsedTime.value)
-        }
-    } ?: ""
+        is ElapsedTime.Later -> FormatLocalDateTimeUseCase.formatDayMonthYear(elapsedTime.value)
+    }
 
     Row(
         modifier = modifier
@@ -100,35 +99,26 @@ fun ConversationItem(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium)
         ) {
-            conversation.lastMessage?.let { message ->
-                val text = if (message.state == MessageState.SENT) message.content else stringResource(R.string.sending)
-                val isNotSender = message.senderId == conversation.interlocutor.id
+            val text = if (message.state == MessageState.SENT) message.content else stringResource(R.string.sending)
+            val isNotSender = message.senderId == conversation.interlocutor.id
 
-                if (isNotSender && !message.isSeen()) {
-                    UnreadConversationItem(
-                        modifier = Modifier
-                            .weight(1f)
-                            .testTag(stringResource(id = R.string.conversation_screen_unread_conversation_item_tag)),
-                        interlocutor = conversation.interlocutor,
-                        lastMessage = message,
-                        elapsedTime = elapsedTimeValue
-                    )
-                } else {
-                    ReadConversationItem(
-                        modifier = Modifier
-                            .weight(1f)
-                            .testTag(stringResource(id = R.string.conversation_screen_read_conversation_item_tag)),
-                        interlocutor = conversation.interlocutor,
-                        lastMessage = message.copy(content = text),
-                        elapsedTime = elapsedTimeValue
-                    )
-                }
-            } ?: run {
-                EmptyConversationItem(
+            if (isNotSender && !message.isSeen()) {
+                UnreadConversationItem(
                     modifier = Modifier
                         .weight(1f)
-                        .testTag(stringResource(id = R.string.conversation_screen_empty_conversation_item_tag)),
-                    interlocutor = conversation.interlocutor
+                        .testTag(stringResource(id = R.string.conversation_screen_unread_conversation_item_tag)),
+                    interlocutor = conversation.interlocutor,
+                    lastMessage = message,
+                    elapsedTime = elapsedTimeValue
+                )
+            } else {
+                ReadConversationItem(
+                    modifier = Modifier
+                        .weight(1f)
+                        .testTag(stringResource(id = R.string.conversation_screen_read_conversation_item_tag)),
+                    interlocutor = conversation.interlocutor,
+                    lastMessage = message.copy(content = text),
+                    elapsedTime = elapsedTimeValue
                 )
             }
         }
@@ -223,35 +213,6 @@ private fun UnreadConversationItem(
     )
 }
 
-@Composable
-private fun EmptyConversationItem(
-    modifier: Modifier = Modifier,
-    interlocutor: User
-) {
-    Column(modifier = modifier) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                modifier = Modifier.weight(1f, fill = false),
-                text = interlocutor.fullName,
-                style = MaterialTheme.typography.bodyMedium,
-                maxLines = 1,
-                fontWeight = FontWeight.SemiBold,
-                overflow = TextOverflow.Ellipsis
-            )
-        }
-
-        Spacer(modifier = Modifier.height(2.dp))
-
-        Text(
-            text = stringResource(id = R.string.tap_to_chat),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.previewText,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
-    }
-}
-
 /*
  =====================================================================
                                 Preview
@@ -280,19 +241,6 @@ private fun UnreadConversationItemPreview() {
             conversation = conversationUIFixture.copy(
                 lastMessage = messageFixture2
             ),
-            onClick = { },
-            onLongClick = { }
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun EmptyConversationPreview() {
-    GedoiseTheme {
-        ConversationItem(
-            modifier = Modifier.fillMaxWidth(),
-            conversation = conversationUIFixture.copy(lastMessage = null),
             onClick = { },
             onLongClick = { }
         )

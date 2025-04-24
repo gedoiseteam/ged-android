@@ -4,8 +4,6 @@ import com.upsaclay.message.domain.repository.MessageRepository
 import com.upsaclay.message.domain.repository.UserConversationRepository
 import com.upsaclay.message.domain.usecase.CreateConversationUseCase
 import com.upsaclay.message.domain.usecase.DeleteConversationUseCase
-import com.upsaclay.message.domain.usecase.GetNewConversationMessageUseCase
-import com.upsaclay.message.domain.usecase.GetPagedConversationsUIUseCase
 import com.upsaclay.message.domain.usecase.ListenRemoteConversationsUseCase
 import com.upsaclay.message.domain.usecase.ListenRemoteMessagesUseCase
 import io.mockk.coEvery
@@ -13,13 +11,11 @@ import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
-import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -29,8 +25,6 @@ class MessageUseCaseTest {
 
     private lateinit var createConversationUseCase: CreateConversationUseCase
     private lateinit var deleteConversationUseCase: DeleteConversationUseCase
-    private lateinit var getNewConversationMessageUseCase: GetNewConversationMessageUseCase
-    private lateinit var getPagedConversationsUIUseCase: GetPagedConversationsUIUseCase
     private lateinit var listenRemoteConversationsUseCase: ListenRemoteConversationsUseCase
     private lateinit var listenRemoteMessagesUseCase: ListenRemoteMessagesUseCase
 
@@ -38,12 +32,7 @@ class MessageUseCaseTest {
 
     @Before
     fun setUp() {
-        getPagedConversationsUIUseCase = GetPagedConversationsUIUseCase(userConversationRepository = userConversationRepository)
         createConversationUseCase = CreateConversationUseCase(userConversationRepository = userConversationRepository)
-        getNewConversationMessageUseCase = GetNewConversationMessageUseCase(
-            userConversationRepository = userConversationRepository,
-            messageRepository = messageRepository
-        )
         deleteConversationUseCase = DeleteConversationUseCase(
             userConversationRepository = userConversationRepository,
             messageRepository = messageRepository
@@ -58,16 +47,16 @@ class MessageUseCaseTest {
             scope = testScope
         )
 
-        coEvery { userConversationRepository.conversationsWithLastMessage } returns flowOf(conversationsMessageFixture)
-        coEvery { userConversationRepository.getConversations() } returns flowOf(conversationsFixture)
-        coEvery { userConversationRepository.getConversation(any()) } returns conversationFixture
+        coEvery { userConversationRepository.conversationsMessage } returns flowOf(conversationsMessageFixture)
+        coEvery { userConversationRepository.conversations } returns flowOf(conversationsFixture)
+        coEvery { userConversationRepository.getConversationFromLocal(any()) } returns conversationFixture
         coEvery { userConversationRepository.createConversation(any()) } returns Unit
         coEvery { userConversationRepository.updateConversation(any()) } returns Unit
         coEvery { userConversationRepository.deleteConversation(any()) } returns Unit
         coEvery { userConversationRepository.deleteLocalConversations() } returns Unit
         coEvery { userConversationRepository.listenRemoteConversations() } returns Unit
         coEvery { messageRepository.listenRemoteMessages(any()) } returns Unit
-        coEvery { messageRepository.createMessage(any()) } returns Unit
+        coEvery { messageRepository.addMessage(any()) } returns Unit
         coEvery { messageRepository.updateMessage(any()) } returns Unit
         coEvery { messageRepository.upsertMessage(any()) } returns Unit
         coEvery { messageRepository.deleteLocalMessages() } returns Unit
@@ -137,26 +126,5 @@ class MessageUseCaseTest {
 
         // Then
         assertFalse(listenRemoteMessagesUseCase.job!!.isActive)
-    }
-
-    @Test
-    fun getNewConversationMessageUseCase_should_get_new_conversation_messages() = runTest {
-        // Given
-        val conversationMessage = conversationMessageFixture.copy(
-            lastMessage = conversationMessageFixture.lastMessage!!.copy(seen = null)
-        )
-        coEvery { userConversationRepository.getConversations() } returns flowOf(
-            listOf(conversationMessage.conversation)
-        )
-        coEvery { messageRepository.getRemoteMessages(any()) } returns flowOf(
-            listOf(conversationMessage.lastMessage!!)
-        )
-
-        // When
-        val result = getNewConversationMessageUseCase()
-
-        // Then
-        assertEquals(listOf(conversationMessage), result.toList().get(0))
-        coVerify { messageRepository.getRemoteMessages(conversationMessage.conversation.id) }
     }
 }

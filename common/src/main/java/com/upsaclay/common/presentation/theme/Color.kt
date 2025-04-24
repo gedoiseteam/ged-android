@@ -68,7 +68,6 @@ val ColorScheme.gold: Color
     @Composable
     get() = Color(0xFFB98129)
 
-
 val ColorScheme.chatInputBackground: Color
     @Composable
     get() = if(isSystemInDarkTheme()) Color(0xFF323232) else Color(0xFFEEEEEE)

@@ -1,6 +1,6 @@
 package com.upsaclay.news.data
 
-import com.upsaclay.common.data.SERVER_1_RETROFIT_QUALIFIER
+import com.upsaclay.common.data.GED_SERVER_QUALIFIER
 import com.upsaclay.common.domain.e
 import com.upsaclay.news.data.local.AnnouncementLocalDataSource
 import com.upsaclay.news.data.remote.AnnouncementRemoteDataSource
@@ -20,7 +20,7 @@ private val BACKGROUND_SCOPE = named("BackgroundScope")
 
 val newsDataModule = module {
     single {
-        get<Retrofit>(qualifier = named(SERVER_1_RETROFIT_QUALIFIER))
+        get<Retrofit>(GED_SERVER_QUALIFIER)
             .create(AnnouncementApi::class.java)
     }
 

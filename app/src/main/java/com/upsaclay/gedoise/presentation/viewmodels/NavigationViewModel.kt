@@ -9,35 +9,36 @@ import com.upsaclay.common.domain.entity.User
 import com.upsaclay.common.domain.repository.UserRepository
 import com.upsaclay.gedoise.domain.entities.MainScreenRoute
 import com.upsaclay.gedoise.domain.repository.ScreenRepository
-import com.upsaclay.gedoise.domain.usecase.ClearDataUseCase
-import com.upsaclay.gedoise.domain.usecase.StartListeningDataUseCase
-import com.upsaclay.gedoise.domain.usecase.StopListeningDataUseCase
 import com.upsaclay.gedoise.presentation.NavigationItem
 import com.upsaclay.message.domain.entity.MessageScreenRoute
 import com.upsaclay.message.domain.repository.UserConversationRepository
 import com.upsaclay.news.domain.entity.NewsScreenRoute
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
 
 class NavigationViewModel(
-    private val userRepository: UserRepository,
+    userRepository: UserRepository,
     private val userConversationRepository: UserConversationRepository,
     private val screenRepository: ScreenRepository,
-    private val authenticationRepository: AuthenticationRepository,
-    private val startListeningDataUseCase: StartListeningDataUseCase,
-    private val stopListeningDataUseCase: StopListeningDataUseCase,
-    private val clearDataUseCase: ClearDataUseCase,
+    private val authenticationRepository: AuthenticationRepository
 ): ViewModel() {
-    private val _routeToNavigate = MutableStateFlow<ScreenRoute>(MainScreenRoute.Splash)
-    val routeToNavigate: Flow<ScreenRoute> = _routeToNavigate
+    private val intentScreenNavigate = MutableStateFlow<ScreenRoute?>(null)
+
+    private val _screenRouteToNavigate = MutableSharedFlow<ScreenRoute>(replay = 3)
+    val screenRouteToNavigate: Flow<ScreenRoute> = _screenRouteToNavigate
+
+    private val _startDestinationScreenRoute = MutableStateFlow<ScreenRoute>(MainScreenRoute.Splash)
+    val startDestinationScreenRoute: StateFlow<ScreenRoute> = _startDestinationScreenRoute
 
     private val _homeNavigationItem = MutableStateFlow(NavigationItem.Home())
     val homeNavigationItem: Flow<NavigationItem> = _homeNavigationItem
@@ -48,70 +49,89 @@ class NavigationViewModel(
     val currentUser: StateFlow<User?> = userRepository.currentUser
 
     init {
-        watchAuthenticationState()
+        updateStartDestinationScreenRoute()
+        updateScreenRoutes()
         updateMessageNavigationItemBadges()
-        verifyCurrentUser()
     }
 
-    fun navigateTo(screenRoute: ScreenRoute) {
-        val route = when(screenRoute) {
-            is MessageScreenRoute.Chat -> MessageScreenRoute.Chat(screenRoute.conversation)
-            else -> return
-        }
-        viewModelScope.launch {
-            _routeToNavigate.emit(route)
-        }
-    }
-
-    fun setCurrentScreen(screenRoute: ScreenRoute?) {
+    fun storeCurrentScreen(screenRoute: ScreenRoute?) {
         screenRepository.setCurrentScreenRoute(screenRoute)
     }
 
-    private fun watchAuthenticationState() {
+    fun updateIntentScreenNavigate(screenRoute: ScreenRoute) {
+        intentScreenNavigate.value = screenRoute
+    }
+
+    private fun updateStartDestinationScreenRoute() {
         viewModelScope.launch {
             authenticationRepository.isAuthenticated
                 .filterNotNull()
-                .collectLatest {
-                    if (it) {
-                        startListeningDataUseCase()
-                        _routeToNavigate.emit(NewsScreenRoute.News)
+                .collect { isAuthenticated ->
+                    _startDestinationScreenRoute.value = if (isAuthenticated) {
+                        NewsScreenRoute.News
                     } else {
-                        stopListeningDataUseCase()
-                        _routeToNavigate.emit(AuthenticationScreenRoute.Authentication)
-                        delay(2000)
-                        clearDataUseCase()
+                        AuthenticationScreenRoute.Authentication
                     }
                 }
         }
     }
 
+    private fun updateScreenRoutes() {
+        viewModelScope.launch {
+            combine(
+                authenticationRepository.isAuthenticated.filterNotNull(),
+                intentScreenNavigate
+            ) { isAuthenticated, intentScreen ->
+                if (isAuthenticated) {
+                    intentScreen
+                }
+                else {
+                    if (screenRepository.currentScreenRoute !is AuthenticationScreenRoute) {
+                        AuthenticationScreenRoute.Authentication
+                    }
+                    else null
+                }
+            }
+                .filterNotNull()
+                .collect {
+                    navigate(it)
+                }
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
     private fun updateMessageNavigationItemBadges() {
         currentUser
             .filterNotNull()
             .distinctUntilChangedBy { it.id }
-            .map { currentUser ->
-                userConversationRepository.conversationsWithLastMessage
+            .mapLatest { currentUser ->
+                userConversationRepository.conversationsMessage
                     .map { conversationsMessage ->
                         conversationsMessage
-                            .filter { it.lastMessage?.senderId != currentUser.id }
-                            .filter { it.lastMessage?.isSeen() == false }
-                            .mapNotNull { it.lastMessage }
+                            .filterNot { it.lastMessage.isSeen() }
+                            .filter { it.lastMessage.senderId != currentUser.id }
                     }.collect { messages ->
                         _messageNavigationItem.value = NavigationItem.Message(badges = messages.size)
                     }
             }.launchIn(viewModelScope)
     }
 
-    private fun verifyCurrentUser() {
-        viewModelScope.launch {
-            userRepository.getCurrentUser()?.let { currentUser ->
-                userRepository.getUser(currentUser.id)?.let {
-                    userRepository.setCurrentUser(it)
-                } ?: run {
-                    authenticationRepository.logout()
-                    userRepository.deleteCurrentUser()
-                }
+    private suspend fun navigate(screenRoute: ScreenRoute) {
+        val routes: Array<ScreenRoute> = when(screenRoute) {
+            is MessageScreenRoute.Chat -> {
+                arrayOf(
+                    MessageScreenRoute.Conversation,
+                    MessageScreenRoute.Chat(screenRoute.conversation)
+                )
             }
+            is AuthenticationScreenRoute.Authentication -> {
+                arrayOf(AuthenticationScreenRoute.Authentication)
+            }
+            else -> return
+        }
+
+        routes.forEach {
+            _screenRouteToNavigate.emit(it)
         }
     }
 }

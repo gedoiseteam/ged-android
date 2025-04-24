@@ -1,8 +1,10 @@
 package com.upsaclay.message.data.remote.api
 
 import com.google.firebase.Firebase
+import com.google.firebase.firestore.ListenSource
 import com.google.firebase.firestore.MetadataChanges
 import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.SnapshotListenOptions
 import com.google.firebase.firestore.Source
 import com.google.firebase.firestore.firestore
 import com.upsaclay.common.domain.e
@@ -24,16 +26,14 @@ internal class MessageApiImpl : MessageApi {
     override fun listenMessages(conversationId: Int): Flow<List<RemoteMessage>> = callbackFlow {
         val listener = conversationsCollection.document(conversationId.toString())
             .collection(MESSAGES_TABLE_NAME)
-            .orderBy(MESSAGE_TIMESTAMP, Query.Direction.DESCENDING)
             .addSnapshotListener(MetadataChanges.INCLUDE) { snapshot, error ->
                 error?.let {
                     e("Error getting last messages", it)
                     return@addSnapshotListener
-
                 }
 
                 val messages = snapshot?.documents
-                    ?.filterNot { it.metadata.isFromCache }
+                    ?.filterNot { it.metadata.isFromCache || it.metadata.hasPendingWrites() }
                     ?.mapNotNull { document ->
                         document.toObject(RemoteMessage::class.java)
                     }

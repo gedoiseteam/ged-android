@@ -16,13 +16,13 @@ object ConversationMapper {
         state = conversationUI.state
     )
 
-    fun toConversationUI(conversation: Conversation, message: Message?): ConversationUI {
+    fun toConversationUI(conversationMessage: ConversationMessage): ConversationUI {
         return ConversationUI(
-            id = conversation.id,
-            interlocutor = conversation.interlocutor,
-            lastMessage = message,
-            createdAt = conversation.createdAt,
-            state = conversation.state
+            id = conversationMessage.conversation.id,
+            interlocutor = conversationMessage.conversation.interlocutor,
+            lastMessage = conversationMessage.lastMessage,
+            createdAt = conversationMessage.conversation.createdAt,
+            state = conversationMessage.conversation.state
         )
     }
 
@@ -40,10 +40,28 @@ object ConversationMapper {
             .toJson(conversation)
     }
 
-    fun fromJson(conversationJson: String): Conversation {
+    fun toJson(conversationMessage: ConversationMessage): String {
         return GsonBuilder()
             .registerTypeAdapter(LocalDateTime::class.java, LocalDateTimeSerializer)
             .create()
-            .fromJson(conversationJson, Conversation::class.java)
+            .toJson(conversationMessage)
+    }
+
+    fun conversationFromJson(conversationJson: String): Conversation? {
+        return runCatching {
+            GsonBuilder()
+                .registerTypeAdapter(LocalDateTime::class.java, LocalDateTimeSerializer)
+                .create()
+                .fromJson(conversationJson, Conversation::class.java)
+        }.getOrNull()
+    }
+
+    fun conversationMessageFromJson(conversationMessageJson: String): ConversationMessage? {
+        return runCatching {
+            GsonBuilder()
+                .registerTypeAdapter(LocalDateTime::class.java, LocalDateTimeSerializer)
+                .create()
+                .fromJson(conversationMessageJson, ConversationMessage::class.java)
+        }.getOrNull()
     }
 }

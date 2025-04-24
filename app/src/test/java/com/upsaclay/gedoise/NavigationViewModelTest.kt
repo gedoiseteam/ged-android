@@ -30,9 +30,6 @@ import kotlin.test.assertEquals
 @OptIn(ExperimentalCoroutinesApi::class)
 class NavigationViewModelTest {
     private val userRepository: UserRepository = mockk()
-    private val startListeningDataUseCase: StartListeningDataUseCase = mockk()
-    private val stopListeningDataUseCase: StopListeningDataUseCase = mockk()
-    private val clearDataUseCase: ClearDataUseCase = mockk()
     private val userConversationRepository: UserConversationRepository = mockk()
     private val screenRepository: ScreenRepository = mockk()
     private val authenticationRepository: AuthenticationRepository = mockk()
@@ -44,7 +41,7 @@ class NavigationViewModelTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
 
-        every { userConversationRepository.conversationsWithLastMessage } returns flowOf(conversationsMessageFixture)
+        every { userConversationRepository.conversationsMessage } returns flowOf(conversationsMessageFixture)
         every { screenRepository.currentScreenRoute } returns null
         every { screenRepository.setCurrentScreenRoute(any()) } returns Unit
         every { userRepository.currentUser } returns MutableStateFlow(userFixture)
@@ -53,9 +50,6 @@ class NavigationViewModelTest {
         coEvery { userRepository.getUsers() } returns usersFixture
         coEvery { userRepository.getUser(any()) } returns userFixture
         coEvery { userRepository.setCurrentUser(any()) } returns Unit
-        coEvery { startListeningDataUseCase() } returns Unit
-        coEvery { stopListeningDataUseCase() } returns Unit
-        coEvery { clearDataUseCase() } returns Unit
     }
 
     @Test
@@ -66,9 +60,6 @@ class NavigationViewModelTest {
         // When
         navigationViewModel = NavigationViewModel(
             userRepository = userRepository,
-            startListeningDataUseCase = startListeningDataUseCase,
-            stopListeningDataUseCase = stopListeningDataUseCase,
-            clearDataUseCase = clearDataUseCase,
             userConversationRepository = userConversationRepository,
             screenRepository = screenRepository,
             authenticationRepository = authenticationRepository
@@ -76,64 +67,5 @@ class NavigationViewModelTest {
 
         // Then
         assertEquals(userFixture, navigationViewModel.currentUser.value)
-    }
-
-    @Test
-    fun data_listening_should_start_when_user_is_authenticated() {
-        // When
-        navigationViewModel = NavigationViewModel(
-            userRepository = userRepository,
-            startListeningDataUseCase = startListeningDataUseCase,
-            stopListeningDataUseCase = stopListeningDataUseCase,
-            clearDataUseCase = clearDataUseCase,
-            userConversationRepository = userConversationRepository,
-            screenRepository = screenRepository,
-            authenticationRepository = authenticationRepository
-        )
-
-        // Then
-        coVerify { startListeningDataUseCase() }
-    }
-
-    @Test
-    fun data_listening_should_stop_when_user_is_not_authenticated() {
-        // Given
-        every { authenticationRepository.isAuthenticated } returns flowOf(false)
-
-        // When
-        navigationViewModel = NavigationViewModel(
-            userRepository = userRepository,
-            startListeningDataUseCase = startListeningDataUseCase,
-            stopListeningDataUseCase = stopListeningDataUseCase,
-            clearDataUseCase = clearDataUseCase,
-            userConversationRepository = userConversationRepository,
-            screenRepository = screenRepository,
-            authenticationRepository = authenticationRepository
-        )
-
-        // Then
-        coVerify { stopListeningDataUseCase() }
-    }
-
-    @Test
-    fun local_data_should_be_deleted_when_user_is_not_authenticated() = runTest {
-        // Given
-        every { authenticationRepository.isAuthenticated } returns flowOf(false)
-
-        // When
-        navigationViewModel = NavigationViewModel(
-            userRepository = userRepository,
-            startListeningDataUseCase = startListeningDataUseCase,
-            stopListeningDataUseCase = stopListeningDataUseCase,
-            clearDataUseCase = clearDataUseCase,
-            userConversationRepository = userConversationRepository,
-            screenRepository = screenRepository,
-            authenticationRepository = authenticationRepository
-        )
-
-        advanceUntilIdle()
-
-        // Then
-        coVerify { clearDataUseCase() }
     }
 }

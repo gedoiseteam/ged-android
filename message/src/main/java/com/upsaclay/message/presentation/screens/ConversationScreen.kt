@@ -26,6 +26,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,13 +42,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
-import androidx.paging.LoadState
-import androidx.paging.compose.LazyPagingItems
-import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.compose.itemContentType
-import androidx.paging.compose.itemKey
 import com.upsaclay.common.domain.entity.ErrorType
-import com.upsaclay.common.presentation.components.CircularProgressBar
 import com.upsaclay.common.presentation.components.ClickableItem
 import com.upsaclay.common.presentation.components.LoadingDialog
 import com.upsaclay.common.presentation.components.SensibleActionDialog
@@ -75,7 +70,7 @@ fun ConversationScreen(
     snackbarHostState: SnackbarHostState,
     conversationViewModel: ConversationViewModel = koinViewModel()
 ) {
-    val conversations = conversationViewModel.conversations.collectAsLazyPagingItems()
+    val conversations by conversationViewModel.conversations.collectAsState(emptyList())
     val context = LocalContext.current
 
     var conversationClicked by remember { mutableStateOf<ConversationUI?>(null) }
@@ -140,7 +135,7 @@ fun ConversationScreen(
 
     Box(modifier = Modifier.fillMaxSize()) {
         ConversationFeed(
-            conversationItems = conversations,
+            conversations = conversations,
             onClick = {
                 val conversation = ConversationMapper.toConversation(it)
                 navController.navigate(MessageScreenRoute.Chat(conversation).route)
@@ -186,18 +181,17 @@ fun ConversationScreen(
 
 @Composable
 private fun ConversationFeed(
-    conversationItems: LazyPagingItems<ConversationUI>,
+    conversations: List<ConversationUI>,
     onClick: (ConversationUI) -> Unit,
     onLongClick: (ConversationUI) -> Unit,
     onCreateClick: () -> Unit
 ) {
     LazyColumn {
-        items(
-            count = conversationItems.itemCount,
-            key = conversationItems.itemKey { it.id },
-            contentType = conversationItems.itemContentType { "Conversation feed" }
-        ) { index ->
-            conversationItems[index]?.let { conversation ->
+        if (conversations.isEmpty()) {
+            item { StartConversation(onCreateClick) }
+        } else {
+            items(conversations.size) { index ->
+                val conversation = conversations[index]
                 ConversationItem(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -206,64 +200,6 @@ private fun ConversationFeed(
                     onClick = { onClick(conversation) },
                     onLongClick = { onLongClick(conversation) }
                 )
-            }
-        }
-
-        item {
-            when (conversationItems.loadState.refresh) {
-                is LoadState.Error -> {
-                    Text(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = stringResource(R.string.error_fetch_conversations),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.error,
-                        textAlign = TextAlign.Center
-                    )
-                }
-
-                is LoadState.Loading -> {
-                    Column(
-                        modifier = Modifier.fillParentMaxSize(),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        CircularProgressBar()
-                    }
-                }
-
-                else -> {}
-            }
-        }
-
-        item {
-            when (conversationItems.loadState.append) {
-                is LoadState.Error -> {
-                    Text(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = stringResource(R.string.error_fetch_messages),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.error,
-                        textAlign = TextAlign.Center
-                    )
-                }
-
-                is LoadState.Loading -> {
-                    Column(
-                        modifier = Modifier.fillParentMaxSize(),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        CircularProgressBar()
-                    }
-                }
-
-                else -> {}
-            }
-        }
-
-        if (conversationItems.itemCount == 0) {
-            item {
-                StartConversation(onCreateClick)
             }
         }
     }
@@ -307,9 +243,7 @@ private fun StartConversation(onCreateClick: () -> Unit) {
 @Preview(showBackground = true)
 @Composable
 private fun ConversationsScreenPreview() {
-    val conversations = conversationsUIFixture.sortedByDescending {
-        it.lastMessage?.date ?: it.createdAt
-    }
+    val conversations = conversationsUIFixture.sortedByDescending { it.lastMessage.date }
 
     GedoiseTheme {
         Box(

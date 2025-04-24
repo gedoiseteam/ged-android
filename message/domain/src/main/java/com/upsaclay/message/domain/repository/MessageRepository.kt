@@ -1,19 +1,16 @@
 package com.upsaclay.message.domain.repository
 
-import androidx.paging.PagingData
 import com.upsaclay.message.domain.entity.Message
 import kotlinx.coroutines.flow.Flow
 
 interface MessageRepository {
-    fun getMessages(conversationId: Int): Flow<PagingData<Message>>
-
-    fun getLastMessage(conversationId: Int): Flow<Message>
+    fun getMessages(conversationId: Int): Flow<List<Message>>
 
     fun getUnreadMessages(conversationId: Int): Flow<List<Message>>
 
     fun getRemoteMessages(conversationId: Int): Flow<List<Message>>
 
-    suspend fun createMessage(message: Message)
+    suspend fun addMessage(message: Message)
 
     suspend fun updateMessage(message: Message)
 

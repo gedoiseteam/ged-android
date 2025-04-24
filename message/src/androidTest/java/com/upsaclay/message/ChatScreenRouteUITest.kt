@@ -6,6 +6,7 @@ import androidx.navigation.testing.TestNavHostController
 import com.upsaclay.message.presentation.viewmodels.ChatViewModel
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
 import org.junit.Rule
 
@@ -18,7 +19,7 @@ class ChatScreenRouteUITest {
 
     @Before
     fun setUp() {
-        every { chatViewModel.textToSend } returns ""
+        every { chatViewModel.text } returns MutableStateFlow("")
         every { chatViewModel.sendMessage() } returns Unit
     }
 }

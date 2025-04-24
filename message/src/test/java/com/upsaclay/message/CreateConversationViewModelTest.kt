@@ -38,7 +38,7 @@ class CreateConversationViewModelTest {
 
         every { userRepository.currentUser } returns MutableStateFlow(userFixture)
         coEvery { getFilteredUserUseCase(any()) } returns usersFixture
-        coEvery { userConversationRepository.getConversation(any()) } returns conversationFixture
+        coEvery { userConversationRepository.getConversationFromLocal(any()) } returns conversationFixture
         coEvery { userRepository.getUsers() } returns usersFixture
 
         createConversationViewModel = CreateConversationViewModel(
@@ -81,7 +81,7 @@ class CreateConversationViewModelTest {
     fun getConversation_should_return_null_when_no_interlocutor_found() = runTest {
         // Given
         val interlocutorId = "unknown"
-        coEvery { userConversationRepository.getConversation(interlocutorId) } returns null
+        coEvery { userConversationRepository.getConversationFromLocal(interlocutorId) } returns null
 
         // When
         val result = createConversationViewModel.getConversation(interlocutorId)

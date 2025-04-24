@@ -2,23 +2,22 @@ package com.upsaclay.gedoise
 
 import androidx.room.Room
 import com.upsaclay.common.AndroidConnectivityObserver
-import com.upsaclay.common.data.SERVER_1_RETROFIT_QUALIFIER
+import com.upsaclay.common.data.GED_SERVER_QUALIFIER
 import com.upsaclay.common.domain.e
 import com.upsaclay.gedoise.data.GedoiseDatabase
-import com.upsaclay.gedoise.data.api.CredentialsApi
-import com.upsaclay.gedoise.data.local.CredentialsDataStore
-import com.upsaclay.gedoise.data.local.CredentialsLocalDataSource
-import com.upsaclay.gedoise.data.repository.CredentialsRepositoryImpl
+import com.upsaclay.common.data.remote.api.FCMApi
+import com.upsaclay.common.data.local.FCMDataStore
+import com.upsaclay.common.data.local.FCMLocalDataSource
 import com.upsaclay.gedoise.data.repository.ScreenRepositoryImpl
 import com.upsaclay.common.domain.ConnectivityObserver
-import com.upsaclay.gedoise.domain.repository.CredentialsRepository
 import com.upsaclay.gedoise.domain.repository.ScreenRepository
 import com.upsaclay.gedoise.domain.usecase.ClearDataUseCase
 import com.upsaclay.gedoise.domain.usecase.StartListeningDataUseCase
 import com.upsaclay.gedoise.domain.usecase.StopListeningDataUseCase
-import com.upsaclay.gedoise.domain.usecase.TokenUseCase
+import com.upsaclay.gedoise.domain.usecase.FCMTokenUseCase
 import com.upsaclay.gedoise.presentation.NotificationPresenter
 import com.upsaclay.gedoise.presentation.viewmodels.AccountViewModel
+import com.upsaclay.gedoise.presentation.viewmodels.MainViewModel
 import com.upsaclay.gedoise.presentation.viewmodels.NavigationViewModel
 import com.upsaclay.gedoise.presentation.viewmodels.ProfileViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -56,8 +55,8 @@ val appModule = module {
     }
 
     single {
-        get<Retrofit>(qualifier = named(SERVER_1_RETROFIT_QUALIFIER))
-            .create(CredentialsApi::class.java)
+        get<Retrofit>(GED_SERVER_QUALIFIER)
+            .create(FCMApi::class.java)
     }
 
     single { get<GedoiseDatabase>().announcementDao() }
@@ -70,17 +69,18 @@ val appModule = module {
     viewModelOf(::NavigationViewModel)
     viewModelOf(::ProfileViewModel)
     viewModelOf(::AccountViewModel)
+    viewModelOf(::MainViewModel)
 
     singleOf(::ClearDataUseCase)
     singleOf(::StartListeningDataUseCase)
     singleOf(::StopListeningDataUseCase)
 
     singleOf(::ScreenRepositoryImpl) { bind<ScreenRepository>() }
-    singleOf(::CredentialsRepositoryImpl) { bind<CredentialsRepository>() }
-    singleOf(::CredentialsLocalDataSource)
-    singleOf(::CredentialsDataStore)
+    singleOf(::FCMLocalDataSource)
+    singleOf(::FCMDataStore)
     single {
-        TokenUseCase(
+        FCMTokenUseCase(
+            userRepository = get(),
             credentialsRepository = get(),
             authenticationRepository = get(),
             connectivityObserver = get(),

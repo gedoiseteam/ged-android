@@ -13,7 +13,9 @@ class ListenRemoteConversationsUseCase(
 
     fun start() {
         job?.cancel()
-        job = scope.launch { userConversationRepository.listenRemoteConversations() }
+        job = scope.launch {
+            userConversationRepository.listenRemoteConversations()
+        }
     }
 
     fun stop() {

@@ -1,14 +1,18 @@
 package com.upsaclay.message
 
-import androidx.paging.PagingData
+import com.upsaclay.common.domain.entity.UserNotFoundException
 import com.upsaclay.common.domain.repository.UserRepository
+import com.upsaclay.common.domain.usecase.NotificationUseCase
 import com.upsaclay.common.domain.userFixture
 import com.upsaclay.message.domain.conversationFixture
+import com.upsaclay.message.domain.conversationsMessageFixture
 import com.upsaclay.message.domain.entity.ConversationState
-import com.upsaclay.message.domain.messageFixture
+import com.upsaclay.message.domain.entity.Message
 import com.upsaclay.message.domain.messagesFixture
 import com.upsaclay.message.domain.repository.MessageRepository
+import com.upsaclay.message.domain.repository.UserConversationRepository
 import com.upsaclay.message.domain.usecase.CreateConversationUseCase
+import com.upsaclay.message.domain.usecase.SendMessageUseCase
 import com.upsaclay.message.presentation.viewmodels.ChatViewModel
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -30,6 +34,9 @@ class ChatViewModelTest {
     private val createConversationUseCase: CreateConversationUseCase = mockk()
     private val userRepository: UserRepository = mockk()
     private val messageRepository: MessageRepository = mockk()
+    private val userConversationRepository: UserConversationRepository = mockk()
+    private val sendMessageUseCase: SendMessageUseCase = mockk()
+    private val notificationUseCase: NotificationUseCase = mockk()
 
     private lateinit var chatViewModel: ChatViewModel
     private val testDispatcher = UnconfinedTestDispatcher()
@@ -39,23 +46,30 @@ class ChatViewModelTest {
         Dispatchers.setMain(testDispatcher)
 
         every { userRepository.currentUser } returns MutableStateFlow(userFixture)
-        every { messageRepository.getMessages(any()) } returns flowOf(PagingData.from(messagesFixture))
-        every { messageRepository.getLastMessage(any()) } returns flowOf(messageFixture)
-        coEvery { messageRepository.createMessage(any()) } returns Unit
+        every { userConversationRepository.conversationsMessage } returns flowOf(conversationsMessageFixture)
+        every { messageRepository.getMessages(any()) } returns flowOf(messagesFixture)
+        every { messageRepository.getUnreadMessages(any()) } returns flowOf(messagesFixture)
+        coEvery { messageRepository.addMessage(any()) } returns Unit
+        coEvery { messageRepository.updateMessage(any()) } returns Unit
         coEvery { createConversationUseCase(any()) } returns Unit
+        coEvery { notificationUseCase.clearNotifications(any()) } returns Unit
+        coEvery { notificationUseCase.sendNotificationToFCM<Message>(any(), any()) } returns Unit
 
         chatViewModel = ChatViewModel(
             conversation = conversationFixture,
             userRepository = userRepository,
             messageRepository = messageRepository,
-            createConversationUseCase = createConversationUseCase
+            createConversationUseCase = createConversationUseCase,
+            sendMessageUseCase = sendMessageUseCase,
+            notificationUseCase = notificationUseCase,
+
         )
     }
 
     @Test
     fun default_values_are_correct() = runTest {
         // Then
-        assertEquals("", chatViewModel.textToSend)
+        assertEquals("", chatViewModel.text.value)
     }
 
     @Test
@@ -67,7 +81,7 @@ class ChatViewModelTest {
         chatViewModel.updateTextToSend(text)
 
         // Then
-        assertEquals(text, chatViewModel.textToSend)
+        assertEquals(text, chatViewModel.text.value)
     }
 
     @Test
@@ -79,16 +93,7 @@ class ChatViewModelTest {
         chatViewModel.sendMessage()
 
         // Then
-        coVerify { messageRepository.createMessage(any()) }
-    }
-
-    @Test
-    fun send_message_should_not_send_message_when_text_is_empty() {
-        // When
-        chatViewModel.sendMessage()
-
-        // Then
-        coVerify(exactly = 0) { messageRepository.createMessage(any()) }
+        coVerify { sendMessageUseCase(any(), any(), any()) }
     }
 
     @Test
@@ -100,7 +105,7 @@ class ChatViewModelTest {
         chatViewModel.sendMessage()
 
         // Then
-        assertEquals("", chatViewModel.textToSend)
+        assertEquals("", chatViewModel.text.value)
     }
 
     @Test
@@ -112,6 +117,8 @@ class ChatViewModelTest {
             userRepository = userRepository,
             messageRepository = messageRepository,
             createConversationUseCase = createConversationUseCase,
+            sendMessageUseCase = sendMessageUseCase,
+            notificationUseCase = notificationUseCase
         )
         chatViewModel.updateTextToSend("Hello")
 
@@ -119,7 +126,7 @@ class ChatViewModelTest {
         chatViewModel.sendMessage()
 
         // Then
-        coVerify { createConversationUseCase(conversation) }
+        coVerify { sendMessageUseCase(any(), any(), any()) }
     }
 
     @Test
@@ -127,10 +134,12 @@ class ChatViewModelTest {
         // Given
         val conversation = conversationFixture.copy(state = ConversationState.CREATED)
         chatViewModel = ChatViewModel(
-            conversation = conversation,
+            conversation = conversationFixture,
             userRepository = userRepository,
             messageRepository = messageRepository,
             createConversationUseCase = createConversationUseCase,
+            sendMessageUseCase = sendMessageUseCase,
+            notificationUseCase = notificationUseCase
         )
         chatViewModel.updateTextToSend("Hello")
 
@@ -139,10 +148,10 @@ class ChatViewModelTest {
 
         // Then
         coVerify(exactly = 0) { createConversationUseCase(conversation) }
-        coVerify { messageRepository.createMessage(any()) }
+        coVerify { sendMessageUseCase(any(), any(), any()) }
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test(expected = UserNotFoundException::class)
     fun send_message_should_throw_exception_when_current_user_is_null() {
         // Given
         every { userRepository.currentUser } returns MutableStateFlow(null)
@@ -151,6 +160,8 @@ class ChatViewModelTest {
             userRepository = userRepository,
             messageRepository = messageRepository,
             createConversationUseCase = createConversationUseCase,
+            sendMessageUseCase = sendMessageUseCase,
+            notificationUseCase = notificationUseCase
         )
         chatViewModel.updateTextToSend("Hello")
 

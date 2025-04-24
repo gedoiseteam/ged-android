@@ -6,16 +6,14 @@ import com.upsaclay.message.data.remote.MessageRemoteDataSource
 import com.upsaclay.message.domain.entity.Message
 import com.upsaclay.message.domain.repository.MessageRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filter
 
 internal class MessageRepositoryImpl(
     private val messageLocalDataSource: MessageLocalDataSource,
     private val messageRemoteDataSource: MessageRemoteDataSource
 ): MessageRepository {
-    override fun getMessages(conversationId: Int): Flow<PagingData<Message>> =
+    override fun getMessages(conversationId: Int): Flow<List<Message>> =
         messageLocalDataSource.getMessages(conversationId)
-
-    override fun getLastMessage(conversationId: Int): Flow<Message> =
-        messageLocalDataSource.getLastMessage(conversationId)
 
     override fun getUnreadMessages(conversationId: Int): Flow<List<Message>> =
         messageLocalDataSource.getUnreadMessages(conversationId)
@@ -23,7 +21,7 @@ internal class MessageRepositoryImpl(
     override fun getRemoteMessages(conversationId: Int): Flow<List<Message>> =
         messageRemoteDataSource.listenMessages(conversationId)
 
-    override suspend fun createMessage(message: Message) {
+    override suspend fun addMessage(message: Message) {
         messageLocalDataSource.insertMessage(message)
         messageRemoteDataSource.createMessage(message)
     }
