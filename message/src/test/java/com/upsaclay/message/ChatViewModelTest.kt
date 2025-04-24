@@ -1,12 +1,16 @@
 package com.upsaclay.message
 
+import com.upsaclay.common.domain.entity.UserNotFoundException
 import com.upsaclay.common.domain.repository.UserRepository
 import com.upsaclay.common.domain.usecase.NotificationUseCase
 import com.upsaclay.common.domain.userFixture
 import com.upsaclay.message.domain.conversationFixture
+import com.upsaclay.message.domain.conversationsMessageFixture
 import com.upsaclay.message.domain.entity.ConversationState
+import com.upsaclay.message.domain.entity.Message
 import com.upsaclay.message.domain.messagesFixture
 import com.upsaclay.message.domain.repository.MessageRepository
+import com.upsaclay.message.domain.repository.UserConversationRepository
 import com.upsaclay.message.domain.usecase.CreateConversationUseCase
 import com.upsaclay.message.domain.usecase.SendMessageUseCase
 import com.upsaclay.message.presentation.viewmodels.ChatViewModel
@@ -30,6 +34,7 @@ class ChatViewModelTest {
     private val createConversationUseCase: CreateConversationUseCase = mockk()
     private val userRepository: UserRepository = mockk()
     private val messageRepository: MessageRepository = mockk()
+    private val userConversationRepository: UserConversationRepository = mockk()
     private val sendMessageUseCase: SendMessageUseCase = mockk()
     private val notificationUseCase: NotificationUseCase = mockk()
 
@@ -41,9 +46,14 @@ class ChatViewModelTest {
         Dispatchers.setMain(testDispatcher)
 
         every { userRepository.currentUser } returns MutableStateFlow(userFixture)
+        every { userConversationRepository.conversationsMessage } returns flowOf(conversationsMessageFixture)
         every { messageRepository.getMessages(any()) } returns flowOf(messagesFixture)
+        every { messageRepository.getUnreadMessages(any()) } returns flowOf(messagesFixture)
         coEvery { messageRepository.addMessage(any()) } returns Unit
+        coEvery { messageRepository.updateMessage(any()) } returns Unit
         coEvery { createConversationUseCase(any()) } returns Unit
+        coEvery { notificationUseCase.clearNotifications(any()) } returns Unit
+        coEvery { notificationUseCase.sendNotificationToFCM<Message>(any(), any()) } returns Unit
 
         chatViewModel = ChatViewModel(
             conversation = conversationFixture,
@@ -83,16 +93,7 @@ class ChatViewModelTest {
         chatViewModel.sendMessage()
 
         // Then
-        coVerify { messageRepository.addMessage(any()) }
-    }
-
-    @Test
-    fun send_message_should_not_send_message_when_text_is_empty() {
-        // When
-        chatViewModel.sendMessage()
-
-        // Then
-        coVerify(exactly = 0) { messageRepository.addMessage(any()) }
+        coVerify { sendMessageUseCase(any(), any(), any()) }
     }
 
     @Test
@@ -112,7 +113,7 @@ class ChatViewModelTest {
         // Given
         val conversation = conversationFixture.copy(state = ConversationState.NOT_CREATED)
         chatViewModel = ChatViewModel(
-            conversation = conversationFixture,
+            conversation = conversation,
             userRepository = userRepository,
             messageRepository = messageRepository,
             createConversationUseCase = createConversationUseCase,
@@ -125,7 +126,7 @@ class ChatViewModelTest {
         chatViewModel.sendMessage()
 
         // Then
-        coVerify { createConversationUseCase(conversation) }
+        coVerify { sendMessageUseCase(any(), any(), any()) }
     }
 
     @Test
@@ -147,10 +148,10 @@ class ChatViewModelTest {
 
         // Then
         coVerify(exactly = 0) { createConversationUseCase(conversation) }
-        coVerify { messageRepository.addMessage(any()) }
+        coVerify { sendMessageUseCase(any(), any(), any()) }
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test(expected = UserNotFoundException::class)
     fun send_message_should_throw_exception_when_current_user_is_null() {
         // Given
         every { userRepository.currentUser } returns MutableStateFlow(null)

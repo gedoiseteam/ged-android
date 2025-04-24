@@ -2,6 +2,7 @@ package com.upsaclay.message
 
 import androidx.paging.PagingData
 import com.upsaclay.message.domain.conversationUIFixture
+import com.upsaclay.message.domain.conversationsMessageFixture
 import com.upsaclay.message.domain.conversationsUIFixture
 import com.upsaclay.message.domain.repository.UserConversationRepository
 import com.upsaclay.message.domain.usecase.DeleteConversationUseCase
@@ -31,6 +32,7 @@ class ConversationViewModelTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
 
+        every { userConversationRepository.conversationsMessage } returns flowOf(conversationsMessageFixture)
         coEvery { deleteConversationUseCase(any()) } returns Unit
 
         conversationViewModel = ConversationViewModel(
