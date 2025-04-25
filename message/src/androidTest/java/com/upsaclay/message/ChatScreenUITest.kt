@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
 import org.junit.Rule
 
-class ChatScreenRouteUITest {
+class ChatScreenUITest {
     @get:Rule
     val rule = createAndroidComposeRule<ComponentActivity>()
 

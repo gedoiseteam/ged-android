@@ -143,6 +143,7 @@ private fun MessageFeed(
 
     Box(modifier = modifier.fillMaxSize()) {
         LazyColumn(
+            modifier = Modifier.testTag(stringResource(R.string.chat_screen_lazy_column_item_tag)),
             reverseLayout = true,
             state = scrollState
         ) {
@@ -168,13 +169,15 @@ private fun MessageFeed(
 
                 if (isSender) {
                     SentMessageItem(
-                        modifier = Modifier.testTag(stringResource(R.string.chat_screen_send_message_item_tag)),
+                        modifier = Modifier
+                            .testTag(stringResource(R.string.chat_screen_send_message_item_tag) + index),
                         message = message,
                         showSeen = showSeenMessage
                     )
                 } else {
                     ReceiveMessageItem(
-                        modifier = Modifier.testTag(stringResource(R.string.chat_screen_receive_message_item_tag)),
+                        modifier = Modifier
+                            .testTag(stringResource(R.string.chat_screen_receive_message_item_tag) + index),
                         message = message,
                         displayProfilePicture = displayProfilePicture,
                         profilePictureUrl = interlocutor.profilePictureUrl

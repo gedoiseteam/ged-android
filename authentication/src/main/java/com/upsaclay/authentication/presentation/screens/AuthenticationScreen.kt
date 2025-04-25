@@ -26,6 +26,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -73,6 +74,7 @@ fun AuthenticationScreen(
     val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
+
     val scrollState = rememberScrollState()
     val scope = rememberCoroutineScope()
     var errorMessage by remember { mutableStateOf("") }
@@ -83,6 +85,9 @@ fun AuthenticationScreen(
             snackbarHostState.showSnackbar(message = message)
         }
     }
+
+    val email by authenticationViewModel.email.collectAsState()
+    val password by authenticationViewModel.password.collectAsState()
 
     LaunchedEffect(Unit) {
         authenticationViewModel.event.collectLatest { event ->
@@ -142,9 +147,9 @@ fun AuthenticationScreen(
 
             Column {
                 InputsSection(
-                    email = authenticationViewModel.email,
+                    email = email,
                     onEmailChange = { authenticationViewModel.updateEmail(it) },
-                    password = authenticationViewModel.password,
+                    password = password,
                     onPasswordChange = { authenticationViewModel.updatePassword(it) },
                     keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
                     errorMessage = errorMessage,

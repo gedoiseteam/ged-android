@@ -79,7 +79,7 @@ class MainActivity : ComponentActivity() {
         when {
             conversationIdExtra != null -> {
                 ConversationMapper.conversationFromJson(conversationIdExtra)?.let { conversation ->
-                    navigationViewModel.updateIntentScreenNavigate(
+                    navigationViewModel.intentToNavigate(
                         MessageScreenRoute.Chat(conversation)
                     )
                 }
@@ -94,7 +94,7 @@ class MainActivity : ComponentActivity() {
             FCMDataType.MESSAGE.toString() -> {
                 extras?.getString("value")?.let {
                     ConversationMapper.conversationMessageFromJson(it)?.let { conversationMessage ->
-                        navigationViewModel.updateIntentScreenNavigate(
+                        navigationViewModel.intentToNavigate(
                             MessageScreenRoute.Chat(conversationMessage.conversation)
                         )
                     }

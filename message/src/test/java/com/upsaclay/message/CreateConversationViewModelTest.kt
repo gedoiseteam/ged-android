@@ -89,4 +89,33 @@ class CreateConversationViewModelTest {
         // Then
         assertNull(result)
     }
+
+    @Test
+    fun all_users_should_be_fetched_except_current() = runTest {
+        // Given
+        val users = usersFixture.filterNot { it.id == userFixture.id }
+        coEvery { userRepository.getUsers() } returns users
+
+        // When
+        createConversationViewModel = CreateConversationViewModel(
+            userConversationRepository = userConversationRepository,
+            userRepository = userRepository,
+            getFilteredUserUseCase = getFilteredUserUseCase
+        )
+
+        // Then
+        assertEquals(users, createConversationViewModel.users.first())
+    }
+
+    @Test
+    fun updateSearchedUser_should_update_query() = runTest {
+        // Given
+        val query = "test"
+
+        // When
+        createConversationViewModel.updateSearchedUser(query)
+
+        // Then
+        assertEquals(query, createConversationViewModel.query.first())
+    }
 }

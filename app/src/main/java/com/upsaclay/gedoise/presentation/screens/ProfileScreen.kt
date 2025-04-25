@@ -56,7 +56,7 @@ fun ProfileScreen(
 ) {
     val user by profileViewModel.currentUser.collectAsState()
     var showLogoutDialog by remember { mutableStateOf(false) }
-    val dividerColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.darkGray else MaterialTheme.colorScheme.lightGray
+    val dividerColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.darkGray else MaterialTheme.colorScheme.    lightGray
 
     DisposableEffect(Unit) {
         onDispose { showLogoutDialog = false }

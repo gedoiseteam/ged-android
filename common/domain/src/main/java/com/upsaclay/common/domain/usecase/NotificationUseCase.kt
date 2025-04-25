@@ -3,11 +3,11 @@ package com.upsaclay.common.domain.usecase
 import com.google.gson.Gson
 import com.upsaclay.common.domain.FCMNotificationSender
 import com.upsaclay.common.domain.entity.FCMMessage
-import com.upsaclay.common.domain.entity.SystemEvents
+import com.upsaclay.common.domain.entity.SharedEvent
 
 class NotificationUseCase(
     private val fcmNotificationSender: FCMNotificationSender,
-    private val systemEventsUseCase: SystemEventsUseCase
+    private val sharedEventsUseCase: SharedEventsUseCase
 ) {
     suspend fun <T>sendNotificationToFCM(
         fcmMessage: FCMMessage<T>,
@@ -17,6 +17,6 @@ class NotificationUseCase(
     }
 
     suspend fun clearNotifications(notificationGroupId: String) {
-        systemEventsUseCase.sendSystemEvent(SystemEvents.ClearNotifications(notificationGroupId))
+        sharedEventsUseCase.sendSharedEvent(SharedEvent.ClearNotifications(notificationGroupId))
     }
 }

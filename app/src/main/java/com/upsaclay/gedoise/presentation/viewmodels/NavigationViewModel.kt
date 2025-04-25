@@ -17,6 +17,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChangedBy
@@ -35,22 +36,22 @@ class NavigationViewModel(
     private val intentScreenNavigate = MutableStateFlow<ScreenRoute?>(null)
 
     private val _screenRouteToNavigate = MutableSharedFlow<ScreenRoute>(replay = 3)
-    val screenRouteToNavigate: Flow<ScreenRoute> = _screenRouteToNavigate
+    val screenRouteToNavigate: SharedFlow<ScreenRoute> = _screenRouteToNavigate
 
     private val _startDestinationScreenRoute = MutableStateFlow<ScreenRoute>(MainScreenRoute.Splash)
     val startDestinationScreenRoute: StateFlow<ScreenRoute> = _startDestinationScreenRoute
 
     private val _homeNavigationItem = MutableStateFlow(NavigationItem.Home())
-    val homeNavigationItem: Flow<NavigationItem> = _homeNavigationItem
+    val homeNavigationItem: StateFlow<NavigationItem> = _homeNavigationItem
 
     private val _messageNavigationItem = MutableStateFlow(NavigationItem.Message())
-    val messageNavigationItem: Flow<NavigationItem> = _messageNavigationItem
+    val messageNavigationItem: StateFlow<NavigationItem> = _messageNavigationItem
 
     val currentUser: StateFlow<User?> = userRepository.currentUser
 
-    init {
+    fun start() {
         updateStartDestinationScreenRoute()
-        updateScreenRoutes()
+        updateScreenRoute()
         updateMessageNavigationItemBadges()
     }
 
@@ -58,7 +59,7 @@ class NavigationViewModel(
         screenRepository.setCurrentScreenRoute(screenRoute)
     }
 
-    fun updateIntentScreenNavigate(screenRoute: ScreenRoute) {
+    fun intentToNavigate(screenRoute: ScreenRoute) {
         intentScreenNavigate.value = screenRoute
     }
 
@@ -76,7 +77,7 @@ class NavigationViewModel(
         }
     }
 
-    private fun updateScreenRoutes() {
+    private fun updateScreenRoute() {
         viewModelScope.launch {
             combine(
                 authenticationRepository.isAuthenticated.filterNotNull(),
@@ -86,10 +87,9 @@ class NavigationViewModel(
                     intentScreen
                 }
                 else {
-                    if (screenRepository.currentScreenRoute !is AuthenticationScreenRoute) {
-                        AuthenticationScreenRoute.Authentication
+                    AuthenticationScreenRoute.Authentication.takeIf {
+                        screenRepository.currentScreenRoute !is AuthenticationScreenRoute
                     }
-                    else null
                 }
             }
                 .filterNotNull()

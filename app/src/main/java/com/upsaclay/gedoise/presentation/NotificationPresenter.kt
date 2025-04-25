@@ -19,12 +19,12 @@ import androidx.core.app.Person
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.drawable.IconCompat
 import com.upsaclay.common.R
-import com.upsaclay.common.domain.entity.SystemEvents
+import com.upsaclay.common.domain.entity.SharedEvent
 import com.upsaclay.common.domain.entity.User
 import com.upsaclay.common.domain.repository.ImageRepository
 import com.upsaclay.common.domain.usecase.ConvertDateUseCase
 import com.upsaclay.common.domain.usecase.GenerateIdUseCase
-import com.upsaclay.common.domain.usecase.SystemEventsUseCase
+import com.upsaclay.common.domain.usecase.SharedEventsUseCase
 import com.upsaclay.gedoise.domain.repository.ScreenRepository
 import com.upsaclay.message.domain.ConversationMapper
 import com.upsaclay.message.domain.entity.Conversation
@@ -42,7 +42,7 @@ class NotificationPresenter(
     private val context: Context,
     private val imageRepository: ImageRepository,
     private val screenRepository: ScreenRepository,
-    private val systemEventsUseCase: SystemEventsUseCase
+    private val sharedEventsUseCase: SharedEventsUseCase
 ) {
     private val notificationManager = NotificationManagerCompat.from(context)
     private val scope = CoroutineScope(Dispatchers.Main)
@@ -77,9 +77,9 @@ class NotificationPresenter(
 
     private fun listenSystemEvents() {
         scope.launch {
-            systemEventsUseCase.systemEvents.collect { event ->
+            sharedEventsUseCase.sharedEvents.collect { event ->
                 when (event) {
-                    is SystemEvents.ClearNotifications -> clearNotifications(event.notificationGroupId)
+                    is SharedEvent.ClearNotifications -> clearNotifications(event.notificationGroupId)
                 }
             }
         }
