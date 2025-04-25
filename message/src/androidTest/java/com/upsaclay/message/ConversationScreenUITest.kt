@@ -13,7 +13,6 @@ import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.testing.TestNavHostController
-import androidx.paging.PagingData
 import com.upsaclay.common.domain.userFixture2
 import com.upsaclay.message.domain.conversationFixture
 import com.upsaclay.message.domain.conversationUIFixture
@@ -22,7 +21,6 @@ import com.upsaclay.message.domain.entity.MessageScreenRoute
 import com.upsaclay.message.domain.messageFixture
 import com.upsaclay.message.presentation.screens.ChatScreen
 import com.upsaclay.message.presentation.screens.ConversationScreen
-import com.upsaclay.message.presentation.screens.CreateConversationScreen
 import com.upsaclay.message.presentation.viewmodels.ConversationViewModel
 import io.mockk.every
 import io.mockk.mockk
@@ -33,7 +31,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-class ConversationScreenRouteUITest {
+class ConversationScreenUITest {
     @get:Rule
     val rule = createAndroidComposeRule<ComponentActivity>()
 

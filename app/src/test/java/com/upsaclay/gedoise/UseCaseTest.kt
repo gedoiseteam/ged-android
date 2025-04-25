@@ -64,8 +64,6 @@ class UseCaseTest {
         coEvery { credentialsRepository.removeUnsentFcmToken() } returns Unit
         coEvery { credentialsRepository.storeUnsentFcmToken(any()) } returns Unit
 
-
-
         clearDataUseCase = ClearDataUseCase(
             userRepository = userRepository,
             userConversationRepository = userConversationRepository,
@@ -161,6 +159,15 @@ class UseCaseTest {
 
         // When
         fcmTokenUseCase.sendFcmToken(fcmToken)
+
+        // Then
+        coVerify { credentialsRepository.storeUnsentFcmToken(fcmToken) }
+    }
+
+    @Test
+    fun fcmTokenUseCase_storeToken_should_store_token() = runTest {
+        // When
+        fcmTokenUseCase.storeToken(fcmToken)
 
         // Then
         coVerify { credentialsRepository.storeUnsentFcmToken(fcmToken) }

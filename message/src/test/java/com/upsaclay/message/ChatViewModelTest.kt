@@ -8,6 +8,7 @@ import com.upsaclay.message.domain.conversationFixture
 import com.upsaclay.message.domain.conversationsMessageFixture
 import com.upsaclay.message.domain.entity.ConversationState
 import com.upsaclay.message.domain.entity.Message
+import com.upsaclay.message.domain.entity.Seen
 import com.upsaclay.message.domain.messagesFixture
 import com.upsaclay.message.domain.repository.MessageRepository
 import com.upsaclay.message.domain.repository.UserConversationRepository
@@ -167,5 +168,45 @@ class ChatViewModelTest {
 
         // When
         chatViewModel.sendMessage()
+    }
+
+    @Test
+    fun unseen_messages_should_be_seen() {
+        // Given
+        val messages = messagesFixture
+            .filterNot { it.isSeen() }
+            .filter { it.senderId != userFixture.id }
+        every { messageRepository.getUnreadMessages(any()) } returns flowOf(messages)
+
+        // When
+        chatViewModel = ChatViewModel(
+            conversation = conversationFixture,
+            userRepository = userRepository,
+            messageRepository = messageRepository,
+            createConversationUseCase = createConversationUseCase,
+            sendMessageUseCase = sendMessageUseCase,
+            notificationUseCase = notificationUseCase
+        )
+
+        // Then
+        messages.forEach {
+            coVerify { messageRepository.updateMessage(it.copy(seen = Seen())) }
+        }
+    }
+
+    @Test
+    fun chat_notifications_should_be_cleared() {
+        // When
+        chatViewModel = ChatViewModel(
+            conversation = conversationFixture,
+            userRepository = userRepository,
+            messageRepository = messageRepository,
+            createConversationUseCase = createConversationUseCase,
+            sendMessageUseCase = sendMessageUseCase,
+            notificationUseCase = notificationUseCase
+        )
+
+        // Then
+        coVerify { notificationUseCase.clearNotifications(conversationFixture.id.toString()) }
     }
 }

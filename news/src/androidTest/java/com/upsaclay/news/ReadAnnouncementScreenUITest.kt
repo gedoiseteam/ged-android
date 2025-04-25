@@ -12,7 +12,6 @@ import androidx.navigation.testing.TestNavHostController
 import com.upsaclay.common.domain.userFixture
 import com.upsaclay.common.domain.userFixture2
 import com.upsaclay.news.domain.announcementFixture
-import com.upsaclay.news.domain.entity.AnnouncementEvent
 import com.upsaclay.news.domain.entity.NewsScreenRoute
 import com.upsaclay.news.presentation.screens.EditAnnouncementScreen
 import com.upsaclay.news.presentation.screens.ReadAnnouncementScreen
@@ -26,7 +25,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-class ReadAnnouncementScreenRouteUITest {
+class ReadAnnouncementScreenUITest {
     @get:Rule
     val rule = createAndroidComposeRule<ComponentActivity>()
 

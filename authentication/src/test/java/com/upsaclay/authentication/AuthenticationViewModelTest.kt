@@ -44,8 +44,8 @@ class AuthenticationViewModelTest {
 
     @Test
     fun default_values_are_correct() {
-        assertEquals("", authenticationViewModel.email)
-        assertEquals("", authenticationViewModel.password)
+        assertEquals("", authenticationViewModel.email.value)
+        assertEquals("", authenticationViewModel.password.value)
     }
 
     @Test
@@ -54,7 +54,7 @@ class AuthenticationViewModelTest {
         authenticationViewModel.updateEmail(email)
 
         // Then
-        assertEquals(email, authenticationViewModel.email)
+        assertEquals(email, authenticationViewModel.email.value)
     }
 
     @Test
@@ -63,7 +63,7 @@ class AuthenticationViewModelTest {
         authenticationViewModel.updatePassword(password)
 
         // Then
-        assertEquals(password, authenticationViewModel.password)
+        assertEquals(password, authenticationViewModel.password.value)
     }
 
     @Test
@@ -77,7 +77,7 @@ class AuthenticationViewModelTest {
         authenticationViewModel.login()
 
         // Then
-        assertEquals("", authenticationViewModel.password)
+        assertEquals("", authenticationViewModel.password.value)
     }
 
     @Test

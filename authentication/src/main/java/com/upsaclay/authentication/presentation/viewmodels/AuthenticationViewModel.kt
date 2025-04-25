@@ -1,6 +1,7 @@
 package com.upsaclay.authentication.presentation.viewmodels
 
 import android.accounts.NetworkErrorException
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -15,7 +16,9 @@ import com.upsaclay.common.domain.entity.TooManyRequestException
 import com.upsaclay.common.domain.repository.UserRepository
 import com.upsaclay.common.domain.usecase.VerifyEmailFormatUseCase
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.io.IOException
 
@@ -25,20 +28,23 @@ class AuthenticationViewModel(
 ): ViewModel() {
     private val _event = MutableSharedFlow<AuthenticationEvent>()
     val event: SharedFlow<AuthenticationEvent> = _event
-    var email by mutableStateOf("")
-        private set
-    var password by mutableStateOf("")
-        private set
+    private val _email = MutableStateFlow("")
+    val email: StateFlow<String> = _email
+    private val _password = MutableStateFlow("")
+    val password: StateFlow<String> = _password
 
     fun updateEmail(email: String) {
-        this.email = email
+        _email.value = email
     }
 
     fun updatePassword(password: String) {
-        this.password = password
+        _password.value = password
     }
 
     fun login() {
+        val email = _email.value
+        val password = _password.value
+
         viewModelScope.launch {
             _event.emit(AuthenticationEvent.Loading)
 
@@ -59,14 +65,17 @@ class AuthenticationViewModel(
     }
 
     fun resetEmail() {
-        email = ""
+        _email.value = ""
     }
 
     fun resetPassword() {
-        password = ""
+        _password.value = ""
     }
 
     fun verifyInputs(): Boolean {
+        val email = _email.value
+        val password = _password.value
+
         return when {
             email.isBlank() || password.isBlank() -> {
                 viewModelScope.launch { _event.emit(AuthenticationEvent.Error(AuthErrorType.EMPTY_FIELDS_ERROR)) }

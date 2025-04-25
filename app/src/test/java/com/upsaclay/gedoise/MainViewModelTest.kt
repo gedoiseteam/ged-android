@@ -61,7 +61,7 @@ class MainViewModelTest {
     }
 
     @Test
-    fun startListening_should_start_listening_data_when_user_is_authenticated() {
+    fun data_should_be_listening_when_user_is_authenticated() {
         // When
         mainViewModel.startListening()
 
@@ -70,7 +70,7 @@ class MainViewModelTest {
     }
 
     @Test
-    fun startListening_should_stop_listening_when_user_is_not_authenticated() {
+    fun data_should_be_not_listening_when_user_is_not_authenticated() {
         // Given
         every { authenticationRepository.isAuthenticated } returns flowOf(false)
 
@@ -82,7 +82,7 @@ class MainViewModelTest {
     }
 
     @Test
-    fun startListening_should_delete_data_when_user_is_not_authenticated() = runTest {
+    fun data_should_be_cleared_when_user_is_not_authenticated() = runTest {
         // Given
         every { authenticationRepository.isAuthenticated } returns flowOf(false)
 
@@ -96,7 +96,21 @@ class MainViewModelTest {
     }
 
     @Test
-    fun startListening_should_update_current_when_user_if_different_from_remote() = runTest {
+    fun data_should_be_deleted_when_user_is_not_authenticated() = runTest {
+        // Given
+        every { authenticationRepository.isAuthenticated } returns flowOf(false)
+
+        // When
+        mainViewModel.startListening()
+
+        advanceUntilIdle()
+
+        // Then
+        coVerify { clearDataUseCase() }
+    }
+
+    @Test
+    fun current_user_should_be_updated_when_is_if_different_from_remote() = runTest {
         // Given
         every { userRepository.currentUser } returns MutableStateFlow(userFixture)
         coEvery { userRepository.getUser(any()) } returns userFixture2
@@ -109,7 +123,7 @@ class MainViewModelTest {
     }
 
     @Test
-    fun startListening_should_remove_user_when_remote_user_is_null() = runTest {
+    fun current_user_should_be_remove_user_when_remote_user_is_null() = runTest {
         // Given
         coEvery { userRepository.getUser(any()) } returns null
 

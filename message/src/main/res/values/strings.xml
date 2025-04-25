@@ -27,6 +27,7 @@
     <string name="conversation_screen_unread_conversation_item_tag">Conversation Screen Unread Conversation Item Tag</string>
     <string name="conversation_screen_create_conversation_button_tag">Conversation Screen Create Conversation Button Tag</string>
 
+    <string name="chat_screen_lazy_column_item_tag">Chat Screen Lazy Column Item Tag</string>
     <string name="chat_screen_send_message_item_tag">Chat Screen Send Message Item Tag</string>
     <string name="chat_screen_receive_message_item_tag">Chat Screen Receive Message Item Tag</string>
     <string name="chat_screen_message_text_tag">Chat Screen Receive Message Text Tag</string>

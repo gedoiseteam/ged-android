@@ -7,6 +7,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.navigation.testing.TestNavHostController
 import com.upsaclay.common.domain.userFixture
+import com.upsaclay.common.domain.userFixture2
 import com.upsaclay.gedoise.domain.entities.AccountScreenState
 import com.upsaclay.gedoise.presentation.screens.AccountScreen
 import com.upsaclay.gedoise.presentation.viewmodels.AccountViewModel
@@ -18,7 +19,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-class AccountScreenRouteUITest {
+class AccountScreenUITest {
     @get:Rule
     val rule = createAndroidComposeRule<ComponentActivity>()
 
@@ -53,5 +54,36 @@ class AccountScreenRouteUITest {
 
         // Then
         rule.onNodeWithTag(rule.activity.getString(R.string.account_screen_delete_profile_picture_dialog_tag)).assertExists()
+    }
+
+    @Test
+    fun member_field_should_be_shown_when_user_is_member() {
+        // When
+        rule.setContent {
+            AccountScreen(
+                navController = navController,
+                accountViewModel = accountViewModel
+            )
+        }
+
+        // Then
+        rule.onNodeWithTag(rule.activity.getString(R.string.account_screen_member_tag)).assertExists()
+    }
+
+    @Test
+    fun member_field_should_not_be_shown_when_user_is_not_member() {
+        // Given
+        every { accountViewModel.currentUser } returns MutableStateFlow(userFixture2)
+
+        // When
+        rule.setContent {
+            AccountScreen(
+                navController = navController,
+                accountViewModel = accountViewModel
+            )
+        }
+
+        // Then
+        rule.onNodeWithTag(rule.activity.getString(R.string.account_screen_member_tag)).assertDoesNotExist()
     }
 }
