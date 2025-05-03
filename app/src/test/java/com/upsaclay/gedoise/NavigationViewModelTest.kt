@@ -1,25 +1,24 @@
 package com.upsaclay.gedoise
 
-import com.upsaclay.authentication.domain.entity.AuthenticationScreenRoute
+import com.google.gson.Gson
+import com.upsaclay.authentication.AuthenticationBaseRoute
 import com.upsaclay.authentication.domain.repository.AuthenticationRepository
-import com.upsaclay.common.domain.repository.UserRepository
-import com.upsaclay.common.domain.userFixture
-import com.upsaclay.common.domain.usersFixture
+import com.upsaclay.authentication.presentation.registration.first.FirstRegistrationRoute
 import com.upsaclay.gedoise.domain.repository.ScreenRepository
+import com.upsaclay.gedoise.presentation.navigation.TopLevelDestination
 import com.upsaclay.gedoise.presentation.viewmodels.NavigationViewModel
+import com.upsaclay.message.domain.ConversationMapper
 import com.upsaclay.message.domain.conversationFixture
-import com.upsaclay.message.domain.conversationMessageFixture
-import com.upsaclay.message.domain.conversationsMessageFixture
-import com.upsaclay.message.domain.entity.MessageScreenRoute
+import com.upsaclay.message.domain.messageFixture
 import com.upsaclay.message.domain.messageFixture2
-import com.upsaclay.message.domain.repository.UserConversationRepository
-import com.upsaclay.news.domain.entity.NewsScreenRoute
-import io.mockk.coEvery
+import com.upsaclay.message.domain.messagesFixture
+import com.upsaclay.message.domain.usecase.GetUnreadMessagesUseCase
+import com.upsaclay.message.presentation.chat.ChatRoute
+import com.upsaclay.news.presentation.NewsBaseRoute
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -31,10 +30,9 @@ import kotlin.test.assertNull
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class NavigationViewModelTest {
-    private val userRepository: UserRepository = mockk()
-    private val userConversationRepository: UserConversationRepository = mockk()
     private val screenRepository: ScreenRepository = mockk()
     private val authenticationRepository: AuthenticationRepository = mockk()
+    private val getUnreadMessagesUseCase: GetUnreadMessagesUseCase = mockk()
 
     private lateinit var navigationViewModel: NavigationViewModel
     private val testDispatcher = UnconfinedTestDispatcher()
@@ -43,45 +41,31 @@ class NavigationViewModelTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
 
-        every { userConversationRepository.conversationsMessage } returns flowOf(conversationsMessageFixture)
+        every { getUnreadMessagesUseCase() } returns flowOf(messagesFixture)
         every { authenticationRepository.isAuthenticated } returns flowOf(true)
-        every { screenRepository.currentScreenRoute } returns null
-        every { userRepository.currentUser } returns MutableStateFlow(userFixture)
+        every { screenRepository.currentRoute } returns null
         every { screenRepository.setCurrentScreenRoute(any()) } returns Unit
-        coEvery { userRepository.getCurrentUser() } returns userFixture
-        coEvery { userRepository.getUsers() } returns usersFixture
-        coEvery { userRepository.getUser(any()) } returns userFixture
-        coEvery { userRepository.setCurrentUser(any()) } returns Unit
 
         navigationViewModel = NavigationViewModel(
-            userRepository = userRepository,
-            userConversationRepository = userConversationRepository,
+            getUnreadMessagesUseCase = getUnreadMessagesUseCase,
             screenRepository = screenRepository,
             authenticationRepository = authenticationRepository
         )
     }
 
     @Test
-    fun default_values_are_correct() = runTest {
-        // Given
-        every { authenticationRepository.isAuthenticated } returns flowOf()
-
-        // When
-        navigationViewModel.start()
-
-        // Then
-        assertEquals(userFixture, navigationViewModel.currentUser.value)
-    }
-
-    @Test
     fun startDestinationScreenRoute_should_be_news_screen_when_authenticated() = runTest {
         // When
-        navigationViewModel.start()
+        navigationViewModel = NavigationViewModel(
+            getUnreadMessagesUseCase = getUnreadMessagesUseCase,
+            screenRepository = screenRepository,
+            authenticationRepository = authenticationRepository
+        )
 
         // Then
-        val result = navigationViewModel.startDestinationScreenRoute.value
+        val result = navigationViewModel.uiState.value.startDestination
 
-        assertEquals(NewsScreenRoute.News, result)
+        assertEquals(NewsBaseRoute, result)
     }
 
     @Test
@@ -90,25 +74,53 @@ class NavigationViewModelTest {
         every { authenticationRepository.isAuthenticated } returns flowOf(false)
 
         // When
-        navigationViewModel.start()
+        navigationViewModel = NavigationViewModel(
+            getUnreadMessagesUseCase = getUnreadMessagesUseCase,
+            screenRepository = screenRepository,
+            authenticationRepository = authenticationRepository
+        )
 
         // Then
-        val result = navigationViewModel.startDestinationScreenRoute.value
+        val result = navigationViewModel.uiState.value.startDestination
 
-        assertEquals(AuthenticationScreenRoute.Authentication, result)
+        assertEquals(AuthenticationBaseRoute, result)
     }
 
     @Test
-    fun should_navigate_to_intent_screen_when_authenticated() = runTest {
+    fun intentToNavigate_should_update_intentScreen() = runTest {
         // Given
-        val screen = MessageScreenRoute.Chat(conversationFixture)
+        val screen = ChatRoute(ConversationMapper.toJson(conversationFixture))
 
         // When
-        navigationViewModel.start()
+        navigationViewModel = NavigationViewModel(
+            getUnreadMessagesUseCase = getUnreadMessagesUseCase,
+            screenRepository = screenRepository,
+            authenticationRepository = authenticationRepository
+        )
         navigationViewModel.intentToNavigate(screen)
 
         // Then
-        val result = navigationViewModel.screenRouteToNavigate.replayCache.last()
+        val result = navigationViewModel.uiState.value.intentScreen
+
+        assertEquals(screen, result)
+    }
+
+    @Test
+    fun should_navigate_to_screen_when_authenticated() = runTest {
+        // Given
+        every { authenticationRepository.isAuthenticated } returns flowOf(true)
+        val screen = ChatRoute(ConversationMapper.toJson(conversationFixture))
+
+        // When
+        navigationViewModel = NavigationViewModel(
+            getUnreadMessagesUseCase = getUnreadMessagesUseCase,
+            screenRepository = screenRepository,
+            authenticationRepository = authenticationRepository
+        )
+        navigationViewModel.intentToNavigate(screen)
+
+        // Then
+        val result = navigationViewModel.uiState.value.intentScreen
 
         assertEquals(screen, result)
     }
@@ -117,54 +129,60 @@ class NavigationViewModelTest {
     fun should_navigate_to_authentication_screen_when_unauthenticated() = runTest {
         // Given
         every { authenticationRepository.isAuthenticated } returns flowOf(false)
-        val screen = MessageScreenRoute.Chat(conversationFixture)
+        val screen = ChatRoute(ConversationMapper.toJson(conversationFixture))
 
         // When
-        navigationViewModel.start()
+        navigationViewModel = NavigationViewModel(
+            getUnreadMessagesUseCase = getUnreadMessagesUseCase,
+            screenRepository = screenRepository,
+            authenticationRepository = authenticationRepository
+        )
         navigationViewModel.intentToNavigate(screen)
 
         // Then
-        val result = navigationViewModel.screenRouteToNavigate.replayCache.last()
+        val result = navigationViewModel.uiState.value.startDestination
 
-        assertEquals(AuthenticationScreenRoute.Authentication, result)
+        assertEquals(AuthenticationBaseRoute, result)
     }
 
     @Test
     fun should_not_navigate_when_current_screen_is_one_of_authentication_screen_when_unauthenticated() = runTest {
         // Given
-        val screen = MessageScreenRoute.Chat(conversationFixture)
+        val screen = FirstRegistrationRoute
         every { authenticationRepository.isAuthenticated } returns flowOf(false)
-        every { screenRepository.currentScreenRoute } returns AuthenticationScreenRoute.FirstRegistration
+        every { screenRepository.currentRoute } returns FirstRegistrationRoute
 
         // When
-        navigationViewModel.start()
+        navigationViewModel = NavigationViewModel(
+            getUnreadMessagesUseCase = getUnreadMessagesUseCase,
+            screenRepository = screenRepository,
+            authenticationRepository = authenticationRepository
+        )
         navigationViewModel.intentToNavigate(screen)
 
         // Then
-        val result = navigationViewModel.screenRouteToNavigate.replayCache.lastOrNull()
+        val result = navigationViewModel.uiState.value.intentScreen
 
-        assertNull(result)
+        assertEquals(result, navigationViewModel.uiState.value.intentScreen)
     }
 
     @Test
-    fun messageNavigationBadges_should_be_equals_to_conversationsMessage_with_unread_message() {
+    fun updateMessageBadges_should_be_equals_to_unread_messages() {
         // Given
         val unreadMessage = 2
-        val conversationsMessage = listOf(
-            conversationMessageFixture.copy(lastMessage = messageFixture2),
-            conversationMessageFixture.copy(
-                conversation = conversationFixture.copy(id = 2),
-                lastMessage = messageFixture2
-            )
-        )
-        every { userConversationRepository.conversationsMessage } returns flowOf(conversationsMessage)
+        every { getUnreadMessagesUseCase() } returns flowOf(listOf(messageFixture, messageFixture))
 
         // When
-        navigationViewModel.start()
+        navigationViewModel = NavigationViewModel(
+            getUnreadMessagesUseCase = getUnreadMessagesUseCase,
+            screenRepository = screenRepository,
+            authenticationRepository = authenticationRepository
+        )
 
         // Then
-        val result = navigationViewModel.messageNavigationItem.value
+        val result = navigationViewModel.uiState.value.topLevelDestinations
+        val topLevelDestination = result.find { it is TopLevelDestination.Message } as TopLevelDestination.Message
 
-        assertEquals(unreadMessage, result.badges)
+        assertEquals(unreadMessage, topLevelDestination.badges)
     }
 }

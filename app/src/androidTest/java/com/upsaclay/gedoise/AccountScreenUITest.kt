@@ -1,16 +1,14 @@
 package com.upsaclay.gedoise
 
-import android.net.Uri
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
-import androidx.navigation.testing.TestNavHostController
 import com.upsaclay.common.domain.userFixture
 import com.upsaclay.common.domain.userFixture2
 import com.upsaclay.gedoise.domain.entities.AccountScreenState
-import com.upsaclay.gedoise.presentation.screens.AccountScreen
-import com.upsaclay.gedoise.presentation.viewmodels.AccountViewModel
+import com.upsaclay.gedoise.presentation.profile.account.AccountScreen
+import com.upsaclay.gedoise.presentation.profile.account.AccountViewModel
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -20,23 +18,27 @@ import org.junit.Rule
 import org.junit.Test
 
 class AccountScreenUITest {
+    private val uiStateFixture = AccountViewModel.AccountUiState(
+        user = userFixture,
+        screenState = AccountScreenState.READ,
+        profilePictureUri = null,
+        loading = false,
+    )
+
     @get:Rule
     val rule = createAndroidComposeRule<ComponentActivity>()
 
-    private var navController: TestNavHostController = mockk()
     private val accountViewModel: AccountViewModel = mockk()
 
     @Before
     fun setUp() {
-        every { accountViewModel.screenState } returns MutableStateFlow(AccountScreenState.READ)
-        every { accountViewModel.currentUser } returns MutableStateFlow(userFixture)
-        every { accountViewModel.profilePictureUri } returns Uri.EMPTY
+        every { accountViewModel.uiState } returns MutableStateFlow(AccountViewModel.AccountUiState())
         every { accountViewModel.event } returns MutableSharedFlow()
-        every { accountViewModel.updateProfilePictureUri(any()) } returns Unit
-        every { accountViewModel.updateScreenState(any()) } returns Unit
+        every { accountViewModel.onProfilePictureUriChange(any()) } returns Unit
+        every { accountViewModel.onScreenStateChange(any()) } returns Unit
         every { accountViewModel.resetProfilePictureUri() } returns Unit
-        every { accountViewModel.deleteUserProfilePicture() } returns Unit
-        every { accountViewModel.resetScreenState() } returns Unit
+        every { accountViewModel.deleteProfilePicture() } returns Unit
+        every { accountViewModel.resetValues() } returns Unit
     }
 
     @Test
@@ -44,8 +46,16 @@ class AccountScreenUITest {
         // When
         rule.setContent {
             AccountScreen(
-                navController = navController,
-                accountViewModel = accountViewModel
+                user = uiStateFixture.user,
+                loading = uiStateFixture.loading,
+                screenState = uiStateFixture.screenState,
+                profilePictureUri = uiStateFixture.profilePictureUri,
+                onProfilePictureUriChange = accountViewModel::onProfilePictureUriChange,
+                onScreenStateChange = accountViewModel::onScreenStateChange,
+                onDeleteProfilePictureClick = accountViewModel::deleteProfilePicture,
+                onSaveProfilePictureClick = accountViewModel::resetValues,
+                onCancelUpdateProfilePictureClick = accountViewModel::resetValues,
+                onBackClick = { }
             )
         }
 
@@ -61,8 +71,16 @@ class AccountScreenUITest {
         // When
         rule.setContent {
             AccountScreen(
-                navController = navController,
-                accountViewModel = accountViewModel
+                user = uiStateFixture.user,
+                loading = uiStateFixture.loading,
+                screenState = uiStateFixture.screenState,
+                profilePictureUri = uiStateFixture.profilePictureUri,
+                onProfilePictureUriChange = accountViewModel::onProfilePictureUriChange,
+                onScreenStateChange = accountViewModel::onScreenStateChange,
+                onDeleteProfilePictureClick = accountViewModel::deleteProfilePicture,
+                onSaveProfilePictureClick = accountViewModel::resetValues,
+                onCancelUpdateProfilePictureClick = accountViewModel::resetValues,
+                onBackClick = { }
             )
         }
 
@@ -72,14 +90,19 @@ class AccountScreenUITest {
 
     @Test
     fun member_field_should_not_be_shown_when_user_is_not_member() {
-        // Given
-        every { accountViewModel.currentUser } returns MutableStateFlow(userFixture2)
-
         // When
         rule.setContent {
             AccountScreen(
-                navController = navController,
-                accountViewModel = accountViewModel
+                user = userFixture2,
+                loading = uiStateFixture.loading,
+                screenState = uiStateFixture.screenState,
+                profilePictureUri = uiStateFixture.profilePictureUri,
+                onProfilePictureUriChange = accountViewModel::onProfilePictureUriChange,
+                onScreenStateChange = accountViewModel::onScreenStateChange,
+                onDeleteProfilePictureClick = accountViewModel::deleteProfilePicture,
+                onSaveProfilePictureClick = accountViewModel::resetValues,
+                onCancelUpdateProfilePictureClick = accountViewModel::resetValues,
+                onBackClick = { }
             )
         }
 

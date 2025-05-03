@@ -3,7 +3,7 @@ package com.upsaclay.news
 import com.upsaclay.common.domain.repository.UserRepository
 import com.upsaclay.common.domain.userFixture
 import com.upsaclay.news.domain.usecase.CreateAnnouncementUseCase
-import com.upsaclay.news.presentation.viewmodels.CreateAnnouncementViewModel
+import com.upsaclay.news.presentation.announcement.create.CreateAnnouncementViewModel
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -31,7 +31,8 @@ class CreateAnnouncementViewModelTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
 
-        every { userRepository.currentUser } returns MutableStateFlow(userFixture)
+        every { userRepository.user } returns MutableStateFlow(userFixture)
+        every { userRepository.currentUser } returns userFixture
         coEvery { createAnnouncementUseCase(any()) } returns Unit
 
         createAnnouncementViewModel = CreateAnnouncementViewModel(
@@ -42,26 +43,26 @@ class CreateAnnouncementViewModelTest {
 
     @Test
     fun default_values_are_correct() {
-        assertEquals("", createAnnouncementViewModel.title)
-        assertEquals("", createAnnouncementViewModel.content)
+        assertEquals("", createAnnouncementViewModel.uiState.value.title)
+        assertEquals("", createAnnouncementViewModel.uiState.value.content)
     }
 
     @Test
-    fun updateTitle_should_update_title() {
+    fun updateTitle_should_on_titleChange() {
         // When
-        createAnnouncementViewModel.updateTitle(title)
+        createAnnouncementViewModel.onTitleChange(title)
 
         // Then
-        assertEquals(title, createAnnouncementViewModel.title)
+        assertEquals(title, createAnnouncementViewModel.uiState.value.title)
     }
 
     @Test
-    fun updateContent_should_update_content() {
+    fun updateContent_should_on_contentChange() {
         // When
-        createAnnouncementViewModel.updateContent(content)
+        createAnnouncementViewModel.onContentChange(content)
 
         // Then
-        assertEquals(content, createAnnouncementViewModel.content)
+        assertEquals(content, createAnnouncementViewModel.uiState.value.content)
     }
 
     @Test
@@ -76,7 +77,7 @@ class CreateAnnouncementViewModelTest {
     @Test
     fun createAnnouncement_should_not_create_announcement_when_user_is_null() {
         // Given
-        every { userRepository.currentUser } returns MutableStateFlow(null)
+        every { userRepository.currentUser } returns null
         createAnnouncementViewModel = CreateAnnouncementViewModel(
             userRepository = userRepository,
             createAnnouncementUseCase = createAnnouncementUseCase

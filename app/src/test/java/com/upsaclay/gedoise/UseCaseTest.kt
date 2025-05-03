@@ -10,28 +10,25 @@ import com.upsaclay.gedoise.domain.usecase.FCMTokenUseCase
 import com.upsaclay.gedoise.domain.usecase.StartListeningDataUseCase
 import com.upsaclay.gedoise.domain.usecase.StopListeningDataUseCase
 import com.upsaclay.message.domain.repository.MessageRepository
-import com.upsaclay.message.domain.repository.UserConversationRepository
+import com.upsaclay.message.domain.repository.ConversationRepository
 import com.upsaclay.message.domain.usecase.ListenRemoteConversationsUseCase
 import com.upsaclay.message.domain.usecase.ListenRemoteMessagesUseCase
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.verify
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import org.junit.Before
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class UseCaseTest {
     private val userRepository: UserRepository = mockk()
-    private val userConversationRepository: UserConversationRepository = mockk()
+    private val conversationRepository: ConversationRepository = mockk()
     private val messageRepository: MessageRepository = mockk()
     private val authenticationRepository: AuthenticationRepository = mockk()
     private val credentialsRepository: CredentialsRepository = mockk()
@@ -57,7 +54,7 @@ class UseCaseTest {
         every { authenticationRepository.isAuthenticated } returns MutableStateFlow(true)
         every { connectivityObserver.isConnected } returns MutableStateFlow(true)
         coEvery { userRepository.deleteCurrentUser() } returns Unit
-        coEvery { userConversationRepository.deleteLocalConversations() } returns Unit
+        coEvery { conversationRepository.deleteLocalConversations() } returns Unit
         coEvery { messageRepository.deleteLocalMessages() } returns Unit
         coEvery { credentialsRepository.sendFcmToken(any()) } returns Unit
         coEvery { credentialsRepository.getUnsentFcmToken() } returns fcmToken
@@ -66,7 +63,7 @@ class UseCaseTest {
 
         clearDataUseCase = ClearDataUseCase(
             userRepository = userRepository,
-            userConversationRepository = userConversationRepository,
+            conversationRepository = conversationRepository,
             messageRepository = messageRepository
         )
 
@@ -96,7 +93,7 @@ class UseCaseTest {
 
         // Then
         coVerify { userRepository.deleteCurrentUser() }
-        coVerify { userConversationRepository.deleteLocalConversations() }
+        coVerify { conversationRepository.deleteLocalConversations() }
         coVerify { messageRepository.deleteLocalMessages() }
     }
 

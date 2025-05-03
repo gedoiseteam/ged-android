@@ -3,7 +3,7 @@ package com.upsaclay.gedoise
 import com.upsaclay.authentication.domain.repository.AuthenticationRepository
 import com.upsaclay.common.domain.repository.UserRepository
 import com.upsaclay.common.domain.userFixture
-import com.upsaclay.gedoise.presentation.viewmodels.ProfileViewModel
+import com.upsaclay.gedoise.presentation.profile.ProfileViewModel
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -29,28 +29,13 @@ class ProfileViewModelTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
 
-        every { userRepository.currentUser } returns MutableStateFlow(userFixture)
+        every { userRepository.user } returns MutableStateFlow(userFixture)
         coEvery { authenticationRepository.logout() } returns Unit
 
         profileViewModel = ProfileViewModel(
             userRepository = userRepository,
             authenticationRepository = authenticationRepository
         )
-    }
-
-    @Test
-    fun default_values_are_correct() {
-        // Given
-        every { userRepository.currentUser } returns MutableStateFlow(null)
-
-        // When
-        profileViewModel = ProfileViewModel(
-            userRepository = userRepository,
-            authenticationRepository = authenticationRepository
-        )
-
-        // Then
-        assertEquals(null, profileViewModel.currentUser.value)
     }
 
     @Test

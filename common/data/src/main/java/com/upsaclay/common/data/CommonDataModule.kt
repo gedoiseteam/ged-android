@@ -8,7 +8,6 @@ import com.upsaclay.common.data.remote.UserRemoteDataSource
 import com.upsaclay.common.data.remote.api.FCMApi
 import com.upsaclay.common.data.remote.api.ImageApi
 import com.upsaclay.common.data.remote.api.ImageApiImpl
-import com.upsaclay.common.data.remote.api.RetrofitImageApi
 import com.upsaclay.common.data.remote.api.UserFirestoreApi
 import com.upsaclay.common.data.remote.api.UserFirestoreApiImpl
 import com.upsaclay.common.data.remote.api.UserRetrofitApi
@@ -52,7 +51,7 @@ val commonDataModule = module {
 
     single {
         get<Retrofit>(GED_SERVER_QUALIFIER)
-            .create(RetrofitImageApi::class.java)
+            .create(ImageApiImpl.RetrofitImageApi::class.java)
     }
 
     single {

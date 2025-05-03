@@ -6,11 +6,11 @@ import androidx.compose.ui.test.isEnabled
 import androidx.compose.ui.test.isNotEnabled
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
-import androidx.navigation.testing.TestNavHostController
-import com.upsaclay.news.presentation.screens.CreateAnnouncementScreen
-import com.upsaclay.news.presentation.viewmodels.CreateAnnouncementViewModel
+import com.upsaclay.news.presentation.announcement.create.CreateAnnouncementDestination
+import com.upsaclay.news.presentation.announcement.create.CreateAnnouncementViewModel
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -19,28 +19,30 @@ class CreateAnnouncementScreenUITest {
     @get:Rule
     val rule = createAndroidComposeRule<ComponentActivity>()
 
-    private var navController: TestNavHostController = mockk()
     private val createAnnouncementViewModel: CreateAnnouncementViewModel = mockk()
+    private val uiState = CreateAnnouncementViewModel.CreateAnnouncementUiState(
+        title = "",
+        content = ""
+    )
 
     @Before
     fun setUp() {
-        every { createAnnouncementViewModel.title } returns ""
-        every { createAnnouncementViewModel.content } returns ""
+        every { createAnnouncementViewModel.uiState } returns MutableStateFlow(uiState)
         every { createAnnouncementViewModel.createAnnouncement() } returns Unit
-        every { createAnnouncementViewModel.updateTitle(any()) } returns Unit
-        every { createAnnouncementViewModel.updateContent(any()) } returns Unit
+        every { createAnnouncementViewModel.onTitleChange(any()) } returns Unit
+        every { createAnnouncementViewModel.onContentChange(any()) } returns Unit
     }
 
     @Test
     fun post_button_should_be_disabled_only_when_content_is_empty() {
         // Given
-        every { createAnnouncementViewModel.title } returns "title"
+        every { createAnnouncementViewModel.uiState } returns MutableStateFlow(uiState.copy(title = "title"))
 
         // When
         rule.setContent {
-            CreateAnnouncementScreen(
-                navController,
-                createAnnouncementViewModel
+            CreateAnnouncementDestination(
+                onBackClick = {},
+                viewModel = createAnnouncementViewModel
             )
         }
 
@@ -53,13 +55,13 @@ class CreateAnnouncementScreenUITest {
     @Test
     fun post_button_should_be_disabled_only_when_content_is_not_empty() {
         // Given
-        every { createAnnouncementViewModel.content } returns "some content"
+        every { createAnnouncementViewModel.uiState } returns MutableStateFlow(uiState.copy(content = "content"))
 
         // When
         rule.setContent {
-            CreateAnnouncementScreen(
-                navController,
-                createAnnouncementViewModel
+            CreateAnnouncementDestination(
+                onBackClick = {},
+                viewModel = createAnnouncementViewModel
             )
         }
 

@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,6 +29,7 @@ import com.upsaclay.common.presentation.components.ProfilePicture
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.previewText
 import com.upsaclay.common.presentation.theme.spacing
+import com.upsaclay.news.R
 import com.upsaclay.news.domain.announcementFixture
 import com.upsaclay.news.domain.entity.Announcement
 import com.upsaclay.news.domain.entity.AnnouncementState
@@ -190,7 +192,7 @@ internal fun AnnouncementItem(
 
         if (announcement.state == AnnouncementState.ERROR) {
             Icon(
-                imageVector = Icons.Outlined.Info,
+                painter = painterResource(com.upsaclay.common.R.drawable.ic_error),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.error
             )

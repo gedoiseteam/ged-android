@@ -23,10 +23,22 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.common.presentation.theme.white
+import com.upsaclay.common.utils.Phones
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SmallTopBarBack(
+fun TitleTopBar(title: String) {
+    TopAppBar(
+        title = { Text(text = title, fontWeight = FontWeight.Medium) },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.background
+        )
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun BackTopBar(
     onBackClick: () -> Unit,
     title: String,
     icon: @Composable () -> Unit = {
@@ -37,7 +49,7 @@ fun SmallTopBarBack(
     }
 ) {
     TopAppBar(
-        title = { Text(text = title, fontWeight = FontWeight.Bold) },
+        title = { Text(text = title, fontWeight = FontWeight.Medium) },
         navigationIcon = {
             IconButton(onClick = onBackClick) {
                 icon()
@@ -51,7 +63,7 @@ fun SmallTopBarBack(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SmallTopBarAction(
+fun EditTopBar(
     modifier: Modifier = Modifier,
     title: String = "",
     onCancelClick: () -> Unit,
@@ -61,7 +73,7 @@ fun SmallTopBarAction(
 ) {
     TopAppBar(
         modifier = modifier,
-        title = { Text(text = title, fontWeight = FontWeight.Bold) },
+        title = { Text(text = title, fontWeight = FontWeight.Medium) },
         navigationIcon = {
             IconButton(onClick = onCancelClick) {
                 Icon(
@@ -96,22 +108,30 @@ fun SmallTopBarAction(
  =====================================================================
  */
 
-@Preview
+@Phones
 @Composable
-private fun SmallTopBarBackPreview() {
+private fun TitleTopBarPreview() {
     GedoiseTheme {
-        SmallTopBarBack(
+        TitleTopBar(title = "Title")
+    }
+}
+
+@Phones
+@Composable
+private fun BackTopBarPreview() {
+    GedoiseTheme {
+        BackTopBar(
             onBackClick = {},
             title = "Title"
         )
     }
 }
 
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Phones
 @Composable
-private fun SmallTopBarActionPreview() {
+private fun EditTopBarPreview() {
     GedoiseTheme {
-        SmallTopBarAction(
+        EditTopBar(
             title = "Title",
             onCancelClick = { },
             onActionClick = { },

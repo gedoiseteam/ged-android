@@ -1,5 +1,6 @@
 package com.upsaclay.common.presentation.components
 
+import android.content.res.Configuration
 import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -27,49 +28,17 @@ import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.profilePictureError
 import com.upsaclay.common.presentation.theme.spacing
 
-
 @Composable
-fun ProfilePictureWithIcon(
-    modifier: Modifier = Modifier,
-    scale: Float = 1f,
-    uri: Uri?,
-    iconVector: ImageVector = Icons.Default.Edit,
-    iconBackgroundColor: Color = MaterialTheme.colorScheme.primary,
-    iconColor: Color = Color.White,
-    contentDescription: String = "",
-    onClick: (() -> Unit)?
-) {
-    ImageWithIcon(
-        modifier = modifier,
-        model = uri ?: R.drawable.default_profile_picture,
-        scale = scale,
-        iconVector = iconVector,
-        iconBackgroundColor = iconBackgroundColor,
-        iconColor = iconColor,
-        contentDescription = contentDescription,
-        onClick = onClick
-    )
-}
-
-@Composable
-fun ProfilePictureWithIcon(
+fun ProfilePicture(
     modifier: Modifier = Modifier,
     scale: Float = 1f,
     url: String?,
-    iconVector: ImageVector = Icons.Default.Edit,
-    iconBackgroundColor: Color = MaterialTheme.colorScheme.primary,
-    iconColor: Color = Color.White,
-    contentDescription: String = "",
     onClick: (() -> Unit)? = null
 ) {
-    ImageWithIcon(
+    Image(
         modifier = modifier,
-        model = url ?: R.drawable.default_profile_picture,
         scale = scale,
-        iconVector = iconVector,
-        iconBackgroundColor = iconBackgroundColor,
-        iconColor = iconColor,
-        contentDescription = contentDescription,
+        model = url ?: R.drawable.default_profile_picture,
         onClick = onClick
     )
 }
@@ -78,12 +47,50 @@ fun ProfilePictureWithIcon(
 fun ProfilePicture(
     modifier: Modifier = Modifier,
     scale: Float = 1f,
+    uri: Uri?,
+    onClick: (() -> Unit)? = null
+) {
+    Image(
+        modifier = modifier,
+        scale = scale,
+        model = uri ?: R.drawable.default_profile_picture,
+        onClick = onClick
+    )
+}
+
+@Composable
+fun ProfilePictureWithIcon(
+    modifier: Modifier = Modifier,
+    scale: Float = 1f,
     url: String?,
+    iconVector: ImageVector = Icons.Default.Edit,
+    iconBackgroundColor: Color = MaterialTheme.colorScheme.primary,
+    iconColor: Color = Color.White,
+    contentDescription: String = "",
+    onClick: (() -> Unit)? = null
+) {
+    ImageWithIcon(
+        modifier = modifier,
+        model = url ?: R.drawable.default_profile_picture,
+        scale = scale,
+        iconVector = iconVector,
+        iconBackgroundColor = iconBackgroundColor,
+        iconColor = iconColor,
+        contentDescription = contentDescription,
+        onClick = onClick
+    )
+}
+
+@Composable
+private fun Image(
+    modifier: Modifier = Modifier,
+    scale: Float = 1f,
+    model: Any,
     onClick: (() -> Unit)? = null
 ) {
     val color = MaterialTheme.colorScheme.profilePictureError
     AsyncImage(
-        model = url ?: R.drawable.default_profile_picture,
+        model = model,
         contentDescription = "",
         contentScale = ContentScale.Crop,
         modifier = onClick?.let {
@@ -98,52 +105,6 @@ fun ProfilePicture(
         },
         onLoading = { ColorPainter(color) },
         error = ColorPainter(color)
-    )
-}
-
-@Composable
-fun ProfilePicture(
-    modifier: Modifier = Modifier,
-    scale: Float = 1f,
-    uri: Uri?,
-    onClick: (() -> Unit)? = null
-) {
-    val color = MaterialTheme.colorScheme.profilePictureError
-    AsyncImage(
-        model = uri ?: R.drawable.default_profile_picture,
-        contentDescription = "",
-        contentScale = ContentScale.Crop,
-        modifier = onClick?.let {
-            modifier
-                .size(100.dp * scale)
-                .clip(CircleShape)
-                .clickable(onClick = it)
-        } ?: run {
-            modifier
-                .size(100.dp * scale)
-                .clip(CircleShape)
-        },
-        onLoading = { ColorPainter(color) },
-        error = ColorPainter(color)
-    )
-}
-
-@Composable
-fun ProfilePictureWithBubble(
-    modifier: Modifier = Modifier,
-    scale: Float = 1f,
-    url: String?,
-    bubbleBackgroundColor: Color,
-    contentDescription: String,
-    onClick: (() -> Unit)? = null
-) {
-    ImageWithBubble(
-        modifier = modifier,
-        model = url ?: R.drawable.default_profile_picture,
-        scale = scale,
-        bubbleBackgroundColor = bubbleBackgroundColor,
-        contentDescription = contentDescription,
-        onClick = onClick
     )
 }
 
@@ -209,56 +170,6 @@ private fun ImageWithIcon(
     }
 }
 
-@Composable
-private fun ImageWithBubble(
-    modifier: Modifier,
-    scale: Float = 1f,
-    model: Any,
-    bubbleBackgroundColor: Color,
-    contentDescription: String,
-    onClick: (() -> Unit)?
-) {
-    val color = MaterialTheme.colorScheme.profilePictureError
-    Box(modifier = modifier.size(100.dp * scale)) {
-        AsyncImage(
-            model = model,
-            contentDescription = contentDescription,
-            contentScale = ContentScale.Crop,
-            modifier = onClick?.let {
-                Modifier
-                    .align(Alignment.Center)
-                    .size(100.dp * scale)
-                    .clip(CircleShape)
-                    .clickable(onClick = it)
-            } ?: run {
-                Modifier
-                    .align(Alignment.Center)
-                    .size(100.dp * scale)
-                    .clip(CircleShape)
-            },
-            onLoading = { ColorPainter(color) },
-            error = ColorPainter(color)
-        )
-
-        Box(
-            modifier = onClick?.let {
-                Modifier
-                    .clip(CircleShape)
-                    .background(bubbleBackgroundColor)
-                    .align(Alignment.BottomEnd)
-                    .size(30.dp * scale)
-                    .clickable(onClick = it)
-            } ?: run {
-                Modifier
-                    .clip(CircleShape)
-                    .background(bubbleBackgroundColor)
-                    .align(Alignment.BottomEnd)
-                    .size(30.dp * scale)
-            }
-        )
-    }
-}
-
 /*
  =====================================================================
                                 Preview
@@ -266,15 +177,14 @@ private fun ImageWithBubble(
  */
 
 @Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun ProfilePicturePreview() {
     GedoiseTheme {
-        Box(Modifier.size(100.dp)) {
-            ProfilePicture(
-                url = null,
-                onClick = {}
-            )
-        }
+        ProfilePicture(
+            url = "",
+            onClick = {}
+        )
     }
 }
 
@@ -282,14 +192,9 @@ private fun ProfilePicturePreview() {
 @Composable
 private fun ProfilePictureWithIconPreview() {
     GedoiseTheme {
-        Box(Modifier.size(100.dp)) {
-            ProfilePictureWithIcon(
-                url = null,
-                iconVector = Icons.Default.Edit,
-                contentDescription = "",
-                iconBackgroundColor = MaterialTheme.colorScheme.primary,
-                onClick = {}
-            )
-        }
+        ProfilePictureWithIcon(
+            url = null,
+            onClick = {}
+        )
     }
 }

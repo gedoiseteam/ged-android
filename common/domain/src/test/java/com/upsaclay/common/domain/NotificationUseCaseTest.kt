@@ -1,6 +1,6 @@
 package com.upsaclay.common.domain
 
-import com.upsaclay.common.domain.entity.SharedEvent
+import com.upsaclay.common.domain.entity.SystemEvent
 import com.upsaclay.common.domain.usecase.NotificationUseCase
 import com.upsaclay.common.domain.usecase.SharedEventsUseCase
 import io.mockk.coEvery
@@ -45,6 +45,6 @@ class NotificationUseCaseTest {
         notificationUseCase.clearNotifications(notificationGroupId)
 
         // Then
-        coVerify { sharedEventsUseCase.sendSharedEvent(SharedEvent.ClearNotifications(notificationGroupId)) }
+        coVerify { sharedEventsUseCase.sendSharedEvent(SystemEvent.ClearNotifications(notificationGroupId)) }
     }
 }

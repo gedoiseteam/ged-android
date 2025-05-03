@@ -30,6 +30,7 @@
     <string name="chat_screen_lazy_column_item_tag">Chat Screen Lazy Column Item Tag</string>
     <string name="chat_screen_send_message_item_tag">Chat Screen Send Message Item Tag</string>
     <string name="chat_screen_receive_message_item_tag">Chat Screen Receive Message Item Tag</string>
+    <string name="chat_screen_message_indicator_tag">Chat Screen Message Indicator Tag</string>
     <string name="chat_screen_message_text_tag">Chat Screen Receive Message Text Tag</string>
     <string name="chat_screen_message_input_tag">Chat Screen Message Input Tag</string>
     <string name="chat_screen_send_button_tag">Chat Screen Send Button Tag</string>

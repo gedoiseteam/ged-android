@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="login_with_paris_saclay_email">Connectez-vous avec vos identifiants de l\'Université Paris-Saclay</string>
     <string name="presentation_text">L\'application qui réunit toutes les actualités de la GED, faite pour les gédois par les gédois.</string>
     <string name="title_login_screen">Gedoise Application</string>
     <string name="show_password_icon_description">Icône pour montrer le mot de passe</string>
@@ -10,7 +9,8 @@
     <string name="password">Mot de passe</string>
     <string name="sign_up">S\'inscrire</string>
     <string name="not_register_yet">Pas encore inscrit ?</string>
-    <string name="login_error">Adresse e-mail ou mot de passe incorrect</string>
+    <string name="invalid_credentials_error">Adresse e-mail ou mot de passe incorrect</string>
+    <string name="mandatory_field">Champ obligatoire</string>
 
     <string name="registration">Inscription</string>
     <string name="partial_arrow_left_icon_description">Icône de retour à l\'écran précédent</string>
@@ -19,13 +19,11 @@
     <string name="select_level_school">Sélectionnez votre niveau d\'étude</string>
 
     <string name="unrecognized_account">Compte universitaire non reconnu</string>
-    <string name="error_update_profile_picture">Une erreur est survenue lors de la mise à jour de la photo de profil.</string>
     <string name="error_incorrect_email_format">Veuillez entrer une adresse e-mail valide</string>
     <string name="error_password_length">Le mot de passe doit comporter au moins 8 caractères</string>
-    <string name="email_already_associated">Cette adresse e-mail est déjà associée à un compte. Veuillez vous connecter ou réinitialiser votre mot de passe.</string>
-    <string name="user_not_white_listed">Votre compte n\'est pas été autorisé à accéder à ce service. Veuillez contacter l\'assistance.</string>
+    <string name="email_already_associated">Cette adresse e-mail est déjà utilisée.</string>
+    <string name="user_not_white_listed">L\'inscription est actuellement limitée aux utilisateurs autorisés.</string>
     <string name="authenticated_user_not_found">L\'utilisateur n\'a pas été trouvé. Veuillez réessayer.</string>
-    <string name="user_creation_error">Une erreur est survenue lors de la création de votre compte. Veuillez réessayer.</string>
 
     <string name="authentication_screen_login_button_tag">Authentication Screen Login Button Tag</string>
     <string name="authentication_screen_registration_button_tag">Authentication Screen Registration Button Tag</string>

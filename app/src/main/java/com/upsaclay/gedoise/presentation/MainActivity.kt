@@ -10,17 +10,22 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.upsaclay.common.domain.entity.FCMDataType
 import com.upsaclay.common.presentation.theme.GedoiseTheme
+import com.upsaclay.gedoise.presentation.navigation.GedNavHost
+import com.upsaclay.gedoise.presentation.navigation.SplashScreenRoute
 import com.upsaclay.gedoise.presentation.viewmodels.MainViewModel
 import com.upsaclay.gedoise.presentation.viewmodels.NavigationViewModel
-import com.upsaclay.message.domain.ConversationMapper
-import com.upsaclay.message.domain.entity.MessageScreenRoute
+import com.upsaclay.message.presentation.chat.ChatRoute
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 @SuppressLint("MissingPermission")
 class MainActivity : ComponentActivity() {
+    companion object {
+        const val CONVERSATION_ID_EXTRA = "conversation_id_extra"
+    }
     private val mainViewModel: MainViewModel by viewModel()
     private val navigationViewModel: NavigationViewModel by viewModel()
     private val notificationPresenter: NotificationPresenter by inject<NotificationPresenter>()
@@ -31,18 +36,19 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-    companion object {
-        const val CONVERSATION_ID_EXTRA = "conversation_id_extra"
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mainViewModel.startListening()
         startNotification()
 
+        val splashscreen = installSplashScreen()
+        splashscreen.setKeepOnScreenCondition {
+            navigationViewModel.uiState.value.startDestination is SplashScreenRoute
+        }
+
         setContent {
             GedoiseTheme {
-                Navigation(navigationViewModel)
+                GedNavHost(navigationViewModel = navigationViewModel)
             }
         }
 
@@ -53,10 +59,8 @@ class MainActivity : ComponentActivity() {
 
     private fun startNotification() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.POST_NOTIFICATIONS
-                ) == PackageManager.PERMISSION_GRANTED
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                == PackageManager.PERMISSION_GRANTED
             ) {
                 notificationPresenter.start()
             } else {
@@ -73,31 +77,23 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun handleIntent(intent: Intent) {
-        val conversationIdExtra = intent.getStringExtra(CONVERSATION_ID_EXTRA)
-        val notificationTypeExtra = intent.getStringExtra("type")
+        val conversationJson = intent.getStringExtra(CONVERSATION_ID_EXTRA)
+        val notificationType = intent.getStringExtra("type")
 
         when {
-            conversationIdExtra != null -> {
-                ConversationMapper.conversationFromJson(conversationIdExtra)?.let { conversation ->
-                    navigationViewModel.intentToNavigate(
-                        MessageScreenRoute.Chat(conversation)
-                    )
-                }
-            }
+            conversationJson != null ->
+                navigationViewModel.intentToNavigate(ChatRoute(conversationJson))
 
-            notificationTypeExtra != null -> handleNotificationIntent(notificationTypeExtra, intent.extras)
+            notificationType != null ->
+                handleNotificationIntent(notificationType, intent.extras)
         }
     }
 
     private fun handleNotificationIntent(type: String, extras: Bundle?) {
         when (type) {
             FCMDataType.MESSAGE.toString() -> {
-                extras?.getString("value")?.let {
-                    ConversationMapper.conversationMessageFromJson(it)?.let { conversationMessage ->
-                        navigationViewModel.intentToNavigate(
-                            MessageScreenRoute.Chat(conversationMessage.conversation)
-                        )
-                    }
+                extras?.getString("value")?.let { conversation ->
+                    navigationViewModel.intentToNavigate(ChatRoute(conversation))
                 }
             }
 

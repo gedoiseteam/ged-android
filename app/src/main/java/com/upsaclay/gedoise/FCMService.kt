@@ -11,8 +11,6 @@ import com.upsaclay.message.domain.ConversationMapper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 
@@ -27,7 +25,7 @@ class FCMService: FirebaseMessagingService() {
         super.onNewToken(tokenValue)
         job?.cancel()
         job = scope.launch(Dispatchers.IO) {
-            userRepository.currentUser.value?.let {
+            userRepository.currentUser?.let {
                 fcmTokenUseCase.sendFcmToken(FcmToken(it.id, tokenValue))
             } ?: run {
                 fcmTokenUseCase.storeToken(FcmToken(null, tokenValue))

@@ -29,10 +29,12 @@ class UpdateProfilePictureUseCaseTest {
 
     @Before
     fun setUp() {
-        every { userRepository.currentUser } returns MutableStateFlow(userFixture)
+        every { userRepository.user } returns MutableStateFlow(userFixture)
         every { drawableRepository.getDrawableUri(any()) } returns uri
         every { fileRepository.getFileType(any()) } returns "jpg"
-        coEvery { userRepository.updateProfilePictureUrl(any(), any()) } returns Unit
+        coEvery { imageRepository.uploadImage(any()) } returns Unit
+        coEvery { imageRepository.deleteImage(any()) } returns Unit
+        coEvery { userRepository.updateProfilePictureFileName(any(), any()) } returns Unit
         coEvery { fileRepository.createFileFromUri(any(), any()) } returns file
         coEvery { fileRepository.createFileFromByteArray(any(), any()) } returns file
 
@@ -46,20 +48,20 @@ class UpdateProfilePictureUseCaseTest {
     @Test
     fun updateProfilePictureUseCase_should_update_profile_picture() = runTest {
         // When
-        updateProfilePictureUseCase(uri)
+        updateProfilePictureUseCase(userFixture, uri)
 
         // Then
-        coVerify { userRepository.updateProfilePictureUrl(userFixture.id, any()) }
+        coVerify { userRepository.updateProfilePictureFileName(userFixture.id, any()) }
         coVerify { imageRepository.uploadImage(any()) }
     }
 
     @Test
     fun updateProfilePictureUseCase_should_delete_previous_profile_picture() = runTest {
         // When
-        updateProfilePictureUseCase(uri)
+        updateProfilePictureUseCase(userFixture, uri)
 
         // Then
-        coVerify { userRepository.updateProfilePictureUrl(userFixture.id, any()) }
+        coVerify { userRepository.updateProfilePictureFileName(userFixture.id, any()) }
         coVerify { imageRepository.deleteImage(userFixture.profilePictureUrl!!.substringAfterLast("/")) }
     }
 }

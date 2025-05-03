@@ -7,6 +7,8 @@ import com.upsaclay.news.domain.repository.AnnouncementRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 
 internal class AnnouncementRepositoryImpl(
@@ -28,6 +30,11 @@ internal class AnnouncementRepositoryImpl(
             refreshAnnouncements()
         }
     }
+
+    override fun getAnnouncementFlow(announcementId: String): Flow<Announcement?> =
+        _announcements.map { announcements ->
+            announcements.firstOrNull { it.id == announcementId }
+        }
 
     override fun getAnnouncement(announcementId: String): Announcement? =
         _announcements.value.firstOrNull { it.id == announcementId }

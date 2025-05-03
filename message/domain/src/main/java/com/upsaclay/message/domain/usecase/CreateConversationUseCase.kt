@@ -2,13 +2,15 @@ package com.upsaclay.message.domain.usecase
 
 import com.upsaclay.message.domain.entity.Conversation
 import com.upsaclay.message.domain.entity.ConversationState
-import com.upsaclay.message.domain.repository.UserConversationRepository
+import com.upsaclay.message.domain.repository.ConversationRepository
 
 class CreateConversationUseCase(
-    private val userConversationRepository: UserConversationRepository
+    private val conversationRepository: ConversationRepository
 ) {
     suspend operator fun invoke(conversation: Conversation) {
-        userConversationRepository.createConversation(conversation)
-        userConversationRepository.updateConversation(conversation.copy(state = ConversationState.CREATED))
+        conversationRepository.createConversation(conversation)
+        conversationRepository.upsertLocalConversation(
+            conversation.copy(state = ConversationState.CREATED)
+        )
     }
 }

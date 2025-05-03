@@ -3,7 +3,6 @@ package com.upsaclay.news.domain
 import com.upsaclay.common.domain.e
 import com.upsaclay.news.domain.usecase.CreateAnnouncementUseCase
 import com.upsaclay.news.domain.usecase.DeleteAnnouncementUseCase
-import com.upsaclay.news.domain.usecase.GetAnnouncementFlowUseCase
 import com.upsaclay.news.domain.usecase.RecreateAnnouncementUseCase
 import com.upsaclay.news.domain.usecase.RefreshAnnouncementUseCase
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -37,7 +36,6 @@ val newsDomainModule = module {
 
     singleOf(::DeleteAnnouncementUseCase)
     singleOf(::RefreshAnnouncementUseCase)
-    singleOf(::GetAnnouncementFlowUseCase)
     single {
         RecreateAnnouncementUseCase(
             announcementRepository = get(),

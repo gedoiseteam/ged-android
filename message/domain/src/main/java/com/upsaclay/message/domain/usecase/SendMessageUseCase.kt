@@ -1,7 +1,7 @@
 package com.upsaclay.message.domain.usecase
 
 import com.google.gson.GsonBuilder
-import com.upsaclay.common.domain.LocalDateTimeSerializer
+import com.upsaclay.common.domain.LocalDateTimeAdapter
 import com.upsaclay.common.domain.entity.FCMData
 import com.upsaclay.common.domain.entity.FCMDataType
 import com.upsaclay.common.domain.entity.FCMMessage
@@ -36,7 +36,7 @@ class SendMessageUseCase(
             )
         )
         val gson = GsonBuilder()
-            .registerTypeAdapter(LocalDateTime::class.java, LocalDateTimeSerializer)
+            .registerTypeAdapter(LocalDateTime::class.java, LocalDateTimeAdapter)
             .create()
         notificationUseCase.sendNotificationToFCM(fcmMessage, gson)
     }

@@ -39,7 +39,7 @@ class MainViewModelTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
 
-        every { userRepository.currentUser } returns MutableStateFlow(userFixture)
+        every { userRepository.user } returns MutableStateFlow(userFixture)
         every { authenticationRepository.isAuthenticated } returns flowOf(true)
         coEvery { userRepository.getCurrentUser() } returns userFixture
         coEvery { userRepository.getUsers() } returns usersFixture
@@ -112,7 +112,7 @@ class MainViewModelTest {
     @Test
     fun current_user_should_be_updated_when_is_if_different_from_remote() = runTest {
         // Given
-        every { userRepository.currentUser } returns MutableStateFlow(userFixture)
+        every { userRepository.user } returns MutableStateFlow(userFixture)
         coEvery { userRepository.getUser(any()) } returns userFixture2
 
         // When

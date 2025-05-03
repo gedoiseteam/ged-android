@@ -15,6 +15,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -22,28 +23,37 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import com.upsaclay.common.presentation.components.ClickableItem
-import com.upsaclay.common.presentation.components.SmallTopBarAction
-import com.upsaclay.common.presentation.components.SmallTopBarBack
+import com.upsaclay.common.presentation.components.EditTopBar
+import com.upsaclay.common.presentation.components.BackTopBar
 import com.upsaclay.common.presentation.theme.GedoiseTheme
 import com.upsaclay.common.presentation.theme.previewText
 import com.upsaclay.common.presentation.theme.spacing
 import com.upsaclay.gedoise.R
 import com.upsaclay.gedoise.domain.entities.AccountInfo
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun AccountModelBottomSheet(
     modifier: Modifier = Modifier,
-    onDismissRequest: () -> Unit,
+    onDismiss: () -> Unit,
     onNewProfilePictureClick: () -> Unit,
     showDeleteProfilePicture: Boolean = false,
     onDeleteProfilePictureClick: () -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState()
+    val scope = rememberCoroutineScope()
+    val hideBottomSheet: () -> Unit = {
+        scope.launch { sheetState.hide() }.invokeOnCompletion {
+            if (!sheetState.isVisible) {
+                onDismiss()
+            }
+        }
+    }
 
     ModalBottomSheet(
         modifier = modifier,
-        onDismissRequest = onDismissRequest,
+        onDismissRequest = onDismiss,
         sheetState = sheetState
     ) {
         ClickableItem(
@@ -55,7 +65,10 @@ internal fun AccountModelBottomSheet(
                     contentDescription = null
                 )
             },
-            onClick = onNewProfilePictureClick
+            onClick = {
+                hideBottomSheet()
+                onNewProfilePictureClick()
+            }
         )
 
         if (showDeleteProfilePicture) {
@@ -76,7 +89,10 @@ internal fun AccountModelBottomSheet(
                         tint = MaterialTheme.colorScheme.error
                     )
                 },
-                onClick = onDeleteProfilePictureClick
+                onClick = {
+                    hideBottomSheet()
+                    onDeleteProfilePictureClick()
+                }
             )
         }
         Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))
@@ -112,14 +128,14 @@ internal fun AccountTopBar(
     onBackClick: () -> Unit
 ) {
     if (isEdited) {
-        SmallTopBarAction(
+        EditTopBar(
             title = stringResource(id = R.string.edit_profile),
             onCancelClick = onCancelClick,
             onActionClick = onSaveClick,
             buttonText = stringResource(id = com.upsaclay.common.R.string.save)
         )
     } else {
-        SmallTopBarBack(
+        BackTopBar(
             title = stringResource(id = R.string.account_informations),
             onBackClick = onBackClick
         )

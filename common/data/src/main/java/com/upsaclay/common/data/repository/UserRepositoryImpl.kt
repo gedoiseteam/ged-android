@@ -7,15 +7,15 @@ import com.upsaclay.common.data.DataIntegrityViolationException
 import com.upsaclay.common.data.local.UserLocalDataSource
 import com.upsaclay.common.data.remote.UserRemoteDataSource
 import com.upsaclay.common.domain.e
+import com.upsaclay.common.domain.entity.DuplicateUserException
 import com.upsaclay.common.domain.entity.ForbiddenException
+import com.upsaclay.common.domain.entity.InternalServerException
 import com.upsaclay.common.domain.entity.TooManyRequestException
 import com.upsaclay.common.domain.entity.User
-import com.upsaclay.common.domain.entity.UserAlreadyExist
 import com.upsaclay.common.domain.repository.UserRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.io.IOException
@@ -26,51 +26,113 @@ internal class UserRepositoryImpl(
     private val userLocalDataSource: UserLocalDataSource,
     scope: CoroutineScope
 ) : UserRepository {
-    private val _currentUser = MutableStateFlow<User?>(null)
-    override val currentUser: StateFlow<User?> = _currentUser
+    private val _user = MutableStateFlow<User?>(null)
+    override val user: Flow<User?> = _user
+    override val currentUser: User?
+        get() = _user.value
 
     init {
         scope.launch {
             userLocalDataSource.getCurrentUserFlow().collectLatest { user ->
-                _currentUser.value = user
+                _user.value = user
             }
         }
     }
 
-    override suspend fun getUsers(): List<User> = userRemoteDataSource.getUsers()
+    override suspend fun getUsers(): List<User> {
+        return try {
+            userRemoteDataSource.getUsers()
+        }
+        catch (e: FirebaseNetworkException) {
+            e("Error network connection: ${e.message}", e)
+            throw NetworkErrorException()
+        }
+        catch (e: FirebaseTooManyRequestsException) {
+            e("Error to get users with Firestore: ${e.message}", e)
+            throw TooManyRequestException()
+        }
+        catch (e: Exception) {
+            e("Error getting users: ${e.message}", e)
+            throw e
+        }
+    }
 
-    override suspend fun getUser(userId: String): User? = userRemoteDataSource.getUser(userId)
+    override suspend fun getUser(userId: String): User? {
+        return try {
+            userRemoteDataSource.getUser(userId)
+        }
+        catch (e: FirebaseNetworkException) {
+            e("Error network connection: ${e.message}", e)
+            throw NetworkErrorException()
+        }
+        catch (e: FirebaseTooManyRequestsException) {
+            e("Error to get user with Firestore: ${e.message}", e)
+            throw TooManyRequestException()
+        }
+        catch (e: Exception) {
+            e("Error getting user: ${e.message}", e)
+            throw e
+        }
+    }
 
     override suspend fun getCurrentUser(): User? = userLocalDataSource.getCurrentUser()
 
-    override suspend fun getUserFlow(userId: String): Flow<User> = userRemoteDataSource.getUserFlow(userId)
+    override suspend fun getUserFlow(userId: String): Flow<User> {
+        return try {
+            userRemoteDataSource.getUserFlow(userId)
+        }
+        catch (e: FirebaseNetworkException) {
+            e("Error network connection: ${e.message}", e)
+            throw NetworkErrorException()
+        }
+        catch (e: FirebaseTooManyRequestsException) {
+            e("Error to get user with Firestore: ${e.message}", e)
+            throw TooManyRequestException()
+        }
+        catch (e: Exception) {
+            e("Error getting user: ${e.message}", e)
+            throw e
+        }
+    }
 
-    override suspend fun getUserWithEmail(userEmail: String): User? = userRemoteDataSource.getUserFirestoreWithEmail(userEmail)
-
-    override suspend fun getFilteredUsers(userName: String): List<User> = userRemoteDataSource.getFilteredUsers(userName)
+    override suspend fun getUserWithEmail(userEmail: String): User? {
+        return try {
+            userRemoteDataSource.getUserFirestoreWithEmail(userEmail)
+        }
+        catch (e: FirebaseNetworkException) {
+            e("Error network connection: ${e.message}", e)
+            throw NetworkErrorException()
+        }
+        catch (e: FirebaseTooManyRequestsException) {
+            e("Error to get user with Firestore: ${e.message}", e)
+            throw TooManyRequestException()
+        }
+        catch (e: Exception) {
+            e("Error getting user with email: ${e.message}", e)
+            throw e
+        }
+    }
 
     override suspend fun createUser(user: User) {
         try {
             userRemoteDataSource.createUser(user)
             userLocalDataSource.setCurrentUser(user)
-        } catch (e: ConnectException) {
-            e("Connect exception: ${e.message}", e)
-            throw e
-        } catch (e: FirebaseNetworkException) {
+        }
+        catch (e: FirebaseNetworkException) {
             e("Error network connection: ${e.message}", e)
             throw NetworkErrorException()
-        } catch (e: FirebaseTooManyRequestsException) {
+        }
+        catch (e: FirebaseTooManyRequestsException) {
             e("Error to create user with Firestore: ${e.message}", e)
             throw TooManyRequestException()
-        } catch (e: ForbiddenException) {
+        }
+        catch (e: DataIntegrityViolationException) {
             e("Error to create user with Oracle: ${e.message}", e)
-            throw ForbiddenException()
-        } catch (e: DataIntegrityViolationException) {
-            e("Error to create user with Oracle: ${e.message}", e)
-            throw UserAlreadyExist()
-        } catch (e: Exception) {
+            throw DuplicateUserException()
+        }
+        catch (e: Exception) {
             e("Error creating user: ${e.message}", e)
-            throw IOException()
+            throw e
         }
     }
 
@@ -79,13 +141,26 @@ internal class UserRepositoryImpl(
     }
 
     override suspend fun deleteCurrentUser() {
-        _currentUser.value = null
+        _user.value = null
         userLocalDataSource.deleteCurrentUser()
     }
 
-    override suspend fun updateProfilePictureUrl(userId: String, profilePictureUrl: String) {
-        userRemoteDataSource.updateProfilePictureFileName(userId, profilePictureUrl)
-        userLocalDataSource.updateProfilePictureUrl(profilePictureUrl)
+    override suspend fun updateProfilePictureFileName(userId: String, fileName: String) {
+        try {
+            userRemoteDataSource.updateProfilePictureFileName(userId, fileName)
+            userLocalDataSource.updateProfilePictureFileName(fileName)
+        } catch (e: FirebaseNetworkException) {
+            e("Error network connection: ${e.message}", e)
+            throw NetworkErrorException()
+        }
+        catch (e: FirebaseTooManyRequestsException) {
+            e("Error to update profile picture file name with Firestore: ${e.message}", e)
+            throw TooManyRequestException()
+        }
+        catch (e: Exception) {
+            e("Error to update profile picture file name: ${e.message}", e)
+            throw e
+        }
     }
 
     override suspend fun deleteProfilePictureUrl(userId: String) {
@@ -94,17 +169,20 @@ internal class UserRepositoryImpl(
     }
 
     override suspend fun isUserExist(email: String): Boolean {
-        try {
-            return userRemoteDataSource.isUserExist(email)
-        } catch (e: FirebaseNetworkException) {
+        return try {
+            userRemoteDataSource.isUserExist(email)
+        }
+        catch (e: FirebaseNetworkException) {
             e("Error network connection: ${e.message}", e)
             throw NetworkErrorException()
-        } catch (e: FirebaseTooManyRequestsException) {
+        }
+        catch (e: FirebaseTooManyRequestsException) {
             e("Error to check is user exist with Firestore: ${e.message}", e)
             throw TooManyRequestException()
-        } catch (e: Exception) {
-            e("Error to verify email with Firebase: ${e.message}", e)
-            throw IOException()
+        }
+        catch (e: Exception) {
+            e("Error to verify is user exist : ${e.message}", e)
+            throw e
         }
     }
 }

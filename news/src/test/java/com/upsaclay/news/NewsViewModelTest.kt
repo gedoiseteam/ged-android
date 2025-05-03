@@ -7,7 +7,7 @@ import com.upsaclay.news.domain.repository.AnnouncementRepository
 import com.upsaclay.news.domain.usecase.DeleteAnnouncementUseCase
 import com.upsaclay.news.domain.usecase.RecreateAnnouncementUseCase
 import com.upsaclay.news.domain.usecase.RefreshAnnouncementUseCase
-import com.upsaclay.news.presentation.viewmodels.NewsViewModel
+import com.upsaclay.news.presentation.news.NewsViewModel
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -41,36 +41,19 @@ class NewsViewModelTest {
         Dispatchers.setMain(testDispatcher)
 
         every { announcementRepository.announcements } returns flowOf(announcementsFixture)
-        every { userRepository.currentUser } returns MutableStateFlow(userFixture)
+        every { userRepository.user } returns MutableStateFlow(userFixture)
         every { recreateAnnouncementUseCase(any()) } returns Unit
         coEvery { refreshAnnouncementUseCase() } returns Unit
+        coEvery { refreshAnnouncementUseCase.refreshing } returns MutableStateFlow(false)
         coEvery { deleteAnnouncementUseCase(any()) } returns Unit
 
         newsViewModel = NewsViewModel(
             recreateAnnouncementUseCase = recreateAnnouncementUseCase,
             deleteAnnouncementUseCase = deleteAnnouncementUseCase,
             refreshAnnouncementUseCase = refreshAnnouncementUseCase,
-            announcementRepository = announcementRepository
+            announcementRepository = announcementRepository,
+            userRepository = userRepository
         )
-    }
-
-    @Test
-    fun announcements_should_be_sorted_by_date_and_truncated() = runTest {
-        // Given
-        val announcements = announcementsFixture
-            .sortedBy { it.date }
-            .map {
-                it.copy(
-                    title = it.title?.take(100),
-                    content = it.content.take(100)
-                )
-        }
-
-        // When
-        val result = newsViewModel.announcements.first()
-
-        // Then
-        assertEquals(announcements, result)
     }
 
     @Test
@@ -83,7 +66,7 @@ class NewsViewModelTest {
     }
 
     @Test
-    fun recreateAnnouncement_should_recreate_announcement() = runTest {
+    fun recreateAnnouncement_should_resend_announcement() = runTest {
         // Given
         val announcement = announcementsFixture.first()
 

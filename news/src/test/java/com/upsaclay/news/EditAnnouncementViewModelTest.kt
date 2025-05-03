@@ -2,7 +2,7 @@ package com.upsaclay.news
 
 import com.upsaclay.news.domain.announcementFixture
 import com.upsaclay.news.domain.repository.AnnouncementRepository
-import com.upsaclay.news.presentation.viewmodels.EditAnnouncementViewModel
+import com.upsaclay.news.presentation.announcement.edit.EditAnnouncementViewModel
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
@@ -38,41 +38,20 @@ class EditAnnouncementViewModelTest {
     }
 
     @Test
-    fun default_values_are_correct() {
-        assertEquals(announcementFixture, editAnnouncementViewModel.announcement.value)
-        assertEquals(false, editAnnouncementViewModel.isAnnouncementModified.value)
-        assertEquals(announcementFixture.title, editAnnouncementViewModel.title.value)
-        assertEquals(announcementFixture.content, editAnnouncementViewModel.content.value)
+    fun updateTitle_should_on_titleChange() {
+        // When
+        editAnnouncementViewModel.onTitleChange(title)
+
+        // Then
+        assertEquals(title, editAnnouncementViewModel.uiState.value.title)
     }
 
     @Test
-    fun updateTitle_should_update_title() {
+    fun updateContent_should_on_contentChange() {
         // When
-        editAnnouncementViewModel.updateTitle(title)
+        editAnnouncementViewModel.onContentChange(content)
 
         // Then
-        assertEquals(title, editAnnouncementViewModel.title.value)
-    }
-
-    @Test
-    fun updateContent_should_update_content() {
-        // When
-        editAnnouncementViewModel.updateContent(content)
-
-        // Then
-        assertEquals(content, editAnnouncementViewModel.content.value)
-    }
-
-    @Test
-    fun updateAnnouncement_should_update_announcement() = runTest {
-        // Given
-        editAnnouncementViewModel.updateTitle(title)
-        editAnnouncementViewModel.updateContent(content)
-
-        // When
-        editAnnouncementViewModel.updateAnnouncement(announcementFixture)
-
-        // Then
-        assertEquals(announcementFixture, editAnnouncementViewModel.announcement.value)
+        assertEquals(content, editAnnouncementViewModel.uiState.value.content)
     }
 }

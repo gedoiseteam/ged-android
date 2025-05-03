@@ -19,3 +19,8 @@ data class Seen (
     val value: Boolean = true,
     val time: LocalDateTime = LocalDateTime.now()
 )
+enum class MessageState {
+    SENT,
+    ERROR,
+    LOADING
+}

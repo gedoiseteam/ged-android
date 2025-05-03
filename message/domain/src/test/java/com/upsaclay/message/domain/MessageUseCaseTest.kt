@@ -1,7 +1,7 @@
 package com.upsaclay.message.domain
 
 import com.upsaclay.message.domain.repository.MessageRepository
-import com.upsaclay.message.domain.repository.UserConversationRepository
+import com.upsaclay.message.domain.repository.ConversationRepository
 import com.upsaclay.message.domain.usecase.CreateConversationUseCase
 import com.upsaclay.message.domain.usecase.DeleteConversationUseCase
 import com.upsaclay.message.domain.usecase.ListenRemoteConversationsUseCase
@@ -21,7 +21,7 @@ import kotlin.test.assertFalse
 @OptIn(ExperimentalCoroutinesApi::class)
 class MessageUseCaseTest {
     private val messageRepository: MessageRepository = mockk()
-    private val userConversationRepository: UserConversationRepository = mockk()
+    private val conversationRepository: ConversationRepository = mockk()
 
     private lateinit var createConversationUseCase: CreateConversationUseCase
     private lateinit var deleteConversationUseCase: DeleteConversationUseCase
@@ -32,29 +32,28 @@ class MessageUseCaseTest {
 
     @Before
     fun setUp() {
-        createConversationUseCase = CreateConversationUseCase(userConversationRepository = userConversationRepository)
+        createConversationUseCase = CreateConversationUseCase(conversationRepository = conversationRepository)
         deleteConversationUseCase = DeleteConversationUseCase(
-            userConversationRepository = userConversationRepository,
+            conversationRepository = conversationRepository,
             messageRepository = messageRepository
         )
         listenRemoteConversationsUseCase = ListenRemoteConversationsUseCase(
-            userConversationRepository = userConversationRepository,
+            conversationRepository = conversationRepository,
             scope = testScope
         )
         listenRemoteMessagesUseCase = ListenRemoteMessagesUseCase(
-            userConversationRepository = userConversationRepository,
+            conversationRepository = conversationRepository,
             messageRepository = messageRepository,
             scope = testScope
         )
 
-        coEvery { userConversationRepository.conversationsMessage } returns flowOf(conversationsMessageFixture)
-        coEvery { userConversationRepository.conversations } returns flowOf(conversationsFixture)
-        coEvery { userConversationRepository.getConversationFromLocal(any()) } returns conversationFixture
-        coEvery { userConversationRepository.createConversation(any()) } returns Unit
-        coEvery { userConversationRepository.updateConversation(any()) } returns Unit
-        coEvery { userConversationRepository.deleteConversation(any()) } returns Unit
-        coEvery { userConversationRepository.deleteLocalConversations() } returns Unit
-        coEvery { userConversationRepository.listenRemoteConversations() } returns Unit
+        coEvery { conversationRepository.conversationsMessage } returns flowOf(conversationsMessageFixture)
+        coEvery { conversationRepository.conversations } returns flowOf(conversationsFixture)
+        coEvery { conversationRepository.getConversationFromLocal(any()) } returns conversationFixture
+        coEvery { conversationRepository.createConversation(any()) } returns Unit
+        coEvery { conversationRepository.deleteConversation(any()) } returns Unit
+        coEvery { conversationRepository.deleteLocalConversations() } returns Unit
+        coEvery { conversationRepository.getRemoteConversations() } returns Unit
         coEvery { messageRepository.listenRemoteMessages(any()) } returns Unit
         coEvery { messageRepository.addMessage(any()) } returns Unit
         coEvery { messageRepository.updateMessage(any()) } returns Unit
@@ -69,7 +68,7 @@ class MessageUseCaseTest {
         createConversationUseCase(conversationFixture)
 
         // Then
-        coVerify { userConversationRepository.createConversation(conversationFixture) }
+        coVerify { conversationRepository.createConversation(conversationFixture) }
     }
 
     @Test
@@ -81,7 +80,7 @@ class MessageUseCaseTest {
         deleteConversationUseCase(conversation)
 
         // Then
-        coVerify { userConversationRepository.deleteConversation(ConversationMapper.toConversation(conversation)) }
+        coVerify { conversationRepository.deleteConversation(ConversationMapper.toConversation(conversation)) }
         coVerify { messageRepository.deleteMessages(conversation.id) }
     }
 
@@ -92,7 +91,7 @@ class MessageUseCaseTest {
 
         // Then
         assert(listenRemoteConversationsUseCase.job != null)
-        coVerify { userConversationRepository.listenRemoteConversations() }
+        coVerify { conversationRepository.getRemoteConversations() }
     }
 
     @Test
