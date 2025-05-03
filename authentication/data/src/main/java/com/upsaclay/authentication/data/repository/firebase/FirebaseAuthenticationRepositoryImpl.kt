@@ -9,8 +9,8 @@ import com.upsaclay.authentication.data.api.FirebaseAuthenticationApi
 import com.upsaclay.authentication.domain.entity.exception.AuthErrorCode
 import com.upsaclay.authentication.domain.entity.exception.AuthUserNotFoundException
 import com.upsaclay.authentication.domain.entity.exception.InvalidCredentialsException
-import com.upsaclay.authentication.domain.entity.exception.UserAlreadyExistsException
 import com.upsaclay.common.domain.e
+import com.upsaclay.common.domain.entity.DuplicateUserException
 import com.upsaclay.common.domain.entity.ServerCommunicationException
 import com.upsaclay.common.domain.entity.TooManyRequestException
 import kotlinx.coroutines.Dispatchers
@@ -27,7 +27,7 @@ class FirebaseAuthenticationRepositoryImpl(
             } catch (e: FirebaseAuthException) {
                 e("Error to sign in with email and password with Firebase: ${e.message}", e)
                 when (AuthErrorCode.fromCode(e.errorCode)) {
-                    AuthErrorCode.EMAIL_ALREADY_AFFILIATED -> throw UserAlreadyExistsException()
+                    AuthErrorCode.EMAIL_ALREADY_AFFILIATED -> throw DuplicateUserException()
                     AuthErrorCode.INVALID_CREDENTIALS -> throw InvalidCredentialsException()
                     else -> throw IOException()
                 }
@@ -51,7 +51,7 @@ class FirebaseAuthenticationRepositoryImpl(
             } catch (e: FirebaseAuthException) {
                 e("Error to sign up with email and password with Firebase: ${e.message}", e)
                 when (AuthErrorCode.fromCode(e.errorCode)) {
-                    AuthErrorCode.EMAIL_ALREADY_AFFILIATED -> throw UserAlreadyExistsException()
+                    AuthErrorCode.EMAIL_ALREADY_AFFILIATED -> throw DuplicateUserException()
                     AuthErrorCode.INVALID_CREDENTIALS -> throw InvalidCredentialsException()
                     else -> throw IOException()
                 }

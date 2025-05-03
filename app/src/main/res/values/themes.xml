@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.Gedoise" parent="Theme.Design.NoActionBar">
+    <style name="Theme.Gedoise" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/background</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_foreground</item>
+        <item name="postSplashScreenTheme">@style/Theme.Gedoise.PostSplash</item>
+    </style>
+
+    <style name="Theme.Gedoise.PostSplash" parent="Theme.Design.NoActionBar">
         <item name="android:windowBackground">@drawable/splash_background</item>
     </style>
 </resources>

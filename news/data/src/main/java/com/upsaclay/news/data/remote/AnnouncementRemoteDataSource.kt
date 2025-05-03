@@ -1,15 +1,18 @@
 package com.upsaclay.news.data.remote
 
 import com.upsaclay.common.data.formatHttpError
+import com.upsaclay.common.domain.entity.InternalServerException
 import com.upsaclay.common.domain.entity.ServerCommunicationException
 import com.upsaclay.news.data.AnnouncementMapper
 import com.upsaclay.news.data.remote.api.AnnouncementApi
 import com.upsaclay.news.domain.entity.Announcement
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.jetbrains.annotations.ApiStatus.Internal
 import timber.log.Timber.Forest.e
 import java.io.IOException
 import java.net.ConnectException
+import java.net.SocketTimeoutException
 
 internal class AnnouncementRemoteDataSource(private val announcementApi: AnnouncementApi) {
     suspend fun getAnnouncement(): List<Announcement> = withContext(Dispatchers.IO) {
@@ -33,10 +36,16 @@ internal class AnnouncementRemoteDataSource(private val announcementApi: Announc
         withContext(Dispatchers.IO) {
             val response = try {
                 announcementApi.createAnnouncement(AnnouncementMapper.toRemote(announcement))
-            } catch (e: ConnectException) {
+            }
+            catch (e: ConnectException) {
                 e("Error creating remote announcement: ${e.message}")
                 throw ConnectException()
-            } catch (e: Exception) {
+            }
+            catch (e: SocketTimeoutException) {
+                e("Error creating remote announcement: ${e.message}")
+                throw SocketTimeoutException()
+            }
+            catch (e: Exception) {
                 e("Error creating remote announcement: ${e.message}")
                 throw IOException()
             }
@@ -56,7 +65,12 @@ internal class AnnouncementRemoteDataSource(private val announcementApi: Announc
             } catch (e: ConnectException) {
                 e("Error deleting remote announcement: ${e.message}", e)
                 throw ConnectException()
-            } catch (e: Exception) {
+            }
+            catch (e: SocketTimeoutException) {
+                e("Error updating remote announcement: ${e.message}", e)
+                throw SocketTimeoutException()
+            }
+            catch (e: Exception) {
                 e("Error deleting remote announcement: ${e.message}", e)
                 throw IOException()
             }
@@ -64,7 +78,7 @@ internal class AnnouncementRemoteDataSource(private val announcementApi: Announc
             if (!response.isSuccessful) {
                 val errorMessage = formatHttpError("Error deleting remote announcement", response)
                 e(errorMessage)
-                throw ServerCommunicationException(errorMessage)
+                throw InternalServerException(errorMessage)
             }
         }
     }
@@ -76,7 +90,12 @@ internal class AnnouncementRemoteDataSource(private val announcementApi: Announc
             } catch (e: ConnectException) {
                 e("Error updating remote announcement: ${e.message}", e)
                 throw ConnectException()
-            } catch (e: Exception) {
+            }
+            catch (e: SocketTimeoutException) {
+                e("Error updating remote announcement: ${e.message}", e)
+                throw SocketTimeoutException()
+            }
+            catch (e: Exception) {
                 e("Error updating remote announcement: ${e.message}", e)
                 throw IOException()
             }
@@ -84,7 +103,7 @@ internal class AnnouncementRemoteDataSource(private val announcementApi: Announc
             if (!response.isSuccessful) {
                 val errorMessage = formatHttpError("Error updating remote announcement", response)
                 e(errorMessage)
-                throw IOException(errorMessage)
+                throw InternalServerException(errorMessage)
             }
         }
     }

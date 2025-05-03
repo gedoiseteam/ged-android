@@ -1,7 +1,7 @@
 package com.upsaclay.message.domain
 
 import com.google.gson.GsonBuilder
-import com.upsaclay.common.domain.LocalDateTimeSerializer
+import com.upsaclay.common.domain.LocalDateTimeAdapter
 import com.upsaclay.message.domain.entity.Conversation
 import com.upsaclay.message.domain.entity.ConversationMessage
 import com.upsaclay.message.domain.entity.ConversationUI
@@ -35,22 +35,15 @@ object ConversationMapper {
 
     fun toJson(conversation: Conversation): String {
         return GsonBuilder()
-            .registerTypeAdapter(LocalDateTime::class.java, LocalDateTimeSerializer)
+            .registerTypeAdapter(LocalDateTime::class.java, LocalDateTimeAdapter)
             .create()
             .toJson(conversation)
-    }
-
-    fun toJson(conversationMessage: ConversationMessage): String {
-        return GsonBuilder()
-            .registerTypeAdapter(LocalDateTime::class.java, LocalDateTimeSerializer)
-            .create()
-            .toJson(conversationMessage)
     }
 
     fun conversationFromJson(conversationJson: String): Conversation? {
         return runCatching {
             GsonBuilder()
-                .registerTypeAdapter(LocalDateTime::class.java, LocalDateTimeSerializer)
+                .registerTypeAdapter(LocalDateTime::class.java, LocalDateTimeAdapter)
                 .create()
                 .fromJson(conversationJson, Conversation::class.java)
         }.getOrNull()
@@ -59,7 +52,7 @@ object ConversationMapper {
     fun conversationMessageFromJson(conversationMessageJson: String): ConversationMessage? {
         return runCatching {
             GsonBuilder()
-                .registerTypeAdapter(LocalDateTime::class.java, LocalDateTimeSerializer)
+                .registerTypeAdapter(LocalDateTime::class.java, LocalDateTimeAdapter)
                 .create()
                 .fromJson(conversationMessageJson, ConversationMessage::class.java)
         }.getOrNull()

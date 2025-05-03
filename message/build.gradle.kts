@@ -1,7 +1,8 @@
 plugins {
-    alias(libs.plugins.androidLibrary)
-    alias(libs.plugins.jetbrainsKotlinAndroid)
-    alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -55,7 +56,6 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.paging.compose)
     implementation(libs.androidx.paging.runtime.ktx)
-
     implementation(libs.koin)
     implementation(libs.koin.core)
     implementation(libs.koin.androidx.compose)
@@ -63,6 +63,7 @@ dependencies {
     implementation(libs.androidx.animation.compose)
     implementation(libs.gson)
     implementation(libs.jakewharton.timber)
+    implementation(libs.kotlinx.serialization.json)
 
     testImplementation(libs.junit)
     testImplementation(libs.mockk)

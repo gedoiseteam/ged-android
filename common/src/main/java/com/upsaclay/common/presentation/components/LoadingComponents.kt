@@ -50,18 +50,6 @@ fun OverlayLinearLoadingScreen() {
     }
 }
 
-@Composable
-fun TopLinearLoadingScreen() {
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .zIndex(1000f)
-    ) {
-        LinearProgressBar(modifier = Modifier
-            .fillMaxWidth()
-            .align(Alignment.TopStart))
-    }
-}
-
 /*
  =====================================================================
                                 Preview

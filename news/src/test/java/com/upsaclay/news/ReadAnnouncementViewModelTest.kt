@@ -5,8 +5,7 @@ import com.upsaclay.common.domain.userFixture
 import com.upsaclay.news.domain.announcementFixture
 import com.upsaclay.news.domain.repository.AnnouncementRepository
 import com.upsaclay.news.domain.usecase.DeleteAnnouncementUseCase
-import com.upsaclay.news.domain.usecase.GetAnnouncementFlowUseCase
-import com.upsaclay.news.presentation.viewmodels.ReadAnnouncementViewModel
+import com.upsaclay.news.presentation.announcement.read.ReadAnnouncementViewModel
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -23,7 +22,6 @@ import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ReadAnnouncementViewModelTest {
-    private val getAnnouncementFlowUseCase: GetAnnouncementFlowUseCase = mockk()
     private val deleteAnnouncementUseCase: DeleteAnnouncementUseCase = mockk()
 
     private val userRepository: UserRepository = mockk()
@@ -36,14 +34,13 @@ class ReadAnnouncementViewModelTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
 
-        every { userRepository.currentUser } returns MutableStateFlow(announcementFixture.author)
+        every { userRepository.user } returns MutableStateFlow(announcementFixture.author)
         every { announcementRepository.getAnnouncement(announcementFixture.id) } returns announcementFixture
-        every { getAnnouncementFlowUseCase(any()) } returns MutableStateFlow(announcementFixture)
+        every { announcementRepository.getAnnouncementFlow(announcementFixture.id) } returns flowOf(announcementFixture)
         coEvery { deleteAnnouncementUseCase(announcementFixture) } returns Unit
 
         readAnnouncementViewModel = ReadAnnouncementViewModel(
             announcementId = announcementFixture.id,
-            getAnnouncementFlowUseCase = getAnnouncementFlowUseCase,
             deleteAnnouncementUseCase = deleteAnnouncementUseCase,
             userRepository = userRepository,
             announcementRepository = announcementRepository
@@ -51,30 +48,13 @@ class ReadAnnouncementViewModelTest {
     }
 
     @Test
-    fun default_values_are_correct() {
-        assertEquals(announcementFixture, readAnnouncementViewModel.announcement.value)
-        assertEquals(userFixture, readAnnouncementViewModel.currentUser.value)
-    }
-
-    @Test
-    fun deleteAnnouncement_should_delete_announcement() {
-        // When
-        readAnnouncementViewModel.deleteAnnouncement()
-
-        // Then
-        coVerify { deleteAnnouncementUseCase(announcementFixture) }
-    }
-
-    @Test
     fun deleteAnnouncement_should_not_delete_announcement_when_announcement_is_null() {
         // Given
         every { announcementRepository.getAnnouncement(announcementFixture.id) } returns null
-        every { getAnnouncementFlowUseCase(any()) } returns flowOf()
 
         readAnnouncementViewModel = ReadAnnouncementViewModel(
             announcementId = announcementFixture.id,
             userRepository = userRepository,
-            getAnnouncementFlowUseCase = getAnnouncementFlowUseCase,
             deleteAnnouncementUseCase = deleteAnnouncementUseCase,
             announcementRepository = announcementRepository
         )

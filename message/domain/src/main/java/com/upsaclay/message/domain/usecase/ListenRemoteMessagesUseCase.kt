@@ -1,19 +1,17 @@
 package com.upsaclay.message.domain.usecase
 
 import com.upsaclay.message.domain.repository.MessageRepository
-import com.upsaclay.message.domain.repository.UserConversationRepository
+import com.upsaclay.message.domain.repository.ConversationRepository
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 class ListenRemoteMessagesUseCase(
-    private val userConversationRepository: UserConversationRepository,
+    private val conversationRepository: ConversationRepository,
     private val messageRepository: MessageRepository,
     private val scope: CoroutineScope
 ) {
@@ -22,7 +20,7 @@ class ListenRemoteMessagesUseCase(
 
     fun start() {
         job?.cancel()
-        job = userConversationRepository.conversations
+        job = conversationRepository.conversations
             .onEach { conversations ->
                 listeningScope?.cancel()
                 listeningScope = CoroutineScope(scope.coroutineContext + SupervisorJob())

@@ -16,10 +16,10 @@ import com.upsaclay.gedoise.domain.usecase.StartListeningDataUseCase
 import com.upsaclay.gedoise.domain.usecase.StopListeningDataUseCase
 import com.upsaclay.gedoise.domain.usecase.FCMTokenUseCase
 import com.upsaclay.gedoise.presentation.NotificationPresenter
-import com.upsaclay.gedoise.presentation.viewmodels.AccountViewModel
+import com.upsaclay.gedoise.presentation.profile.account.AccountViewModel
 import com.upsaclay.gedoise.presentation.viewmodels.MainViewModel
 import com.upsaclay.gedoise.presentation.viewmodels.NavigationViewModel
-import com.upsaclay.gedoise.presentation.viewmodels.ProfileViewModel
+import com.upsaclay.gedoise.presentation.profile.ProfileViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

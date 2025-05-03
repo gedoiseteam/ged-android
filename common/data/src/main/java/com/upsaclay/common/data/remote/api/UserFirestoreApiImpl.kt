@@ -73,25 +73,6 @@ internal class UserFirestoreApiImpl : UserFirestoreApi {
             }
     }
 
-    override suspend fun getFilteredUsers(query: String): List<FirestoreUser> = suspendCoroutine {
-           usersCollection
-               .whereGreaterThanOrEqualTo(UserField.Remote.FULL_NAME, query)
-               .whereLessThanOrEqualTo(UserField.Remote.FULL_NAME, query + "\uf8ff")
-               .limit(30)
-               .get()
-                .addOnSuccessListener { snapshot ->
-                     val users = snapshot?.documents?.mapNotNull {
-                          it.toObject(FirestoreUser::class.java)
-                     } ?: emptyList()
-
-                     it.resume(users)
-                }
-                .addOnFailureListener { e ->
-                     e("Error getting firestore users", e)
-                     it.resume(emptyList())
-                }
-    }
-
     override suspend fun createUser(firestoreUser: FirestoreUser) {
         suspendCoroutine { continuation ->
             usersCollection.document(firestoreUser.userId).set(firestoreUser)

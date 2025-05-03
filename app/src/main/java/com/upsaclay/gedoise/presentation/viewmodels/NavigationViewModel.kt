@@ -2,93 +2,55 @@ package com.upsaclay.gedoise.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.upsaclay.authentication.domain.entity.AuthenticationScreenRoute
+import com.upsaclay.authentication.AuthenticationBaseRoute
+import com.upsaclay.authentication.AuthenticationRoute
 import com.upsaclay.authentication.domain.repository.AuthenticationRepository
-import com.upsaclay.common.domain.entity.ScreenRoute
-import com.upsaclay.common.domain.entity.User
 import com.upsaclay.common.domain.repository.UserRepository
-import com.upsaclay.gedoise.domain.entities.MainScreenRoute
 import com.upsaclay.gedoise.domain.repository.ScreenRepository
-import com.upsaclay.gedoise.presentation.NavigationItem
-import com.upsaclay.message.domain.entity.MessageScreenRoute
-import com.upsaclay.message.domain.repository.UserConversationRepository
-import com.upsaclay.news.domain.entity.NewsScreenRoute
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
+import com.upsaclay.gedoise.presentation.navigation.SplashScreenRoute
+import com.upsaclay.gedoise.presentation.navigation.TopLevelDestination
+import com.upsaclay.message.domain.usecase.GetUnreadMessagesUseCase
+import com.upsaclay.message.presentation.chat.ChatRoute
+import com.upsaclay.message.presentation.conversation.ConversationRoute
+import com.upsaclay.news.presentation.NewsBaseRoute
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.reflect.KClass
 
 class NavigationViewModel(
-    userRepository: UserRepository,
-    private val userConversationRepository: UserConversationRepository,
+    private val getUnreadMessagesUseCase: GetUnreadMessagesUseCase,
     private val screenRepository: ScreenRepository,
     private val authenticationRepository: AuthenticationRepository
 ): ViewModel() {
-    private val intentScreenNavigate = MutableStateFlow<ScreenRoute?>(null)
+    private val _uiState = MutableStateFlow(NavigationState())
+    val uiState: StateFlow<NavigationState> = _uiState
 
-    private val _screenRouteToNavigate = MutableSharedFlow<ScreenRoute>(replay = 3)
-    val screenRouteToNavigate: SharedFlow<ScreenRoute> = _screenRouteToNavigate
-
-    private val _startDestinationScreenRoute = MutableStateFlow<ScreenRoute>(MainScreenRoute.Splash)
-    val startDestinationScreenRoute: StateFlow<ScreenRoute> = _startDestinationScreenRoute
-
-    private val _homeNavigationItem = MutableStateFlow(NavigationItem.Home())
-    val homeNavigationItem: StateFlow<NavigationItem> = _homeNavigationItem
-
-    private val _messageNavigationItem = MutableStateFlow(NavigationItem.Message())
-    val messageNavigationItem: StateFlow<NavigationItem> = _messageNavigationItem
-
-    val currentUser: StateFlow<User?> = userRepository.currentUser
-
-    fun start() {
+    init {
         updateStartDestinationScreenRoute()
+        updateMessageBadges()
         updateScreenRoute()
-        updateMessageNavigationItemBadges()
-    }
-
-    fun storeCurrentScreen(screenRoute: ScreenRoute?) {
-        screenRepository.setCurrentScreenRoute(screenRoute)
-    }
-
-    fun intentToNavigate(screenRoute: ScreenRoute) {
-        intentScreenNavigate.value = screenRoute
-    }
-
-    private fun updateStartDestinationScreenRoute() {
-        viewModelScope.launch {
-            authenticationRepository.isAuthenticated
-                .filterNotNull()
-                .collect { isAuthenticated ->
-                    _startDestinationScreenRoute.value = if (isAuthenticated) {
-                        NewsScreenRoute.News
-                    } else {
-                        AuthenticationScreenRoute.Authentication
-                    }
-                }
-        }
     }
 
     private fun updateScreenRoute() {
         viewModelScope.launch {
             combine(
                 authenticationRepository.isAuthenticated.filterNotNull(),
-                intentScreenNavigate
+                _uiState
+                    .distinctUntilChangedBy { it.intentScreen }
+                    .mapNotNull { it.intentScreen }
             ) { isAuthenticated, intentScreen ->
                 if (isAuthenticated) {
                     intentScreen
-                }
-                else {
-                    AuthenticationScreenRoute.Authentication.takeIf {
-                        screenRepository.currentScreenRoute !is AuthenticationScreenRoute
+                } else {
+                    AuthenticationRoute.takeIf {
+                        screenRepository.currentRoute is AuthenticationRoute
                     }
                 }
             }
@@ -99,39 +61,76 @@ class NavigationViewModel(
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private fun updateMessageNavigationItemBadges() {
-        currentUser
-            .filterNotNull()
-            .distinctUntilChangedBy { it.id }
-            .mapLatest { currentUser ->
-                userConversationRepository.conversationsMessage
-                    .map { conversationsMessage ->
-                        conversationsMessage
-                            .filterNot { it.lastMessage.isSeen() }
-                            .filter { it.lastMessage.senderId != currentUser.id }
-                    }.collect { messages ->
-                        _messageNavigationItem.value = NavigationItem.Message(badges = messages.size)
-                    }
-            }.launchIn(viewModelScope)
+    fun intentToNavigate(route: Any) {
+        _uiState.update {
+            it.copy(intentScreen = route)
+        }
     }
 
-    private suspend fun navigate(screenRoute: ScreenRoute) {
-        val routes: Array<ScreenRoute> = when(screenRoute) {
-            is MessageScreenRoute.Chat -> {
+    private fun updateStartDestinationScreenRoute() {
+        viewModelScope.launch {
+            authenticationRepository.isAuthenticated
+                .filterNotNull()
+                .map {
+                    if (it) {
+                        NewsBaseRoute
+                    } else {
+                        AuthenticationBaseRoute
+                    }
+                }
+                .collect { route ->
+                    _uiState.update {
+                        it.copy(startDestination = route)
+                    }
+                }
+        }
+    }
+
+    private fun updateMessageBadges() {
+        viewModelScope.launch {
+            getUnreadMessagesUseCase().collect { messages ->
+                _uiState.update {
+                    it.copy(
+                        topLevelDestinations = it.topLevelDestinations.map { destination ->
+                            if (destination is TopLevelDestination.Message) {
+                                destination.copy(badges = messages.size)
+                            } else {
+                                destination
+                            }
+                        }
+                    )
+                }
+            }
+        }
+    }
+
+    private fun navigate(route: Any) {
+        val routes = when(route) {
+            ChatRoute -> {
                 arrayOf(
-                    MessageScreenRoute.Conversation,
-                    MessageScreenRoute.Chat(screenRoute.conversation)
+                    ConversationRoute,
+                    route
                 )
             }
-            is AuthenticationScreenRoute.Authentication -> {
-                arrayOf(AuthenticationScreenRoute.Authentication)
-            }
+
+            AuthenticationRoute -> arrayOf(route)
+
             else -> return
         }
 
-        routes.forEach {
-            _screenRouteToNavigate.emit(it)
+        routes.forEach { screen ->
+            _uiState.update {
+                it.copy(intentScreen = screen)
+            }
         }
     }
+
+    data class NavigationState(
+        val topLevelDestinations: List<TopLevelDestination> = listOf(
+            TopLevelDestination.Home(),
+            TopLevelDestination.Message(),
+        ),
+        val startDestination: Any = SplashScreenRoute,
+        val intentScreen: Any? = null
+    )
 }

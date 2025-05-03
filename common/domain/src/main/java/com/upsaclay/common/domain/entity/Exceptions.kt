@@ -20,10 +20,10 @@ class UserNotFoundException(
     override val cause: Throwable? = null
 ): Exception()
 
-class UserAlreadyExist(
+class DuplicateUserException(
     override val message: String? = null,
-    override val cause: Throwable? = null
-): Exception()
+    override val cause: Throwable? = null,
+) : Exception()
 
 class ForbiddenException(
     override val message: String? = null,

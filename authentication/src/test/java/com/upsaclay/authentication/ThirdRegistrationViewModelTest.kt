@@ -1,7 +1,7 @@
 package com.upsaclay.authentication
 
 import com.upsaclay.authentication.domain.repository.AuthenticationRepository
-import com.upsaclay.authentication.presentation.viewmodels.ThirdRegistrationViewModel
+import com.upsaclay.authentication.presentation.registration.third.ThirdRegistrationViewModel
 import com.upsaclay.common.domain.repository.UserRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -14,6 +14,7 @@ import kotlinx.coroutines.test.setMain
 import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ThirdRegistrationViewModelTest {
@@ -25,18 +26,15 @@ class ThirdRegistrationViewModelTest {
     private val testDispatcher = UnconfinedTestDispatcher()
     private val firstName = "John"
     private val lastName = "Doe"
+    private val schoolLevel = "Bachelor"
     private val email = "email@example.com"
     private val password = "password1234"
-    private val schoolLevel = "GED 2"
 
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
 
         thirdRegistrationViewModel = ThirdRegistrationViewModel(
-            firstName = firstName,
-            lastName = lastName,
-            schoolLevel = schoolLevel,
             authenticationRepository = authenticationRepository,
             userRepository = userRepository
         )
@@ -47,114 +45,85 @@ class ThirdRegistrationViewModelTest {
     }
 
     @Test
-    fun default_values_are_correct() {
+    fun onEmailChange_should_update_email() {
+        // When
+        thirdRegistrationViewModel.onEmailChange(email)
+
         // Then
-        assertEquals("", thirdRegistrationViewModel.email)
-        assertEquals("", thirdRegistrationViewModel.password)
+        assertEquals(email, thirdRegistrationViewModel.uiState.value.email)
     }
 
     @Test
-    fun updateEmail_should_update_email() {
+    fun onPasswordChange_should_update_password() {
         // When
-        thirdRegistrationViewModel.updateEmail(email)
+        thirdRegistrationViewModel.onPasswordChange(password)
 
         // Then
-        assertEquals(email, thirdRegistrationViewModel.email)
-    }
-
-    @Test
-    fun updatePassword_should_update_password() {
-        // When
-        thirdRegistrationViewModel.updatePassword(password)
-
-        // Then
-        assertEquals(password, thirdRegistrationViewModel.password)
+        assertEquals(password, thirdRegistrationViewModel.uiState.value.password)
     }
 
     @Test
     fun register_should_register_user() = runTest {
         // Given
-        thirdRegistrationViewModel.updateEmail(email)
-        thirdRegistrationViewModel.updatePassword(password)
+        thirdRegistrationViewModel.onEmailChange(email)
+        thirdRegistrationViewModel.onPasswordChange(password)
 
         // When
-        thirdRegistrationViewModel.register()
+        thirdRegistrationViewModel.register(firstName, lastName, schoolLevel)
 
         // Then
         coVerify { authenticationRepository.registerWithEmailAndPassword(email, password) }
     }
 
     @Test
-    fun register_should_create_user() = runTest {
+    fun register_should_set_email_error_when_email_is_empty() {
+        // Given
+        thirdRegistrationViewModel.onEmailChange("")
+        thirdRegistrationViewModel.onPasswordChange(password)
+
         // When
-        thirdRegistrationViewModel.register()
+        thirdRegistrationViewModel.register(firstName, lastName, schoolLevel)
 
         // Then
-        coVerify { userRepository.createUser(any()) }
+        assertNotNull(thirdRegistrationViewModel.uiState.value.email)
     }
 
     @Test
-    fun validateCredentialInputs_should_return_true_when_email_and_password_are_not_empty() {
+    fun register_should_set_email_error_when_email_format_is_incorrect() {
         // Given
-        thirdRegistrationViewModel.updateEmail(email)
-        thirdRegistrationViewModel.updatePassword(password)
+        thirdRegistrationViewModel.onEmailChange("email")
+        thirdRegistrationViewModel.onPasswordChange(password)
 
         // When
-        val result = thirdRegistrationViewModel.validateCredentialInputs()
+        thirdRegistrationViewModel.register(firstName, lastName, schoolLevel)
 
         // Then
-        assertEquals(true, result)
+        assertNotNull(thirdRegistrationViewModel.uiState.value.email)
     }
 
     @Test
-    fun validateCredentialInputs_should_return_false_when_email_is_empty() {
+    fun register_should_set_password_error_when_password_is_empty() {
         // Given
-        thirdRegistrationViewModel.updateEmail("")
-        thirdRegistrationViewModel.updatePassword(password)
+        thirdRegistrationViewModel.onEmailChange(email)
+        thirdRegistrationViewModel.onPasswordChange("")
 
         // When
-        val result = thirdRegistrationViewModel.validateCredentialInputs()
+        thirdRegistrationViewModel.register(firstName, lastName, schoolLevel)
 
         // Then
-        assertEquals(false, result)
+        assertNotNull(thirdRegistrationViewModel.uiState.value.password)
     }
 
     @Test
-    fun validateCredentialInputs_should_return_false_when_email_format_is_incorrect() {
+    fun validateInputs_should_return_false_when_password_length_is_shorter_than_8() {
         // Given
-        thirdRegistrationViewModel.updateEmail("email")
-        thirdRegistrationViewModel.updatePassword(password)
+        thirdRegistrationViewModel.onEmailChange(email)
+        thirdRegistrationViewModel.onPasswordChange("pass")
 
         // When
-        val result = thirdRegistrationViewModel.validateCredentialInputs()
+        thirdRegistrationViewModel.register(firstName, lastName, schoolLevel)
 
         // Then
-        assertEquals(false, result)
-    }
-
-    @Test
-    fun validateCredentialInputs_should_return_false_when_password_is_empty() {
-        // Given
-        thirdRegistrationViewModel.updateEmail(email)
-        thirdRegistrationViewModel.updatePassword("")
-
-        // When
-        val result = thirdRegistrationViewModel.validateCredentialInputs()
-
-        // Then
-        assertEquals(false, result)
-    }
-
-    @Test
-    fun validateCredentialInputs_should_return_false_when_password_length_is_shorter_than_8() {
-        // Given
-        thirdRegistrationViewModel.updateEmail(email)
-        thirdRegistrationViewModel.updatePassword("pass")
-
-        // When
-        val result = thirdRegistrationViewModel.validateCredentialInputs()
-
-        // Then
-        assertEquals(false, result)
+        assertNotNull(thirdRegistrationViewModel.uiState.value.password)
     }
 }

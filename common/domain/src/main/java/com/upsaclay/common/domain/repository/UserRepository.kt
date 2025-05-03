@@ -5,7 +5,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 interface UserRepository {
-    val currentUser: StateFlow<User?>
+    val user: Flow<User?>
+    val currentUser: User?
 
     suspend fun getUsers(): List<User>
 
@@ -17,15 +18,13 @@ interface UserRepository {
 
     suspend fun getUserWithEmail(userEmail: String): User?
 
-    suspend fun getFilteredUsers(userName: String): List<User>
-
     suspend fun createUser(user: User)
 
     suspend fun setCurrentUser(user: User)
 
     suspend fun deleteCurrentUser()
 
-    suspend fun updateProfilePictureUrl(userId: String, profilePictureUrl: String)
+    suspend fun updateProfilePictureFileName(userId: String, fileName: String)
 
     suspend fun deleteProfilePictureUrl(userId: String)
 

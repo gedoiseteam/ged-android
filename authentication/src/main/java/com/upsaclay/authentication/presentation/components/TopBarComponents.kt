@@ -3,6 +3,7 @@ package com.upsaclay.authentication.presentation.components
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -14,6 +15,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -23,19 +25,17 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.upsaclay.authentication.R
 import com.upsaclay.common.presentation.theme.GedoiseTheme
-import com.upsaclay.common.presentation.theme.spacing
+import com.upsaclay.common.utils.Phones
+import com.upsaclay.common.utils.mediumPadding
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun RegistrationScaffold(
-    navController: NavController,
-    onBackClick: () -> Unit = { navController.popBackStack() },
+    onBackClick: () -> Unit,
     snackbarHostState: SnackbarHostState? = null,
-    content: @Composable BoxScope.() -> Unit
+    content: @Composable (PaddingValues) -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -56,31 +56,19 @@ internal fun RegistrationScaffold(
                             )
                         )
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                   containerColor = MaterialTheme.colorScheme.background
-                )
+                }
             )
         },
         snackbarHost = {
             snackbarHostState?.let {
-                SnackbarHost(it) {
-                    Snackbar(it)
+                SnackbarHost(it) { data ->
+                    Snackbar(data)
                 }
             }
         }
-    ) {
-        Box(
-            modifier = Modifier
-                .padding(
-                    top = it.calculateTopPadding(),
-                    bottom = MaterialTheme.spacing.medium,
-                    start = MaterialTheme.spacing.medium,
-                    end = MaterialTheme.spacing.medium
-                )
-                .fillMaxSize()
-        ) {
-            content()
+    ) { paddingsValues ->
+        Surface {
+            content(paddingsValues)
         }
     }
 }
@@ -91,10 +79,16 @@ internal fun RegistrationScaffold(
  =====================================================================
  */
 
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Phones
 @Composable
-internal fun RegistrationTopBarPreview() {
+private fun RegistrationScaffoldPreview() {
     GedoiseTheme {
-        RegistrationScaffold(navController = rememberNavController()) {}
+        RegistrationScaffold(onBackClick = {}) {
+            Text(
+                text = stringResource(id = R.string.registration),
+                modifier = Modifier.fillMaxSize(),
+                fontWeight = FontWeight.Bold
+            )
+        }
     }
 }

@@ -19,7 +19,7 @@ import androidx.core.app.Person
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.drawable.IconCompat
 import com.upsaclay.common.R
-import com.upsaclay.common.domain.entity.SharedEvent
+import com.upsaclay.common.domain.entity.SystemEvent
 import com.upsaclay.common.domain.entity.User
 import com.upsaclay.common.domain.repository.ImageRepository
 import com.upsaclay.common.domain.usecase.ConvertDateUseCase
@@ -30,7 +30,7 @@ import com.upsaclay.message.domain.ConversationMapper
 import com.upsaclay.message.domain.entity.Conversation
 import com.upsaclay.message.domain.entity.ConversationMessage
 import com.upsaclay.message.domain.entity.Message
-import com.upsaclay.message.domain.entity.MessageScreenRoute
+import com.upsaclay.message.presentation.chat.ChatRoute
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -77,25 +77,28 @@ class NotificationPresenter(
 
     private fun listenSystemEvents() {
         scope.launch {
-            sharedEventsUseCase.sharedEvents.collect { event ->
+            sharedEventsUseCase.systemEvents.collect { event ->
                 when (event) {
-                    is SharedEvent.ClearNotifications -> clearNotifications(event.notificationGroupId)
+                    is SystemEvent.ClearNotifications -> clearNotifications(event.notificationGroupId)
                 }
             }
         }
     }
 
-    private fun clearNotifications(conversationId: String) {
+    private fun clearNotifications(notificationGroupId: String) {
         notificationManager.activeNotifications.filter {
-            it.groupKey == conversationId
+            it.groupKey == notificationGroupId
         }.forEach {
             notificationManager.cancel(it.id)
         }
     }
 
     private fun isCurrentMessageScreen(conversationId: Int): Boolean {
-        val messageScreen = screenRepository.currentScreenRoute as? MessageScreenRoute.Chat
-        return messageScreen?.conversation?.id == conversationId
+        val messageScreen = screenRepository.currentRoute as? ChatRoute
+        return messageScreen
+            ?.conversationJson
+            ?.let { ConversationMapper.conversationFromJson(it) }
+            ?.id == conversationId
     }
 
     private fun createMessageNotificationChannel() {
@@ -138,7 +141,7 @@ class NotificationPresenter(
 
         return PendingIntent.getActivity(
             context,
-            GenerateIdUseCase.asInt(),
+            GenerateIdUseCase.intId,
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )

@@ -6,7 +6,7 @@ import com.upsaclay.common.domain.usecase.DeleteProfilePictureUseCase
 import com.upsaclay.common.domain.usecase.UpdateProfilePictureUseCase
 import com.upsaclay.common.domain.userFixture
 import com.upsaclay.gedoise.domain.entities.AccountScreenState
-import com.upsaclay.gedoise.presentation.viewmodels.AccountViewModel
+import com.upsaclay.gedoise.presentation.profile.account.AccountViewModel
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -29,13 +29,14 @@ class AccountViewModelTest {
 
     private lateinit var accountViewModel: AccountViewModel
     private val testDispatcher = UnconfinedTestDispatcher()
+    private val uri: Uri = mockk()
 
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
 
-        every { userRepository.currentUser } returns MutableStateFlow(userFixture)
-        coEvery { updateProfilePictureUseCase(any()) } returns Unit
+        every { userRepository.user } returns MutableStateFlow(userFixture)
+        coEvery { updateProfilePictureUseCase(any(), any()) } returns Unit
         coEvery { deleteProfilePictureUseCase(any(), any()) } returns Unit
 
         accountViewModel = AccountViewModel(
@@ -46,69 +47,59 @@ class AccountViewModelTest {
     }
 
     @Test
-    fun default_values_are_correct() {
-        // Then
-        assertEquals(null, accountViewModel.profilePictureUri)
-        assertEquals(userFixture, accountViewModel.currentUser.value)
-        assertEquals(AccountScreenState.READ, accountViewModel.screenState.value)
-    }
-
-    @Test
-    fun updateProfilePictureUri_should_update_profilePictureUri() {
-        // Given
-        val uri = mockk<Uri>()
-
+    fun onProfilePictureUriChange_should_update_profile_picture_uri() {
         // When
-        accountViewModel.updateProfilePictureUri(uri)
+        accountViewModel.onProfilePictureUriChange(uri)
 
         // Then
-        assert(accountViewModel.profilePictureUri == uri)
+        assert(accountViewModel.uiState.value.profilePictureUri == uri)
     }
 
     @Test
-    fun updateAccountScreenState_should_update_screen_state() {
+    fun onScreenStateChange_should_update_screen_state() {
         // Given
         val screenState = AccountScreenState.EDIT
 
         // When
-        accountViewModel.updateScreenState(screenState)
+        accountViewModel.onScreenStateChange(screenState)
 
         // Then
-        assertEquals(screenState, accountViewModel.screenState.value)
+        assertEquals(screenState, accountViewModel.uiState.value.screenState)
     }
 
     @Test
     fun resetProfilePictureUri_should_reset_profilePictureUri() {
+        // Given
+        accountViewModel.onProfilePictureUriChange(uri)
+
         // When
         accountViewModel.resetProfilePictureUri()
 
         // Then
-        assert(accountViewModel.profilePictureUri == null)
+        assert(accountViewModel.uiState.value.profilePictureUri == null)
     }
 
     @Test
     fun updateUserProfilePicture_should_update_profile_picture_when_uri_is_not_null() = runTest {
         // Given
-        val uri = mockk<Uri>()
-        accountViewModel.updateProfilePictureUri(uri)
+        accountViewModel.onProfilePictureUriChange(uri)
 
         // When
-        accountViewModel.updateUserProfilePicture()
+        accountViewModel.updateProfilePicture()
 
         // Then
-        coVerify { updateProfilePictureUseCase(any()) }
+        coVerify { updateProfilePictureUseCase(any(), any()) }
     }
 
     @Test
-    fun deleteUserProfilePicture_should_reset_profile_picture_uri() = runTest {
+    fun deleteProfilePicture_should_reset_profile_picture_uri() = runTest {
         // Given
-        val uri = mockk<Uri>()
-        accountViewModel.updateProfilePictureUri(uri)
+        accountViewModel.onProfilePictureUriChange(uri)
 
         // When
-        accountViewModel.deleteUserProfilePicture()
+        accountViewModel.deleteProfilePicture()
 
         // Then
-        assertEquals(null, accountViewModel.profilePictureUri)
+        assertEquals(null, accountViewModel.uiState.value.profilePictureUri)
     }
 }

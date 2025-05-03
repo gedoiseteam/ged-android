@@ -15,10 +15,10 @@ class GenerateIdUseCaseTest {
 
     @Test
     fun generateIdUseCase_should_generate_unique_id() {
-        for (i in 0..100) {
+        for (i in 0..1000) {
             // When
-            val id1 = generateIdUseCase.asString()
-            val id2 = generateIdUseCase.asString()
+            val id1 = generateIdUseCase.stringId
+            val id2 = generateIdUseCase.stringId
 
             // Then
             assertNotEquals(id1, id2)

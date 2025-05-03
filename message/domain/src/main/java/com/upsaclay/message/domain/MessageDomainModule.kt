@@ -3,7 +3,7 @@ package com.upsaclay.message.domain
 import com.upsaclay.common.domain.e
 import com.upsaclay.message.domain.usecase.CreateConversationUseCase
 import com.upsaclay.message.domain.usecase.DeleteConversationUseCase
-import com.upsaclay.message.domain.usecase.GetFilteredUserUseCase
+import com.upsaclay.message.domain.usecase.GetUnreadMessagesUseCase
 import com.upsaclay.message.domain.usecase.ListenRemoteConversationsUseCase
 import com.upsaclay.message.domain.usecase.ListenRemoteMessagesUseCase
 import com.upsaclay.message.domain.usecase.SendMessageUseCase
@@ -30,19 +30,19 @@ val messageDomainModule = module {
 
     singleOf(::CreateConversationUseCase)
     singleOf(::DeleteConversationUseCase)
-    singleOf(::GetFilteredUserUseCase)
+    singleOf(::GetUnreadMessagesUseCase)
     singleOf(::SendMessageUseCase)
 
     single {
         ListenRemoteConversationsUseCase(
-            userConversationRepository = get(),
+            conversationRepository = get(),
             scope = get(BACKGROUND_SCOPE)
         )
     }
 
     single {
         ListenRemoteMessagesUseCase(
-            userConversationRepository = get(),
+            conversationRepository = get(),
             messageRepository = get(),
             scope = get(BACKGROUND_SCOPE)
         )

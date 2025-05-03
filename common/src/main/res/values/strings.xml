@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">La Grande Ecole du Droit</string>
+    <string name="app_name">Grande Ecole du Droit</string>
+
+    <string name="home">Accueil</string>
+    <string name="messages">Messages</string>
+    <string name="calendar">Calendrier</string>
+    <string name="forum">Forum</string>
+    <string name="profile">Profil</string>
+
+    <string name="home_icon_description">Icône pour accéder à la page d\'accueil</string>
+    <string name="calendar_icon_description">Icône pour accéder au calendrier</string>
+    <string name="forum_icon_description">Icône pour accéder au forum</string>
+    <string name="message_icon_description">Icône pour accéder à la messagerie</string>
+    <string name="profile_icon_description">Icône pour accéder au profil</string>
 
     <string name="close">Fermer</string>
     <string name="show">Voir</string>
@@ -41,9 +53,10 @@
     <string name="empty_field_error">Veuillez remplir le champ</string>
     <string name="unknown_error">Une erreur inconnue est survenue</string>
     <string name="internal_server_error">Une erreur interne au serveur est survenue</string>
-    <string name="server_communication_error">Impossible de se connecter au serveur</string>
+    <string name="server_connection_error">Impossible de se connecter au serveur</string>
     <string name="unknown_network_error">Une erreur réseau est survenue.</string>
     <string name="occurred_error">Une erreur est survenue</string>
     <string name="too_many_request_error">Vous avez effectué trop de requêtes. Veuillez réessayer dans quelques minutes.</string>
-    <string name="no_user_found">Aucun utilisateur trouvé</string>
+    <string name="user_not_found">Aucun utilisateur trouvé</string>
+    <string name="timeout_error">Le serveur a mis trop de temps à répondre. Veuillez réessayer</string>
 </resources>

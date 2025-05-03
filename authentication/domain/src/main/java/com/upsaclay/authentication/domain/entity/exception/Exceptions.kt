@@ -5,11 +5,6 @@ class InvalidCredentialsException(
     override val cause: Throwable? = null,
 ) : Exception()
 
-class UserAlreadyExistsException(
-    override val message: String? = null,
-    override val cause: Throwable? = null,
-) : Exception()
-
 class AuthUserNotFoundException(
     override val message: String? = null,
     override val cause: Throwable? = null,

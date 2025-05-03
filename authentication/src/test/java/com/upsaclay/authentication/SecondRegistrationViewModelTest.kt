@@ -1,6 +1,6 @@
 package com.upsaclay.authentication
 
-import com.upsaclay.authentication.presentation.viewmodels.SecondRegistrationViewModel
+import com.upsaclay.authentication.presentation.registration.second.SecondRegistrationViewModel
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -32,12 +32,12 @@ class SecondRegistrationViewModelTest {
     }
 
     @Test
-    fun updateSchoolLevel_should_update_schoolLevel() {
+    fun updateSchoolLevel_should_on_schoolLevelChange() {
         // Given
         val schoolLevel = "GED 2"
 
         // When
-        secondRegistrationViewModel.updateSchoolLevel(schoolLevel)
+        secondRegistrationViewModel.onSchoolLevelChange(schoolLevel)
 
         // Then
         assertEquals(schoolLevel, secondRegistrationViewModel.schoolLevel.value)

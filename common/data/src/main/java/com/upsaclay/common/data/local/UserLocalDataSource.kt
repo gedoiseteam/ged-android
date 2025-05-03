@@ -16,7 +16,7 @@ internal class UserLocalDataSource(private val userDataStore: UserDataStore) {
         userDataStore.storeCurrentUser(UserMapper.toDTO(user))
     }
 
-    suspend fun updateProfilePictureUrl(url: String) {
+    suspend fun updateProfilePictureFileName(url: String) {
         userDataStore.getCurrentUserFlow().firstOrNull()?.let { userDTO ->
             userDataStore.storeCurrentUser(userDTO.copy(userProfilePictureFileName = url))
         }

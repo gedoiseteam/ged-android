@@ -1,5 +1,6 @@
 package com.upsaclay.common.presentation.components
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -28,6 +29,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -47,19 +49,32 @@ fun OutlineTextField(
     onValueChange: (String) -> Unit,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    isError: Boolean = false,
+    @StringRes errorMessage: Int? = null,
     enabled: Boolean = true,
     readOnly: Boolean = false
 ) {
+    val errorText: (@Composable () -> Unit)? = if (errorMessage != null) {
+        {
+            Text(
+                text = stringResource(errorMessage),
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
+    } else {
+        null
+    }
+
     OutlinedTextField(
         modifier = modifier,
         value = value,
         label = { Text(text = label) },
         onValueChange = onValueChange,
         keyboardOptions = keyboardOptions,
-        isError = isError,
+        isError = errorMessage != null,
         keyboardActions = keyboardActions,
         singleLine = true,
+        supportingText = errorText,
         enabled = enabled,
         readOnly = readOnly
     )
@@ -196,7 +211,7 @@ fun TransparentFocusedTextField(
 
 @Preview(showBackground = true)
 @Composable
-private fun OutlinedInputsPreview() {
+private fun OutlinedTextFieldPreview() {
     var text by remember { mutableStateOf("") }
 
     GedoiseTheme {

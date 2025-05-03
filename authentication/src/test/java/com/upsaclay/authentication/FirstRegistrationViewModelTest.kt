@@ -1,6 +1,6 @@
 package com.upsaclay.authentication
 
-import com.upsaclay.authentication.presentation.viewmodels.FirstRegistrationViewModel
+import com.upsaclay.authentication.presentation.registration.first.FirstRegistrationViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -26,89 +26,82 @@ class FirstRegistrationViewModelTest {
     }
 
     @Test
-    fun default_values_are_correct() {
-        // Then
-        assertEquals("", firstRegistrationViewModel.firstName.value)
-        assertEquals("", firstRegistrationViewModel.lastName.value)
-    }
-
-    @Test
-    fun updateFirstName_should_update_firstName() {
+    fun onFirstNameChange_should_on_update_first_name() {
         // When
-        firstRegistrationViewModel.updateFirstName(firstName)
+        firstRegistrationViewModel.onFirstNameChange(firstName)
 
         // Then
-        assertEquals(firstName, firstRegistrationViewModel.firstName.value)
+        assertEquals(firstName, firstRegistrationViewModel.uiState.value.firstName)
     }
 
     @Test
-    fun updateLastName_should_update_lastName() {
+    fun onLastNameChange_should_on_update_last_Name() {
         // When
-        firstRegistrationViewModel.updateLastName(lastName)
+        firstRegistrationViewModel.onLastNameChange(lastName)
 
         // Then
-        assertEquals(lastName, firstRegistrationViewModel.lastName.value)
+        assertEquals(lastName, firstRegistrationViewModel.uiState.value.lastName)
     }
 
     @Test
-    fun verifyNamesInputs_should_return_true_when_names_are_not_empty() {
+    fun validateInputs_should_return_true_when_not_empty() {
         // Given
-        firstRegistrationViewModel.updateFirstName(firstName)
-        firstRegistrationViewModel.updateLastName(lastName)
+        firstRegistrationViewModel.onFirstNameChange(firstName)
+        firstRegistrationViewModel.onLastNameChange(lastName)
 
         // When
-        val result = firstRegistrationViewModel.verifyNamesInputs()
+        val result = firstRegistrationViewModel.validateInputs()
 
         // Then
         assertEquals(true, result)
     }
 
     @Test
-    fun verifyNamesInputs_should_return_false_when_names_are_empty() {
+    fun validateInputs_should_return_false_when_empty() {
         // When
-        val result = firstRegistrationViewModel.verifyNamesInputs()
+        val result = firstRegistrationViewModel.validateInputs()
 
         // Then
         assertEquals(false, result)
     }
 
     @Test
-    fun verifyNamesInputs_should_return_false_when_names_are_blank() {
+    fun validateInputs_should_return_false_when_blank() {
         // Given
-        firstRegistrationViewModel.updateFirstName("  ")
-        firstRegistrationViewModel.updateLastName("")
+        firstRegistrationViewModel.onFirstNameChange("  ")
+        firstRegistrationViewModel.onLastNameChange("")
 
         // When
-        val result = firstRegistrationViewModel.verifyNamesInputs()
+        val result = firstRegistrationViewModel.validateInputs()
 
         // Then
         assertFalse(result)
     }
 
     @Test
-    fun verifyNamesInputs_should_return_true_when_names_are_not_blank() {
+    fun validateInputs_should_return_true_when_not_blank() {
         // Given
-        firstRegistrationViewModel.updateFirstName("  John  ")
-        firstRegistrationViewModel.updateLastName("  Doe  ")
+        firstRegistrationViewModel.onFirstNameChange("  John  ")
+        firstRegistrationViewModel.onLastNameChange("  Doe  ")
 
         // When
-        val result = firstRegistrationViewModel.verifyNamesInputs()
+        val result = firstRegistrationViewModel.validateInputs()
 
         // Then
         assertEquals(true, result)
     }
 
     @Test
-    fun correctNamesInputs_should_trim_and_uppercase_names() {
+    fun validateInputs_should_trim_and_uppercase_names() {
         // Given
-        firstRegistrationViewModel.updateFirstName("john ")
-        firstRegistrationViewModel.updateLastName(" doe")
+        firstRegistrationViewModel.onFirstNameChange("john ")
+        firstRegistrationViewModel.onLastNameChange(" doe")
 
         // When
-        firstRegistrationViewModel.correctNamesInputs()
+        firstRegistrationViewModel.validateInputs()
 
         // Then
-        assertEquals(firstName, firstRegistrationViewModel.firstName.value)
-        assertEquals(lastName, firstRegistrationViewModel.lastName.value)
+        assertEquals(firstName, firstRegistrationViewModel.uiState.value.firstName)
+        assertEquals(lastName, firstRegistrationViewModel.uiState.value.lastName)
     }
 }

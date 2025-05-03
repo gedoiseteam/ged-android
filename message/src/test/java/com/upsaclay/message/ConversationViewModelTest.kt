@@ -1,12 +1,12 @@
 package com.upsaclay.message
 
-import androidx.paging.PagingData
+import com.upsaclay.message.domain.conversationFixture
 import com.upsaclay.message.domain.conversationUIFixture
 import com.upsaclay.message.domain.conversationsMessageFixture
-import com.upsaclay.message.domain.conversationsUIFixture
-import com.upsaclay.message.domain.repository.UserConversationRepository
+import com.upsaclay.message.domain.repository.ConversationMessageRepository
+import com.upsaclay.message.domain.repository.ConversationRepository
 import com.upsaclay.message.domain.usecase.DeleteConversationUseCase
-import com.upsaclay.message.presentation.viewmodels.ConversationViewModel
+import com.upsaclay.message.presentation.conversation.ConversationViewModel
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -22,7 +22,7 @@ import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ConversationViewModelTest {
-    private val userConversationRepository: UserConversationRepository = mockk()
+    private val conversationMessageRepository: ConversationMessageRepository = mockk()
     private val deleteConversationUseCase: DeleteConversationUseCase = mockk()
 
     private lateinit var conversationViewModel: ConversationViewModel
@@ -32,11 +32,10 @@ class ConversationViewModelTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
 
-        every { userConversationRepository.conversationsMessage } returns flowOf(conversationsMessageFixture)
         coEvery { deleteConversationUseCase(any()) } returns Unit
 
         conversationViewModel = ConversationViewModel(
-            userConversationRepository = userConversationRepository,
+            conversationMessageRepository = conversationMessageRepository,
             deleteConversationUseCase = deleteConversationUseCase
         )
     }
@@ -44,7 +43,7 @@ class ConversationViewModelTest {
     @Test
     fun deleteConversation_delete_conversation() = runTest {
         // Given
-        val conversation = conversationUIFixture
+        val conversation = conversationFixture
 
         // When
         conversationViewModel.deleteConversation(conversation)

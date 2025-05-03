@@ -2,20 +2,39 @@ package com.upsaclay.common.data.repository
 
 import android.graphics.Bitmap
 import com.upsaclay.common.data.remote.ImageRemoteDataSource
+import com.upsaclay.common.domain.e
 import com.upsaclay.common.domain.repository.ImageRepository
 import java.io.File
-
+import java.io.IOException
+import java.net.ConnectException
 
 internal class ImageRepositoryImpl(
     private val imageRemoteDataSource: ImageRemoteDataSource
 ): ImageRepository {
-    override suspend fun getImage(fileName: String): Bitmap? = imageRemoteDataSource.getImage(fileName)
+    override suspend fun getImage(fileName: String): Bitmap? {
+        return try {
+            imageRemoteDataSource.getImage(fileName)
+        } catch (e: Exception) {
+            e("Unexpected error: ${e.message}", e)
+            throw e
+        }
+    }
 
     override suspend fun uploadImage(file: File) {
-        imageRemoteDataSource.uploadImage(file)
+        try {
+            imageRemoteDataSource.uploadImage(file)
+        } catch (e: Exception) {
+            e("Error uploading image: ${e.message}", e)
+            throw e
+        }
     }
 
     override suspend fun deleteImage(fileName: String) {
-        imageRemoteDataSource.deleteImage(fileName)
+        try {
+            imageRemoteDataSource.deleteImage(fileName)
+        } catch (e: Exception) {
+            e("Error deleting image: ${e.message}", e)
+            throw e
+        }
     }
 }

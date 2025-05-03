@@ -47,7 +47,6 @@ internal val onBackgroundDark = white
 internal val outlineDark = Color(0xFF8F9299)
 internal val outlineVariantDark = Color(0xFFC4C8D0)
 
-
 val ColorScheme.black: Color
     @Composable
     get() = com.upsaclay.common.presentation.theme.black
@@ -91,3 +90,7 @@ val ColorScheme.overlay: Color
 val ColorScheme.profilePictureError: Color
     @Composable
     get() = if (isSystemInDarkTheme()) Color(0xFF323232) else Color(0xFFE6E6E6)
+
+val ColorScheme.hintText: Color
+    @Composable
+    get() = if (isSystemInDarkTheme()) Color(0xFF929298) else Color(0xFF8C8C8C)

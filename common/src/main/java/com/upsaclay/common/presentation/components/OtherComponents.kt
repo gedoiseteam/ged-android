@@ -107,7 +107,7 @@ private fun ClickableMenuItemPreview() {
                 text = { Text(text = "Item") },
                 icon = {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_person),
+                        painter = painterResource(id = R.drawable.ic_fill_person),
                         contentDescription = null
                     )
                 },

@@ -8,13 +8,9 @@ class DataIntegrityViolationException(
     override val cause: Throwable? = null
 ): Exception()
 
-fun parseOracleException(serverResponse: ServerResponse?): Exception {
-    if (serverResponse == null) {
-        return InternalServerException()
-    }
-
-    return when (serverResponse.code) {
+fun parseOracleException(code: String?, message: String?): Exception {
+    return when (code) {
         "ORA-12801" -> DataIntegrityViolationException()
-        else -> InternalServerException()
+        else -> InternalServerException(message)
     }
 }

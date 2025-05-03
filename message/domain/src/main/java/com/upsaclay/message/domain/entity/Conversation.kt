@@ -1,11 +1,15 @@
 package com.upsaclay.message.domain.entity
 
+import com.upsaclay.common.domain.LocalDateTimeSerializer
 import com.upsaclay.common.domain.entity.User
+import kotlinx.serialization.Serializable
 import java.time.LocalDateTime
 
+@Serializable
 data class Conversation(
     val id: Int,
     val interlocutor: User,
+    @Serializable(with = LocalDateTimeSerializer::class)
     val createdAt: LocalDateTime,
     val state: ConversationState
 ) {
@@ -25,4 +29,11 @@ data class Conversation(
         result = 31 * result + state.hashCode()
         return result
     }
+}
+
+enum class ConversationState {
+    DEFAULT,
+    LOADING,
+    CREATED,
+    NOT_CREATED
 }

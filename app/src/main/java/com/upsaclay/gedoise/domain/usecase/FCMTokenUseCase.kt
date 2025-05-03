@@ -34,7 +34,7 @@ class FCMTokenUseCase(
                    when {
                        isAuthenticated -> {
                            credentialsRepository.getUnsentFcmToken()?.let { fcmToken ->
-                               val userId = fcmToken.userId ?: userRepository.currentUser.filterNotNull().first().id
+                               val userId = fcmToken.userId ?: userRepository.user.filterNotNull().first().id
                                sendFcmToken(fcmToken.copy(userId = userId))
                            }
                        }

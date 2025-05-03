@@ -7,6 +7,7 @@ import com.upsaclay.common.data.remote.api.UserFirestoreApi
 import com.upsaclay.common.data.remote.api.UserRetrofitApi
 import com.upsaclay.common.domain.e
 import com.upsaclay.common.domain.entity.ForbiddenException
+import com.upsaclay.common.domain.entity.InternalServerException
 import com.upsaclay.common.domain.entity.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -22,25 +23,22 @@ internal class UserRemoteDataSource(
     private val userFirestoreApi: UserFirestoreApi
 ) {
     suspend fun getUser(userId: String): User? = withContext(Dispatchers.IO) {
-        userFirestoreApi.getUser(userId)?.let { UserMapper.toDomain(it) }
+        userFirestoreApi.getUser(userId)
+            ?.let(UserMapper::toDomain)
     }
 
     suspend fun getUserFlow(userId: String): Flow<User> = withContext(Dispatchers.IO) {
         userFirestoreApi.getUserFlow(userId)
-            .catch { e("Error while getting user with firestore : $it", it) }
-            .mapNotNull { it?.let { UserMapper.toDomain(it) } }
+            .mapNotNull { it?.let(UserMapper::toDomain) }
     }
 
     suspend fun getUserFirestoreWithEmail(userEmail: String): User? = withContext(Dispatchers.IO) {
-        userFirestoreApi.getUserWithEmail(userEmail)?.let { UserMapper.toDomain(it) }
+        userFirestoreApi.getUserWithEmail(userEmail)
+            ?.let(UserMapper::toDomain)
     }
 
     suspend fun getUsers(): List<User> = withContext(Dispatchers.IO) {
         userFirestoreApi.getUsers().map(UserMapper::toDomain)
-    }
-
-    suspend fun getFilteredUsers(userName: String): List<User> = withContext(Dispatchers.IO) {
-        userFirestoreApi.getFilteredUsers(userName).map(UserMapper::toDomain)
     }
 
     suspend fun createUser(user: User) {
@@ -58,23 +56,21 @@ internal class UserRemoteDataSource(
                 if (!response.isSuccessful) {
                     val errorMessage = formatHttpError("Error updating profile picture file name", response)
                     e(errorMessage)
-                    throw IOException(errorMessage)
+                    throw InternalServerException(errorMessage)
                 }
-            }
+            }.join()
         }
     }
 
     suspend fun deleteProfilePictureUrl(userId: String) {
         withContext(Dispatchers.IO) {
-            launch { userFirestoreApi.updateProfilePictureFileName(userId, null) }
-            launch {
-                val response = userRetrofitApi.deleteProfilePictureFileName(userId)
-                if (!response.isSuccessful) {
-                    val errorMessage = formatHttpError("Error deleting profile picture file name", response)
-                    e(errorMessage)
-                    throw IOException(errorMessage)
-                }
+            val response = userRetrofitApi.deleteProfilePictureFileName(userId)
+            if (!response.isSuccessful) {
+                val errorMessage = formatHttpError("Error deleting profile picture file name", response)
+                e(errorMessage)
+                throw InternalServerException(errorMessage)
             }
+            launch { userFirestoreApi.updateProfilePictureFileName(userId, null) }
         }
     }
 
@@ -89,7 +85,7 @@ internal class UserRemoteDataSource(
             if (response.code() == HttpURLConnection.HTTP_FORBIDDEN) {
                 throw ForbiddenException(errorMessage)
             }
-            throw parseOracleException(response.body())
+            throw parseOracleException(response.body()?.code, errorMessage)
         }
     }
 
