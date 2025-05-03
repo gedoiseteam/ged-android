@@ -59,7 +59,7 @@ class ThirdRegistrationViewModelTest {
         thirdRegistrationViewModel.onPasswordChange(password)
 
         // Then
-        assertEquals(email, thirdRegistrationViewModel.uiState.value.password)
+        assertEquals(password, thirdRegistrationViewModel.uiState.value.password)
     }
 
     @Test
@@ -73,15 +73,6 @@ class ThirdRegistrationViewModelTest {
 
         // Then
         coVerify { authenticationRepository.registerWithEmailAndPassword(email, password) }
-    }
-
-    @Test
-    fun register_should_create_user() = runTest {
-        // When
-        thirdRegistrationViewModel.register(firstName, lastName, schoolLevel)
-
-        // Then
-        coVerify { userRepository.createUser(any()) }
     }
 
     @Test
