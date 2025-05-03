@@ -1,5 +1,6 @@
 package com.upsaclay.message.domain
 
+import com.upsaclay.message.domain.repository.ConversationMessageRepository
 import com.upsaclay.message.domain.repository.MessageRepository
 import com.upsaclay.message.domain.repository.ConversationRepository
 import com.upsaclay.message.domain.usecase.CreateConversationUseCase
@@ -22,6 +23,7 @@ import kotlin.test.assertFalse
 class MessageUseCaseTest {
     private val messageRepository: MessageRepository = mockk()
     private val conversationRepository: ConversationRepository = mockk()
+    private val conversationMessageRepository: ConversationMessageRepository = mockk()
 
     private lateinit var createConversationUseCase: CreateConversationUseCase
     private lateinit var deleteConversationUseCase: DeleteConversationUseCase
@@ -32,6 +34,21 @@ class MessageUseCaseTest {
 
     @Before
     fun setUp() {
+        coEvery { conversationMessageRepository.conversationsMessage } returns flowOf(conversationsMessageFixture)
+        coEvery { conversationRepository.conversations } returns flowOf(conversationsFixture)
+        coEvery { conversationRepository.getConversationFromLocal(any()) } returns conversationFixture
+        coEvery { conversationRepository.createConversation(any()) } returns Unit
+        coEvery { conversationRepository.deleteConversation(any()) } returns Unit
+        coEvery { conversationRepository.deleteLocalConversations() } returns Unit
+        coEvery { conversationRepository.upsertLocalConversation(any()) } returns Unit
+        coEvery { conversationRepository.getRemoteConversations() } returns flowOf(conversationFixture)
+        coEvery { messageRepository.listenRemoteMessages(any()) } returns Unit
+        coEvery { messageRepository.addMessage(any()) } returns Unit
+        coEvery { messageRepository.updateMessage(any()) } returns Unit
+        coEvery { messageRepository.upsertMessage(any()) } returns Unit
+        coEvery { messageRepository.deleteLocalMessages() } returns Unit
+        coEvery { messageRepository.deleteMessages(any()) } returns Unit
+
         createConversationUseCase = CreateConversationUseCase(conversationRepository = conversationRepository)
         deleteConversationUseCase = DeleteConversationUseCase(
             conversationRepository = conversationRepository,
@@ -46,20 +63,6 @@ class MessageUseCaseTest {
             messageRepository = messageRepository,
             scope = testScope
         )
-
-        coEvery { conversationRepository.conversationsMessage } returns flowOf(conversationsMessageFixture)
-        coEvery { conversationRepository.conversations } returns flowOf(conversationsFixture)
-        coEvery { conversationRepository.getConversationFromLocal(any()) } returns conversationFixture
-        coEvery { conversationRepository.createConversation(any()) } returns Unit
-        coEvery { conversationRepository.deleteConversation(any()) } returns Unit
-        coEvery { conversationRepository.deleteLocalConversations() } returns Unit
-        coEvery { conversationRepository.getRemoteConversations() } returns Unit
-        coEvery { messageRepository.listenRemoteMessages(any()) } returns Unit
-        coEvery { messageRepository.addMessage(any()) } returns Unit
-        coEvery { messageRepository.updateMessage(any()) } returns Unit
-        coEvery { messageRepository.upsertMessage(any()) } returns Unit
-        coEvery { messageRepository.deleteLocalMessages() } returns Unit
-        coEvery { messageRepository.deleteMessages(any()) } returns Unit
     }
 
     @Test
@@ -73,15 +76,12 @@ class MessageUseCaseTest {
 
     @Test
     fun deleteConversationUseCase_should_delete_conversation() = runTest {
-        // Given
-        val conversation = conversationUIFixture
-
         // When
-        deleteConversationUseCase(conversation)
+        deleteConversationUseCase(conversationFixture)
 
         // Then
-        coVerify { conversationRepository.deleteConversation(ConversationMapper.toConversation(conversation)) }
-        coVerify { messageRepository.deleteMessages(conversation.id) }
+        coVerify { conversationRepository.deleteConversation(conversationFixture) }
+        coVerify { messageRepository.deleteMessages(conversationFixture.id) }
     }
 
     @Test
