@@ -27,6 +27,7 @@ import com.upsaclay.message.domain.messagesFixture
 import com.upsaclay.message.presentation.chat.ChatViewModel.MessageEvent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -40,12 +41,15 @@ fun ChatDestination(
     }
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val newMessageEvent by viewModel.event
+        .mapNotNull { it as? MessageEvent.NewMessage }
+        .collectAsState(null)
 
     ChatScreen(
         conversation = conversation,
         messages = uiState.messages,
         text = uiState.text,
-        event = viewModel.event,
+        newMessageEvent = newMessageEvent,
         onTextChange = viewModel::onTextChanged,
         onSendMessage = viewModel::sendMessage,
         onBackClick = onBackClick
@@ -57,7 +61,7 @@ private fun ChatScreen(
     conversation: Conversation,
     messages: List<Message>,
     text: String,
-    event: Flow<MessageEvent>,
+    newMessageEvent: MessageEvent.NewMessage?,
     onTextChange: (String) -> Unit,
     onSendMessage: () -> Unit,
     onBackClick: () -> Unit
@@ -85,7 +89,7 @@ private fun ChatScreen(
                 modifier = Modifier.weight(1f),
                 messages = messages,
                 interlocutor = conversation.interlocutor,
-                newMessageEvent = event.mapNotNull { it as? MessageEvent.NewMessage }
+                newMessageEvent = newMessageEvent
             )
 
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
@@ -116,7 +120,7 @@ private fun ChatScreenPreview() {
             conversation = conversationFixture,
             messages = messagesFixture,
             text = text,
-            event = flowOf(),
+            newMessageEvent = null,
             onTextChange = { text = it },
             onSendMessage = {},
             onBackClick = {}

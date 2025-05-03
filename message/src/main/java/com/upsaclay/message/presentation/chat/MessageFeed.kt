@@ -50,7 +50,7 @@ internal fun MessageFeed(
     modifier: Modifier = Modifier,
     messages: List<Message>,
     interlocutor: User,
-    newMessageEvent: Flow<MessageEvent.NewMessage>
+    newMessageEvent: MessageEvent.NewMessage?
 ) {
     val scrollState = rememberLazyListState()
     val scope = rememberCoroutineScope()
@@ -59,8 +59,8 @@ internal fun MessageFeed(
         derivedStateOf { scrollState.firstVisibleItemIndex == 0 }
     }
 
-    LaunchedEffect(Unit) {
-        newMessageEvent.collectLatest { event ->
+    LaunchedEffect(newMessageEvent) {
+        newMessageEvent?.let { event ->
             when {
                 scrollState.firstVisibleItemIndex <= 1 &&
                         scrollState.layoutInfo.visibleItemsInfo.size < messages.size ->
@@ -173,7 +173,7 @@ private fun MessageFeedPreview() {
                     .mediumPadding(),
                 messages = messagesFixture,
                 interlocutor = conversationFixture.interlocutor,
-                newMessageEvent = flowOf()
+                newMessageEvent = null
             )
         }
     }
